@@ -107,7 +107,7 @@ def resp_charges(xyz_file):
 
     os.system('cp '+os.environ['DOCK_LIB_DIR']+'/densf.sh .')
     os.system("sed '/Inline/ r grid.dat' densf.sh > run.sh")
-    os.system("sh run.sh")
+    os.system("sh run.sh > densf_output")
     os.system('rm run.sh densf.sh')
 
     os.system(os.environ['AMSBIN']+'''/dmpkf TAPE41 SCF > grid_esp.dat''')
