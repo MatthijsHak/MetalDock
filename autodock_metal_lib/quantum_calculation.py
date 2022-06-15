@@ -72,6 +72,8 @@ def plams_single_point(xyz_file):
     s.input.adf.relativity.formalism='ZORA'
     s.input.adf.relativity.level='Scalar'
 
+    s.input.adf.Solvation.Solv = "Name=Water"
+
     #Run Job
     j = AMSJob(molecule=m, settings=s)
     result = j.run()
