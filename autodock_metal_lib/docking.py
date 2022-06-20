@@ -61,23 +61,22 @@ def prepare_receptor():
 
 def add_to_dat_file():
     dat = open('ad4_parameters_test.dat', 'a')
-    dat.write('nbp_r_eps 2.100   3.8453 12 6 OA '+iv.var.metal_symbol+'\n')
-    dat.write('nbp_r_eps 2.250   7.5914 12 6 SA '+iv.var.metal_symbol+'\n')
-    dat.write('nbp_r_eps 1.700   50.0    12 6 HD '+iv.var.metal_symbol+'\n')
-    dat.write('nbp_r_eps '+iv.var.r_nitrogen_A+'   '+iv.var.eps_nitrogen_A+' 12 6 NA '+iv.var.metal_symbol+'\n')
-    dat.write('nbp_r_eps '+iv.var.r_nitrogen+'   '+iv.var.eps_nitrogen+' 12 6  N '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+iv.var.r_OA+'   '+iv.var.e_OA+' 12 6 OA '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+iv.var.r_SA+'   '+iv.var.e_SA+' 12 6 SA '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+iv.var.r_HD+'   '+iv.var.e_HD+' 12 6 HD '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+iv.var.r_NA+'   '+iv.var.e_NA+' 12 6 NA '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+iv.var.r_N+'   '+iv.var.e_N+' 12 6  N '+iv.var.metal_symbol+'\n')
     dat.close()
 
 def create_gpf():
     os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+iv.var.name_ligand+".pdbqt  -r clean_"+iv.var.name_protein+".pdbqt -p parameter_file="+iv.var.parameter_file+" -p npts='"+iv.var.box_size+"' -p gridcenter='"+dock_x+","+dock_y+","+dock_z+"'")
     gpf = open('clean_'+iv.var.name_protein+'.gpf', 'a')
-    gpf.write('nbp_r_eps 2.100   3.8453 12 6 OA '+iv.var.metal_symbol+'\n')
-    gpf.write('nbp_r_eps 2.250   7.5914 12 6 SA '+iv.var.metal_symbol+'\n')
-    gpf.write('nbp_r_eps 1.700   0.0    12 6 HD '+iv.var.metal_symbol+'\n')
-    gpf.write('nbp_r_eps '+iv.var.r_nitrogen_A+'   '+iv.var.eps_nitrogen_A+' 12 6 NA '+iv.var.metal_symbol+'\n')
-    gpf.write('nbp_r_eps '+iv.var.r_nitrogen+'   '+iv.var.eps_nitrogen+' 12 6  N '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+iv.var.r_OA+'   '+iv.var.e_OA+' 12 6 OA '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+iv.var.r_SA+'   '+iv.var.e_SA+' 12 6 SA '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+iv.var.r_HD+'   '+iv.var.e_HD+' 12 6 HD '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+iv.var.r_NA+'   '+iv.var.e_NA+' 12 6 NA '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+iv.var.r_N+'   '+iv.var.e_N+' 12 6  N '+iv.var.metal_symbol+'\n')
     gpf.close()
-
 
 def autogrid():
     os.system(os.environ['AUTODOCK']+'/autogrid4 -p clean_'+iv.var.name_protein+'.gpf')
