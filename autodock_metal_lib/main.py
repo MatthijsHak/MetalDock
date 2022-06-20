@@ -116,7 +116,7 @@ if __name__=='__main__':
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
 
     os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") ($7 = '''+iv.var.r_Ru_Ru+''') && ($8 = '''+iv.var.e_Ru_Ru+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
-        os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
+    os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
 
 
     os.system('cp '+os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob/output.xyz .')
