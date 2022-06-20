@@ -49,10 +49,24 @@ def insert_arguments():
     parser.add_argument("-p", "--parameter_file", type=str, help="Parameter file", metavar="", required=True)
     parser.add_argument("-npts", "--box_size", type=str, help="Boxsize", metavar="", required=True)
 
-    parser.add_argument("-r_NA", "--r_nitrogen_A", type=str, help="r_nitrogen_A", metavar="", required=True)
-    parser.add_argument("-eps_NA", "--eps_nitrogen_A", type=str, help="eps_nitrogen_A", metavar="", required=True)
-    parser.add_argument("-r_N", "--r_nitrogen", type=str, help="r_nitrogen", metavar="", required=True)
-    parser.add_argument("-eps_N", "--eps_nitrogen", type=str, help="eps_nitrogen", metavar="", required=True)
+    parser.add_argument("-r_OA", "--r_OA", type=str, help="r_OA", metavar="", required=True)
+    parser.add_argument("-e_OA", "--e_OA", type=str, help="e_OA", metavar="", required=True)
+
+    parser.add_argument("-r_SA", "--r_SA", type=str, help="r_SA", metavar="", required=True)
+    parser.add_argument("-e_SA", "--e_SA", type=str, help="e_SA", metavar="", required=True)
+
+    parser.add_argument("-r_HD", "--r_HD", type=str, help="r_HD", metavar="", required=True)
+    parser.add_argument("-e_HD", "--e_HD", type=str, help="e_HD", metavar="", required=True)
+
+    parser.add_argument("-r_NA", "--r_NA", type=str, help="r_NA", metavar="", required=True)
+    parser.add_argument("-e_NA", "--e_NA", type=str, help="e_NA", metavar="", required=True)
+
+    parser.add_argument("-r_N", "--r_N", type=str, help="r_N", metavar="", required=True)
+    parser.add_argument("-e_N", "--e_N", type=str, help="e_N", metavar="", required=True)
+
+    parser.add_argument("-r_Ru_Ru", "--r_Ru_Ru", type=str, help="r_N", metavar="", required=True)
+    parser.add_argument("-e_Ru_Ru", "--e_Ru_Ru", type=str, help="e_N", metavar="", required=True)
+
 
     args = parser.parse_args()
 
@@ -65,6 +79,5 @@ def insert_arguments():
     metal_cap = args.metal_symbol.upper()
 
     global var
-    var = vc.lig_par_dock(args.reference_docking, args.dock_x, args.dock_y, args.dock_z, args.rmsd, args.pdb_file_protein, name_protein, args.xyz_file_ligand, name_ligand, args.parameter_file, args.box_size, args.metal_symbol, metal_cap, args.charge_ligand, args.spin_ligand, args.basis_set, args.gga_functional, args.hybrid_functional, args.dispersion_correction, args.r_nitrogen_A, args.eps_nitrogen_A, args.r_nitrogen, args.eps_nitrogen)
-
+    var = vc.lig_par_dock(args.reference_docking, args.dock_x, args.dock_y, args.dock_z, args.rmsd, args.pdb_file_protein, name_protein, args.xyz_file_ligand, name_ligand, args.parameter_file, args.box_size, args.metal_symbol, metal_cap, args.charge_ligand, args.spin_ligand, args.basis_set, args.gga_functional, args.hybrid_functional, args.dispersion_correction, args.r_OA, args.e_OA, args.r_SA, args.e_SA,args.r_HD, args.e_HD,args.r_NA, args.e_NA,args.r_N, args.e_N, args.r_Ru_Ru, args.e_Ru_Ru)
 

@@ -1,6 +1,6 @@
 class lig_par_dock:
 
-    def __init__(self, reference_docking, dock_x, dock_y, dock_z, rmsd, pdb_file_protein, name_protein, xyz_file_ligand, name_ligand, parameter_file, box_size,  metal_symbol, metal_cap, charge_ligand, spin_ligand,  basis_set, gga_functional, hybrid_functional, dispersion_correction, r_nitrogen_A, eps_nitrogen_A, r_nitrogen, eps_nitrogen):
+    def __init__(self, reference_docking, dock_x, dock_y, dock_z, rmsd, pdb_file_protein, name_protein, xyz_file_ligand, name_ligand, parameter_file, box_size,  metal_symbol, metal_cap, charge_ligand, spin_ligand,  basis_set, gga_functional, hybrid_functional, dispersion_correction, r_OA, e_OA, r_SA, e_SA, r_HD, e_HD, r_NA, e_NA, r_N, e_N, r_Ru_Ru, e_Ru_Ru):
 
         self.reference_docking = reference_docking
 
@@ -29,9 +29,20 @@ class lig_par_dock:
         self.hybrid_functional = hybrid_functional
         self.dispersion_correction = dispersion_correction
 
-        self.r_nitrogen_A = r_nitrogen_A
-        self.eps_nitrogen_A = eps_nitrogen_A
+        self.r_OA = r_OA
+        self.e_OA = e_OA
 
-        self.r_nitrogen = r_nitrogen
-        self.eps_nitrogen = eps_nitrogen
+        self.r_SA = r_SA
+        self.e_SA = e_SA
 
+        self.r_HD = r_HD
+        self.e_HD = e_HD
+
+        self.r_NA = r_NA
+        self.e_NA = e_NA
+
+        self.r_N = r_N
+        self.e_N = e_N
+
+        self.r_Ru_Ru = r_Ru_Ru
+        self.e_Ru_Ru = e_Ru_Ru
