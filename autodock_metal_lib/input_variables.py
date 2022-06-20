@@ -49,23 +49,23 @@ def insert_arguments():
     parser.add_argument("-p", "--parameter_file", type=str, help="Parameter file", metavar="", required=True)
     parser.add_argument("-npts", "--box_size", type=str, help="Boxsize", metavar="", required=True)
 
-    parser.add_argument("-r_OA", "--r_OA", type=str, help="r_OA", metavar="", required=True)
-    parser.add_argument("-e_OA", "--e_OA", type=str, help="e_OA", metavar="", required=True)
+    parser.add_argument("-r_OA", "--r_OA", type=str, help="r_OA", required=True)
+    parser.add_argument("-e_OA", "--e_OA", type=str, help="e_OA", required=True)
 
-    parser.add_argument("-r_SA", "--r_SA", type=str, help="r_SA", metavar="", required=True)
-    parser.add_argument("-e_SA", "--e_SA", type=str, help="e_SA", metavar="", required=True)
+    parser.add_argument("-r_SA", "--r_SA", type=str, help="r_SA", required=True)
+    parser.add_argument("-e_SA", "--e_SA", type=str, help="e_SA", required=True)
 
-    parser.add_argument("-r_HD", "--r_HD", type=str, help="r_HD", metavar="", required=True)
-    parser.add_argument("-e_HD", "--e_HD", type=str, help="e_HD", metavar="", required=True)
+    parser.add_argument("-r_HD", "--r_HD", type=str, help="r_HD", required=True)
+    parser.add_argument("-e_HD", "--e_HD", type=str, help="e_HD", required=True)
 
-    parser.add_argument("-r_NA", "--r_NA", type=str, help="r_NA", metavar="", required=True)
-    parser.add_argument("-e_NA", "--e_NA", type=str, help="e_NA", metavar="", required=True)
+    parser.add_argument("-r_NA", "--r_NA", type=str, help="r_NA", required=True)
+    parser.add_argument("-e_NA", "--e_NA", type=str, help="e_NA", required=True)
 
-    parser.add_argument("-r_N", "--r_N", type=str, help="r_N", metavar="", required=True)
-    parser.add_argument("-e_N", "--e_N", type=str, help="e_N", metavar="", required=True)
+    parser.add_argument("-r_N", "--r_N", type=str, help="r_N", required=True)
+    parser.add_argument("-e_N", "--e_N", type=str, help="e_N", required=True)
 
-    parser.add_argument("-r_Ru_Ru", "--r_Ru_Ru", type=str, help="r_N", metavar="", required=True)
-    parser.add_argument("-e_Ru_Ru", "--e_Ru_Ru", type=str, help="e_N", metavar="", required=True)
+    parser.add_argument("-r_Ru_Ru", "--r_Ru_Ru", type=str, help="r_N", required=True)
+    parser.add_argument("-e_Ru_Ru", "--e_Ru_Ru", type=str, help="e_N", required=True)
 
 
     args = parser.parse_args()
