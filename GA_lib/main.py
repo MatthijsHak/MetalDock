@@ -146,8 +146,11 @@ def fitness_func(solution, solution_idx):
                 generation_avg: takes the average of the RMSD of the poses of each protein and averages once more
                 generation_min_avg: takes the minimum of the RMSD of the poses of each protein and averages
     """
+    if len(dir_list) > 1:
+            generation_avg = (sum(generation_avg_list) / len(generation_avg_list))
+            generation_min_avg= (sum(generation_min_avg_list) / len(generation_min_avg_list))
 
-    method = avg_output
+    method = generation_avg
 
     fitness = 1 / np.abs(method - desired_output)
 
@@ -155,14 +158,12 @@ def fitness_func(solution, solution_idx):
 
     if parent <= sol_per_pop:
         if len(dir_list) > 1:
-            generation_avg = (sum(generation_avg_list) / len(generation_avg_list))
-            generation_min_avg= (sum(generation_min_avg_list) / len(generation_min_avg_list))
             print(f"The average RMSD of all proteins in parameter set {parent} in genration {generation}: {generation_avg:.4}")
             print(f"The average RMSD of the lowest conformation of each ligand in parameter set {parent} in generation {generation}: {generation_min_avg:.4}")
             print("-----------------------------------------------------------------------------------------------------------")
 
         with open('parameter_history', 'a') as f:
-            f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {>10.5f}      {>10.5f}\n'.format(fitness,generation_avg, generation_min_avg))
+            f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {:>10.5f}     {:>10.5f}\n'.format(fitness,generation_avg, generation_min_avg))
         parent+=1
 
     else:
@@ -177,7 +178,7 @@ def fitness_func(solution, solution_idx):
             print("-----------------------------------------------------------------------------------------------------------")
 
         with open('parameter_history', 'a') as f:
-            f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {>10.5f}      {>10.5f}\n'.format(fitness,generation_avg, generation_min_avg))
+             f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {:>10.5f}     {:>10.5f}\n'.format(fitness,generation_avg, generation_min_avg))
         parent+=1
 
     return fitness
@@ -195,7 +196,7 @@ if __name__=='__main__':
     generation = 0
 
     with open('parameter_history', 'a') as f:
-        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_Ru_Ru     e_Ru_Ru|    fitness RMSD_AVG RMSD_MIN_AVG\n")
+        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_Ru_Ru     e_Ru_Ru|    fitness    RMSD_AVG    RMSD_MIN_AVG\n")
 
     # Make list of the protein numbers to iterate over
     dir_list = os.listdir(os.getcwd())
