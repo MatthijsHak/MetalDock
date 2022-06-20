@@ -162,7 +162,7 @@ def fitness_func(solution, solution_idx):
             print("-----------------------------------------------------------------------------------------------------------")
 
         with open('parameter_history', 'a') as f:
-            f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}\n'.format(fitness))
+            f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {>10.5f}      {>10.5f}\n'.format(fitness,generation_avg, generation_min_avg))
         parent+=1
 
     else:
@@ -177,7 +177,7 @@ def fitness_func(solution, solution_idx):
             print("-----------------------------------------------------------------------------------------------------------")
 
         with open('parameter_history', 'a') as f:
-            f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}\n'.format(fitness))
+            f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {>10.5f}      {>10.5f}\n'.format(fitness,generation_avg, generation_min_avg))
         parent+=1
 
     return fitness
@@ -195,7 +195,7 @@ if __name__=='__main__':
     generation = 0
 
     with open('parameter_history', 'a') as f:
-        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_Ru_Ru     e_Ru_Ru|    fitness\n")
+        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_Ru_Ru     e_Ru_Ru|    fitness RMSD_AVG RMSD_MIN_AVG\n")
 
     # Make list of the protein numbers to iterate over
     dir_list = os.listdir(os.getcwd())
