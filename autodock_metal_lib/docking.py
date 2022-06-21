@@ -60,7 +60,7 @@ def prepare_receptor():
     os.system(os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+iv.var.name_protein+'.pdb')
 
 def add_to_dat_file():
-    dat = open('ad4_parameters_test.dat', 'a')
+    dat = open(''+iv.var.parameter_file+'', 'a')
     dat.write('nbp_r_eps '+iv.var.r_OA+'   '+iv.var.e_OA+' 12 6 OA '+iv.var.metal_symbol+'\n')
     dat.write('nbp_r_eps '+iv.var.r_SA+'   '+iv.var.e_SA+' 12 6 SA '+iv.var.metal_symbol+'\n')
     dat.write('nbp_r_eps '+iv.var.r_HD+'   '+iv.var.e_HD+' 12 6 HD '+iv.var.metal_symbol+'\n')

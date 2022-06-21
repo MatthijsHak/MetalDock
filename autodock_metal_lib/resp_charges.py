@@ -3,6 +3,8 @@ import os, stat
 import environment_variables
 
 import subprocess
+import input_variables as iv
+
 from subprocess import call
 
 from vdw_surface import vdw_surface
@@ -22,7 +24,7 @@ def resp_charges(xyz_file):
     if 'GRID' not in options:
         options['GRID'] = []
     if 'VDW_SCALE_FACTORS' not in options:
-        options['VDW_SCALE_FACTORS'] = [1.4, 1.6, 1.8, 2.0]
+        options['VDW_SCALE_FACTORS'] = [1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
     if 'VDW_POINT_DENSITY' not in options:
         options['VDW_POINT_DENSITY'] = 1.0
 
@@ -39,9 +41,9 @@ def resp_charges(xyz_file):
         if 'IHFREE' not in options:
             options['IHFREE'] = True
         if 'TOLER' not in options:
-            options['TOLER'] = 1e-5
+            options['TOLER'] = 1e-10
         if 'MAX_IT' not in options:
-            options['MAX_IT'] = 25
+            options['MAX_IT'] = 1000000
 
     # Constraint options
     if 'CONSTRAINT_CHARGE' not in options:
@@ -55,7 +57,7 @@ def resp_charges(xyz_file):
     # data same conformer
     data['natoms'] = []
     data['symbols'] = []
-    data['mol_charge'] = 0
+    data['mol_charge'] = ''+iv.var.charge_ligand+''
 
     # data eac conformer
     data['coordinates'] = []
@@ -103,14 +105,14 @@ def resp_charges(xyz_file):
 
     # calculate esp values
     if os.path.exists('TAPE41') == True:
-        os.system('rm TAPE41')
+        os.remove("TAPE41")
 
-    os.system('cp '+os.environ['DOCK_LIB_DIR']+'/densf.sh .')
-    os.system("sed '/Inline/ r grid.dat' densf.sh > run.sh")
-    os.system("sh run.sh > densf_output")
-    os.system('rm run.sh densf.sh')
-
-    os.system(os.environ['AMSBIN']+'''/dmpkf TAPE41 SCF > grid_esp.dat''')
+    else:
+        os.system('cp '+os.environ['METPAR']+'/densf.sh .')
+        os.system("sed '/Inline/ r grid.dat' densf.sh > run.sh")
+        os.system("sh run.sh > densf_output")
+        os.system('rm run.sh densf.sh')
+        os.system(os.environ['AMSBIN']+'''/dmpkf TAPE41 SCF > grid_esp.dat''')
 
     os.system("awk 'NR > 3' grid_esp.dat > grid_esp_clean")
 
@@ -173,7 +175,7 @@ def resp_charges(xyz_file):
                         %np.sum(i))
             f.write('\n')
 
-        with open("charges","w") as output:
+        with open("RESP_charges","w") as output:
             for i in range(data['natoms']):
                 output.write("%12.3f" %qf[1][i])
                 output.write("\n")

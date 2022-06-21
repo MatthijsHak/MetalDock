@@ -10,6 +10,8 @@ import copy
 import warnings
 
 import numpy as np
+import sys
+
 
 
 def esp_solve(A, B):
@@ -118,7 +120,10 @@ def iterate(q, A_unrestrained, B, resp_a, resp_b, ihfree, symbols, toler, maxit,
         q_last = copy.deepcopy(q)
 
     if dif > toler:
-        note += ('\nCharge fitting did not converge; ' + 
+        note += ('\nCharge fitting did not converge; ' +
+               'try increasing the maximum number of iterations to ' +
+               '> %i.' %maxit)
+        sys.exit('\nCharge fitting did not converge; ' +
                'try increasing the maximum number of iterations to ' +
                '> %i.' %maxit)
     return q[:len(symbols)], note
@@ -195,10 +200,10 @@ def fit(options, data):
     """
     qf = []
     labelf = []
-    #constraint_charges, constraint_indices = intramolecular_constraints(options['CONSTRAINT_CHARGE'],
-    #                                                                    options['CONSTRAINT_GROUP'])
+    constraint_charges, constraint_indices = intramolecular_constraints(options['CONSTRAINT_CHARGE'],
+                                                                        options['CONSTRAINT_GROUP'])
     natoms = data['natoms']
-    ndim = int(natoms) + 1 #+ len(constraint_charges) 
+    ndim = int(natoms) + 1 + len(constraint_charges) 
     A = np.zeros((ndim, ndim))
     B = np.zeros(ndim)
 
@@ -229,15 +234,15 @@ def fit(options, data):
     B[natoms] = data['mol_charge']
 
     # Add constraints to matrices A and B
-    #for i in range(len(constraint_charges)):
-    #    B[natoms + 1 + i] = constraint_charges[i]
-    #    for k in constraint_indices[i]:
-    #        if k > 0:
-    #            A[natoms + 1 + i, k - 1] = 1
-    #            A[k - 1, natoms + 1 + i] = 1
-    #        else:
-    #            A[natoms + 1 + i, -k - 1] = -1
-    #            A[-k - 1, natoms + 1 + i] = -1
+    for i in range(len(constraint_charges)):
+        B[natoms + 1 + i] = constraint_charges[i]
+        for k in constraint_indices[i]:
+            if k > 0:
+                A[natoms + 1 + i, k - 1] = 1
+                A[k - 1, natoms + 1 + i] = 1
+            else:
+                A[natoms + 1 + i, -k - 1] = -1
+                A[-k - 1, natoms + 1 + i] = -1
 
     labelf.append('ESP')
     q = esp_solve(A, B)
