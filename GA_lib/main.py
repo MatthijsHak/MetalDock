@@ -22,6 +22,10 @@ def convertible(v):
     except (TypeError, ValueError):
         return False
 
+def remove_suffix(text, suffix):
+    if text.endswith(suffix):
+        return text[len(suffix):]
+    return text
 
 def fitness_func(solution, solution_idx):
     global parent
@@ -36,11 +40,13 @@ def fitness_func(solution, solution_idx):
 
         for file in glob.glob("*.xyz"):
             name_ligand = file
-            name_ligand = name_ligand.removesuffix('.xyz')
+            name_ligand = remove_suffix(file,'.xyz')
+            print(name_ligand)
 
         for file in glob.glob("*.pdb"):
             name_protein = file
-            name_protein = name_protein.removesuffix('.pdb')
+            name_protein = remove_suffix(file,'.pdb')
+            print(name_protein)
 
         os.environ['OUTPUT_DIR']=os.environ['WORKING_DIR']+f'/protein_{n_prot}/output'
 

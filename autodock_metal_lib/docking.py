@@ -20,6 +20,10 @@ def create_ligand_pdbqt_file():
     # Grep the correct part  of the itp file
     os.system("awk '/@<TRIPOS>ATOM/{flag=1; next} /@<TRIPOS>BOND/{flag=0} flag' "+iv.var.name_ligand+".mol2  > almost")
 
+    # Create charge file if CM5
+    os.system("awk '{if (NR!=1) {print}}' CM5_charges > new")
+    os.system(r'''awk '{printf "%8s\n",$2}' new > new_charge''')
+
     # Insert extra column
     os.system("paste -d' 'test almost charges > there")
 
@@ -31,7 +35,7 @@ def create_ligand_pdbqt_file():
 
     # Insert in ligand_par.itp
     os.system("sed '/@<TRIPOS>ATOM/ r correct' ligand_almost > "+iv.var.name_ligand+".mol2")
-    os.system("rm ligand_almost correct there almost")
+    os.system("rm new, new_charge ligand_almost correct there almost")
 
     pdbqt = next(py.readfile('mol2',iv.var.name_ligand+'.mol2'))
     pdbqt.write('pdbqt',iv.var.name_ligand+'.pdbqt',overwrite=True)
