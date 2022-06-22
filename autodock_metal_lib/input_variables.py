@@ -49,26 +49,51 @@ def insert_arguments():
     parser.add_argument("-p", "--parameter_file", type=str, help="Parameter file", metavar="", required=True)
     parser.add_argument("-npts", "--box_size", type=str, help="Boxsize", metavar="", required=True)
 
-    parser.add_argument("-r_OA", "--r_OA", type=str, help="r_OA", required=True)
-    parser.add_argument("-e_OA", "--e_OA", type=str, help="e_OA", required=True)
+    parser.add_argument("-r_OA", "--r_OA", type=str, help="r_OA")
+    parser.add_argument("-e_OA", "--e_OA", type=str, help="e_OA")
 
-    parser.add_argument("-r_SA", "--r_SA", type=str, help="r_SA", required=True)
-    parser.add_argument("-e_SA", "--e_SA", type=str, help="e_SA", required=True)
+    parser.add_argument("-r_SA", "--r_SA", type=str, help="r_SA")
+    parser.add_argument("-e_SA", "--e_SA", type=str, help="e_SA")
 
-    parser.add_argument("-r_HD", "--r_HD", type=str, help="r_HD", required=True)
-    parser.add_argument("-e_HD", "--e_HD", type=str, help="e_HD", required=True)
+    parser.add_argument("-r_HD", "--r_HD", type=str, help="r_HD")
+    parser.add_argument("-e_HD", "--e_HD", type=str, help="e_HD")
 
-    parser.add_argument("-r_NA", "--r_NA", type=str, help="r_NA", required=True)
-    parser.add_argument("-e_NA", "--e_NA", type=str, help="e_NA", required=True)
+    parser.add_argument("-r_NA", "--r_NA", type=str, help="r_NA")
+    parser.add_argument("-e_NA", "--e_NA", type=str, help="e_NA")
 
-    parser.add_argument("-r_N", "--r_N", type=str, help="r_N", required=True)
-    parser.add_argument("-e_N", "--e_N", type=str, help="e_N", required=True)
+    parser.add_argument("-r_N", "--r_N", type=str, help="r_N")
+    parser.add_argument("-e_N", "--e_N", type=str, help="e_N")
 
-    parser.add_argument("-r_Ru_Ru", "--r_Ru_Ru", type=str, help="r_N", required=True)
-    parser.add_argument("-e_Ru_Ru", "--e_Ru_Ru", type=str, help="e_N", required=True)
+    parser.add_argument("-r_Ru_Ru", "--r_Ru_Ru", type=str, help="r_Ru_Ru")
+    parser.add_argument("-e_Ru_Ru", "--e_Ru_Ru", type=str, help="e_Ru_Ru")
 
 
     args = parser.parse_args()
+
+    if args.r_OA == None:
+        args.r_OA = "2.0"
+    if args.e_OA == None:
+        args.e_OA = "10.0"
+    if args.r_SA == None:
+        args.r_SA = "2.0"
+    if args.e_SA == None:
+        args.e_SA = "10.0"
+    if args.r_HD == None:
+        args.r_HD = "2.0"
+    if args.e_HD == None:
+        args.e_HD = "10.0"
+    if args.r_NA == None:
+        args.r_NA = "2.0"
+    if args.e_NA == None:
+        args.e_NA = "10.0"
+    if args.r_N == None:
+        args.r_N = "2.0"
+    if args.e_N == None:
+        args.e_N = "10.0"
+    if args.r_Ru_Ru == None:
+        args.r_Ru_Ru = "2.0"
+    if args.e_Ru_Ru == None:
+        args.e_Ru_Ru = "10.0"
 
     name_protein = args.pdb_file_protein
     name_protein = name_protein.removesuffix('.pdb')

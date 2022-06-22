@@ -24,7 +24,7 @@ def resp_charges(xyz_file):
     if 'GRID' not in options:
         options['GRID'] = []
     if 'VDW_SCALE_FACTORS' not in options:
-        options['VDW_SCALE_FACTORS'] = [1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
+        options['VDW_SCALE_FACTORS'] = [1.7,1.8,1.9,2.0,2.1,2.2]
     if 'VDW_POINT_DENSITY' not in options:
         options['VDW_POINT_DENSITY'] = 1.0
 
@@ -35,9 +35,9 @@ def resp_charges(xyz_file):
         options['RESTRAINT'] = True
     if options['RESTRAINT']:
         if 'RESP_A' not in options:
-            options['RESP_A'] = 0.0005
+            options['RESP_A'] = 0.002
         if 'RESP_B' not in options:
-            options['RESP_B'] = 0.1
+            options['RESP_B'] = 0.05
         if 'IHFREE' not in options:
             options['IHFREE'] = True
         if 'TOLER' not in options:
@@ -90,8 +90,12 @@ def resp_charges(xyz_file):
     coordinates = [[float(j) for j in i] for i in coordinates]
     data['coordinates'] = np.array(coordinates)
 
+    print(data['coordinates'])
+
     elements = [item for sublist in elements for item in sublist]
     data['symbols'] = [el.upper() for el in elements]
+
+    print(data['symbols'])
 
     # generate surface points 
     points = []
@@ -108,7 +112,7 @@ def resp_charges(xyz_file):
         os.remove("TAPE41")
 
     else:
-        os.system('cp '+os.environ['METPAR']+'/densf.sh .')
+        os.system('cp '+os.environ['DOCK_LIB_DIR']+'/densf.sh .')
         os.system("sed '/Inline/ r grid.dat' densf.sh > run.sh")
         os.system("sh run.sh > densf_output")
         os.system('rm run.sh densf.sh')
@@ -180,5 +184,5 @@ def resp_charges(xyz_file):
                 output.write("%12.3f" %qf[1][i])
                 output.write("\n")
 
-    os.system("rm grid_esp_clean natoms xyz_clean")
+    #os.system("rm grid_esp_clean natoms xyz_clean")
     return

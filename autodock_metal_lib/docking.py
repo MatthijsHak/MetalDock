@@ -31,7 +31,7 @@ def create_ligand_pdbqt_file():
 
     # Insert in ligand_par.itp
     os.system("sed '/@<TRIPOS>ATOM/ r correct' ligand_almost > "+iv.var.name_ligand+".mol2")
-    os.system("rm ligand_almost correct there almost") 
+    os.system("rm ligand_almost correct there almost")
 
     pdbqt = next(py.readfile('mol2',iv.var.name_ligand+'.mol2'))
     pdbqt.write('pdbqt',iv.var.name_ligand+'.pdbqt',overwrite=True)

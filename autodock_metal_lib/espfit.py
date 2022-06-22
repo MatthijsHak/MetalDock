@@ -211,7 +211,9 @@ def fit(options, data):
     # Bayly:93:10271 (Eqs. 12-14)
     for mol in range(len(data['invr'])):
         r_inverse, V = data['invr'][mol], data['esp_values'][mol]
-
+        
+        print(r_inverse.shape)
+        print(V.shape)
         # Lower case a and b are the A matrix and B vector for one molecule
         # and without the addition of constraints
 

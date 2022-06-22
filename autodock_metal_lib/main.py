@@ -97,12 +97,14 @@ if __name__=='__main__':
     if os.path.isdir(os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob') == False:
         q.plams_single_point(iv.var.name_ligand+'_c.xyz')
         os.chdir(os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob')
-        q.single_point_check('ams.log')
-        resp_charges('../../'+iv.var.name_ligand+'_c.xyz')
+        q.single_point_check('ams.log')i
+        os.system(os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges')
+        #resp_charges('../../'+iv.var.name_ligand+'_c.xyz')
     else:
         os.chdir(os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob')
         q.single_point_check('ams.log')
-        resp_charges('../../'+iv.var.name_ligand+'_c.xyz')
+        os.system(os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges')
+        #resp_charges('../../'+iv.var.name_ligand+'_c.xyz')
 
     ##### AutoDock #####
     os.chdir(os.environ['OUTPUT_DIR'])
@@ -121,7 +123,7 @@ if __name__=='__main__':
 
     os.system('cp '+os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob/output.xyz .')
     os.system('cp '+os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob/output.sdf .')
-    os.system('cp '+os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob/charges .')
+    os.system('cp '+os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob/CM5_charges .')
 
     os.system('cp '+os.environ['OUTPUT_DIR']+'/file_prep/clean_'+iv.var.name_protein+'.pdb .')
 
