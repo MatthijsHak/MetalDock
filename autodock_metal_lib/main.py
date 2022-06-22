@@ -97,7 +97,7 @@ if __name__=='__main__':
     if os.path.isdir(os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob') == False:
         q.plams_single_point(iv.var.name_ligand+'_c.xyz')
         os.chdir(os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob')
-        q.single_point_check('ams.log')i
+        q.single_point_check('ams.log')
         os.system(os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges')
         #resp_charges('../../'+iv.var.name_ligand+'_c.xyz')
     else:
