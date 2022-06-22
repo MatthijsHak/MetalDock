@@ -38,7 +38,7 @@ def insert_arguments():
     parser.add_argument("-cross_prob", "--crossover_prob", type=float, help="The probability of selecting a parent for applying the crossover operation")
 
     # Mutation #
-    parser.add_argument("-mut", "--mutation_type", type=str, help="Type of the mutation operation",required=True)
+    parser.add_argument("-mut", "--mutation_type", type=float, help="Type of the mutation operation")
     parser.add_argument("-mut_prob", "--mutation_prob", type=float, help="The probability of selecting a gene for applying the mutation operation")
     parser.add_argument("-mut_perc", "--mutation_percent", type=int, help="Percentage of genes to mutate")
 

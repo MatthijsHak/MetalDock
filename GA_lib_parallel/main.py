@@ -29,18 +29,11 @@ def convertible(v):
     except (TypeError, ValueError):
         return False
 
-# Disable
-def blockPrint():
-    sys.stdout = open(os.devnull, 'w')
-
-# Restore
-def enablePrint():
-    sys.stdout = sys.__stdout__
-
 def mutation_func(offspring, ga_instance):
     '''
     Mutation function that adds 10 percent or substracts 10 percent of the parameter value
     '''
+    print(mutation_probability)
     for chromosome_idx in range(0,len(offspring[0])):
         random_number_1 = random.uniform(0,1)
         random_number_2 = random.uniform(0,1)
@@ -62,12 +55,14 @@ def fitness_func(solution, solution_idx):
     generation_avg_list = []
     generation_min_avg_list = []
 
+    os.chdir(os.environ['WORKING_DIR']+'/tmp')
+
     dir_name = str(uuid.uuid4())
-    os.mkdir(os.environ['WORKING_DIR']+'/'+dir_name)
-    os.chdir(os.environ['WORKING_DIR']+'/'+dir_name)
+    os.mkdir(os.environ['WORKING_DIR']+'/tmp/'+dir_name)
+    os.chdir(os.environ['WORKING_DIR']+'/tmp/'+dir_name)
 
     os.environ['TMP_DIR']=os.getcwd()
-    os.system("cp -r ../protein* .")
+    os.system("cp -r ../../protein* .")
 
     for n_prot in dir_list:
 
@@ -147,18 +142,14 @@ def fitness_func(solution, solution_idx):
         rmsd_avg = []
         rmsd_list = []
 
-        blockPrint()
         os.system(os.environ['OBABEL']+" -isdf output.sdf -oxyz normalize.xyz -d > normalize.xyz")
-        enablePrint()
 
         rmsd_normalize = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz normalize.xyz --reorder']))
         rmsd_list.append("RMSD between reference ligand and quantum optimized structure: %.4f" % rmsd_normalize)
 
         i = 1
         while os.path.exists(name_ligand+"_%i.pdbqt" % i):
-            blockPrint()
             os.system(os.environ['OBABEL']+" -ipdbqt "+name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+name_ligand+"_{}.xyz".format(i)+" -d > "+name_ligand+"_{}.xyz".format(i))
-            enablePrint()
 
             rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' --reorder --rotation none --translation none']))
             rmsd = rmsd_non_rotate
@@ -198,32 +189,6 @@ def fitness_func(solution, solution_idx):
     method = generation_avg
 
     fitness = 1 / np.abs(method - desired_output)
-
-
-    #if parent <= sol_per_pop:
-    #    if len(dir_list) > 1:
-    #        print(f"The average RMSD of all proteins in parameter set {parent} in generation {generation}: {generation_avg:.4}")
-    #        print(f"The average RMSD of the lowest conformation of each ligand in parameter set {parent} in generation {generation}: {generation_min_avg:.4}")
-    #        print("-----------------------------------------------------------------------------------------------------------")
-
-    #    with open('parameter_history', 'a') as f:
-    #        f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {:>10.5f}     {:>10.5f}\n'.format(fitness,generation_avg, generation_min_avg))
-    #    parent+=1
-
-    #else:
-    #    parent = 1
-    #    generation+=1
-
-    #    if len(dir_list) > 1:
-    #        generation_avg = (sum(generation_avg_list) / len(generation_avg_list))
-    #        generation_min_avg= (sum(generation_min_avg_list) / len(generation_min_avg_list))
-    #        print(f"The average RMSD of all proteins in parameter set {parent} in generation {generation}: {generation_avg:.4}")
-    #        print(f"The average RMSD of the lowest conformation of each ligand in parameter set {parent} in generation {generation}: {generation_min_avg:.4}")
-    #        print("-----------------------------------------------------------------------------------------------------------")
-
-    #    with open('parameter_history', 'a') as f:
-    #         f.write('Parameters generation {} parent {}:  '.format(str(generation), str(parent))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {:>10.5f}     {:>10.5f}\n'.format(fitness,generation_avg, generation_min_avg))
-    #    parent+=1
 
 
     if len(dir_list) > 1:
@@ -301,7 +266,7 @@ if __name__=='__main__':
     crossover_probability = iv.var.crossover_prob
 
     #mutation_type = iv.var.mutation_type
-    mutation_probability = 0.8#iv.var.mutation_prob
+    mutation_probability = iv.var.mutation_prob
     mutation_percent_genes = iv.var.mutation_percent
 
     # Create Class
@@ -321,20 +286,7 @@ if __name__=='__main__':
                            mutation_type=mutation_func,
                            save_solutions=True)
 
-    #if mutation_percent_genes != None:
-    #        ga_instance = PooledGA(num_generations=num_generations,
-    #                   num_parents_mating=num_parents_mating,
-    #                   fitness_func=fitness_function,
-    #                   sol_per_pop=sol_per_pop,
-    #                   num_genes=num_genes,
-    #                   gene_space=gene_space,
-    #                   parent_selection_type=parent_selection_type,
-    #                   keep_parents=keep_parents,
-    #                   K_tournament=K_tournament,
-    #                   crossover_type=crossover_type,
-    #                   crossover_probability=crossover_probability,
-    #                   mutation_type=mutation_func,
-    #                   save_solutions=True)
+    os.mkdir(os.environ['WORKING_DIR']+'/tmp')
 
     with Pool(processes=sol_per_pop) as pool:
         ga_instance.run()
@@ -342,3 +294,5 @@ if __name__=='__main__':
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
     print("Parameters of the best solution : {solution}".format(solution=solution))
     print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+
+    shutil.rmtree(os.environ['WORKING_DIR']+'/tmp',ignore_errors=True)
