@@ -14,8 +14,10 @@ import input_variables as iv
 import variable_class as vc
 
 def create_ligand_pdbqt_file():
-    mol2 = next(py.readfile('xyz','output.xyz'))
-    mol2.write('mol2',iv.var.name_ligand+'.mol2',overwrite=True)
+    #mol2 = next(py.readfile('xyz',''+iv.var.name_ligand+'_c.xyz'))
+    #mol2.write('mol2',iv.var.name_ligand+'.mol2',overwrite=True)
+    #mol2 = next(py.readfile('xyz','output.xyz'))
+    #mol2.write('mol2',iv.var.name_ligand+'.mol2',overwrite=True)
 
     # Grep the correct part  of the itp file
     os.system("awk '/@<TRIPOS>ATOM/{flag=1; next} /@<TRIPOS>BOND/{flag=0} flag' "+iv.var.name_ligand+".mol2  > almost")
@@ -25,7 +27,8 @@ def create_ligand_pdbqt_file():
     os.system(r'''awk '{printf "%8s\n",$2}' new > new_charge''')
 
     # Insert extra column
-    os.system("paste -d' 'test almost charges > there")
+    os.system("paste -d' 'test almost new_charge > there")
+    #os.system("paste -d' 'test almost charges > there")
 
     # Switch Columns
     os.system(r'''awk '{ printf "%7s %-3s %14s %9s %9s %-5s %3s %5s %12s \n",$1,$2,$3,$4,$5,$6,$7,$8,$10}' there > correct''')
@@ -37,20 +40,21 @@ def create_ligand_pdbqt_file():
     os.system("sed '/@<TRIPOS>ATOM/ r correct' ligand_almost > "+iv.var.name_ligand+".mol2")
     os.system("rm new new_charge ligand_almost correct there almost")
 
+    #os.system(os.environ['PYTHON_2']+''' '''+os.environ['MGLTOOLS']+'''/prepare_ligand4.py -l '''+iv.var.name_ligand+'''.mol2 -U \""" -C''')
     pdbqt = next(py.readfile('mol2',iv.var.name_ligand+'.mol2'))
     pdbqt.write('pdbqt',iv.var.name_ligand+'.pdbqt',overwrite=True)
 
 def get_coordinates():
-    os.system('''awk '{if($NF ~ /'''+iv.var.metal_cap+'''/ || $NF ~ /'''+iv.var.metal_symbol+'''/) {printf "%7s %7s %7s",$(NF-5),$(NF-4),$(NF-3)}}' ref.pdb > coordinates''')
+    os.system('''awk '$1 == "Ru" { print $0 }' ref.xyz > coordinates''')
 
     dock_site = open('coordinates','r')
     coord = [line.split() for line in dock_site]
 
     global dock_x, dock_y, dock_z
 
-    dock_x = coord[0][0]
-    dock_y = coord[0][1]
-    dock_z = coord[0][2]
+    dock_x = str(coord[0][1])
+    dock_y = str(coord[0][2])
+    dock_z = str(coord[0][3])
 
 def users_coordinates():
     global dock_x, dock_y, dock_z
@@ -230,7 +234,7 @@ def randomize_translation_rotation(pdbqt_file):
         new_output.write('\n')
 
     new_output.close()
-    os.system(r'''awk '{ printf "%-4s %6s %2s %5s %1s %3s %11s %7s %7s %5s %5s %9s %-3s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' new_output_test > '''+iv.var.name_ligand+'''.pdbqt''')
+    os.system(r'''awk '{ printf "%-4s %6s %3s %4s %1s %3s %11s %7s %7s %5s %5s %9s %-3s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' new_output_test > '''+iv.var.name_ligand+'''.pdbqt''')
 
     os.system("rm temp_1 temp_2 temp_3 output_test new_output_test")
 

@@ -28,7 +28,7 @@ if __name__=='__main__':
 
     ###### Canonicalize Ligand ######
     if os.path.exists(iv.var.name_ligand+'_c.xyz') == False:
-        os.system(os.environ['OBABEL']+' -ixyz '+iv.var.name_ligand+'.xyz -oxyz '+iv.var.name_ligand+'_c.xyz --canonical > '+iv.var.name_ligand+'_c.xyz')
+        os.system(os.environ['OBABEL']+' -imol2 '+iv.var.name_ligand+'.mol2 -oxyz '+iv.var.name_ligand+'_c.xyz --canonical > '+iv.var.name_ligand+'_c.xyz')
 
     ###### Generate Output Dir #######
     if os.path.isdir('output') == False:
@@ -48,38 +48,7 @@ if __name__=='__main__':
 
     if os.path.exists('clean_'+iv.var.name_protein+'.pdb') == False:
         os.system("cp  "+os.environ['WORKING_DIR']+"/clean_"+iv.var.name_protein+".pdb' .")
-        #pdb.clean_protein_pdb(iv.var.pdb_file_protein)
-
-    if os.path.exists('clean_'+iv.var.name_protein+'.pdb') == False:
-        os.system("cp  "+os.environ['WORKING_DIR']+"/ref.pdb .")
-        #pdb.get_ref_pdb(iv.var.pdb_file_protein)
-
-    if iv.var.reference_docking == True:
-        dock.get_coordinates()
-    else:
-        dock.users_coordinates()
-
-    ##### GO ######
-    os.chdir(os.environ['OUTPUT_DIR'])
-
-    if os.path.isdir('gfnxtb') == False:
-        os.mkdir('gfnxtb')
-        os.chdir('gfnxtb')
-    else:
-        os.chdir('gfnxtb')
-
-    os.system('mv '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'_c.xyz .')
-
-    # If Geometry Converged Skip otherwise Run Again#
-    if os.path.isdir(os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob') == False:
-        q.run_gfnxtb(iv.var.name_ligand+'_c.xyz')
-        os.chdir(os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob')
-        q.gfnxtb_converged('ams.log')
-        os.system(os.environ['AMSBIN']+'/amsreport dftb.rkf sdf > output.sdf')
-    else:
-        os.chdir(os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob')
-        q.gfnxtb_converged('ams.log')
-        os.system(os.environ['AMSBIN']+'/amsreport dftb.rkf sdf > output.sdf')
+        pdb.clean_protein_pdb(iv.var.pdb_file_protein)
 
     ###### Single Point ######
     os.chdir(os.environ['OUTPUT_DIR'])
@@ -90,8 +59,7 @@ if __name__=='__main__':
     else:
         os.chdir('single_point')
 
-    os.system('cp '+os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob/output.xyz .')
-    os.system('mv output.xyz '+iv.var.name_ligand+'_c.xyz')
+    os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'_c.xyz .')
 
     # If single point successful Skip otherwise Run Again#
     if os.path.isdir(os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob') == False:
@@ -119,21 +87,24 @@ if __name__=='__main__':
 
     os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") ($7 = '''+iv.var.r_Ru_Ru+''') && ($8 = '''+iv.var.e_Ru_Ru+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
     os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
-
-
-    os.system('cp '+os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob/output.xyz .')
-    os.system('cp '+os.environ['OUTPUT_DIR']+'/gfnxtb/plams_workdir/plamsjob/output.sdf .')
-    os.system('cp '+os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob/CM5_charges .')
+    os.system("rm file_1")
 
     os.system('cp '+os.environ['OUTPUT_DIR']+'/file_prep/clean_'+iv.var.name_protein+'.pdb .')
 
-    if iv.var.rmsd == False or iv.var.rmsd == None:
-        os.system('cp '+os.environ['OUTPUT_DIR']+'/file_prep/ref.pdb .')
+    os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'.mol2 .')
+    os.system('cp '+os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob/CM5_charges .')
 
-        #if os.path.exists(iv.var.name_ligand+'.pdbqt') == False:
+    os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'_c.xyz .')
+    os.system(os.environ['OBABEL']+" -ixyz "+iv.var.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz")
+
+    if iv.var.reference_docking == True:
+        dock.get_coordinates()
+    else:
+        dock.users_coordinates()
+
+    if iv.var.rmsd == False or iv.var.rmsd == None:
         dock.create_ligand_pdbqt_file()
 
-        #if os.path.exists('clean_'+iv.var.name_protein+'.pdb') == False:
         dock.prepare_receptor()
 
         dock.randomize_translation_rotation(iv.var.name_ligand+'.pdbqt')
@@ -148,17 +119,8 @@ if __name__=='__main__':
         dock.write_all_conformations()
 
     if iv.var.reference_docking == True:
-        #if os.path.exists('ref.xyz') == False:
-        #pdb = next(py.readfile('pdb','ref.pdb'))
-        #pdb.write('xyz','ref.xyz',overwrite=True)
 
         rmsd_list = []
-
-        os.system(os.environ['OBABEL']+" -isdf output.sdf -oxyz normalize.xyz -d > normalize.xyz")
-        rmsd_normalize = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['DOCK_LIB_DIR']+'/calculate_rmsd.py ref.xyz normalize.xyz --reorder']))
-
-        rmsd_list.append("RMSD between reference ligand and quantum optimized structure: %.4f" % rmsd_normalize)
-
         i = 1
         while os.path.exists(iv.var.name_ligand+"_%i.pdbqt" % i):
             os.system(os.environ['OBABEL']+" -ipdbqt "+iv.var.name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+iv.var.name_ligand+"_{}.xyz".format(i)+" -d > "+iv.var.name_ligand+"_{}.xyz".format(i))
