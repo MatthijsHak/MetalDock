@@ -47,7 +47,7 @@ if __name__=='__main__':
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.pdb_file_protein+' .')
 
     if os.path.exists('clean_'+iv.var.name_protein+'.pdb') == False:
-        os.system("cp  "+os.environ['WORKING_DIR']+"/clean_"+iv.var.name_protein+".pdb' .")
+        os.system("cp  "+os.environ['WORKING_DIR']+"/"+iv.var.name_protein+".pdb .")
         pdb.clean_protein_pdb(iv.var.pdb_file_protein)
 
     ###### Single Point ######
@@ -72,7 +72,7 @@ if __name__=='__main__':
         os.chdir(os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob')
         q.single_point_check('ams.log')
         os.system(os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges')
-        #resp_charges('../../'+iv.var.name_ligand+'_c.xyz')
+       #resp_charges('../../'+iv.var.name_ligand+'_c.xyz')
 
     ##### AutoDock #####
     os.chdir(os.environ['OUTPUT_DIR'])
