@@ -39,6 +39,7 @@ def insert_arguments():
 
     # Mutation #
     parser.add_argument("-mut", "--mutation_type", type=float, help="Type of the mutation operation")
+    parser.add_argument("-mut_rate", "--mutation_rate", type=float, help="The rate at which the mutation changes the gene.", required=True)
     parser.add_argument("-mut_prob", "--mutation_prob", type=float, help="The probability of selecting a gene for applying the mutation operation")
     parser.add_argument("-mut_perc", "--mutation_percent", type=int, help="Percentage of genes to mutate")
 
@@ -47,6 +48,6 @@ def insert_arguments():
     metal_cap = args.metal_symbol.upper()
 
     global var
-    var = vc.lig_par_dock(args.parameter_file, args.box_size, args.metal_symbol, metal_cap, args.num_generations, args.num_parents_mating, args.sol_per_pop, args.parent_selection_type, args.keep_parents, args.K_tournament, args.crossover_type, args.crossover_prob, args.mutation_type, args.mutation_prob, args.mutation_percent)
+    var = vc.lig_par_dock(args.parameter_file, args.box_size, args.metal_symbol, metal_cap, args.num_generations, args.num_parents_mating, args.sol_per_pop, args.parent_selection_type, args.keep_parents, args.K_tournament, args.crossover_type, args.crossover_prob, args.mutation_type, args.mutation_rate, args.mutation_prob, args.mutation_percent)
 
 

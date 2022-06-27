@@ -1,6 +1,6 @@
 class lig_par_dock:
 
-    def __init__(self, parameter_file, box_size,  metal_symbol, metal_cap, num_generations, num_parents_mating, sol_per_pop, parent_selection_type, keep_parents, K_tournament, crossover_type, crossover_prob, mutation_type, mutation_prob, mutation_percent):
+    def __init__(self, parameter_file, box_size,  metal_symbol, metal_cap, num_generations, num_parents_mating, sol_per_pop, parent_selection_type, keep_parents, K_tournament, crossover_type, crossover_prob, mutation_type, mutation_rate, mutation_prob, mutation_percent):
 
         self.parameter_file = parameter_file
         self.box_size = box_size
@@ -20,6 +20,7 @@ class lig_par_dock:
         self.crossover_prob = crossover_prob
 
         self.mutation_type = mutation_type
+        self.mutation_rate = mutation_rate
         self.mutation_prob = mutation_prob
         self.mutation_percent = mutation_percent
 

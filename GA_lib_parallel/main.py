@@ -33,16 +33,15 @@ def mutation_func(offspring, ga_instance):
     '''
     Mutation function that adds 10 percent or substracts 10 percent of the parameter value
     '''
-    print(mutation_probability)
     for chromosome_idx in range(0,len(offspring[0])):
         random_number_1 = random.uniform(0,1)
         random_number_2 = random.uniform(0,1)
 
         if random_number_1 < mutation_probability:
             if random_number_2 <= 0.5:
-                mutated_gene = offspring[0][chromosome_idx]*1.1
+                mutated_gene = offspring[0][chromosome_idx]*(1+iv.var.mutation_rate)
             else:
-                mutated_gene = offspring[0][chromosome_idx]*0.9
+                mutated_gene = offspring[0][chromosome_idx]*(1-iv.var.mutation_rate)
 
             offspring[0][chromosome_idx] = mutated_gene
 
@@ -69,7 +68,7 @@ def fitness_func(solution, solution_idx):
         os.chdir(os.environ['WORKING_DIR']+f'/protein_{n_prot}')
 
         for files in glob.glob("*.xyz"):
-            file_list = files.split('.')
+            file_list = files.split('_c.')
             name_ligand = file_list[0]
 
         for files in glob.glob("*.pdb"):
@@ -79,7 +78,13 @@ def fitness_func(solution, solution_idx):
         os.environ['OUTPUT_DIR']=os.environ['TMP_DIR']+f'/protein_{n_prot}/output'
 
         ##### AutoDock ##### 
-        os.chdir(os.environ['OUTPUT_DIR']+'/file_prep')
+        os.chdir(os.environ['OUTPUT_DIR'])
+
+        if os.path.isdir('docking') == False:
+            os.mkdir('docking')
+            os.chdir('docking')
+        else:
+            os.chdir('docking')
 
         dock_site = open('coordinates','r')
         coord = [line.split() for line in dock_site]
@@ -88,13 +93,6 @@ def fitness_func(solution, solution_idx):
         dock_y = coord[0][1]
         dock_z = coord[0][2]
 
-        os.chdir(os.environ['OUTPUT_DIR'])
-
-        if os.path.isdir('docking') == False:
-            os.mkdir('docking')
-            os.chdir('docking')
-        else:
-            os.chdir('docking')
 
         dock.randomize_translation_rotation(name_ligand+'.pdbqt')
         os.system('mv docking.pdbqt '+name_ligand+'.pdbqt')
@@ -142,10 +140,10 @@ def fitness_func(solution, solution_idx):
         rmsd_avg = []
         rmsd_list = []
 
-        os.system(os.environ['OBABEL']+" -isdf output.sdf -oxyz normalize.xyz -d > normalize.xyz")
+        #os.system(os.environ['OBABEL']+" -isdf output.sdf -oxyz normalize.xyz -d > normalize.xyz")
 
-        rmsd_normalize = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz normalize.xyz --reorder']))
-        rmsd_list.append("RMSD between reference ligand and quantum optimized structure: %.4f" % rmsd_normalize)
+        #rmsd_normalize = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz normalize.xyz --reorder']))
+        #rmsd_list.append("RMSD between reference ligand and quantum optimized structure: %.4f" % rmsd_normalize)
 
         i = 1
         while os.path.exists(name_ligand+"_%i.pdbqt" % i):
@@ -227,7 +225,6 @@ if __name__=='__main__':
     if os.path.exists('parameter_history'):
         os.remove('parameter_history')
 
-    parent = 1
     generation = 0
 
     with open('parameter_history', 'a') as f:
@@ -291,8 +288,8 @@ if __name__=='__main__':
     with Pool(processes=sol_per_pop) as pool:
         ga_instance.run()
 
-    solution, solution_fitness, solution_idx = ga_instance.best_solution()
-    print("Parameters of the best solution : {solution}".format(solution=solution))
-    print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
+        solution, solution_fitness, solution_idx = ga_instance.best_solution()
+        print("Parameters of the best solution : {solution}".format(solution=solution))
+        print("Fitness value of the best solution = {solution_fitness}".format(solution_fitness=solution_fitness))
 
     shutil.rmtree(os.environ['WORKING_DIR']+'/tmp',ignore_errors=True)
