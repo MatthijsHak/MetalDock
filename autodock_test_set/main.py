@@ -59,23 +59,25 @@ if __name__=='__main__':
 
         os.chdir(os.environ['WORKING_DIR']+f'/protein_{n_prot}')
 
-        for file in glob.glob("*.xyz"):
-            name_ligand = file[:-4]
+        for files in glob.glob("*.xyz"):
+            file_list = files.split('_c.')
+            name_ligand = file_list[0]
 
-        for file in glob.glob("*.pdb"):
-            name_protein = file[:-4]
+        for files in glob.glob("*.pdb"):
+            file_list = files.split('.')
+            name_protein = file_list[0]
 
         os.environ['OUTPUT_DIR']=os.environ['WORKING_DIR']+f'/protein_{n_prot}/output'
 
         ##### AutoDock ##### 
-        os.chdir(os.environ['OUTPUT_DIR']+'/file_prep')
+        #os.chdir(os.environ['OUTPUT_DIR']+'/file_prep')
 
-        dock_site = open('coordinates','r')
-        coord = [line.split() for line in dock_site]
+        #dock_site = open('coordinates','r')
+        #coord = [line.split() for line in dock_site]
 
-        dock_x = coord[0][0]
-        dock_y = coord[0][1]
-        dock_z = coord[0][2]
+        #dock_x = coord[0][0]
+        #dock_y = coord[0][1]
+        #dock_z = coord[0][2]
 
         os.chdir(os.environ['OUTPUT_DIR'])
 
@@ -84,6 +86,15 @@ if __name__=='__main__':
             os.chdir('docking')
         else:
             os.chdir('docking')
+
+        dock_site = open('coordinates','r')
+        coord = [line.split() for line in dock_site]
+
+        global dock_x, dock_y, dock_z
+
+        dock_x = str(coord[0][1])
+        dock_y = str(coord[0][2])
+        dock_z = str(coord[0][3])
 
         dock.randomize_translation_rotation(name_ligand+'.pdbqt')
         os.system('mv docking.pdbqt '+name_ligand+'.pdbqt')
@@ -130,9 +141,9 @@ if __name__=='__main__':
         rmsd_avg = []
         rmsd_list = []
 
-        os.system(os.environ['OBABEL']+" -isdf output.sdf -oxyz normalize.xyz -d > normalize.xyz")
-        rmsd_normalize = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz normalize.xyz --reorder']))
-        rmsd_list.append("RMSD between reference ligand and quantum optimized structure: %.4f" % rmsd_normalize)
+        #os.system(os.environ['OBABEL']+" -isdf output.sdf -oxyz normalize.xyz -d > normalize.xyz")
+        #rmsd_normalize = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz normalize.xyz --reorder']))
+        #rmsd_list.append("RMSD between reference ligand and quantum optimized structure: %.4f" % rmsd_normalize)
 
         i = 1
         while os.path.exists(name_ligand+"_%i.pdbqt" % i):

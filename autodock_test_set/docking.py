@@ -149,7 +149,7 @@ def randomize_translation_rotation(pdbqt_file):
         new_output.write('\n')
 
     new_output.close()
-    os.system(r'''awk '{ printf "%-4s %6s %2s %5s %1s %3s %11s %7s %7s %4s %6s %9s %-3s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' new_output_test > docking.pdbqt''')
+    os.system(r'''awk '{ printf "%-4s %5s %4s %4s %1s %3s %11s %7s %7s %5s %5s %9s %-3s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' new_output_test > docking.pdbqt''')
 
     os.system("rm temp_1 temp_2 temp_3 output_test new_output_test")
 
