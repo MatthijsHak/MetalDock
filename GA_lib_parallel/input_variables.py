@@ -39,7 +39,7 @@ def insert_arguments():
 
     # Mutation #
     parser.add_argument("-mut", "--mutation_type", type=float, help="Type of the mutation operation")
-    parser.add_argument("-mut_rate", "--mutation_rate", type=float, help="The rate at which the mutation changes the gene.", required=True)
+    parser.add_argument("-mut_rate", "--mutation_rate", type=float, help="The rate at which the mutation changes the gene.")
     parser.add_argument("-mut_prob", "--mutation_prob", type=float, help="The probability of selecting a gene for applying the mutation operation")
     parser.add_argument("-mut_perc", "--mutation_percent", type=int, help="Percentage of genes to mutate")
 

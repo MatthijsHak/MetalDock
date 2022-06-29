@@ -36,12 +36,13 @@ def mutation_func(offspring, ga_instance):
     for chromosome_idx in range(0,len(offspring[0])):
         random_number_1 = random.uniform(0,1)
         random_number_2 = random.uniform(0,1)
+        random_int =  random_int = random.randint(0, 9)
 
         if random_number_1 < mutation_probability:
             if random_number_2 <= 0.5:
-                mutated_gene = offspring[0][chromosome_idx]*(1+iv.var.mutation_rate)
+                mutated_gene = offspring[0][chromosome_idx]*(1+mutation_rate[random_int])
             else:
-                mutated_gene = offspring[0][chromosome_idx]*(1-iv.var.mutation_rate)
+                mutated_gene = offspring[0][chromosome_idx]*(1-mutation_rate[random_int])
 
             if gene_space[chromosome_idx]['low'] <= mutated_gene <= gene_space[chromosome_idx]['high']:
                 pass
@@ -270,6 +271,7 @@ if __name__=='__main__':
     #mutation_type = iv.var.mutation_type
     mutation_probability = iv.var.mutation_prob
     mutation_percent_genes = iv.var.mutation_percent
+    mutation_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
     # Create Class
     #if mutation_probability != None:
