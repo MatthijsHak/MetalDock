@@ -43,7 +43,12 @@ def mutation_func(offspring, ga_instance):
             else:
                 mutated_gene = offspring[0][chromosome_idx]*(1-iv.var.mutation_rate)
 
-            offspring[0][chromosome_idx] = mutated_gene
+            if gene_space[chromosome_idx]['low'] <= mutated_gene <= gene_space[chromosome_idx]['high']:
+                pass
+            else:
+                mutated_gene = offspring[chromosome_idx]
+
+        offspring[chromosome_idx] = mutated_gene
 
     return offspring
 
