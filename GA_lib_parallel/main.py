@@ -39,6 +39,7 @@ def mutation_func(offspring, ga_instance):
         random_int =  random_int = random.randint(0, 9)
 
         if random_number_1 < mutation_probability:
+
             if random_number_2 <= 0.5:
                 mutated_gene = offspring[0][chromosome_idx]*(1+mutation_rate[random_int])
             else:
@@ -49,7 +50,8 @@ def mutation_func(offspring, ga_instance):
             else:
                 mutated_gene = offspring[chromosome_idx]
 
-        offspring[chromosome_idx] = mutated_gene
+        else:
+            offspring[chromosome_idx] = offspring[chromosome_idx]
 
     return offspring
 

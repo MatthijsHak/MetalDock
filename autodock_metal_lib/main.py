@@ -98,7 +98,8 @@ if __name__=='__main__':
     os.system(os.environ['OBABEL']+" -ixyz "+iv.var.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz")
 
     if iv.var.reference_docking == True:
-        dock.get_coordinates()
+        dock.users_coordinates()
+        #dock.get_coordinates()
     else:
         dock.users_coordinates()
 
