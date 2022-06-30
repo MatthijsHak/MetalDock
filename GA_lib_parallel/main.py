@@ -36,14 +36,16 @@ def mutation_func(offspring, ga_instance):
     for chromosome_idx in range(0,len(offspring[0])):
         random_number_1 = random.uniform(0,1)
         random_number_2 = random.uniform(0,1)
-        random_int =  random_int = random.randint(0, 9)
+        random_int = random.randint(0, 8)
 
         if random_number_1 < mutation_probability:
 
             if random_number_2 <= 0.5:
                 mutated_gene = offspring[0][chromosome_idx]*(1+mutation_rate[random_int])
+                print('Mutation rate: {}'.format(1+mutation_rate[random_int]))
             else:
                 mutated_gene = offspring[0][chromosome_idx]*(1-mutation_rate[random_int])
+                print('Mutation rate: {}'.format(1-mutation_rate[random_int]))
 
             if gene_space[chromosome_idx]['low'] <= mutated_gene <= gene_space[chromosome_idx]['high']:
                 pass
@@ -108,8 +110,8 @@ def fitness_func(solution, solution_idx):
         os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
 
         # insert solution for R and epsilon for H-bond
-        os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") ($7 = '''+str(solution[10])+''') && ($8 = '''+str(solution[11])+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
-        os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
+        os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+str(solution[10])+''') && ($8 = '''+str(solution[11])+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
+        os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
 
         #add_to_dat_file():
         dat = open(''+iv.var.parameter_file+'', 'a')
@@ -236,7 +238,7 @@ if __name__=='__main__':
     generation = 0
 
     with open('parameter_history', 'a') as f:
-        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_Ru_Ru     e_Ru_Ru|    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
+        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_"+iv.var.metal_symbol+"_"+iv.var.metal_symbol+"     e_"+iv.var.metal_symbol+"_"+iv.var.metal_symbol+"|    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
 
     # Make list of the protein numbers to iterate over
     dir_list = os.listdir(os.getcwd())
