@@ -9,7 +9,7 @@ def clean_protein_pdb(pdb_file):
     os.system("rm clean_1 clean_2")
 
 def protonate_pdb(pdb_file):
-    os.system('~/.conda/envs/MetPar/bin/pdb2pqr30 --pdb-output pdb_prot.pdb --pH 7.4 --drop-water '+pdb_file+' pdb_prot.pdb')
+    os.system(os.environ['PYTHON_BIN']+'/pdb2pqr30 --pdb-output pdb_prot.pdb --pH 7.4 --drop-water '+pdb_file+' pdb_prot.pdb')
 
 
 def get_ref_pdb(pdb_file):
