@@ -48,7 +48,9 @@ if __name__=='__main__':
 
     if os.path.exists('clean_'+iv.var.name_protein+'.pdb') == False:
         os.system("cp  "+os.environ['WORKING_DIR']+"/"+iv.var.name_protein+".pdb .")
-        pdb.clean_protein_pdb(iv.var.pdb_file_protein)
+        #pdb.clean_protein_pdb(iv.var.pdb_file_protein)
+        pdb.protonate_pdb(iv.var.name_protein)
+        pdb.clean_protein_pdb('pdb_prot.pdb')
 
     ###### Single Point ######
     os.chdir(os.environ['OUTPUT_DIR'])
@@ -83,13 +85,13 @@ if __name__=='__main__':
     else:
         os.chdir('docking')
 
-    os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
+    #os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
 
-    os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") ($7 = '''+iv.var.r_Ru_Ru+''') && ($8 = '''+iv.var.e_Ru_Ru+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
-    os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
-    os.system("rm file_1")
+    #os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+iv.var.r_Ru_Ru+''') && ($8 = '''+iv.var.e_Ru_Ru+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
+    #os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
+    #os.system("rm file_1")
 
-    os.system('cp '+os.environ['OUTPUT_DIR']+'/file_prep/clean_'+iv.var.name_protein+'.pdb .')
+    os.system('cp '+os.environ['OUTPUT_DIR']+'/file_prep/clean_'+iv.var.pdb_file_protein+' .')
 
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'.mol2 .')
     os.system('cp '+os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob/CM5_charges .')
@@ -98,26 +100,13 @@ if __name__=='__main__':
     os.system(os.environ['OBABEL']+" -ixyz "+iv.var.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz")
 
     if iv.var.reference_docking == True:
-        dock.users_coordinates()
-        #dock.get_coordinates()
+        #dock.users_coordinates()
+        dock.get_coordinates()
     else:
         dock.users_coordinates()
 
     if iv.var.rmsd == False or iv.var.rmsd == None:
-        dock.create_ligand_pdbqt_file()
-
-        dock.prepare_receptor()
-
-        dock.randomize_translation_rotation(iv.var.name_ligand+'.pdbqt')
-        dock.add_to_dat_file()
-
-        dock.create_gpf()
-        dock.autogrid()
-
-        dock.create_dpf()
-        dock.autodock()
-
-        dock.write_all_conformations()
+        dock.docking()
 
     if iv.var.reference_docking == True:
 

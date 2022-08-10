@@ -13,6 +13,27 @@ from rdkit import Chem
 import input_variables as iv
 import variable_class as vc
 
+'''
+All the docking parameters were obtained by a genetic alogrithm
+'''
+
+dock_par = {'V': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Cr': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Fe': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Co': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Ni': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Cu': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Y': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Mo': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Ru': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Rh': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Pd': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Re': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Os': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Ir': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Pt': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'}
+           }
+
 def create_ligand_pdbqt_file():
     #mol2 = next(py.readfile('xyz',''+iv.var.name_ligand+'_c.xyz'))
     #mol2.write('mol2',iv.var.name_ligand+'.mol2',overwrite=True)
@@ -45,7 +66,7 @@ def create_ligand_pdbqt_file():
     pdbqt.write('pdbqt',iv.var.name_ligand+'.pdbqt',overwrite=True)
 
 def get_coordinates():
-    os.system('''awk '$1 == "Ru" { print $0 }' ref.xyz > coordinates''')
+    os.system('''awk '$1 == "'''+iv.var.metal_symbol+r'''" { print $0 }' ref.xyz > coordinates''')
 
     dock_site = open('coordinates','r')
     coord = [line.split() for line in dock_site]
@@ -65,25 +86,25 @@ def users_coordinates():
 
 
 def prepare_receptor():
-    os.system(os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+iv.var.name_protein+'.pdb')
+    os.system(os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+iv.var.pdb_file_protein)
 
 def add_to_dat_file():
     dat = open(''+iv.var.parameter_file+'', 'a')
-    dat.write('nbp_r_eps '+iv.var.r_OA+'   '+iv.var.e_OA+' 12 6 OA '+iv.var.metal_symbol+'\n')
-    dat.write('nbp_r_eps '+iv.var.r_SA+'   '+iv.var.e_SA+' 12 6 SA '+iv.var.metal_symbol+'\n')
-    dat.write('nbp_r_eps '+iv.var.r_HD+'   '+iv.var.e_HD+' 12 6 HD '+iv.var.metal_symbol+'\n')
-    dat.write('nbp_r_eps '+iv.var.r_NA+'   '+iv.var.e_NA+' 12 6 NA '+iv.var.metal_symbol+'\n')
-    dat.write('nbp_r_eps '+iv.var.r_N+'   '+iv.var.e_N+' 12 6  N '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_OA']+'   '+dock_par[iv.var.metal_symbol]['e_OA']+' 12 6 OA '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_SA']+'   '+dock_par[iv.var.metal_symbol]['e_SA']+' 12 6 SA '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_HD']+'   '+dock_par[iv.var.metal_symbol]['e_HD']+' 12 6 HD '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_NA']+'   '+dock_par[iv.var.metal_symbol]['e_NA']+' 12 6 NA '+iv.var.metal_symbol+'\n')
+    dat.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_N']+'   '+dock_par[iv.var.metal_symbol]['e_N']+' 12 6  N '+iv.var.metal_symbol+'\n')
     dat.close()
 
 def create_gpf():
     os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+iv.var.name_ligand+".pdbqt  -r clean_"+iv.var.name_protein+".pdbqt -p parameter_file="+iv.var.parameter_file+" -p npts='"+iv.var.box_size+"' -p gridcenter='"+dock_x+","+dock_y+","+dock_z+"'")
     gpf = open('clean_'+iv.var.name_protein+'.gpf', 'a')
-    gpf.write('nbp_r_eps '+iv.var.r_OA+'   '+iv.var.e_OA+' 12 6 OA '+iv.var.metal_symbol+'\n')
-    gpf.write('nbp_r_eps '+iv.var.r_SA+'   '+iv.var.e_SA+' 12 6 SA '+iv.var.metal_symbol+'\n')
-    gpf.write('nbp_r_eps '+iv.var.r_HD+'   '+iv.var.e_HD+' 12 6 HD '+iv.var.metal_symbol+'\n')
-    gpf.write('nbp_r_eps '+iv.var.r_NA+'   '+iv.var.e_NA+' 12 6 NA '+iv.var.metal_symbol+'\n')
-    gpf.write('nbp_r_eps '+iv.var.r_N+'   '+iv.var.e_N+' 12 6  N '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_OA']+'   '+dock_par[iv.var.metal_symbol]['e_OA']+' 12 6 OA '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_SA']+'   '+dock_par[iv.var.metal_symbol]['e_SA']+' 12 6 SA '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_HD']+'   '+dock_par[iv.var.metal_symbol]['e_HD']+' 12 6 HD '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_NA']+'   '+dock_par[iv.var.metal_symbol]['e_NA']+' 12 6 NA '+iv.var.metal_symbol+'\n')
+    gpf.write('nbp_r_eps '+dock_par[iv.var.metal_symbol]['R_N']+'   '+dock_par[iv.var.metal_symbol]['e_N']+' 12 6  N '+iv.var.metal_symbol+'\n')
     gpf.close()
 
 def autogrid():
@@ -97,6 +118,28 @@ def autodock():
 
 def write_all_conformations():
      os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+iv.var.name_ligand+"_clean_"+iv.var.name_protein+".dlg")
+
+def docking():
+    os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
+    os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+dock_par[iv.var.metal_symbol]['r_M_M']+''') && ($8 = '''+dock_par[iv.var.metal_symbol]['e_M_M']+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
+    os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > ad4_parameters.dat''')
+    os.system("rm file_1")
+
+    create_ligand_pdbqt_file()
+    prepare_receptor()
+
+    randomize_translation_rotation(iv.var.name_ligand+'.pdbqt')
+    add_to_dat_file()
+    create_gpf()
+    autogrid()
+    create_dpf()
+    autodock()
+
+    write_all_conformations()
+    return
+
+
+
 
 def distance(x1,x2,y1,y2,z1,z2):
 
