@@ -1,6 +1,6 @@
 class lig_par_dock:
 
-    def __init__(self, reference_docking, dock_x, dock_y, dock_z, rmsd, pdb_file_protein, name_protein, xyz_file_ligand, name_ligand, parameter_file, box_size,  metal_symbol, metal_cap, charge_ligand, spin_ligand,  basis_set, gga_functional, hybrid_functional, dispersion_correction, r_OA, e_OA, r_SA, e_SA, r_HD, e_HD, r_NA, e_NA, r_N, e_N, r_Ru_Ru, e_Ru_Ru):
+    def __init__(self, reference_docking, dock_x, dock_y, dock_z, rmsd, pdb_file_protein, name_protein, pH, xyz_file_ligand, name_ligand, parameter_file, box_size,  metal_symbol, metal_cap, charge_ligand, spin_ligand,  basis_set, gga_functional, hybrid_functional, dispersion_correction, r_OA, e_OA, r_SA, e_SA, r_HD, e_HD, r_NA, e_NA, r_N, e_N, r_Ru_Ru, e_Ru_Ru):
 
         self.reference_docking = reference_docking
 
@@ -12,6 +12,7 @@ class lig_par_dock:
 
         self.pdb_file_protein = pdb_file_protein
         self.name_protein = name_protein
+        self.pH = pH
 
         self.xyz_file_ligand = xyz_file_ligand
         self.name_ligand = name_ligand

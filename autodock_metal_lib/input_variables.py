@@ -28,6 +28,7 @@ def insert_arguments():
 
     ###### Protein File ######
     parser.add_argument("-pdb","--pdb_file_protein", type=str, help="The pdb file of the protein",required=True)
+    parser.add_argument("-pH","--pH",type=str, help='pH of system',required=True)
 
     ###### Ligand Settings ######
     parser.add_argument("-xyz","--xyz_file_ligand", type=str, help="The xyz file of the ligand",required=True)
@@ -104,5 +105,5 @@ def insert_arguments():
     metal_cap = args.metal_symbol.upper()
 
     global var
-    var = vc.lig_par_dock(args.reference_docking, args.dock_x, args.dock_y, args.dock_z, args.rmsd, args.pdb_file_protein, name_protein, args.xyz_file_ligand, name_ligand, args.parameter_file, args.box_size, args.metal_symbol, metal_cap, args.charge_ligand, args.spin_ligand, args.basis_set, args.gga_functional, args.hybrid_functional, args.dispersion_correction, args.r_OA, args.e_OA, args.r_SA, args.e_SA,args.r_HD, args.e_HD,args.r_NA, args.e_NA,args.r_N, args.e_N, args.r_Ru_Ru, args.e_Ru_Ru)
+    var = vc.lig_par_dock(args.reference_docking, args.dock_x, args.dock_y, args.dock_z, args.rmsd, args.pdb_file_protein, name_protein, args.pH, args.xyz_file_ligand, name_ligand, args.parameter_file, args.box_size, args.metal_symbol, metal_cap, args.charge_ligand, args.spin_ligand, args.basis_set, args.gga_functional, args.hybrid_functional, args.dispersion_correction, args.r_OA, args.e_OA, args.r_SA, args.e_SA,args.r_HD, args.e_HD,args.r_NA, args.e_NA,args.r_N, args.e_N, args.r_Ru_Ru, args.e_Ru_Ru)
 
