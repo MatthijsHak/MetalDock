@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os
+from os import path
 import argparse
 import subprocess
 
@@ -97,9 +98,9 @@ if __name__=='__main__':
     os.system('cp '+os.environ['OUTPUT_DIR']+'/single_point/plams_workdir/plamsjob/CM5_charges .')
 
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'_c.xyz .')
-    
-    # Comment if necessary to create own ref.xyz file
-    os.system(os.environ['OBABEL']+" -ixyz "+iv.var.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz")
+
+    if os.path.isfile('ref.xyz') == False:
+        os.system(os.environ['OBABEL']+" -ixyz "+iv.var.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz")
 
     if iv.var.reference_docking == True:
         #dock.users_coordinates()

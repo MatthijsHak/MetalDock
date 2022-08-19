@@ -29,6 +29,15 @@ def convertible(v):
     except (TypeError, ValueError):
         return False
 
+def is_float(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
+
 def mutation_func(offspring, ga_instance):
     '''
     Mutation function that adds 10 percent or substracts 10 percent of the parameter value
@@ -99,9 +108,14 @@ def fitness_func(solution, solution_idx):
         dock_site = open('coordinates','r')
         coord = [line.split() for line in dock_site]
 
-        dock_x = coord[0][0]
-        dock_y = coord[0][1]
-        dock_z = coord[0][2]
+        if is_float(coord[0][0]) == True:
+            dock_x = coord[0][0]
+            dock_y = coord[0][1]
+            dock_z = coord[0][2]
+        else:
+            dock_x = coord[0][1]
+            dock_y = coord[0][2]
+            dock_z = coord[0][3]
 
 
         dock.randomize_translation_rotation(name_ligand+'.pdbqt')
@@ -113,17 +127,9 @@ def fitness_func(solution, solution_idx):
         os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+str(solution[10])+''') && ($8 = '''+str(solution[11])+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
         os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
 
-        #add_to_dat_file():
-        dat = open(''+iv.var.parameter_file+'', 'a')
-        dat.write('nbp_r_eps '+str(solution[0])+'   '+str(solution[1])+'    12 6 OA '+iv.var.metal_symbol+'\n')
-        dat.write('nbp_r_eps '+str(solution[2])+'   '+str(solution[3])+'    12 6 SA '+iv.var.metal_symbol+'\n')
-        dat.write('nbp_r_eps '+str(solution[4])+'   '+str(solution[5])+'    12 6 HD '+iv.var.metal_symbol+'\n')
-        dat.write('nbp_r_eps '+str(solution[6])+'   '+str(solution[7])+'    12 6 NA '+iv.var.metal_symbol+'\n')
-        dat.write('nbp_r_eps '+str(solution[8])+'   '+str(solution[9])+'    12 6  N '+iv.var.metal_symbol+'\n')
-        dat.close()
-
 
         #create_gpf():
+        os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+iv.var.parameter_file+" -p npts='"+iv.var.box_size+"' -p gridcenter='"+dock_x+","+dock_y+","+dock_z+"' > /dev/null 2>&1")
         gpf = open('clean_'+name_protein+'.gpf', 'a')
         gpf.write('nbp_r_eps '+str(solution[0])+'   '+str(solution[1])+'    12 6 OA '+iv.var.metal_symbol+'\n')
         gpf.write('nbp_r_eps '+str(solution[2])+'   '+str(solution[3])+'    12 6 SA '+iv.var.metal_symbol+'\n')
@@ -138,22 +144,22 @@ def fitness_func(solution, solution_idx):
         #create_dpf()
         os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_dpf42.py -l "+name_ligand+".pdbqt -r clean_"+name_protein+".pdb -p parameter_file="+iv.var.parameter_file+" > /dev/null 2>&1")
 
+        dpf = open(name_ligand+'_clean_'+name_protein+'.dpf', 'a')
+        dpf.write('intnbp_r_eps '+str(solution[0])+'   '+str(solution[1])+'    12 6 OA '+iv.var.metal_symbol+'\n')
+        dpf.write('intnbp_r_eps '+str(solution[2])+'   '+str(solution[3])+'    12 6 SA '+iv.var.metal_symbol+'\n')
+        dpf.write('intnbp_r_eps '+str(solution[4])+'   '+str(solution[5])+'    12 6 HD '+iv.var.metal_symbol+'\n')
+        dpf.write('intnbp_r_eps '+str(solution[6])+'   '+str(solution[7])+'    12 6 NA '+iv.var.metal_symbol+'\n')
+        dpf.write('intnbp_r_eps '+str(solution[8])+'   '+str(solution[9])+'    12 6  N '+iv.var.metal_symbol+'\n')
+        dpf.close()
+
         #autodock()
         os.system(os.environ['AUTODOCK']+'/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf > /dev/null 2>&1')
 
         #write_all_conformations()
         os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+name_ligand+"_clean_"+name_protein+".dlg")
 
-        #pdb = next(py.readfile('pdb','ref.pdb'))
-        #pdb.write('xyz','ref.xyz',overwrite=True)
-
         rmsd_avg = []
         rmsd_list = []
-
-        #os.system(os.environ['OBABEL']+" -isdf output.sdf -oxyz normalize.xyz -d > normalize.xyz")
-
-        #rmsd_normalize = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz normalize.xyz --reorder']))
-        #rmsd_list.append("RMSD between reference ligand and quantum optimized structure: %.4f" % rmsd_normalize)
 
         i = 1
         while os.path.exists(name_ligand+"_%i.pdbqt" % i):

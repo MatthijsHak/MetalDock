@@ -17,13 +17,13 @@ import variable_class as vc
 All the docking parameters were obtained by a genetic alogrithm
 '''
 
-dock_par = {'V': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+dock_par = {'V' : {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Cr': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Fe': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Co': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Ni': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Cu': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
-            'Y': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Y' : {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Mo': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Ru': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Rh': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
@@ -31,7 +31,8 @@ dock_par = {'V': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.
             'Re': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Os': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
             'Ir': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
-            'Pt': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'}
+            'Pt': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'},
+            'Au': {'R_OA':'2.0','e_OA':'5.0','R_SA':'2.0','e_SA':'5.0','R_HD':'1.7','e_HD':'5.0','R_NA':'2.0','e_NA':'5.0','R_N':'2.0','e_N':'5.0','r_M_M':'2.0','e_M_M':'5.0'}
            }
 
 def create_ligand_pdbqt_file():
@@ -112,6 +113,13 @@ def autogrid():
 
 def create_dpf():
     os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_dpf42.py -l "+iv.var.name_ligand+".pdbqt -r clean_"+iv.var.name_protein+".pdb -p parameter_file="+iv.var.parameter_file)
+    dpf = open(iv.var.name_ligand+'_clean_'+iv.var.name_protein+'.dpf', 'a')
+    dpf.write('intnbp_r_eps '+dock_par[iv.var.metal_symbol]['R_OA']+'   '+dock_par[iv.var.metal_symbol]['e_OA']+' 12 6 OA '+iv.var.metal_symbol+'\n')
+    dpf.write('intnbp_r_eps '+dock_par[iv.var.metal_symbol]['R_SA']+'   '+dock_par[iv.var.metal_symbol]['e_SA']+' 12 6 SA '+iv.var.metal_symbol+'\n')
+    dpf.write('intnbp_r_eps '+dock_par[iv.var.metal_symbol]['R_HD']+'   '+dock_par[iv.var.metal_symbol]['e_HD']+' 12 6 HD '+iv.var.metal_symbol+'\n')
+    dpf.write('intnbp_r_eps '+dock_par[iv.var.metal_symbol]['R_NA']+'   '+dock_par[iv.var.metal_symbol]['e_NA']+' 12 6 NA '+iv.var.metal_symbol+'\n')
+    dpf.write('intnbp_r_eps '+dock_par[iv.var.metal_symbol]['R_N']+'   '+dock_par[iv.var.metal_symbol]['e_N']+' 12 6  N '+iv.var.metal_symbol+'\n')
+    dpf.close()
 
 def autodock():
     os.system(os.environ['AUTODOCK']+'/autodock4 -p '+iv.var.name_ligand+'_clean_'+iv.var.name_protein+'.dpf')
@@ -122,14 +130,13 @@ def write_all_conformations():
 def docking():
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
     os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+dock_par[iv.var.metal_symbol]['r_M_M']+''') && ($8 = '''+dock_par[iv.var.metal_symbol]['e_M_M']+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
-    os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > ad4_parameters.dat''')
+    os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
     os.system("rm file_1")
 
     create_ligand_pdbqt_file()
     prepare_receptor()
 
     randomize_translation_rotation(iv.var.name_ligand+'.pdbqt')
-    add_to_dat_file()
     create_gpf()
     autogrid()
     create_dpf()
