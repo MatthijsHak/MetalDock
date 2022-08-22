@@ -65,8 +65,8 @@ def insert_arguments():
     parser.add_argument("-r_N", "--r_N", type=str, help="r_N")
     parser.add_argument("-e_N", "--e_N", type=str, help="e_N")
 
-    parser.add_argument("-r_Ru_Ru", "--r_Ru_Ru", type=str, help="r_Ru_Ru")
-    parser.add_argument("-e_Ru_Ru", "--e_Ru_Ru", type=str, help="e_Ru_Ru")
+    parser.add_argument("-r_M", "--r_M", type=str, help="r_M")
+    parser.add_argument("-e_M", "--e_M", type=str, help="e_M")
 
 
     args = parser.parse_args()
@@ -91,10 +91,10 @@ def insert_arguments():
         args.r_N = "2.0"
     if args.e_N == None:
         args.e_N = "10.0"
-    if args.r_Ru_Ru == None:
-        args.r_Ru_Ru = "2.0"
-    if args.e_Ru_Ru == None:
-        args.e_Ru_Ru = "10.0"
+    if args.r_M == None:
+        args.r_M = "2.0"
+    if args.e_M == None:
+        args.e_M = "10.0"
 
     name_protein = args.pdb_file_protein
     name_protein = name_protein.removesuffix('.pdb')
