@@ -1,6 +1,6 @@
 class lig_par_dock:
 
-    def __init__(self, parameter_file, box_size,  metal_symbol, metal_cap, r_OA, e_OA, r_SA, e_SA, r_HD, e_HD, r_NA, e_NA, r_N, e_N, r_Ru_Ru, e_Ru_Ru):
+    def __init__(self, parameter_file, box_size,  metal_symbol, metal_cap, r_OA, e_OA, r_SA, e_SA, r_HD, e_HD, r_NA, e_NA, r_N, e_N, r_M, e_M):
 
         self.parameter_file = parameter_file
         self.box_size = box_size
@@ -23,5 +23,5 @@ class lig_par_dock:
         self.r_N = r_N
         self.e_N = e_N
 
-        self.r_Ru_Ru = r_Ru_Ru
-        self.e_Ru_Ru = e_Ru_Ru
+        self.r_M = r_M
+        self.e_M = e_M

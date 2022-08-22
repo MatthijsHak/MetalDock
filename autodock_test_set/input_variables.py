@@ -37,8 +37,8 @@ def insert_arguments():
     parser.add_argument("-r_N", "--r_N", type=str, help="r_N", required=True)
     parser.add_argument("-e_N", "--e_N", type=str, help="e_N", required=True)
 
-    parser.add_argument("-r_Ru_Ru", "--r_Ru_Ru", type=str, help="r_N", required=True)
-    parser.add_argument("-e_Ru_Ru", "--e_Ru_Ru", type=str, help="e_N", required=True)
+    parser.add_argument("-r_M", "--r_M", type=str, help="r_N", required=True)
+    parser.add_argument("-e_M", "--e_M", type=str, help="e_N", required=True)
 
 
     args = parser.parse_args()
@@ -46,6 +46,6 @@ def insert_arguments():
     metal_cap = args.metal_symbol.upper()
 
     global var
-    var = vc.lig_par_dock(args.parameter_file, args.box_size, args.metal_symbol, metal_cap, args.r_OA, args.e_OA, args.r_SA, args.e_SA,args.r_HD, args.e_HD,args.r_NA, args.e_NA,args.r_N, args.e_N, args.r_Ru_Ru, args.e_Ru_Ru )
+    var = vc.lig_par_dock(args.parameter_file, args.box_size, args.metal_symbol, metal_cap, args.r_OA, args.e_OA, args.r_SA, args.e_SA,args.r_HD, args.e_HD,args.r_NA, args.e_NA,args.r_N, args.e_N, args.r_M, args.e_M)
 
 

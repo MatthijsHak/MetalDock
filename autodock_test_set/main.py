@@ -22,6 +22,14 @@ def convertible(v):
     except (TypeError, ValueError):
         return False
 
+def is_float(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
 def remove_suffix(text, suffix):
     if text.endswith(suffix):
         return text[len(suffix):]
@@ -41,7 +49,7 @@ if __name__=='__main__':
     generation = 0
 
     with open('parameter_history', 'a') as f:
-        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_Ru_Ru     e_Ru_Ru|    fitness    RMSD_AVG    RMSD_MIN_AVG\n")
+        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_"+iv.var.metal_symbol+"_"+iv.var.metal_symbol+"     e_"+iv.var.metal_symbol+"_"+iv.var.metal_symbol+"|    fitness    RMSD_AVG    RMSD_MIN_AVG\n")
 
     # Make list of the protein numbers to iterate over
     dir_list = os.listdir(os.getcwd())
@@ -92,9 +100,15 @@ if __name__=='__main__':
 
         global dock_x, dock_y, dock_z
 
-        dock_x = str(coord[0][1])
-        dock_y = str(coord[0][2])
-        dock_z = str(coord[0][3])
+        if is_float(coord[0][0]) == True:
+            dock_x = str(coord[0][0])
+            dock_y = str(coord[0][1])
+            dock_z = str(coord[0][2])
+        else:
+            dock_x = str(coord[0][1])
+            dock_y = str(coord[0][2])
+            dock_z = str(coord[0][3])
+
 
         dock.randomize_translation_rotation(name_ligand+'.pdbqt')
         os.system('mv docking.pdbqt '+name_ligand+'.pdbqt')
@@ -102,19 +116,11 @@ if __name__=='__main__':
         os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
 
         # insert solution for R and epsilon for H-bond
-        os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") ($7 = '''+iv.var.r_Ru_Ru+''') && ($8 = '''+iv.var.e_Ru_Ru+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
-        os.system(r'''awk '{ if ($2 == "RU" || $2 == "Ru") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
-
-        #add_to_dat_file():
-        dat = open(''+iv.var.parameter_file+'', 'a')
-        dat.write('nbp_r_eps '+iv.var.r_OA+'   '+iv.var.e_OA+' 12 6 OA '+iv.var.metal_symbol+'\n')
-        dat.write('nbp_r_eps '+iv.var.r_SA+'   '+iv.var.e_SA+' 12 6 SA '+iv.var.metal_symbol+'\n')
-        dat.write('nbp_r_eps '+iv.var.r_HD+'   '+iv.var.e_HD+' 12 6 HD '+iv.var.metal_symbol+'\n')
-        dat.write('nbp_r_eps '+iv.var.r_NA+'   '+iv.var.e_NA+' 12 6 NA '+iv.var.metal_symbol+'\n')
-        dat.write('nbp_r_eps '+iv.var.r_N+'   '+iv.var.e_N+' 12 6  N '+iv.var.metal_symbol+'\n')
-        dat.close()
+        os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+iv.var.r_M+''') && ($8 = '''+iv.var.e_M+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
+        os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
 
         #create_gpf():
+        os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+iv.var.parameter_file+" -p npts='"+iv.var.box_size+"' -p gridcenter='"+dock_x+","+dock_y+","+dock_z+"' > /dev/null 2>&1")
         gpf = open('clean_'+name_protein+'.gpf', 'a')
         gpf.write('nbp_r_eps '+iv.var.r_OA+'   '+iv.var.e_OA+' 12 6 OA '+iv.var.metal_symbol+'\n')
         gpf.write('nbp_r_eps '+iv.var.r_SA+'   '+iv.var.e_SA+' 12 6 SA '+iv.var.metal_symbol+'\n')
@@ -128,6 +134,15 @@ if __name__=='__main__':
 
         #create_dpf()
         os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_dpf42.py -l "+name_ligand+".pdbqt -r clean_"+name_protein+".pdb -p parameter_file="+iv.var.parameter_file+" > /dev/null 2>&1")
+
+        dpf = open(name_ligand+'_clean_'+name_protein+'.dpf', 'a')
+        dpf.write('intnbp_r_eps '+iv.var.r_OA+'   '+iv.var.e_OA+'    12 6 OA '+iv.var.metal_symbol+'\n')
+        dpf.write('intnbp_r_eps '+iv.var.r_SA+'   '+iv.var.e_SA+'    12 6 SA '+iv.var.metal_symbol+'\n')
+        dpf.write('intnbp_r_eps '+iv.var.r_HD+'   '+iv.var.e_HD+'    12 6 HD '+iv.var.metal_symbol+'\n')
+        dpf.write('intnbp_r_eps '+iv.var.r_NA+'   '+iv.var.e_NA+'    12 6 NA '+iv.var.metal_symbol+'\n')
+        dpf.write('intnbp_r_eps '+iv.var.r_N+'   '+iv.var.e_N+'    12 6  N '+iv.var.metal_symbol+'\n')
+        dpf.close()
+
 
         #autodock()
         os.system(os.environ['AUTODOCK']+'/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf > /dev/null 2>&1')
@@ -183,7 +198,7 @@ if __name__=='__main__':
             generation_avg = (sum(generation_avg_list) / len(generation_avg_list))
             generation_min_avg= (sum(generation_min_avg_list) / len(generation_min_avg_list))
 
-    method = generation_avg
+    method = avg_output 
 
     fitness = 1 / np.abs(method - desired_output)
 
