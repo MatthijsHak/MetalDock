@@ -1,0 +1,27 @@
+GEOMETRY CONVERGED
+
+SINGLE POINT SUCCESSFULLY PERFORMED
+
+
+SINGLE POINT SUCCESSFULLY PERFORMED
+
+
+DOCKING SUCCESFULLY COMPLETED
+
+THE PRINTED POSES AND PROTEIN CAN BE FOUND IN THE RESULTS DIRECTORY
+
+
+JOB STATISTICS
+==============
+Job ID: 1637222
+Cluster: snellius
+User/Group: matthak/matthak
+State: RUNNING
+Nodes: 1
+Cores per node: 32
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 03:29:04 core-walltime
+Job Wall-clock time: 00:06:32
+Memory Utilized: 0.00 MB (estimated maximum)
+Memory Efficiency: 0.00% of 56.00 GB (1.75 GB/core)
+WARNING: Efficiency statistics may be misleading for RUNNING jobs.

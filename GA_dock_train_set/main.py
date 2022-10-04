@@ -11,6 +11,7 @@ import random
 import statistics
 import multiprocessing as mp 
 
+from scipy.stats import rankdata
 
 import matplotlib as mpl
 from matplotlib import pyplot as plt
@@ -53,9 +54,16 @@ def mutation_func(offspring, ga_instance):
     mutation_positive = [x * 0.1 for x in range(1, mutation_step)]
     mutation_negative = [x * 0.001 for x in range(1, mutation_step)]
 
+    #Adaptive Mutation
+    mutation_probability_list = [ x  for x in np.linspace(0, 1, num=iv.var.sol_per_pop)]
+
+    rank_list = rankdata(ga_instance.last_generation_fitness)
+
     offspring_length = iv.var.sol_per_pop - iv.var.keep_parents
 
     for i in range(0,offspring_length):
+        mutation_probability = mutation_probability_list[int(rank_list[i])-1]
+
         for chromosome_idx in range(0,len(gene_space)):
             random_number_1 = random.uniform(0,1)
             random_number_2 = random.uniform(0,1)
@@ -64,16 +72,13 @@ def mutation_func(offspring, ga_instance):
             if random_number_1 < mutation_probability:
                 if random_number_2 <= 0.5:
                     mutated_gene = offspring[i][chromosome_idx] * mutation_positive[random_int]
-                    #print('Mutation rate for gene {}: {}\n'.format(chromosome_idx, mutation_positive[random_int]))
                 else:
                     mutated_gene = offspring[i][chromosome_idx] * mutation_negative[random_int]
-                    #rint('Mutation rate gene {}: {:.4}\n'.format(chromosome_idx, mutation_negative[random_int]))
 
                 if gene_space[chromosome_idx]['low'] <= mutated_gene <= gene_space[chromosome_idx]['high']:
                     pass
                 else:
                     mutated_gene = offspring[i][chromosome_idx]
-                    #print('Mutation out of gene space\n')
             
             else:
                 offspring[i] = offspring[i]
@@ -85,15 +90,15 @@ def box_size_func(sdf_file, spacing, scale_factor):
     sdf = glob.glob(sdf_file)
     sdf = ''.join(str(x) for x in sdf)
     sdf = open(sdf, 'r')
-        
+
     # Extract coordinates 
     lines = [line.split() for line in sdf]
     del lines[:4]
-        
+
     for j in range(0,len(lines)):
         del lines[j][4:]
         string = lines[j][3]
-            
+
         if is_float(string) == True:
             del lines[j:]
             break
@@ -103,14 +108,14 @@ def box_size_func(sdf_file, spacing, scale_factor):
     x_axis = []
     y_axis = []
     z_axis = []
-    
+
     for k in range(0,len(lines)):
         if lines[k][3] == ''+iv.var.metal_symbol+'':
             metal = lines[k][:3]
-        
+
         coordinates.append(lines[k][:3])
         elements.append(lines[k][3])
-        
+
         x_axis.append(float(lines[k][0]))
         y_axis.append(float(lines[k][1]))
         z_axis.append(float(lines[k][2]))
@@ -132,13 +137,20 @@ def box_size_func(sdf_file, spacing, scale_factor):
     x_axis = np.abs(np.max(x_axis-metal[0]) - np.min(x_axis-metal[0]))*scale_factor
     y_axis = np.abs(np.max(y_axis-metal[1]) - np.min(y_axis-metal[1]))*scale_factor
     z_axis = np.abs(np.max(z_axis-metal[2]) - np.min(z_axis-metal[2]))*scale_factor
-    
+
+    if x_axis > 20:
+        x_axis = 20
+    if y_axis > 20:
+        y_axis = 20
+    if z_axis > 20:
+        z_axis = 20
+
     x_npts = (round(x_axis / spacing)) & (-2)
     y_npts = (round(y_axis / spacing)) & (-2)
     z_npts = (round(z_axis / spacing)) & (-2)
 
     max_side = max([x_npts,y_npts,z_npts])
-
+    print('Box size is {} {} {}'.format(x_npts*spacing,y_npts*spacing,z_npts*spacing))
     # Box dimensions in npts
     npts = [max_side, max_side, max_side]
 
@@ -158,7 +170,7 @@ def docking_centre(coordinate_file):
 
 def docking_func(solution, name_ligand, name_protein, energy, dock, npts, solution_idx):
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
-
+    
     # insert solution for R and epsilon for H-bond
     os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+str(solution[10])+''') && ($8 = '''+str(solution[11])+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
     os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
@@ -174,17 +186,17 @@ def docking_func(solution, name_ligand, name_protein, energy, dock, npts, soluti
     gpf.close()
 
     #autogrid()
-    os.system(os.environ['AUTODOCK']+'/autogrid4 -p clean_'+name_protein+'.gpf > /dev/null 2>&1')
+    os.system(os.environ['AUTODOCK']+'/autogrid4 -p clean_'+name_protein+'.gpf  >  /dev/null 2>&1')
 
     #create_dpf()
     d.write_dpf_file('clean_'+name_protein+'.gpf', name_ligand, 'clean_'+name_protein, iv.var.parameter_file, energy, random_pos=iv.var.random_position, SA=iv.var.docking_simulated_annealing, GA=iv.var.docking_genetic_algorithm)
 
     #autodock()
-    os.system(os.environ['AUTODOCK']+'/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf >  /dev/null 2>&1')
+    os.system(os.environ['AUTODOCK']+'/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf  >  /dev/null 2>&1')
 
     #write_all_conformations()
     os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+name_ligand+"_clean_"+name_protein+".dlg")
-
+    print('Parent {}: succesful!'.format(solution_idx))
     return
 
 def rmsd_func(name_ligand, n_prot):
@@ -248,8 +260,8 @@ def fitness_func(solution, solution_idx):
     global step
     global population_avg_list
     global population_min_avg_list
-    # global even_list
-    # global uneven_list
+    global even_list
+    global uneven_list
 
     population_avg_list = []
     population_min_avg_list = []
@@ -283,6 +295,12 @@ def fitness_func(solution, solution_idx):
         
         if iv.var.box_size != None: 
             npts = iv.var.box_size
+        
+        if iv.var.step_wise == True:    
+            try:
+                npts = box_size_func('*.sdf', 0.375, box_size[step])
+            except IndexError:
+                npts = box_size_func('*.sdf', 0.375, box_size[-1])
 
         ##### AutoDock ##### 
         os.chdir(os.environ['OUTPUT_DIR'])
@@ -311,32 +329,32 @@ def fitness_func(solution, solution_idx):
     '''Compare previous generations with each. If the average of the solutions between each two generations is below a certain threshold
     then the size of the box will be increased.
     ''' 
-
-    # if generation % 2 == 0:
-    #     "Even generations"
-    #     even_list = np.append(even_list,solution)
-        
-    #     if generation != 0:
-    #         difference = [np.abs(i[0]-i[1]) for i in zip(even_list,uneven_list)]
+    if iv.var.step_wise == True:  
+        if generation % 2 == 0:
+            "Even generations"
+            even_list = np.append(even_list,solution)
             
-    #         if np.mean(np.array(difference)) < 0.5:
-    #             step+=1
-    #             print('Increased boxsize')
-
-    #         even_list = np.zeros([1,12])
+            if generation != 0:
+                difference = [np.abs(i[0]-i[1]) for i in zip(even_list,uneven_list)]
                 
+                if np.mean(np.array(difference)) < 0.5:
+                    step+=1
+                    #print('Item of boxsize list is now item {}'.format(step))
 
-    # if generation % 2 != 0:
-    #     "Uneven generations"
-    #     uneven_list = np.append(uneven_list,solution)
+                even_list = np.zeros([1,12])
+                    
 
-    #     difference = [np.abs(i[0]-i[1]) for i in zip(even_list,uneven_list)]
-        
-    #     if np.mean(np.array(difference)) < 0.5:
-    #         step+=1
-    #         print('Increased boxsize')
-        
-    #     uneven_list = np.zeros([1,12])
+        if generation % 2 != 0:
+            "Uneven generations"
+            uneven_list = np.append(uneven_list,solution)
+
+            difference = [np.abs(i[0]-i[1]) for i in zip(even_list,uneven_list)]
+            
+            if np.mean(np.array(difference)) < 0.5:
+                step+=1
+                #print('Item of boxsize list is now item {}'.format(step))
+            
+            uneven_list = np.zeros([1,12])
 
     os.chdir(os.environ['WORKING_DIR'])
     """ Method to Calculate Fitness
@@ -623,9 +641,9 @@ def plot_parameters(metal):
     ax[5][0].set_xlabel('N parents')
     ax[5][1].set_xlabel('N parents')
 
-    for i in range(0,6):
-        for j in range(0,2):
-            ax[i][j].set_xlim(0,500)
+    # for i in range(0,6):
+    #     for j in range(0,2):
+    #         ax[i][j].set_xlim(0,500)
 
     plt.tight_layout()
     plt.savefig(f"parameters.png", bbox_inches='tight')
@@ -658,7 +676,7 @@ class PooledGA(pygad.GA):
         pop_fitness = np.array(pop_fitness)
         return pop_fitness
 
-if __name__=='__main__':
+def train_GA():
 
     iv.insert_arguments()
 
@@ -696,6 +714,9 @@ if __name__=='__main__':
     desired_output = 0
 
     fitness_function = fitness_func
+
+    # Scale factor list
+    box_size = [1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0]
 
     num_generations = iv.var.num_generations
     num_parents_mating = iv.var.num_parents_mating
@@ -741,11 +762,8 @@ if __name__=='__main__':
 
     os.environ['TMP_DIR']=os.getcwd()
 
-    # global uneven_list
-    # global even_list
-
-    # even_list = np.zeros([1,12])
-    # uneven_list = np.zeros([1,12])
+    even_list = np.zeros([1,12])
+    uneven_list = np.zeros([1,12])
 
     with Pool(processes=sol_per_pop) as pool:
         ga_instance.run()

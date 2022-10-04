@@ -25,6 +25,7 @@ def insert_arguments():
     box = parser.add_mutually_exclusive_group(required=True)
     box.add_argument("-npts", "--box_size", type=str, help="Manually insert box size")
     box.add_argument("-scale", "--scale_factor", type=float, help="Scale to size of compound.")
+    box.add_argument("-sw", "--step_wise",  action='store_true', help="Step wise increase the scale factor.")
 
     docking_method = parser.add_mutually_exclusive_group(required=True)
     docking_method.add_argument('-GA','--docking_genetic_algorithm', action='store_true')
@@ -93,9 +94,9 @@ def insert_arguments():
     if args.crossover_prob == None:
         raise ValueError('You must specifiy the parent selection type to use the gentic algorithm as docking method.')
 
-    # Mutation #
-    if args.mutation_prob == None:
-        raise ValueError('You must specifiy the mutation probability  to use the gentic algorithm as docking method.')
+    # # Mutation #
+    # if args.mutation_prob == None:
+    #     raise ValueError('You must specifiy the mutation probability  to use the gentic algorithm as docking method.')
 
     # Random Position #
     if args.random_position == None:
@@ -120,7 +121,7 @@ def insert_arguments():
         if args.max_cycles == None:
             raise ValueError('You must specifiy the maximum number of cylces for each run to use simulated annealing as docking method.')
         
-    var = vc.variables(args.parameter_file, args.box_size, args.scale_factor, args.metal_symbol, metal_cap, args.num_generations, args.num_parents_mating, args.sol_per_pop, args.parent_selection_type, 
+    var = vc.variables(args.parameter_file, args.box_size, args.scale_factor, args.step_wise ,args.metal_symbol, metal_cap, args.num_generations, args.num_parents_mating, args.sol_per_pop, args.parent_selection_type, 
                             args.keep_parents, args.k_tournament, args.crossover_type, args.crossover_prob, args.mutation_prob , args.docking_simulated_annealing, args.docking_genetic_algorithm, 
                                     args.random_position, args.time_step, args.max_initial_energy, args.initial_annealing_temperature, args.temp_reduction_factor, args.number_of_runs, args.max_cycles)
                                          

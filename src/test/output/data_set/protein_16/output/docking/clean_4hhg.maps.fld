@@ -1,0 +1,40 @@
+# AVS field file
+#
+# AutoDock Atomic Affinity and Electrostatic Grids
+#
+# Created by /home/matthak/software/AutoDock/autogrid4.
+#
+#SPACING 0.375
+#NELEMENTS 32 42 36
+#CENTER 10.100 -19.000 -14.000
+#MACROMOLECULE clean_4hhg.pdbqt
+#GRID_PARAMETER_FILE clean_4hhg.gpf
+#
+ndim=3			# number of dimensions in the field
+dim1=33			# number of x-elements
+dim2=43			# number of y-elements
+dim3=37			# number of z-elements
+nspace=3		# number of physical coordinates per point
+veclen=7		# number of affinity values at each point
+data=float		# data type (byte, integer, float, double)
+field=uniform		# field type (uniform, rectilinear, irregular)
+coord 1 file=clean_4hhg.maps.xyz filetype=ascii offset=0
+coord 2 file=clean_4hhg.maps.xyz filetype=ascii offset=2
+coord 3 file=clean_4hhg.maps.xyz filetype=ascii offset=4
+label=A-affinity	# component label for variable 1
+label=Ru-affinity	# component label for variable 2
+label=C-affinity	# component label for variable 3
+label=NA-affinity	# component label for variable 4
+label=N-affinity	# component label for variable 5
+label=Electrostatics	# component label for variable 5
+label=Desolvation	# component label for variable 6
+#
+# location of affinity grid files and how to read them
+#
+variable 1 file=clean_4hhg.A.map filetype=ascii skip=6
+variable 2 file=clean_4hhg.Ru.map filetype=ascii skip=6
+variable 3 file=clean_4hhg.C.map filetype=ascii skip=6
+variable 4 file=clean_4hhg.NA.map filetype=ascii skip=6
+variable 5 file=clean_4hhg.N.map filetype=ascii skip=6
+variable 6 file=clean_4hhg.e.map filetype=ascii skip=6
+variable 7 file=clean_4hhg.d.map filetype=ascii skip=6

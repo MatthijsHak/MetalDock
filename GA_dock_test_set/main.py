@@ -70,6 +70,35 @@ def remove_suffix(text, suffix):
         return text[len(suffix):]
     return text
 
+def create_ligand_pdbqt_file():
+    # Grep the correct part  of the itp file
+    os.system("awk '/@<TRIPOS>ATOM/{flag=1; next} /@<TRIPOS>BOND/{flag=0} flag' "+iv.var.name_ligand+".mol2  > almost")
+
+    # Create charge file if CM5
+    os.system("awk '{if (NR!=1) {print}}' CM5_charges > new")
+    os.system(r'''awk '{printf "%8s\n",$2}' new > new_charge''')
+
+    # Insert extra column
+    os.system("paste -d' 'test almost new_charge > there")
+    #os.system("paste -d' 'test almost charges > there")
+
+    # Switch Columns
+    os.system(r'''awk '{ printf "%7s %-3s %14s %9s %9s %-5s %3s %5s %12s \n",$1,$2,$3,$4,$5,$6,$7,$8,$10}' there > correct''')
+
+    # Delete previous stuff
+    os.system("sed -n '1,/@<TRIPOS>ATOM/p;/@<TRIPOS>BOND/,$p' "+iv.var.name_ligand+".mol2 > ligand_almost")
+
+    # Insert in ligand_par.itp
+    os.system("sed '/@<TRIPOS>ATOM/ r correct' ligand_almost > "+iv.var.name_ligand+".mol2")
+    os.system("rm new new_charge ligand_almost correct there almost")
+
+    #os.system(os.environ['PYTHON_2']+''' '''+os.environ['MGLTOOLS']+'''/prepare_ligand4.py -l '''+iv.var.name_ligand+'''.mol2 -U \""" -C''')
+    pdbqt = next(py.readfile('mol2',iv.var.name_ligand+'.mol2'))
+    pdbqt.write('pdbqt',iv.var.name_ligand+'.pdbqt',overwrite=True)
+
+    return
+
+
 def box_size_func(sdf_file, spacing, scale_factor):
     # Open SDF file
     sdf = glob.glob(sdf_file)
@@ -147,6 +176,8 @@ def docking_centre(coordinate_file):
 
 def docking_func(parameter_set, name_ligand, name_protein, energy, dock, npts):
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
+    os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'_c.xyz .')
+    create_ligand_pdbqt_file()
 
     # insert solution for R and epsilon for H-bond
     os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+str(parameter_set[10])+''') && ($8 = '''+str(parameter_set[11])+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')

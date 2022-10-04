@@ -27,13 +27,20 @@ if __name__=='__main__':
 
     ###### Canonicalize Ligand ######
     if os.path.exists(iv.var.name_ligand+'_c.xyz') == False:
-        os.system(os.environ['OBABEL']+' -imol2 '+iv.var.name_ligand+'.mol2 -oxyz '+iv.var.name_ligand+'_c.xyz --canonical > '+iv.var.name_ligand+'_c.xyz')
+        os.system(os.environ['OBABEL']+' -ixyz '+iv.var.name_ligand+'.xyz -oxyz '+iv.var.name_ligand+'_c.xyz --canonical > '+iv.var.name_ligand+'_c.xyz')
+
+    if os.path.exists(iv.var.name_ligand+'.mol2') == False:
+        os.system(os.environ['OBABEL']+' -ixyz '+iv.var.name_ligand+'_c.xyz -omol2 '+iv.var.name_ligand+'.mol2  > '+iv.var.name_ligand+'.mol2')
+
+    if os.path.exists(iv.var.name_ligand+'.sdf') == False:
+        os.system(os.environ['OBABEL']+' -ixyz '+iv.var.name_ligand+'_c.xyz -osdf '+iv.var.name_ligand+'.sdf  > '+iv.var.name_ligand+'.sdf')
 
     if iv.var.scale_factor != None:
-        npts = d.box_size_func('*.sdf', 0.375, iv.var.scale_factor)
-        
-    if iv.var.box_size != None: 
-        npts = iv.var.box_size
+        npts = d.box_size_func(iv.var.name_ligand+'.sdf', 0.375, iv.var.scale_factor)
+
+    if iv.var.box_size != None:
+        npts = iv.var.box_size.split(",")
+        npts = [int(i) for i in npts]
 
     ###### Generate Output Dir #######
     if os.path.isdir('output') == False:
@@ -53,7 +60,6 @@ if __name__=='__main__':
 
     if os.path.exists('clean_'+iv.var.name_protein+'.pdb') == False:
         os.system("cp  "+os.environ['WORKING_DIR']+"/"+iv.var.name_protein+".pdb .")
-        #pdb.clean_protein_pdb(iv.var.pdb_file_protein)
         pdb.protonate_pdb(iv.var.name_protein)
         pdb.clean_protein_pdb('pdb_prot.pdb')
 
@@ -93,10 +99,6 @@ if __name__=='__main__':
 
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
 
-    # os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+iv.var.r_M+''') && ($8 = '''+iv.var.e_M+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
-    # os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf "%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
-    # os.system("rm file_1")
-
     os.system('cp '+os.environ['OUTPUT_DIR']+'/file_prep/clean_'+iv.var.pdb_file_protein+' .')
 
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'.mol2 .')
@@ -109,12 +111,13 @@ if __name__=='__main__':
 
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'_c.xyz .')
 
-    if os.path.isfile('ref.xyz') == False:
-        os.system(os.environ['OBABEL']+" -ixyz "+iv.var.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz")
+    if iv.var.rmsd == True:
+        if os.path.isfile('ref.xyz') == False:
+            os.system(os.environ['OBABEL']+" -ixyz "+iv.var.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz")
 
     if iv.var.dock_x and iv.var.dock_y and iv.var.dock_z != None:
         dock = d.users_coordinates()
-    if iv.var.dock_x and iv.var.dock_y and iv.var.dock_z == None:
+    else:
         dock = d.get_coordinates()
 
     if iv.var.standard == True:
@@ -124,16 +127,17 @@ if __name__=='__main__':
         parameter_set = [iv.var.r_OA, iv.var.e_OA, iv.var.r_SA, iv.var.e_SA, iv.var.r_HD, iv.var.e_HD, iv.var.r_NA, iv.var.e_NA, iv.var.r_N, iv.var.e_N, iv.var.r_M, iv.var.e_M]
         d.docking_func(parameter_set, iv.var.name_ligand, iv.var.name_protein, energy, dock, npts)
 
-    rmsd_list = []
-    i = 1
-    while os.path.exists(iv.var.name_ligand+"_%i.pdbqt" % i):
-        os.system(os.environ['OBABEL']+" -ipdbqt "+iv.var.name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+iv.var.name_ligand+"_{}.xyz".format(i)+" -d > "+iv.var.name_ligand+"_{}.xyz".format(i))
+    if iv.var.rmsd == True:
+        rmsd_list = []
+        i = 1
+        while os.path.exists(iv.var.name_ligand+"_%i.pdbqt" % i):
+            os.system(os.environ['OBABEL']+" -ipdbqt "+iv.var.name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+iv.var.name_ligand+"_{}.xyz".format(i)+" -d > "+iv.var.name_ligand+"_{}.xyz".format(i))
 
-        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['DOCK_LIB_DIR']+'/calculate_rmsd.py ref.xyz '+iv.var.name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
-        rmsd = rmsd_non_rotate
+            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['DOCK_LIB_DIR']+'/calculate_rmsd.py ref.xyz '+iv.var.name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
+            rmsd = rmsd_non_rotate
 
-        rmsd_list.append("RMSD for Conformation %i = %.4f"% (i, rmsd))
-        i += 1
+            rmsd_list.append("RMSD for Conformation %i = %.4f"% (i, rmsd))
+            i += 1
 
-    for i in range(0,len(rmsd_list)):
-        print(rmsd_list[i])
+        for i in range(0,len(rmsd_list)):
+            print(rmsd_list[i])

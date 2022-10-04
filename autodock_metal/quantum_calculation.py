@@ -52,6 +52,7 @@ def plams_single_point(xyz_file):
     s.input.ams.Task='SinglePoint'
 
     #ADF engine input
+    s.input.adf.scf.iterations='500'
     s.input.adf.AtomicChargesTypeForAMS='CM5'
     s.input.adf.basis.type=''+iv.var.basis_set.upper()+''
     s.input.adf.basis.core='None'

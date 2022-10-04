@@ -1,6 +1,6 @@
 import os
 import argparse
-import sys
+import sys, glob
 import subprocess
 from argparse import RawTextHelpFormatter
 import variable_class as vc
@@ -8,6 +8,7 @@ import variable_class as vc
 
 
 def insert_arguments():
+    global var
     ###### Argparse ######
     parser = argparse.ArgumentParser(
         prog='MetPar',
@@ -17,21 +18,7 @@ def insert_arguments():
 
     parser.add_argument("-p", "--parameter_file", type=str, help="Parameter file", metavar="", required=True)
     parser.add_argument("-std", "--standard", action='store_true', help='Dock with standard parameters')
-
-    ##### Docking type #####
-    # Box size # 
-    box = parser.add_mutually_exclusive_group(required=True)
-    box.add_argument("-npts", "--box_size", type=str, help="Manually insert box size")
-    box.add_argument("-scale", "--scale_factor", type=float, help="Scale to size of compound.")
-
-    docking_method = parser.add_mutually_exclusive_group(required=True)
-    docking_method.add_argument('-GA','--docking_genetic_algorithm', action='store_true')
-    docking_method.add_argument('-SA','--docking_simulated_annealing', action='store_true')
-
-    # Docking site # 
-    parser.add_argument("-dock_x", "--dock_x", type=str, help="The x-coordinate for docking")
-    parser.add_argument("-dock_y", "--dock_y", type=str, help="The y-coordinate for docking")
-    parser.add_argument("-dock_z", "--dock_z", type=str, help="The z-coordinate for docking")
+    parser.add_argument("-rmsd", "--rmsd", action='store_true', help='Dock with standard parameters')
 
     ###### Protein File ######
     parser.add_argument("-pdb","--pdb_file_protein", type=str, help="The pdb file of the protein",required=True)
@@ -43,7 +30,7 @@ def insert_arguments():
     parser.add_argument("-c", "--charge_ligand", type=str, help="Charge_ligand", required=True)
     parser.add_argument("-s", "--spin_ligand", type=str, help="Number of unpaired electrons")
 
-    ###### Input Single Point & Hessian Calculation ######
+    ###### Input Single Point Calculation ######
     parser.add_argument("-basis", "--basis_set", type=str, help="The basis set used in single point", required=True, metavar="")
 
     functional = parser.add_mutually_exclusive_group(required=True)
@@ -55,14 +42,36 @@ def insert_arguments():
     ###### Docking  Settings######
     parser.add_argument("-random_pos", "--random_position", type=bool, help="The probability of selecting a gene for applying the mutation operation")
 
-    # SA Settings Docking # 
-    parser.add_argument("-tstep", "--time_step", type=str, help="Type of the mutation operation")
-    parser.add_argument("-emax", "--max_initial_energy", type=str, help="The rate at which the mutation changes the gene.")
-    parser.add_argument("-rt", "--initial_annealing_temperature", type=str, help="The probability of selecting a gene for applying the mutation operation")
-    parser.add_argument("-rtrf", "--temp_reduction_factor", type=str, help="Percentage of genes to mutate")
-    parser.add_argument("-runs", "--number_of_runs", type=str, help="Type of the mutation operation")
-    parser.add_argument("-cycles", "--max_cycles", type=str, help="The rate at which the mutation changes the gene.")
+    # Box size # 
+    box = parser.add_mutually_exclusive_group(required=True)
+    box.add_argument("-npts", "--box_size", type=str, help="Manually insert box size")
+    box.add_argument("-scale", "--scale_factor", type=float, help="Scale to size of compound.")
 
+    # Docking site # 
+    parser.add_argument("-dock_x", "--dock_x", type=str, help="The x-coordinate for docking")
+    parser.add_argument("-dock_y", "--dock_y", type=str, help="The y-coordinate for docking")
+    parser.add_argument("-dock_z", "--dock_z", type=str, help="The z-coordinate for docking")
+
+    # Docking Algorithm #  
+    subparsers = parser.add_subparsers(help='help for subcommand', dest="cmd")
+    # GA Settings Docking # 
+    parser_GA = subparsers.add_parser("GA_dock", help='Use a genetic algorithm to dock the ligands.')
+    parser_GA.add_argument("-ga_pop_size","--ga_pop_size", type=str, help='The population size of the genetic algorithm for the docking procedure.')
+    parser_GA.add_argument("-ga_num_evals","--ga_num_evals", type=str, help='The maximum number of energy evluations of the genetic algorithm for the docking procedure.')
+    parser_GA.add_argument("-ga_num_generations","--ga_num_generations", type=str, help='The maximum number of generations of the genetic algorithm for the docking procedure.')
+    parser_GA.add_argument("-ga_elitism","--ga_elitism", type=str, help='The number of parents kept for the next generation of the genetic algorithm for the docking procedure.')
+    parser_GA.add_argument("-ga_mutation_rate","--ga_mutation_rate", type=str, help='The mutation rate of the genetic algorithm for the docking procedure.')
+    parser_GA.add_argument("-ga_crossover_rate","--ga_crossover_rate", type=str, help='The crossover rate of the genetic algorithm for the docking procedure.')
+    parser_GA.add_argument("-ga_window_size","--ga_window_size", type=str, help='The window size of the genetic algorithm for the docking procedure.')
+
+    # SA Settings Docking # 
+    parser_SA = subparsers.add_parser("SA_dock", help='Use the simulated annealing algorithm to dock the ligands.')
+    parser_SA.add_argument("-tstep", "--time_step", type=str, help="Type of the mutation operation")
+    parser_SA.add_argument("-emax", "--max_initial_energy", type=str, help="The rate at which the mutation changes the gene.")
+    parser_SA.add_argument("-rt", "--initial_annealing_temperature", type=str, help="The probability of selecting a gene for applying the mutation operation")
+    parser_SA.add_argument("-rtrf", "--temp_reduction_factor", type=str, help="Percentage of genes to mutate")
+    parser_SA.add_argument("-runs", "--number_of_runs", type=str, help="Type of the mutation operation")
+    parser_SA.add_argument("-cycles", "--max_cycles", type=str, help="The rate at which the mutation changes the gene.")
 
     ###### Parameter Settings ######
     parser.add_argument("-r_OA", "--r_OA", type=float, help="r_OA")
@@ -86,10 +95,10 @@ def insert_arguments():
     args = parser.parse_args()
 
     name_protein = args.pdb_file_protein
-    name_protein = name_protein.removesuffix('.pdb')
+    name_protein = name_protein[:-4]
 
     name_ligand = args.xyz_file_ligand
-    name_ligand = name_ligand.removesuffix('.xyz')
+    name_ligand = name_ligand[:-4]
 
     metal_cap = args.metal_symbol.upper()
 
@@ -101,7 +110,8 @@ def insert_arguments():
     if args.random_position == None:
         raise ValueError('You must specifiy if the docking procedure will be performed with an initial random position.')
 
-    if args.docking_simulated_annealing == True:
+
+    if args.cmd == "SA_dock":
         if args.time_step == None:
             raise ValueError('You must specifiy the time step to use simulated annealing as docking method.')
 
@@ -120,9 +130,16 @@ def insert_arguments():
         if args.max_cycles == None:
             raise ValueError('You must specifiy the maximum number of cylces for each run to use simulated annealing as docking method.')
 
-    global var
-    var = vc.lig_par_dock(args.standard, args.dock_x, args.dock_y, args.dock_z, args.pdb_file_protein, name_protein, args.pH, args.xyz_file_ligand, name_ligand, args.parameter_file, args.scale_factor, args.box_size, args.metal_symbol, 
-                                metal_cap, args.charge_ligand, args.spin_ligand, args.basis_set, args.gga_functional, args.hybrid_functional, args.dispersion_correction, args.docking_simulated_annealing, args.docking_genetic_algorithm, 
-                                    args.random_position, args.time_step, args.max_initial_energy, args.initial_annealing_temperature, args.temp_reduction_factor, args.number_of_runs, args.max_cycles, args.r_OA, args.e_OA, args.r_SA, args.e_SA, 
-                                        args.r_HD, args.e_HD,args.r_NA, args.e_NA,args.r_N, args.e_N, args.r_M, args.e_M)
+        docking_simulated_annealing = True
+        docking_genetic_algorithm = False
+        var = vc.lig_par_dock_SA(args.standard, args.dock_x, args.dock_y, args.dock_z, args.pdb_file_protein, name_protein, args.pH, args.xyz_file_ligand, name_ligand, args.parameter_file, args.scale_factor, args.box_size, args.metal_symbol, 
+                                metal_cap, args.charge_ligand, args.spin_ligand, args.basis_set, args.gga_functional, args.hybrid_functional, args.dispersion_correction, docking_simulated_annealing, docking_genetic_algorithm, args.random_position, args.time_step, args.max_initial_energy, 
+                                    args.initial_annealing_temperature,args.temp_reduction_factor, args.number_of_runs, args.max_cycles, args.r_OA, args.e_OA, args.r_SA, args.e_SA, args.r_HD, args.e_HD,args.r_NA, args.e_NA,args.r_N, args.e_N, args.r_M, args.e_M)
 
+    if args.cmd == "GA_dock":
+        docking_simulated_annealing = False
+        docking_genetic_algorithm = True
+
+        var = vc.lig_par_dock_GA(args.standard, args.rmsd, args.dock_x, args.dock_y, args.dock_z, args.pdb_file_protein, name_protein, args.pH, args.xyz_file_ligand, name_ligand, args.parameter_file, args.scale_factor, args.box_size, args.metal_symbol, 
+                                    metal_cap, args.charge_ligand, args.spin_ligand, args.basis_set, args.gga_functional, args.hybrid_functional, args.dispersion_correction, docking_simulated_annealing, docking_genetic_algorithm, args.random_position, args.ga_pop_size, args.ga_num_evals, args.ga_num_generations, 
+                                        args.ga_elitism, args.ga_mutation_rate, args.ga_crossover_rate, args.ga_window_size, args.r_OA, args.e_OA, args.r_SA, args.e_SA, args.r_HD, args.e_HD,args.r_NA, args.e_NA, args.r_N, args.e_N, args.r_M, args.e_M)

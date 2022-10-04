@@ -1,17 +1,15 @@
 import os, glob
-import rdkit
+import numpy as np
 
-import random
 from random import seed
 
 import numpy as np
-import networkx as nx
+
 
 from openbabel import pybel as py
 from rdkit import Chem
-
-import input_variables as iv
-import variable_class as vc
+import rdkit
+import networkx as nx
 
 '''
 All the docking parameters were obtained by a genetic alogrithm
@@ -24,14 +22,9 @@ def is_float(string):
     except ValueError:
         return False
 
-def create_ligand_pdbqt_file():
-    #mol2 = next(py.readfile('xyz',''+iv.var.name_ligand+'_c.xyz'))
-    #mol2.write('mol2',iv.var.name_ligand+'.mol2',overwrite=True)
-    #mol2 = next(py.readfile('xyz','output.xyz'))
-    #mol2.write('mol2',iv.var.name_ligand+'.mol2',overwrite=True)
-
+def create_ligand_pdbqt_file(name_ligand):
     # Grep the correct part  of the itp file
-    os.system("awk '/@<TRIPOS>ATOM/{flag=1; next} /@<TRIPOS>BOND/{flag=0} flag' "+iv.var.name_ligand+".mol2  > almost")
+    os.system("awk '/@<TRIPOS>ATOM/{flag=1; next} /@<TRIPOS>BOND/{flag=0} flag' "+name_ligand+".mol2  > almost")
 
     # Create charge file if CM5
     os.system("awk '{if (NR!=1) {print}}' CM5_charges > new")
@@ -45,15 +38,15 @@ def create_ligand_pdbqt_file():
     os.system(r'''awk '{ printf "%7s %-3s %14s %9s %9s %-5s %3s %5s %12s \n",$1,$2,$3,$4,$5,$6,$7,$8,$10}' there > correct''')
 
     # Delete previous stuff
-    os.system("sed -n '1,/@<TRIPOS>ATOM/p;/@<TRIPOS>BOND/,$p' "+iv.var.name_ligand+".mol2 > ligand_almost")
+    os.system("sed -n '1,/@<TRIPOS>ATOM/p;/@<TRIPOS>BOND/,$p' "+name_ligand+".mol2 > ligand_almost")
 
     # Insert in ligand_par.itp
-    os.system("sed '/@<TRIPOS>ATOM/ r correct' ligand_almost > "+iv.var.name_ligand+".mol2")
+    os.system("sed '/@<TRIPOS>ATOM/ r correct' ligand_almost > "+name_ligand+".mol2")
     os.system("rm new new_charge ligand_almost correct there almost")
 
     #os.system(os.environ['PYTHON_2']+''' '''+os.environ['MGLTOOLS']+'''/prepare_ligand4.py -l '''+iv.var.name_ligand+'''.mol2 -U \""" -C''')
-    pdbqt = next(py.readfile('mol2',iv.var.name_ligand+'.mol2'))
-    pdbqt.write('pdbqt',iv.var.name_ligand+'.pdbqt',overwrite=True)
+    pdbqt = next(py.readfile('mol2',name_ligand+'.mol2'))
+    pdbqt.write('pdbqt',name_ligand+'.pdbqt',overwrite=True)
 
 def get_coordinates():
     os.system('''awk '$1 == "'''+iv.var.metal_symbol+r'''" { print $0 }' ref.xyz > coordinates''')
@@ -67,7 +60,7 @@ def get_coordinates():
 
     dock = [dock_x, dock_y, dock_z]
 
-    return docking
+    return dock
 
 def users_coordinates():
     dock_x = iv.var.dock_x
@@ -83,15 +76,15 @@ def box_size_func(sdf_file, spacing, scale_factor):
     sdf = glob.glob(sdf_file)
     sdf = ''.join(str(x) for x in sdf)
     sdf = open(sdf, 'r')
-        
+
     # Extract coordinates 
     lines = [line.split() for line in sdf]
     del lines[:4]
-        
+
     for j in range(0,len(lines)):
         del lines[j][4:]
         string = lines[j][3]
-            
+
         if is_float(string) == True:
             del lines[j:]
             break
@@ -101,25 +94,25 @@ def box_size_func(sdf_file, spacing, scale_factor):
     x_axis = []
     y_axis = []
     z_axis = []
-    
+
     for k in range(0,len(lines)):
         if lines[k][3] == ''+iv.var.metal_symbol+'':
             metal = lines[k][:3]
-        
+
         coordinates.append(lines[k][:3])
         elements.append(lines[k][3])
-        
+
         x_axis.append(float(lines[k][0]))
         y_axis.append(float(lines[k][1]))
         z_axis.append(float(lines[k][2]))
-        
+
     # Shift axis to centre at metal
     metal = [float(i) for i in metal]
     metal = np.array(metal)
-    
+
     x_max = np.max(x_axis-metal[0])
     x_min = np.min(x_axis-metal[0])
-    
+
     y_max = np.max(y_axis-metal[1])
     y_min = np.min(y_axis-metal[1])
 
@@ -130,7 +123,7 @@ def box_size_func(sdf_file, spacing, scale_factor):
     x_axis = np.abs(np.max(x_axis-metal[0]) - np.min(x_axis-metal[0]))*scale_factor
     y_axis = np.abs(np.max(y_axis-metal[1]) - np.min(y_axis-metal[1]))*scale_factor
     z_axis = np.abs(np.max(z_axis-metal[2]) - np.min(z_axis-metal[2]))*scale_factor
-    
+
     x_npts = (round(x_axis / spacing)) & (-2)
     y_npts = (round(y_axis / spacing)) & (-2)
     z_npts = (round(z_axis / spacing)) & (-2)
@@ -142,17 +135,21 @@ def box_size_func(sdf_file, spacing, scale_factor):
 
     return npts
 
-def prepare_receptor():
-    os.system(os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+iv.var.pdb_file_protein)
+def prepare_receptor(pdb_file):
+    os.system(os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+pdb_file)
 
 
 def docking_func(parameter_set, name_ligand, name_protein, energy, dock, npts):
     os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .')
+    os.system('cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'.mol2 .')
+
+    create_ligand_pdbqt_file(iv.var.name_ligand)
+    prepare_receptor(iv.var.pdb_file_protein)
 
     # insert parameters for R and epsilon for H-bond
     os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+'''") ($7 = '''+str(parameter_set[10])+''') && ($8 = '''+str(parameter_set[11])+'''); print $0}' '''+iv.var.parameter_file+''' > file_1''')
     os.system(r'''awk '{ if ($2 == "'''+iv.var.metal_cap+'''" || $2 == "'''+iv.var.metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+iv.var.parameter_file)
-   
+
     #create_gpf():
     os.system(os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+iv.var.parameter_file+" -p npts='{},{},{}'".format(npts[0],npts[1],npts[2])+" -p gridcenter='{:.4},{:.4},{:.4}' ".format(dock[0],dock[1],dock[2]))
     gpf = open('clean_'+name_protein+'.gpf', 'a')
@@ -211,13 +208,13 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
 
     if GA == True:
         dpf_file.write('# GA parameters\n')
-        dpf_file.write('ga_pop_size 150                      # number of individuals in population\n')
-        dpf_file.write('ga_num_evals 2500000                 # maximum number of energy evaluations\n')
-        dpf_file.write('ga_num_generations 27000             # maximum number of generations\n')
-        dpf_file.write('ga_elitism 1                         # number of top individuals to survive to next generation\n')
-        dpf_file.write('ga_mutation_rate 0.02                # rate of gene mutation\n')
-        dpf_file.write('ga_crossover_rate 0.8                # rate of crossover\n')
-        dpf_file.write('ga_window_size 10                    # number of preceding generation when deciding threshold for worst individual current population\n')
+        dpf_file.write('ga_pop_size '+iv.var.ga_pop_size+'                      # number of individuals in population\n')
+        dpf_file.write('ga_num_evals '+iv.var.ga_num_evals+'                 # maximum number of energy evaluations\n')
+        dpf_file.write('ga_num_generations '+iv.var.ga_num_generation+'             # maximum number of generations\n')
+        dpf_file.write('ga_elitism '+iv.var.ga_elitism+'                         # number of top individuals to survive to next generation\n')
+        dpf_file.write('ga_mutation_rate '+iv.var.ga_mutation_rate+'                # rate of gene mutation\n')
+        dpf_file.write('ga_crossover_rate '+iv.var.ga_crossover_rate+'                # rate of crossover\n')
+        dpf_file.write('ga_window_size '+iv.var.ga_window_size+'                    # number of preceding generation when deciding threshold for worst individual current population\n')
         dpf_file.write('ga_cauchy_alpha 0.0                  # Alpha parameter of Cauchy distribution\n')
         dpf_file.write('ga_cauchy_beta 1.0                   # Beta parameter Cauchy distribution\n')
 
@@ -257,10 +254,7 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
     dpf_file.write('rmstol 2.0                           # RMSD tolerance\n')
     dpf_file.write('analysis                             # perforem a ranked cluster analysis\n')
 
-
-
-
-
+    return
 
 
 def distance(x1,x2,y1,y2,z1,z2):

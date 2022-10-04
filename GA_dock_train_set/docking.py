@@ -47,7 +47,7 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
 
     if GA == True:
         dpf_file.write('# GA parameters\n')
-        dpf_file.write('ga_pop_size 150                      # number of individuals in population\n')
+        dpf_file.write('ga_pop_size 400                      # number of individuals in population\n')
         dpf_file.write('ga_num_evals 2500000                 # maximum number of energy evaluations\n')
         dpf_file.write('ga_num_generations 27000             # maximum number of generations\n')
         dpf_file.write('ga_elitism 1                         # number of top individuals to survive to next generation\n')

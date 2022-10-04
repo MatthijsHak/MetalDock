@@ -1,0 +1,16 @@
+[09:21:25] Running PLAMS located in /gpfs/home4/matthak/.local/lib/python3.8/site-packages/scm/plams
+[09:21:25] Using Python 3.7.12 located in /home/matthak/.conda/envs/MetPar/bin/python
+[09:21:25] PLAMS defaults were loaded from /sw/arch/Centos8/EB_production/2021/software/AMS/2021.101-intelmpi/scripting/scm/plams/plams_defaults
+[09:21:25] PLAMS environment initialized
+[09:21:25] PLAMS working folder: /gpfs/home4/matthak/AutoDock_GA_par/autodock_metal_GA/src/test/output/QM/geom_opt/plams_workdir
+[09:21:25] JOB plamsjob STARTED
+[09:21:25] Starting plamsjob.prerun()
+[09:21:25] plamsjob.prerun() finished
+[09:21:25] JOB plamsjob RUNNING
+[09:21:25] Executing plamsjob.run
+[09:21:27] Execution of plamsjob.run finished with returncode 174
+[09:21:27] WARNING: Job plamsjob finished with nonzero return code
+[09:21:27] WARNING: Main KF file ams.rkf not present in /gpfs/home4/matthak/AutoDock_GA_par/autodock_metal_GA/src/test/output/QM/geom_opt/plams_workdir/plamsjob
+[09:21:27] JOB plamsjob CRASHED
+[09:21:27] PLAMS environment cleaned up successfully
+[09:21:27] PLAMS run finished. Goodbye
