@@ -450,5 +450,5 @@ def train_GA(input_file):
 
     parameter_set = opt.gradient_descent(tmp_dir, dir_list, par, parameter_set, learning_rate=0.5, n_iter=50)
 
-    print('Finale Parameter set is: {}'.format(parameter_set))
+    print('FINAL PARAMETER SET IS: {}'.format(parameter_set))
     return 

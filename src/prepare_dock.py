@@ -157,11 +157,11 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
 
     dpf_file = open(name_ligand+'_'+name_protein+'.dpf','w')
     dpf_file.write('autodock_parameter_version 4.2       # used by autodock to validate parameter set\n')
-    dpf_file.write('parameter_file '+parameter_file+'    # parameter library filename\n')
+    dpf_file.write('parameter_file '+parameter_file+' # parameter library filename\n')
     dpf_file.write('outlev 1                             # diagnostic output level\n')
     dpf_file.write('intelec                              # calculate internal electrostatics\n')
     dpf_file.write('seed pid time                        # seeds for random generator\n')
-    dpf_file.write('ligand_types '+ligand_type_str+'     # atoms types in ligand\n')
+    dpf_file.write('ligand_types '+ligand_type_str+'             # atoms types in ligand\n')
     dpf_file.write('fld '+name_protein+'.maps.fld              # grid_data_file\n')
     for i in range(0,len(ligand_type)):
         dpf_file.write('map '+name_protein+'.'+ligand_type[i]+'.map                 # atom-specific affinity map\n')
@@ -170,11 +170,11 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
     dpf_file.write('desolvmap '+name_protein+'.d.map           # desolvation map\n\n')
 
     dpf_file.write('# Unbound Ligand Parameters\n')
-    dpf_file.write('unbound_energy '+str(energy_ligand)+'                      # set the energy of the unbound state\n')
+    dpf_file.write('unbound_energy '+str(energy_ligand)+'              # set the energy of the unbound state\n')
     dpf_file.write('move '+name_ligand+'.pdbqt                # small molecule\n')
 
     if random_pos == True:
-        dpf_file.write('tran0 random  # initial coordinates/A or random\n')
+        dpf_file.write('tran0 random                         # initial coordinates/A or random\n')
         dpf_file.write('quaternion0 random                   # initial orientation\n')
         dpf_file.write('dihe0 random                         # initial dihedrals (relative) or random\n')
 
@@ -184,7 +184,7 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
         dpf_file.write('ga_num_evals '+str(dock_algorithm[1])+'                 # maximum number of energy evaluations\n')
         dpf_file.write('ga_num_generations '+str(dock_algorithm[2])+'             # maximum number of generations\n')
         dpf_file.write('ga_elitism '+str(dock_algorithm[3])+'                         # number of top individuals to survive to next generation\n')
-        dpf_file.write('ga_mutation_rate '+str(dock_algorithm[4])+'                # rate of gene mutation\n')
+        dpf_file.write('ga_mutation_rate '+str(dock_algorithm[4])+'                 # rate of gene mutation\n')
         dpf_file.write('ga_crossover_rate '+str(dock_algorithm[5])+'                # rate of crossover\n')
         dpf_file.write('ga_window_size '+str(dock_algorithm[6])+'                    # number of preceding generation when deciding threshold for worst individual current population\n')
         dpf_file.write('ga_cauchy_alpha 0.0                  # Alpha parameter of Cauchy distribution\n')
@@ -201,7 +201,7 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
         dpf_file.write('# Activate LGA\n')
         dpf_file.write('set_ga                               # set the above parameters for GA or LGA\n')
         dpf_file.write('set_psw1                             # set the above pseudo-Solis & Wets parameters\n')
-        dpf_file.write('ga_run '+str(num_poses)+'                            # do this many hybrid GA-LS runs\n')
+        dpf_file.write('ga_run '+str(num_poses)+'                             # do this many hybrid GA-LS runs\n')
     if SA == True:
         dpf_file.write('# SA Parameters\n')
         dpf_file.write('tstep 2.0\n')

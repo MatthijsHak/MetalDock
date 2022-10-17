@@ -1,0 +1,91 @@
+2022-08-19 10:47:05,192 INFO:main.py:240:print_splash_screen:PDB2PQR v3.5.2: biomolecular structure conversion software.
+2022-08-19 10:47:05,192 INFO:main.py:242:print_splash_screen:Please cite:  Jurrus E, et al.  Improvements to the APBS biomolecular solvation software suite.  Protein Sci 27 112-128 (2018).
+2022-08-19 10:47:05,192 INFO:main.py:242:print_splash_screen:Please cite:  Dolinsky TJ, et al.  PDB2PQR: expanding and upgrading automated preparation of biomolecular structures for molecular simulations. Nucleic Acids Res 35 W522-W525 (2007).
+2022-08-19 10:47:05,192 INFO:main.py:752:main_driver:Checking and transforming input arguments.
+2022-08-19 10:47:05,195 INFO:main.py:756:main_driver:Loading topology files.
+2022-08-19 10:47:05,273 INFO:main.py:758:main_driver:Loading molecule: /gpfs/home4/matthak/AutoDock_GA_par/parametrization/metals/Ruthenium/data_set/protein_65/output/file_prep/1jze.pdb
+2022-08-19 10:47:05,290 INFO:main.py:761:main_driver:Dropping water from structure.
+2022-08-19 10:47:05,292 INFO:main.py:763:main_driver:Setting up molecule.
+2022-08-19 10:47:05,299 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for CU.  Parsing as new residue.
+2022-08-19 10:47:05,299 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for CU.  Parsing as new residue.
+2022-08-19 10:47:05,299 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for DRU.  Parsing as new residue.
+2022-08-19 10:47:05,299 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for LRU.  Parsing as new residue.
+2022-08-19 10:47:05,300 INFO:main.py:409:setup_molecule:Created biomolecule object with 132 residues and 1036 atoms.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: RU in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: N2 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C3 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C4 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C5 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C6 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C7 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C8 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C9 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C10 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C11 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C12 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: N13 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: N26 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C27 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C28 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C29 in DRU A 903.
+2022-08-19 10:47:05,300 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C30 in DRU A 903.
+2022-08-19 10:47:05,301 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C31 in DRU A 903.
+2022-08-19 10:47:05,301 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C32 in DRU A 903.
+2022-08-19 10:47:05,301 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C33 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C34 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C35 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C36 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: N37 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CD2 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: ND1 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CE1 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NE2 in DRU A 903.
+2022-08-19 10:47:05,302 WARNING:main.py:424:setup_molecule:Multiple occupancies found in DRU A 903. At least one of the instances is being ignored.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: RU in LRU A 904.
+2022-08-19 10:47:05,302 WARNING:main.py:418:setup_molecule:Multiple occupancies found: N2 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C3 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C4 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C5 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C6 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C7 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C8 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C9 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C10 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C11 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C12 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: N13 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: N26 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C27 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C28 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C29 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C30 in LRU A 904.
+2022-08-19 10:47:05,303 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C31 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C32 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C33 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C34 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C35 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: C36 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: N37 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CD2 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: ND1 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CE1 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NE2 in LRU A 904.
+2022-08-19 10:47:05,304 WARNING:main.py:424:setup_molecule:Multiple occupancies found in LRU A 904. At least one of the instances is being ignored.
+2022-08-19 10:47:05,304 INFO:main.py:767:main_driver:Setting termini states for biomolecule chains.
+2022-08-19 10:47:05,309 INFO:main.py:603:non_trivial:Loading forcefield.
+2022-08-19 10:47:05,327 INFO:main.py:607:non_trivial:Loading hydrogen topology definitions.
+2022-08-19 10:47:05,331 INFO:main.py:459:is_repairable:This biomolecule is clean.  No repair needed.
+2022-08-19 10:47:05,331 INFO:main.py:622:non_trivial:Updating disulfide bridges.
+2022-08-19 10:47:05,332 INFO:main.py:625:non_trivial:Debumping biomolecule.
+2022-08-19 10:47:05,370 INFO:main.py:642:non_trivial:Adding hydrogens to biomolecule.
+2022-08-19 10:47:05,531 INFO:main.py:645:non_trivial:Debumping biomolecule (again).
+2022-08-19 10:47:05,747 INFO:main.py:647:non_trivial:Optimizing hydrogen bonds
+2022-08-19 10:47:06,175 INFO:main.py:659:non_trivial:Applying force field to biomolecule states.
+2022-08-19 10:47:06,177 INFO:main.py:706:non_trivial:Regenerating headers.
+2022-08-19 10:47:06,178 INFO:main.py:731:non_trivial:Regenerating PDB lines.
+2022-08-19 10:47:06,193 WARNING:main.py:312:print_pqr:Ignoring 2819 header lines in output.
+2022-08-19 10:47:06,193 WARNING:main.py:316:print_pqr:Ignoring 62 missing lines in output.
+2022-08-19 10:47:06,210 WARNING:main.py:355:print_pdb:Ignoring 2819 header lines in output.
+2022-08-19 10:47:06,210 WARNING:main.py:359:print_pdb:Ignoring 62 missing lines in output.

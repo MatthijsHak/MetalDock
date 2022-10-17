@@ -1,0 +1,84 @@
+2022-08-19 10:43:35,635 INFO:main.py:240:print_splash_screen:PDB2PQR v3.5.2: biomolecular structure conversion software.
+2022-08-19 10:43:35,635 INFO:main.py:242:print_splash_screen:Please cite:  Jurrus E, et al.  Improvements to the APBS biomolecular solvation software suite.  Protein Sci 27 112-128 (2018).
+2022-08-19 10:43:35,636 INFO:main.py:242:print_splash_screen:Please cite:  Dolinsky TJ, et al.  PDB2PQR: expanding and upgrading automated preparation of biomolecular structures for molecular simulations. Nucleic Acids Res 35 W522-W525 (2007).
+2022-08-19 10:43:35,636 INFO:main.py:752:main_driver:Checking and transforming input arguments.
+2022-08-19 10:43:35,637 INFO:main.py:756:main_driver:Loading topology files.
+2022-08-19 10:43:35,718 INFO:main.py:758:main_driver:Loading molecule: /gpfs/home4/matthak/AutoDock_GA_par/parametrization/metals/Ruthenium/data_set/protein_62/output/file_prep/5v4h.pdb
+2022-08-19 10:43:35,742 INFO:main.py:761:main_driver:Dropping water from structure.
+2022-08-19 10:43:35,744 INFO:main.py:763:main_driver:Setting up molecule.
+2022-08-19 10:43:35,752 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for NA.  Parsing as new residue.
+2022-08-19 10:43:35,752 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for RU7.  Parsing as new residue.
+2022-08-19 10:43:35,752 INFO:main.py:409:setup_molecule:Created biomolecule object with 131 residues and 1015 atoms.
+2022-08-19 10:43:35,752 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CA in ARG A 14.
+2022-08-19 10:43:35,752 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CB in ARG A 14.
+2022-08-19 10:43:35,752 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG in ARG A 14.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CD in ARG A 14.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NE in ARG A 14.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CZ in ARG A 14.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH1 in ARG A 14.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH2 in ARG A 14.
+2022-08-19 10:43:35,753 WARNING:main.py:424:setup_molecule:Multiple occupancies found in ARG A 14. At least one of the instances is being ignored.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CA in ARG A 21.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CB in ARG A 21.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG in ARG A 21.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CD in ARG A 21.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NE in ARG A 21.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CZ in ARG A 21.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH1 in ARG A 21.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH2 in ARG A 21.
+2022-08-19 10:43:35,753 WARNING:main.py:424:setup_molecule:Multiple occupancies found in ARG A 21. At least one of the instances is being ignored.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CA in ASN A 44.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CB in ASN A 44.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG in ASN A 44.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: OD1 in ASN A 44.
+2022-08-19 10:43:35,753 WARNING:main.py:418:setup_molecule:Multiple occupancies found: ND2 in ASN A 44.
+2022-08-19 10:43:35,753 WARNING:main.py:424:setup_molecule:Multiple occupancies found in ASN A 44. At least one of the instances is being ignored.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CA in ARG A 45.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CB in ARG A 45.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG in ARG A 45.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CD in ARG A 45.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NE in ARG A 45.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CZ in ARG A 45.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH1 in ARG A 45.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH2 in ARG A 45.
+2022-08-19 10:43:35,755 WARNING:main.py:424:setup_molecule:Multiple occupancies found in ARG A 45. At least one of the instances is being ignored.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CA in ILE A 55.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CB in ILE A 55.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG1 in ILE A 55.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG2 in ILE A 55.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CD1 in ILE A 55.
+2022-08-19 10:43:35,755 WARNING:main.py:424:setup_molecule:Multiple occupancies found in ILE A 55. At least one of the instances is being ignored.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CA in ARG A 61.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CB in ARG A 61.
+2022-08-19 10:43:35,755 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG in ARG A 61.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CD in ARG A 61.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NE in ARG A 61.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CZ in ARG A 61.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH1 in ARG A 61.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH2 in ARG A 61.
+2022-08-19 10:43:35,756 WARNING:main.py:424:setup_molecule:Multiple occupancies found in ARG A 61. At least one of the instances is being ignored.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CA in ARG A 68.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CB in ARG A 68.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CG in ARG A 68.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CD in ARG A 68.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NE in ARG A 68.
+2022-08-19 10:43:35,756 WARNING:main.py:418:setup_molecule:Multiple occupancies found: CZ in ARG A 68.
+2022-08-19 10:43:35,757 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH1 in ARG A 68.
+2022-08-19 10:43:35,757 WARNING:main.py:418:setup_molecule:Multiple occupancies found: NH2 in ARG A 68.
+2022-08-19 10:43:35,757 WARNING:main.py:424:setup_molecule:Multiple occupancies found in ARG A 68. At least one of the instances is being ignored.
+2022-08-19 10:43:35,757 INFO:main.py:767:main_driver:Setting termini states for biomolecule chains.
+2022-08-19 10:43:35,761 INFO:main.py:603:non_trivial:Loading forcefield.
+2022-08-19 10:43:35,780 INFO:main.py:607:non_trivial:Loading hydrogen topology definitions.
+2022-08-19 10:43:35,784 INFO:main.py:459:is_repairable:This biomolecule is clean.  No repair needed.
+2022-08-19 10:43:35,784 INFO:main.py:622:non_trivial:Updating disulfide bridges.
+2022-08-19 10:43:35,787 INFO:main.py:625:non_trivial:Debumping biomolecule.
+2022-08-19 10:43:35,827 INFO:main.py:642:non_trivial:Adding hydrogens to biomolecule.
+2022-08-19 10:43:35,993 INFO:main.py:645:non_trivial:Debumping biomolecule (again).
+2022-08-19 10:43:36,212 INFO:main.py:647:non_trivial:Optimizing hydrogen bonds
+2022-08-19 10:43:36,627 INFO:main.py:659:non_trivial:Applying force field to biomolecule states.
+2022-08-19 10:43:36,629 INFO:main.py:706:non_trivial:Regenerating headers.
+2022-08-19 10:43:36,630 INFO:main.py:731:non_trivial:Regenerating PDB lines.
+2022-08-19 10:43:36,645 WARNING:main.py:312:print_pqr:Ignoring 1223 header lines in output.
+2022-08-19 10:43:36,645 WARNING:main.py:316:print_pqr:Ignoring 14 missing lines in output.
+2022-08-19 10:43:36,662 WARNING:main.py:355:print_pdb:Ignoring 1223 header lines in output.
+2022-08-19 10:43:36,662 WARNING:main.py:359:print_pdb:Ignoring 14 missing lines in output.

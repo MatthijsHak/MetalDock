@@ -1,0 +1,25 @@
+REMARK  Name    = 4j8x_L_RU7                                                            
+REMARK     4 active torsions:                                                            
+REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+REMARK     1    A between atoms: C_1         and     C_2                                  
+REMARK     2    A between atoms: C_2         and     C_3                                  
+REMARK     3    A between atoms: C_2         and     C_4                                  
+REMARK     4    A between atoms: C_9         and    C_10                                  
+REMARK     x    y    z vdW Elec           q    Type                                  
+REMARK _______ _______ _______ _____ _____      ______    ____                                  
+ROOT                                                                            
+ATOM     1    C  UNL A   1      16.126  45.490 -23.207  0.00  0.00    +0.134 C  
+ATOM     2    C  UNL A   1      17.504  45.813 -23.444  0.00  0.00    +0.240 C  
+ATOM     3    C  UNL A   1      17.957  46.162 -24.711  0.00  0.00    +0.033 C  
+ATOM     4    C  UNL A   1      15.269  45.522 -24.301  0.00  0.00    +0.026 C  
+ATOM     5    C  UNL A   1      15.751  45.869 -25.602  0.00  0.00    +0.282 C  
+ATOM     6    C  UNL A   1      17.093  46.199 -25.834  0.00  0.00    +1.200 C  
+ATOM     7    C  UNL A   1      17.584  46.566 -27.209  0.00  0.00    +0.271 C  
+ATOM     8   RU  UNL A   1      16.978  44.238 -24.861  0.00  0.00    +0.176 Ru 
+ENDROOT                                                                            
+BRANCH     1   10                                                                 
+ATOM     9    C  UNL A   1      14.363  44.319 -21.655  0.00  0.00    +0.240 C  
+ATOM    10    C  UNL A   1      15.689  45.134 -21.780  0.00  0.00    -0.047 C  
+ATOM    11    C  UNL A   1      15.524  46.467 -21.024  0.00  0.00    -0.556 C  
+ENDBRANCH     1   10                                                                 
+TORSDOF     1                                                                      

@@ -1,0 +1,1121 @@
+          AutoDock 4.2 Release 4.2.6   
+         (C) 1989-2012 The Scripps Research Institute
+        AutoDock comes with ABSOLUTELY NO WARRANTY.
+        AutoDock is free software, and you are welcome
+        to redistribute it under certain conditions;
+        for details type 'autodock4 -C'
+
+                     main.cc  $Revision: 1.213 $
+
+                   Compiled on Jul 18 2014 at 18:34:22
+
+
+This file was created at:			5:35 17" p.m., 08/23/2022
+                   on host:		"tcn165"
+Current Working Directory = "/gpfs/home4/matthak/AutoDock_GA_par/parametrization/metals/Ruthenium/data_set/protein_61/output/docking"
+
+      ________________________________________________________________
+
+                   SETTING UP DEFAULT PARAMETER LIBRARY
+      ________________________________________________________________
+
+
+Random number generator was seeded with values 3515321, 1661268917.
+Docking parameter file (DPF) used for this docking:		4j8v_L_RU7_clean_4j8v.dpf
+DPF> autodock_parameter_version 4.2       # used by autodock to validate parameter set
+
+	Autodock parameter version 4.2.
+DPF> outlev 1                             # diagnostic output level
+
+Output Level = 1  ADT-COMPATIBLE OUTPUT DURING DOCKING.
+DPF> parameter_file ad4_parameters_HD.dat    # parameter library filename
+
+Using read_parameter_library() to try to open and read "ad4_parameters_HD.dat".
+
+DPF> intelec                              # calculate internal electrostatics
+
+Electrostatic energies will be calculated for all non-bonds between moving atoms.
+DPF> seed pid time                        # seeds for random generator
+
+Random number generator was seeded with values 3515321, 1661268917.
+DPF> ligand_types Ru C    # atoms types in ligand
+
+DPF> fld clean_4j8v.maps.fld              # grid_data_file
+
+Opening Grid Map Dimensions file:		clean_4j8v.maps.fld
+Grid Point Spacing =				0.375 Angstroms
+
+Even Number of User-specified Grid Points =	54 x-points
+						54 y-points
+						54 z-points
+
+Coordinates of Central Grid Point of Maps =	(-30.189, -20.493, 25.671)
+Macromolecule file used to create Grid Maps =	clean_4j8v.pdbqt
+Grid Parameter file used to create Grid Maps =	clean_4j8v.gpf
+Minimum coordinates in grid = (-40.314, -30.618, 15.546)
+Maximum coordinates in grid = (-20.064, -10.368, 35.796)
+
+DPF> intnbp_r_eps 2.0   5.0 12 6 OA Ru
+
+
+Calculating internal non-bonded interaction energies for docking calculation;
+
+Calculating internal non-bonded interaction energies for unbound conformation calculation;
+DPF> intnbp_r_eps 2.0   5.0 12 6 SA Ru
+
+
+Calculating internal non-bonded interaction energies for docking calculation;
+
+Calculating internal non-bonded interaction energies for unbound conformation calculation;
+DPF> intnbp_r_eps 1.7   5.0 12 6 HD Ru
+
+
+Calculating internal non-bonded interaction energies for docking calculation;
+
+Calculating internal non-bonded interaction energies for unbound conformation calculation;
+DPF> intnbp_r_eps 2.0   5.0 12 6 NA Ru
+
+
+Calculating internal non-bonded interaction energies for docking calculation;
+
+Calculating internal non-bonded interaction energies for unbound conformation calculation;
+DPF> intnbp_r_eps 2.0   5.0 12 6  N Ru
+
+
+Calculating internal non-bonded interaction energies for docking calculation;
+
+Calculating internal non-bonded interaction energies for unbound conformation calculation;
+DPF> map clean_4j8v.Ru.map                 # atom-specific affinity map
+
+DPF> map clean_4j8v.C.map                 # atom-specific affinity map
+
+DPF> elecmap clean_4j8v.e.map             # electrostatics map
+
+DPF> desolvmap clean_4j8v.d.map           # desolvation map
+
+DPF> 
+
+DPF> # Unbound Ligand Parameters
+
+DPF> unbound_energy -3640.38                      # set the energy of the unbound state
+
+The internal energy of the unbound state was set to -3640.380 kcal/mol
+The unbound ligand energy model was set to User
+
+DPF> move 4j8v_L_RU7.pdbqt                # small molecule
+
+1,4-interactions will be _ignored_ in the non-bonded internal energy calculation.
+
+Ligand PDBQT file = "4j8v_L_RU7.pdbqt"
+
+INPUT LIGAND PDBQT FILE:
+________________________
+
+INPUT-LIGAND-PDBQT: REMARK  Name    =  RU7                                                            
+INPUT-LIGAND-PDBQT: REMARK     4 active torsions:                                                            
+INPUT-LIGAND-PDBQT: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+INPUT-LIGAND-PDBQT: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+INPUT-LIGAND-PDBQT: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+INPUT-LIGAND-PDBQT: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+INPUT-LIGAND-PDBQT: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+INPUT-LIGAND-PDBQT: REMARK     x    y    z vdW Elec           q    Type                                  
+INPUT-LIGAND-PDBQT: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+INPUT-LIGAND-PDBQT: ROOT                                                                            
+INPUT-LIGAND-PDBQT: ATOM     1   C4  RU7 A   1     -46.620  12.600  11.173  0.00  0.00    +0.114 C  
+INPUT-LIGAND-PDBQT: ATOM     2   C5  RU7 A   1     -46.772  13.867  11.823  0.00  0.00    +0.211 C  
+INPUT-LIGAND-PDBQT: ATOM     3   C6  RU7 A   1     -47.873  14.675  11.585  0.00  0.00    +0.126 C  
+INPUT-LIGAND-PDBQT: ATOM     4   C3  RU7 A   1     -47.615  12.221  10.289  0.00  0.00    -0.088 C  
+INPUT-LIGAND-PDBQT: ATOM     5   C2  RU7 A   1     -48.736  13.069  10.041  0.00  0.00    +0.064 C  
+INPUT-LIGAND-PDBQT: ATOM     6   C1  RU7 A   1     -48.890  14.302  10.684  0.00  0.00    -0.060 C  
+INPUT-LIGAND-PDBQT: ATOM     7   C7  RU7 A   1     -50.073  15.184  10.422  0.00  0.00    +0.053 C  
+INPUT-LIGAND-PDBQT: ATOM     8  RU1  RU7 A   1     -46.940  14.233   9.676  0.00  0.00    +1.172 Ru 
+INPUT-LIGAND-PDBQT: ENDROOT                                                                            
+INPUT-LIGAND-PDBQT: BRANCH     1   10                                                                 
+INPUT-LIGAND-PDBQT: ATOM     9  C10  RU7 A   1     -45.543  11.252  12.894  0.00  0.00    +0.229 C  
+INPUT-LIGAND-PDBQT: ATOM    10   C8  RU7 A   1     -45.390  11.747  11.472  0.00  0.00    -0.143 C  
+INPUT-LIGAND-PDBQT: ATOM    11   C9  RU7 A   1     -45.147  10.611  10.514  0.00  0.00    +0.318 C  
+INPUT-LIGAND-PDBQT: ENDBRANCH     1   10                                                                 
+INPUT-LIGAND-PDBQT: TORSDOF     1                                                                      
+________________________________________________________________________________
+
+Total charge on ligand                               =	+1.996 e
+REMARK  Name    =  RU7                                                            
+REMARK     4 active torsions:                                                            
+REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+REMARK     1    A between atoms: C10_1         and    C8_2                                  
+REMARK     2    A between atoms: C8_2         and    C9_3                                  
+REMARK     3    A between atoms: C8_2         and    C4_4                                  
+REMARK     4    A between atoms: C1_9         and   C7_10                                  
+REMARK     x    y    z vdW Elec           q    Type                                  
+REMARK _______ _______ _______ _____ _____      ______    ____                                  
+
+
+Number of Rotatable Bonds in Small Molecule =	1 torsions
+Number of atoms in ligand:  11
+
+Number of non-hydrogen atoms in ligand:  11
+
+Number of vibrational degrees of freedom of ligand:  27
+
+
+Number of torsional degrees of freedom = 1
+Estimated loss of torsional free energy upon binding = +0.2983 kcal/mol
+
+
+DPF> about -30.18900 -20.49300 25.67100            # small molecule center
+
+Small molecule center of rotation =	(-30.189, -20.493, +25.671)
+
+DPF> 
+
+DPF> # SA Parameters
+
+DPF> tstep 2.0
+
+Initial simanneal cycle, maximum translation step = +/- 2.0 Angstroms
+DPF> linear_schedule                      # linear_schedule or geometric_schedule
+
+A linear temperature reduction schedule will be used...
+
+DPF> rt0 500                              # initial annealing temperature (absolute tmperature multiplied by gas constant
+
+
+		TEMPERATURE SCHEDULE INFORMATION
+		________________________________
+
+               -1 -1                 -1 -1
+R = 8.314 J mol  K    = 1.987 cal mol  K  
+
+                                        -1
+Initial R*Temperature =   500.00 cal mol
+      (=> Temperature =   251.61 K
+                   or =   -21.54 C)
+
+DPF> rtrf 0.9                             # annealing temperature reductin factor < 1 cools > 1 heats system
+
+R*Temperature reduction factor =     0.90	/cycle
+DPF> runs 50                              # number of docking runs
+
+Number of runs = 50 runs
+DPF> cycles 50                            # number of temperature reduction cycles
+
+Maximum number of cycles =       50 cycles
+DPF> accs 30000                           # maximum number of accepted steps per cycle
+
+Maximum number accepted per cycle =		   30000 steps
+DPF> rejs 30000                           # maximum number of rejected steps per cycle
+
+Maximum number rejected per cycle =		   30000 steps
+DPF> select m                             # m selects the minimum state, 1 selects the last state during each cycle
+
+DPF> trnrf 1.0                            # per cycle reduction factor for translation steps
+
+Reduction factor for simanneal translations =	1.000 /cycle
+DPF> quarf 1.0                            # per cycle reduction factor for orientation steps
+
+Reduction factor for simanneal quaternion angle =	1.000 /cycle
+DPF> dihrf 1.0                            # per cycle reduction factor for torsional dihedral steps
+
+Reduction factor for simanneal torsion angles =	1.000 /cycle
+DPF> # Activate SA
+
+DPF> simanneal 10                         # run this many SA docking
+
+Number of simanneal runs  = 10 nruns
+
+Maximum number of cycles per run = 50 cycles
+
+A linear temperature reduction schedule was requested...
+Annealing temperature will be reduced by 10.000 cal mol per cycle.
+/home/matthak/software/AutoDock/autodock4 will begin each new cycle
+with the state of minimum energy from the previous annealing cycle.
+
+Total number of ligands read in by the DPF "move" command = 1
+Maximum possible number of steps per cycle = 60000 steps
+centering ligand on specified point: -30.189 -20.493 25.671
+Furthest true ligand atom from "about" center is 43.598 Angstroms (maxrad).
+Unbound model to be used is from file: "ad4_parameters_HD.dat".
+
+
+		BEGINNING MONTE CARLO SIMULATED ANNEALING
+     		_________________________________________
+
+
+
+Run: 1 Seed: 3515321 1661268917 [ Run 1 of 10 SA ]
+Final-Value: -11.946
+Detailed state:  trans 2.944 -4.610 29.301 quatxyzw 0.931492 -0.293984 0.200326 0.075930 center -30.189 -20.493 25.671 ntor 1 74.1577
+State:	  2.944  -4.610  29.301   0.934 -0.295  0.201 171.291     74.16
+
+DOCKED: MODEL        1
+DOCKED: USER    Run = 1
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -12.34 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -12.95 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.61 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.39 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 2.943658 -4.609649 29.301253
+DOCKED: USER    NEWDPF quaternion0 0.931492 -0.293984 0.200326 0.075930
+DOCKED: USER    NEWDPF axisangle0 0.934189 -0.294835 0.200906 171.290731
+DOCKED: USER    NEWDPF quat0 0.934189 -0.294835 0.200906 171.290731
+DOCKED: USER    NEWDPF dihe0 74.16 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -32.504 -22.445  28.491 -0.23 +0.08    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -33.002 -23.375  27.522 -0.08 +0.20    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -34.341 -23.403  27.167 -0.20 +0.16    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -33.421 -21.582  29.065 +0.47 -0.08    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -34.800 -21.631  28.702 -0.12 +0.08    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -35.284 -22.533  27.748 -0.26 -0.09    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -36.734 -22.574  27.368 -0.27 +0.10    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -34.213 -23.627  29.322-11.97 +0.13    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -30.624 -21.012  29.082 -0.21 +0.13    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -31.019 -22.453  28.845 -0.27 -0.06    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -30.641 -23.330  30.009 +0.18 -0.04    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 2 Seed: 1350769619 1541849560 [ Run 2 of 10 SA ]
+Final-Value: -13.851
+Detailed state:  trans 2.679 -5.316 33.256 quatxyzw 0.914723 -0.286827 0.276489 0.067568 center -30.189 -20.493 25.671 ntor 1 -0.1944
+State:	  2.679  -5.316  33.256   0.917 -0.287  0.277 172.251     -0.19
+
+DOCKED: MODEL        2
+DOCKED: USER    Run = 2
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -14.16 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -15.13 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.97 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.31 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 2.678795 -5.315632 33.255771
+DOCKED: USER    NEWDPF quaternion0 0.914723 -0.286827 0.276489 0.067568
+DOCKED: USER    NEWDPF axisangle0 0.916818 -0.287484 0.277122 172.251318
+DOCKED: USER    NEWDPF quat0 0.916818 -0.287484 0.277122 172.251318
+DOCKED: USER    NEWDPF dihe0 -0.19 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -32.560 -22.918  28.391 -0.17 +0.08    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -32.928 -23.902  27.418 +0.54 +0.18    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -34.203 -23.943  26.875 -0.19 +0.15    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -33.536 -22.015  28.774 +0.00 -0.08    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -34.850 -22.077  28.219 -0.25 +0.09    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -35.206 -23.031  27.260 -0.26 -0.09    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -36.586 -23.086  26.678 -0.26 +0.09    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -34.390 -24.035  29.035-14.15 +0.47    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -30.231 -22.475  27.831 -0.18 +0.14    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -31.142 -22.915  28.956 -0.27 -0.05    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -30.943 -22.076  30.190 +0.05 -0.01    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 3 Seed: 1245045936 1302972223 [ Run 3 of 10 SA ]
+Final-Value: -16.370
+Detailed state:  trans -7.152 -19.676 -1.105 quatxyzw 0.866116 -0.458328 -0.173078 -0.099109 center -30.189 -20.493 25.671 ntor 1 -103.2742
+State:	 -7.152 -19.676  -1.105   0.870 -0.461 -0.174 -168.624   -103.27
+
+DOCKED: MODEL        3
+DOCKED: USER    Run = 3
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.62e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -16.70 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -19.69 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +2.99 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.33 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 -7.152072 -19.676232 -1.104664
+DOCKED: USER    NEWDPF quaternion0 0.866116 -0.458328 -0.173078 -0.099109
+DOCKED: USER    NEWDPF axisangle0 0.870401 -0.460596 -0.173934 -168.624254
+DOCKED: USER    NEWDPF quat0 0.870401 -0.460596 -0.173934 -168.624254
+DOCKED: USER    NEWDPF dihe0 -103.27 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -35.170 -24.418  26.605 -0.31 +0.16    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -36.465 -25.011  26.457 +1.30 +0.29    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -37.559 -24.548  27.173 +0.56 +0.19    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -35.054 -23.370  27.501 -0.27 -0.12    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -36.184 -22.914  28.244 -0.34 +0.10    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -37.452 -23.485  28.092 -0.34 -0.10    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -38.635 -22.996  28.871 -0.26 +0.09    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -35.992 -25.048  28.589-19.27 +1.81    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -34.233 -26.451  25.641 -0.37 +0.31    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -33.999 -24.963  25.791 -0.27 -0.18    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -33.780 -24.300  24.457 -0.12 +0.44    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 4 Seed: 699058787 1059906147 [ Run 4 of 10 SA ]
+Final-Value: -16.241
+Detailed state:  trans -8.937 6.507 5.393 quatxyzw 0.684549 -0.339007 -0.542845 0.348980 center -30.189 -20.493 25.671 ntor 1 -37.7400
+State:	 -8.937   6.507   5.393   0.730 -0.362 -0.579 139.150    -37.74
+
+DOCKED: MODEL        4
+DOCKED: USER    Run = 4
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.62e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -16.53 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -19.59 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +3.06 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.29 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 -8.936654 6.507153 5.392781
+DOCKED: USER    NEWDPF quaternion0 0.684549 -0.339007 -0.542845 0.348980
+DOCKED: USER    NEWDPF axisangle0 0.730473 -0.361750 -0.579263 139.150091
+DOCKED: USER    NEWDPF quat0 0.730473 -0.361750 -0.579263 139.150091
+DOCKED: USER    NEWDPF dihe0 -37.74 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -32.461 -21.781  20.283 -0.15 +0.21    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -33.885 -21.886  20.184 -0.13 +0.33    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -34.645 -22.418  21.214 -0.01 +0.16    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -31.873 -22.244  21.447 -0.13 -0.16    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -32.665 -22.805  22.494 -0.18 +0.10    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -34.058 -22.897  22.402 -0.21 -0.08    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -34.883 -23.483  23.508 -0.25 +0.08    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -33.137 -23.880  20.667-18.27 +1.70    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -32.565 -20.146  18.479 -0.02 +0.42    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -31.671 -21.184  19.121 -0.15 -0.28    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -30.328 -20.608  19.486 -0.10 +0.58    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 5 Seed: 2083553142 520254958 [ Run 5 of 10 SA ]
+Final-Value: -11.411
+Detailed state:  trans 3.418 -27.823 30.642 quatxyzw -0.699803 0.538143 -0.419018 0.212373 center -30.189 -20.493 25.671 ntor 1 104.3497
+State:	  3.418 -27.823  30.642  -0.716  0.551 -0.429 155.477    104.35
+
+DOCKED: MODEL        5
+DOCKED: USER    Run = 5
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -11.82 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -17.90 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +6.09 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.41 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 3.417637 -27.822940 30.642118
+DOCKED: USER    NEWDPF quaternion0 -0.699803 0.538143 -0.419018 0.212373
+DOCKED: USER    NEWDPF axisangle0 -0.716139 0.550705 -0.428799 155.477080
+DOCKED: USER    NEWDPF quat0 -0.716139 0.550705 -0.428799 155.477080
+DOCKED: USER    NEWDPF dihe0 104.35 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -33.730 -18.464  20.262 -0.09 +0.26    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -34.688 -19.282  19.580 -0.04 +0.43    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -35.602 -18.738  18.691 -0.08 +0.25    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -33.763 -17.105  20.003 +0.25 -0.25    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -34.720 -16.555  19.097 +0.19 +0.17    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -35.648 -17.356  18.423 -0.11 -0.13    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -36.646 -16.771  17.470 -0.11 +0.10    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -35.809 -17.700  20.586-17.67 +4.48    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -31.787 -18.025  21.665 -0.15 +0.43    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -32.743 -19.114  21.228 -0.08 -0.28    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -33.365 -19.811  22.410 -0.01 +0.62    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 6 Seed: 1308493960 908472304 [ Run 6 of 10 SA ]
+Final-Value: -9.827
+Detailed state:  trans -67.521 1.417 33.718 quatxyzw -0.455895 -0.490369 -0.670816 -0.318910 center -30.189 -20.493 25.671 ntor 1 99.8958
+State:	-67.521   1.417  33.718  -0.481 -0.517 -0.708 -142.806     99.90
+
+DOCKED: MODEL        6
+DOCKED: USER    Run = 6
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -10.23 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -12.30 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +2.07 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.41 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 -67.520705 1.416884 33.718206
+DOCKED: USER    NEWDPF quaternion0 -0.455895 -0.490369 -0.670816 -0.318910
+DOCKED: USER    NEWDPF axisangle0 -0.481011 -0.517384 -0.707773 -142.805941
+DOCKED: USER    NEWDPF quat0 -0.481011 -0.517384 -0.707773 -142.805941
+DOCKED: USER    NEWDPF dihe0 99.90 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -36.640 -23.100  29.179 -0.32 +0.15    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -35.279 -22.886  29.571 +1.87 +0.13    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -34.224 -23.388  28.825 +1.02 +0.08    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -36.856 -23.838  28.029 -0.32 -0.14    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -35.762 -24.362  27.278 -0.34 +0.09    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -34.432 -24.145  27.655 +1.15 -0.07    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -33.288 -24.694  26.858 +1.23 +0.05    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -35.536 -25.042  29.328-22.44 +1.16    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -39.041 -22.690  29.238 -0.14 +0.41    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -37.765 -22.523  30.034 -0.06 -0.23    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -37.892 -23.114  31.413 +6.04 +0.44    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 7 Seed: 2030636442 959444291 [ Run 7 of 10 SA ]
+Final-Value: -13.540
+Detailed state:  trans -48.584 -28.461 -17.746 quatxyzw -0.618483 -0.535775 0.103649 0.565403 center -30.189 -20.493 25.671 ntor 1 4.5511
+State:	-48.584 -28.461 -17.746  -0.750 -0.650  0.126 111.139      4.55
+
+DOCKED: MODEL        7
+DOCKED: USER    Run = 7
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -13.85 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -20.49 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +6.63 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.31 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 -48.583971 -28.460507 -17.746495
+DOCKED: USER    NEWDPF quaternion0 -0.618483 -0.535775 0.103649 0.565403
+DOCKED: USER    NEWDPF axisangle0 -0.749845 -0.649570 0.125664 111.139491
+DOCKED: USER    NEWDPF quat0 -0.749845 -0.649570 0.125664 111.139491
+DOCKED: USER    NEWDPF dihe0 4.55 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -36.343 -18.610  18.701 -0.13 +0.23    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -35.106 -18.949  19.338 -0.05 +0.44    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -35.035 -19.184  20.702 -0.09 +0.30    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -37.463 -18.517  19.508 -0.26 -0.18    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -37.374 -18.747  20.914 -0.18 +0.15    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -36.167 -19.089  21.535 -0.13 -0.16    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -36.083 -19.333  23.011 -0.20 +0.15    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -35.914 -17.223  20.405-19.29 +5.03    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -36.251 -19.719  16.533 -0.02 +0.39    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -36.368 -18.363  17.195 -0.06 -0.25    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -37.564 -17.602  16.688 -0.07 +0.53    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 8 Seed: 1192580812 1395406606 [ Run 8 of 10 SA ]
+Final-Value: -11.581
+Detailed state:  trans 4.366 -25.464 14.578 quatxyzw -0.684898 0.306068 -0.376526 0.543567 center -30.189 -20.493 25.671 ntor 1 -108.2945
+State:	  4.366 -25.464  14.578  -0.816  0.365 -0.449 114.146   -108.29
+
+DOCKED: MODEL        8
+DOCKED: USER    Run = 8
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -11.92 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -17.75 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +5.83 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.34 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 4.365770 -25.463961 14.577900
+DOCKED: USER    NEWDPF quaternion0 -0.684898 0.306068 -0.376526 0.543567
+DOCKED: USER    NEWDPF axisangle0 -0.815971 0.364642 -0.448584 114.146443
+DOCKED: USER    NEWDPF quat0 -0.815971 0.364642 -0.448584 114.146443
+DOCKED: USER    NEWDPF dihe0 -108.29 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -34.402 -18.502  19.469 -0.08 +0.25    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -35.413 -19.415  19.910 -0.07 +0.44    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -36.709 -19.351  19.421 -0.18 +0.24    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -34.776 -17.546  18.541 -0.09 -0.19    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -36.117 -17.481  18.057 -0.11 +0.13    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -37.103 -18.380  18.479 -0.22 -0.11    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -38.507 -18.308  17.962 -0.10 +0.09    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -36.198 -17.401  20.225-16.77 +4.21    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -33.140 -18.961  21.502 -0.07 +0.48    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -32.989 -18.616  20.036 -0.08 -0.29    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -32.089 -19.593  19.328 +0.00 +0.58    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 9 Seed: 1436325279 825136115 [ Run 9 of 10 SA ]
+Final-Value: -10.803
+Detailed state:  trans -34.292 -38.088 -15.392 quatxyzw -0.618323 -0.243807 0.117854 0.737798 center -30.189 -20.493 25.671 ntor 1 124.8155
+State:	-34.292 -38.088 -15.392  -0.916 -0.361  0.175 84.912    124.82
+
+DOCKED: MODEL        9
+DOCKED: USER    Run = 9
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -11.21 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -18.50 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +7.29 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.41 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 -34.291955 -38.087649 -15.392416
+DOCKED: USER    NEWDPF quaternion0 -0.618323 -0.243807 0.117854 0.737798
+DOCKED: USER    NEWDPF axisangle0 -0.916004 -0.361184 0.174593 84.911688
+DOCKED: USER    NEWDPF quat0 -0.916004 -0.361184 0.174593 84.911688
+DOCKED: USER    NEWDPF dihe0 124.82 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -35.683 -19.254  19.517 -0.11 +0.23    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -35.072 -19.641  20.753 -0.07 +0.46    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -35.678 -19.383  21.972 -0.13 +0.32    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -36.902 -18.602  19.593 -0.22 -0.19    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -37.508 -18.329  20.856 -0.21 +0.16    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -36.916 -18.716  22.063 -0.11 -0.18    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -37.562 -18.430  23.384 -0.25 +0.17    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -35.500 -17.504  20.901-17.39 +5.58    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -35.658 -18.732  17.137 -0.01 +0.40    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -34.975 -19.564  18.201 -0.03 -0.26    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -33.486 -19.343  18.204 +0.02 +0.58    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+Run: 10 Seed: 1700276248 757642179 [ Run 10 of 10 SA ]
+Final-Value: -14.565
+Detailed state:  trans -42.390 -3.037 -14.452 quatxyzw -0.428905 0.498725 0.752168 0.039458 center -30.189 -20.493 25.671 ntor 1 36.4142
+State:	-42.390  -3.037 -14.452  -0.429  0.499  0.753 175.477     36.41
+
+DOCKED: MODEL       10
+DOCKED: USER    Run = 10
+DOCKED: USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -14.92 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -16.86 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +1.94 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.35 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 4j8v_L_RU7.pdbqt
+DOCKED: USER    NEWDPF about -30.189000 -20.493000 25.671000
+DOCKED: USER    NEWDPF tran0 -42.390399 -3.036789 -14.451667
+DOCKED: USER    NEWDPF quaternion0 -0.428905 0.498725 0.752168 0.039458
+DOCKED: USER    NEWDPF axisangle0 -0.429240 0.499113 0.752754 175.477302
+DOCKED: USER    NEWDPF quat0 -0.429240 0.499113 0.752754 175.477302
+DOCKED: USER    NEWDPF dihe0 36.41 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RU7                                                            
+DOCKED: REMARK     4 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C10_1         and    C8_2                                  
+DOCKED: REMARK     2    A between atoms: C8_2         and    C9_3                                  
+DOCKED: REMARK     3    A between atoms: C8_2         and    C4_4                                  
+DOCKED: REMARK     4    A between atoms: C1_9         and   C7_10                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1  C4  RU7 A   1     -34.324 -21.946  19.500 -0.17 +0.18    +0.114 C 
+DOCKED: ATOM      2  C5  RU7 A   1     -35.140 -22.039  20.673 -0.12 +0.30    +0.211 C 
+DOCKED: ATOM      3  C6  RU7 A   1     -34.583 -22.077  21.941 -0.17 +0.19    +0.126 C 
+DOCKED: ATOM      4  C3  RU7 A   1     -32.953 -21.906  19.686 -0.13 -0.16    -0.088 C 
+DOCKED: ATOM      5  C2  RU7 A   1     -32.391 -21.961  20.997 -0.18 +0.11    +0.064 C 
+DOCKED: ATOM      6  C1  RU7 A   1     -33.189 -22.041  22.144 -0.16 -0.10    -0.060 C 
+DOCKED: ATOM      7  C7  RU7 A   1     -32.590 -22.093  23.517 -0.11 +0.08    +0.053 C 
+DOCKED: ATOM      8 RU1  RU7 A   1     -33.700 -23.678  20.772-15.54 +0.60    +1.172 Ru
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH     1   10                                                                 
+DOCKED: ATOM      9 C10  RU7 A   1     -34.869 -20.480  17.631 -0.01 +0.40    +0.229 C 
+DOCKED: ATOM     10  C8  RU7 A   1     -34.988 -21.905  18.126 -0.15 -0.23    -0.143 C 
+DOCKED: ATOM     11  C9  RU7 A   1     -34.447 -22.887  17.120 -0.11 +0.57    +0.318 C 
+DOCKED: ENDBRANCH     1   10                                                                 
+DOCKED: TORSDOF     1                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+DPF> # Perform Analysis
+
+DPF> rmsref 4j8v_L_RU7.pdbqt              # RMSD will be calculated with this file
+
+RMS reference coordinates will taken from "4j8v_L_RU7.pdbqt"
+DPF> rmsmode atype                        # Method to calculate the RMSD
+
+Symmetry in RMS calculations will consider all atom pairs.
+
+DPF> rmstol 2.0                           # RMSD tolerance
+
+Maximum RMS tolerance for conformational cluster analysis = 2.00 Angstroms
+DPF> analysis                             # perforem a ranked cluster analysis
+
+
+		CLUSTER ANALYSIS OF CONFORMATIONS
+		_________________________________
+
+Number of conformations = 10
+
+RMSD cluster analysis will be performed using the ligand atoms only (11 / 11 total atoms).
+
+RMS Reference Coordinates from "4j8v_L_RU7.pdbqt":-
+
+Atom     1,  x,y,z =  -46.620   12.600   11.173
+Atom     2,  x,y,z =  -46.772   13.867   11.823
+Atom     3,  x,y,z =  -47.873   14.675   11.585
+Atom     4,  x,y,z =  -47.615   12.221   10.289
+Atom     5,  x,y,z =  -48.736   13.069   10.041
+Atom     6,  x,y,z =  -48.890   14.302   10.684
+Atom     7,  x,y,z =  -50.073   15.184   10.422
+Atom     8,  x,y,z =  -46.940   14.233    9.676
+Atom     9,  x,y,z =  -45.543   11.252   12.894
+Atom    10,  x,y,z =  -45.390   11.747   11.472
+Atom    11,  x,y,z =  -45.147   10.611   10.514
+
+Outputting structurally similar clusters, ranked in order of increasing energy.
+
+
+________________________________________________________________________________
+
+Number of distinct conformational clusters found = 4,  out of 10 runs,
+Using an rmsd-tolerance of 2.0 A
+
+
+	CLUSTERING HISTOGRAM
+	____________________
+
+________________________________________________________________________________
+     |           |     |           |     |                                    
+Clus | Lowest    | Run | Mean      | Num | Histogram                          
+-ter | Binding   |     | Binding   | in  |                                    
+Rank | Energy    |     | Energy    | Clus|    5    10   15   20   25   30   35
+_____|___________|_____|___________|_____|____:____|____:____|____:____|____:___
+   1 |  +3624.31 |   3 |  +3627.58 |   2 |##
+   2 |  +3624.44 |   4 |  +3625.28 |   2 |##
+   3 |  +3626.83 |   2 |  +3627.78 |   2 |##
+   4 |  +3627.14 |   7 |  +3628.84 |   4 |####
+_____|___________|_____|___________|_____|______________________________________
+
+
+Number of multi-member conformational clusters found = 4, out of 10 runs.
+
+	RMSD TABLE
+	__________
+
+_____________________________________________________________________
+     |      |      |           |         |                 |
+Rank | Sub- | Run  | Binding   | Cluster | Reference       | Grep
+     | Rank |      | Energy    | RMSD    | RMSD            | Pattern
+_____|______|______|___________|_________|_________________|___________
+   1      1      3    +3624.31      0.00     39.97           RANKING
+   1      2      6    +3630.85      1.37     39.99           RANKING
+   2      1      4    +3624.44      0.00     36.91           RANKING
+   2      2     10    +3626.11      1.61     36.38           RANKING
+   3      1      2    +3626.83      0.00     39.88           RANKING
+   3      2      1    +3628.73      0.82     39.66           RANKING
+   4      1      7    +3627.14      0.00     32.32           RANKING
+   4      2      8    +3629.10      1.64     32.46           RANKING
+   4      3      5    +3629.27      2.00     32.52           RANKING
+   4      4      9    +3629.87      1.08     32.81           RANKING
+_______________________________________________________________________
+
+
+
+	INFORMATION ENTROPY ANALYSIS FOR THIS CLUSTERING
+	________________________________________________
+
+
+Information entropy for this clustering = 0.58  (rmstol = 2.00 Angstrom)
+
+_______________________________________________________________________
+
+
+	STATISTICAL MECHANICAL ANALYSIS
+	_______________________________
+
+
+Partition function, Q =     0.02            at Temperature, T = 298.15 K
+Free energy,        A ~  2263.42 kcal/mol   at Temperature, T = 298.15 K
+Internal energy,    U =  3627.66 kcal/mol   at Temperature, T = 298.15 K
+Entropy,            S =     4.58 kcal/mol/K at Temperature, T = 298.15 K
+
+_______________________________________________________________________
+
+
+	LOWEST ENERGY DOCKED CONFORMATION from EACH CLUSTER
+	___________________________________________________
+
+
+
+Keeping original residue number (specified in the input PDBQ file) for outputting.
+
+MODEL        3
+USER    Run = 3
+USER    Cluster Rank = 1
+USER    Number of conformations in this cluster = 2
+USER  
+USER    RMSD from reference structure       = 39.966 A
+USER  
+USER    Estimated Free Energy of Binding    =   +3.62e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+USER    
+USER    (1) Final Intermolecular Energy     =  -16.70 kcal/mol
+USER        vdW + Hbond + desolv Energy     =  -19.69 kcal/mol
+USER        Electrostatic Energy            =   +2.99 kcal/mol
+USER    (2) Final Total Internal Energy     =   +0.33 kcal/mol
+USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+USER    
+USER    
+USER  
+USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+USER    NEWDPF move	4j8v_L_RU7.pdbqt
+USER    NEWDPF about	-30.189000 -20.493000 25.671000
+USER    NEWDPF tran0	-7.152072 -19.676232 -1.104664
+USER    NEWDPF axisangle0	0.870401 -0.460596 -0.173934 -168.624254
+USER    NEWDPF quaternion0	0.866116 -0.458328 -0.173078 -0.099109
+USER    NEWDPF dihe0	-103.27 
+USER  
+USER                              x       y       z    vdW   Elec        q     RMS 
+ATOM      1  C4  RU7 A   1     -35.170 -24.418  26.605 -0.31 +0.16    +0.114    39.966
+ATOM      2  C5  RU7 A   1     -36.465 -25.011  26.457 +1.30 +0.29    +0.211    39.966
+ATOM      3  C6  RU7 A   1     -37.559 -24.548  27.173 +0.56 +0.19    +0.126    39.966
+ATOM      4  C3  RU7 A   1     -35.054 -23.370  27.501 -0.27 -0.12    -0.088    39.966
+ATOM      5  C2  RU7 A   1     -36.184 -22.914  28.244 -0.34 +0.10    +0.064    39.966
+ATOM      6  C1  RU7 A   1     -37.452 -23.485  28.092 -0.34 -0.10    -0.060    39.966
+ATOM      7  C7  RU7 A   1     -38.635 -22.996  28.871 -0.26 +0.09    +0.053    39.966
+ATOM      8 RU1  RU7 A   1     -35.992 -25.048  28.589-19.27 +1.81    +1.172    39.966
+ATOM      9 C10  RU7 A   1     -34.233 -26.451  25.641 -0.37 +0.31    +0.229    39.966
+ATOM     10  C8  RU7 A   1     -33.999 -24.963  25.791 -0.27 -0.18    -0.143    39.966
+ATOM     11  C9  RU7 A   1     -33.780 -24.300  24.457 -0.12 +0.44    +0.318    39.966
+TER
+ENDMDL
+MODEL        4
+USER    Run = 4
+USER    Cluster Rank = 2
+USER    Number of conformations in this cluster = 2
+USER  
+USER    RMSD from reference structure       = 36.905 A
+USER  
+USER    Estimated Free Energy of Binding    =   +3.62e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+USER    
+USER    (1) Final Intermolecular Energy     =  -16.53 kcal/mol
+USER        vdW + Hbond + desolv Energy     =  -19.59 kcal/mol
+USER        Electrostatic Energy            =   +3.06 kcal/mol
+USER    (2) Final Total Internal Energy     =   +0.29 kcal/mol
+USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+USER    
+USER    
+USER  
+USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+USER    NEWDPF move	4j8v_L_RU7.pdbqt
+USER    NEWDPF about	-30.189000 -20.493000 25.671000
+USER    NEWDPF tran0	-8.936654 6.507153 5.392781
+USER    NEWDPF axisangle0	0.730473 -0.361750 -0.579263 139.150091
+USER    NEWDPF quaternion0	0.684549 -0.339007 -0.542845 0.348980
+USER    NEWDPF dihe0	-37.74 
+USER  
+USER                              x       y       z    vdW   Elec        q     RMS 
+ATOM      1  C4  RU7 A   1     -32.461 -21.781  20.283 -0.15 +0.21    +0.114    36.905
+ATOM      2  C5  RU7 A   1     -33.885 -21.886  20.184 -0.13 +0.33    +0.211    36.905
+ATOM      3  C6  RU7 A   1     -34.645 -22.418  21.214 -0.01 +0.16    +0.126    36.905
+ATOM      4  C3  RU7 A   1     -31.873 -22.244  21.447 -0.13 -0.16    -0.088    36.905
+ATOM      5  C2  RU7 A   1     -32.665 -22.805  22.494 -0.18 +0.10    +0.064    36.905
+ATOM      6  C1  RU7 A   1     -34.058 -22.897  22.402 -0.21 -0.08    -0.060    36.905
+ATOM      7  C7  RU7 A   1     -34.883 -23.483  23.508 -0.25 +0.08    +0.053    36.905
+ATOM      8 RU1  RU7 A   1     -33.137 -23.880  20.667-18.27 +1.70    +1.172    36.905
+ATOM      9 C10  RU7 A   1     -32.565 -20.146  18.479 -0.02 +0.42    +0.229    36.905
+ATOM     10  C8  RU7 A   1     -31.671 -21.184  19.121 -0.15 -0.28    -0.143    36.905
+ATOM     11  C9  RU7 A   1     -30.328 -20.608  19.486 -0.10 +0.58    +0.318    36.905
+TER
+ENDMDL
+MODEL        2
+USER    Run = 2
+USER    Cluster Rank = 3
+USER    Number of conformations in this cluster = 2
+USER  
+USER    RMSD from reference structure       = 39.879 A
+USER  
+USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+USER    
+USER    (1) Final Intermolecular Energy     =  -14.16 kcal/mol
+USER        vdW + Hbond + desolv Energy     =  -15.13 kcal/mol
+USER        Electrostatic Energy            =   +0.97 kcal/mol
+USER    (2) Final Total Internal Energy     =   +0.31 kcal/mol
+USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+USER    
+USER    
+USER  
+USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+USER    NEWDPF move	4j8v_L_RU7.pdbqt
+USER    NEWDPF about	-30.189000 -20.493000 25.671000
+USER    NEWDPF tran0	2.678795 -5.315632 33.255771
+USER    NEWDPF axisangle0	0.916818 -0.287484 0.277122 172.251318
+USER    NEWDPF quaternion0	0.914723 -0.286827 0.276489 0.067568
+USER    NEWDPF dihe0	-0.19 
+USER  
+USER                              x       y       z    vdW   Elec        q     RMS 
+ATOM      1  C4  RU7 A   1     -32.560 -22.918  28.391 -0.17 +0.08    +0.114    39.879
+ATOM      2  C5  RU7 A   1     -32.928 -23.902  27.418 +0.54 +0.18    +0.211    39.879
+ATOM      3  C6  RU7 A   1     -34.203 -23.943  26.875 -0.19 +0.15    +0.126    39.879
+ATOM      4  C3  RU7 A   1     -33.536 -22.015  28.774 +0.00 -0.08    -0.088    39.879
+ATOM      5  C2  RU7 A   1     -34.850 -22.077  28.219 -0.25 +0.09    +0.064    39.879
+ATOM      6  C1  RU7 A   1     -35.206 -23.031  27.260 -0.26 -0.09    -0.060    39.879
+ATOM      7  C7  RU7 A   1     -36.586 -23.086  26.678 -0.26 +0.09    +0.053    39.879
+ATOM      8 RU1  RU7 A   1     -34.390 -24.035  29.035-14.15 +0.47    +1.172    39.879
+ATOM      9 C10  RU7 A   1     -30.231 -22.475  27.831 -0.18 +0.14    +0.229    39.879
+ATOM     10  C8  RU7 A   1     -31.142 -22.915  28.956 -0.27 -0.05    -0.143    39.879
+ATOM     11  C9  RU7 A   1     -30.943 -22.076  30.190 +0.05 -0.01    +0.318    39.879
+TER
+ENDMDL
+MODEL        7
+USER    Run = 7
+USER    Cluster Rank = 4
+USER    Number of conformations in this cluster = 4
+USER  
+USER    RMSD from reference structure       = 32.317 A
+USER  
+USER    Estimated Free Energy of Binding    =   +3.63e+03 kcal/mol  [=(1)+(2)+(3)-(4)]
+USER    
+USER    (1) Final Intermolecular Energy     =  -13.85 kcal/mol
+USER        vdW + Hbond + desolv Energy     =  -20.49 kcal/mol
+USER        Electrostatic Energy            =   +6.63 kcal/mol
+USER    (2) Final Total Internal Energy     =   +0.31 kcal/mol
+USER    (3) Torsional Free Energy           =   +0.30 kcal/mol
+USER    (4) Unbound System's Energy         =   -3.64e+03 kcal/mol
+USER    
+USER    
+USER  
+USER    DPF = 4j8v_L_RU7_clean_4j8v.dpf
+USER    NEWDPF move	4j8v_L_RU7.pdbqt
+USER    NEWDPF about	-30.189000 -20.493000 25.671000
+USER    NEWDPF tran0	-48.583971 -28.460507 -17.746495
+USER    NEWDPF axisangle0	-0.749845 -0.649570 0.125664 111.139491
+USER    NEWDPF quaternion0	-0.618483 -0.535775 0.103649 0.565403
+USER    NEWDPF dihe0	4.55 
+USER  
+USER                              x       y       z    vdW   Elec        q     RMS 
+ATOM      1  C4  RU7 A   1     -36.343 -18.610  18.701 -0.13 +0.23    +0.114    32.317
+ATOM      2  C5  RU7 A   1     -35.106 -18.949  19.338 -0.05 +0.44    +0.211    32.317
+ATOM      3  C6  RU7 A   1     -35.035 -19.184  20.702 -0.09 +0.30    +0.126    32.317
+ATOM      4  C3  RU7 A   1     -37.463 -18.517  19.508 -0.26 -0.18    -0.088    32.317
+ATOM      5  C2  RU7 A   1     -37.374 -18.747  20.914 -0.18 +0.15    +0.064    32.317
+ATOM      6  C1  RU7 A   1     -36.167 -19.089  21.535 -0.13 -0.16    -0.060    32.317
+ATOM      7  C7  RU7 A   1     -36.083 -19.333  23.011 -0.20 +0.15    +0.053    32.317
+ATOM      8 RU1  RU7 A   1     -35.914 -17.223  20.405-19.29 +5.03    +1.172    32.317
+ATOM      9 C10  RU7 A   1     -36.251 -19.719  16.533 -0.02 +0.39    +0.229    32.317
+ATOM     10  C8  RU7 A   1     -36.368 -18.363  17.195 -0.06 -0.25    -0.143    32.317
+ATOM     11  C9  RU7 A   1     -37.564 -17.602  16.688 -0.07 +0.53    +0.318    32.317
+TER
+ENDMDL
+
+
+AVSFLD: # AVS field file
+AVSFLD: #
+AVSFLD: # Created by AutoDock
+AVSFLD: #
+AVSFLD: ndim=2           # number of dimensions in the field
+AVSFLD: nspace=1         # number of physical coordinates
+AVSFLD: veclen=7         # vector size
+AVSFLD: dim1=11          # atoms
+AVSFLD: dim2=4           # conformations
+AVSFLD: data=Real       # data type (byte,integer,Real,double)
+AVSFLD: field=uniform    # field coordinate layout
+AVSFLD: label= x y z vdW Elec q RMS
+AVSFLD: variable 1 file = 4j8v_L_RU7_clean_4j8v.dlg.pdb filetype = ascii offset = 5 stride = 12
+AVSFLD: variable 2 file = 4j8v_L_RU7_clean_4j8v.dlg.pdb filetype = ascii offset = 6 stride = 12
+AVSFLD: variable 3 file = 4j8v_L_RU7_clean_4j8v.dlg.pdb filetype = ascii offset = 7 stride = 12
+AVSFLD: variable 4 file = 4j8v_L_RU7_clean_4j8v.dlg.pdb filetype = ascii offset = 8 stride = 12
+AVSFLD: variable 5 file = 4j8v_L_RU7_clean_4j8v.dlg.pdb filetype = ascii offset = 9 stride = 12
+AVSFLD: variable 6 file = 4j8v_L_RU7_clean_4j8v.dlg.pdb filetype = ascii offset = 10 stride = 12
+AVSFLD: variable 7 file = 4j8v_L_RU7_clean_4j8v.dlg.pdb filetype = ascii offset = 11 stride = 12
+AVSFLD: # end of file
+
+>>> Closing the docking parameter file (DPF)...
+This docking finished at:			5:35 23" p.m., 08/23/2022
+
+
+________________________________________________________________________________
+
+/home/matthak/software/AutoDock/autodock4: Successful Completion on "tcn165"
+
+Real= 5.89s,  CPU= 5.86s,  System= 0.01s
+________________________________________________________________________________
+

@@ -1,0 +1,27 @@
+REMARK  Name    =  RU7                                                            
+REMARK     4 active torsions:                                                            
+REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+REMARK     1    A between atoms: C10_1         and    C8_2                                  
+REMARK     2    A between atoms: C8_2         and    C9_3                                  
+REMARK     3    A between atoms: C8_2         and    C4_4                                  
+REMARK     4    A between atoms: C1_9         and   C7_10                                  
+REMARK     x    y    z vdW Elec           q    Type                                  
+REMARK _______ _______ _______ _____ _____      ______    ____                                  
+ROOT                                                                            
+ATOM     1   C4  RU7 A   1      -0.077  14.639  14.397  0.00  0.00    +0.105 C  
+ATOM     2   C5  RU7 A   1       1.115  13.905  14.449  0.00  0.00    -0.379 C  
+ATOM     3   C6  RU7 A   1       1.281  12.774  13.637  0.00  0.00    -0.473 C  
+ATOM     4   C3  RU7 A   1      -1.088  14.228  13.538  0.00  0.00    -0.273 C  
+ATOM     5   C2  RU7 A   1      -0.930  13.095  12.728  0.00  0.00    +0.013 C  
+ATOM     6   C1  RU7 A   1       0.261  12.369  12.774  0.00  0.00    +0.607 C  
+ATOM     7   C7  RU7 A   1       0.425  11.159  11.883  0.00  0.00    +0.067 C  
+ATOM     8  RU1  RU7 A   1       0.676  14.504  12.181  0.00  0.00    -0.077 Ru 
+ATOM     9  CL1  RU7 A   1       1.963  13.887  10.215  0.00  0.00    +0.099 Cl 
+ATOM    10  CL2  RU7 A   1      -0.557  15.895  10.762  0.00  0.00    +0.099 Cl 
+ENDROOT                                                                            
+BRANCH     1   12                                                                 
+ATOM    11  C10  RU7 A   1      -0.486  15.359  16.701  0.00  0.00    +0.418 C  
+ATOM    12   C8  RU7 A   1      -0.321  15.832  15.255  0.00  0.00    -0.157 C  
+ATOM    13   C9  RU7 A   1       0.765  16.888  15.168  0.00  0.00    -0.049 C  
+ENDBRANCH     1   12                                                                 
+TORSDOF     1                                                                      

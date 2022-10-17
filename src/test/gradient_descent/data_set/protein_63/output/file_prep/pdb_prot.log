@@ -1,0 +1,57 @@
+2022-08-19 16:21:08,815 INFO:main.py:240:print_splash_screen:PDB2PQR v3.5.2: biomolecular structure conversion software.
+2022-08-19 16:21:08,815 INFO:main.py:242:print_splash_screen:Please cite:  Jurrus E, et al.  Improvements to the APBS biomolecular solvation software suite.  Protein Sci 27 112-128 (2018).
+2022-08-19 16:21:08,815 INFO:main.py:242:print_splash_screen:Please cite:  Dolinsky TJ, et al.  PDB2PQR: expanding and upgrading automated preparation of biomolecular structures for molecular simulations. Nucleic Acids Res 35 W522-W525 (2007).
+2022-08-19 16:21:08,815 INFO:main.py:752:main_driver:Checking and transforming input arguments.
+2022-08-19 16:21:08,816 INFO:main.py:756:main_driver:Loading topology files.
+2022-08-19 16:21:08,882 INFO:main.py:758:main_driver:Loading molecule: /gpfs/home4/matthak/AutoDock_GA_par/parametrization/metals/Ruthenium/data_set/protein_63/output/file_prep/4j8x.pdb
+2022-08-19 16:21:08,946 INFO:main.py:761:main_driver:Dropping water from structure.
+2022-08-19 16:21:08,955 INFO:main.py:763:main_driver:Setting up molecule.
+2022-08-19 16:21:09,017 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for SO4.  Parsing as new residue.
+2022-08-19 16:21:09,017 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for RU7.  Parsing as new residue.
+2022-08-19 16:21:09,017 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for MG.  Parsing as new residue.
+2022-08-19 16:21:09,017 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for SO4.  Parsing as new residue.
+2022-08-19 16:21:09,017 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for SO4.  Parsing as new residue.
+2022-08-19 16:21:09,017 WARNING:biomolecule.py:967:create_residue:Unable to find amino or nucleic acid definition for RU7.  Parsing as new residue.
+2022-08-19 16:21:09,019 INFO:main.py:409:setup_molecule:Created biomolecule object with 1061 residues and 12063 atoms.
+2022-08-19 16:21:09,019 INFO:main.py:767:main_driver:Setting termini states for biomolecule chains.
+2022-08-19 16:21:09,050 INFO:main.py:603:non_trivial:Loading forcefield.
+2022-08-19 16:21:09,065 INFO:main.py:607:non_trivial:Loading hydrogen topology definitions.
+2022-08-19 16:21:09,073 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue ARG A 134
+2022-08-19 16:21:09,074 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue LYS C 119
+2022-08-19 16:21:09,075 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue ARG E 134
+2022-08-19 16:21:09,076 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue LYS G 119
+2022-08-19 16:21:09,079 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue ARG A 134
+2022-08-19 16:21:09,080 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue LYS C 119
+2022-08-19 16:21:09,080 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue ARG E 134
+2022-08-19 16:21:09,081 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue LYS G 119
+2022-08-19 16:21:09,084 INFO:main.py:618:non_trivial:Attempting to repair 4 missing atoms in biomolecule.
+2022-08-19 16:21:09,084 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue ARG A 134
+2022-08-19 16:21:09,085 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue LYS C 119
+2022-08-19 16:21:09,086 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue ARG E 134
+2022-08-19 16:21:09,087 WARNING:biomolecule.py:158:num_missing_heavy:Missing atom OXT in residue LYS G 119
+2022-08-19 16:21:09,090 INFO:biomolecule.py:1052:repair_heavy:Added atom OXT to residue ARG A 134 at coordinates -18.753, -11.503, 54.988
+2022-08-19 16:21:09,091 INFO:biomolecule.py:1052:repair_heavy:Added atom OXT to residue LYS C 119 at coordinates -10.620, -8.463, 79.997
+2022-08-19 16:21:09,092 INFO:biomolecule.py:1052:repair_heavy:Added atom OXT to residue ARG E 134 at coordinates -23.550, -31.762, 52.416
+2022-08-19 16:21:09,093 INFO:biomolecule.py:1052:repair_heavy:Added atom OXT to residue LYS G 119 at coordinates -38.322, -41.965, 79.103
+2022-08-19 16:21:09,095 INFO:main.py:622:non_trivial:Updating disulfide bridges.
+2022-08-19 16:21:09,095 INFO:main.py:625:non_trivial:Debumping biomolecule.
+2022-08-19 16:21:09,340 INFO:main.py:642:non_trivial:Adding hydrogens to biomolecule.
+2022-08-19 16:21:10,246 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,246 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,246 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,246 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,247 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,247 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,247 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,247 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,247 WARNING:biomolecule.py:374:add_hydrogens:Tetrahedral hydrogen reconstruction not available for nucleic acids. Some hydrogens may be missing (if so, this is a bug).
+2022-08-19 16:21:10,248 WARNING:io.py:41:filter:Suppressing further "Tetrahedral hydrogen reconstruction" messages
+2022-08-19 16:21:10,815 INFO:main.py:645:non_trivial:Debumping biomolecule (again).
+2022-08-19 16:21:12,019 INFO:main.py:647:non_trivial:Optimizing hydrogen bonds
+2022-08-19 16:21:14,107 INFO:main.py:659:non_trivial:Applying force field to biomolecule states.
+2022-08-19 16:21:14,126 INFO:main.py:706:non_trivial:Regenerating headers.
+2022-08-19 16:21:14,134 INFO:main.py:731:non_trivial:Regenerating PDB lines.
+2022-08-19 16:21:14,212 WARNING:main.py:312:print_pqr:Ignoring 300286 header lines in output.
+2022-08-19 16:21:14,212 WARNING:main.py:316:print_pqr:Ignoring 9258 missing lines in output.
+2022-08-19 16:21:14,359 WARNING:main.py:355:print_pdb:Ignoring 300286 header lines in output.
+2022-08-19 16:21:14,360 WARNING:main.py:359:print_pdb:Ignoring 9258 missing lines in output.
