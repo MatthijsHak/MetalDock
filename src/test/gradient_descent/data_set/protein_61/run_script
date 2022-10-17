@@ -1,9 +1,0 @@
-#!/bin/bash
-#SBATCH -N 1
-#SBATCH --tasks-per-node=32
-#SBATCH -t 1:00:00
-#
-
-module load 2021 AMS/2021.101-intelmpi
-
-~/.conda/envs/vina/bin/python3 -u /home/matthak/AutoDock_GA_par/autodock_metal_GA/autodock_metal_lib/main.py -ref True -pdb 4j8v.pdb -pH 6.0 -xyz 4j8v_L_RU7.xyz -p ad4_parameters_HD.dat -m Ru -c 2 -basis TZP -hybrid B3LYP -dispersion "GRIMME3 BJDAMP" -npts 54,54,54 
