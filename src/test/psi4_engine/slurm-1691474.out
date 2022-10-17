@@ -1,0 +1,256 @@
+
+128
+  Threads set to 128 by Python driver.
+
+Scratch directory: /tmp/
+gradient() will perform analytic gradient computation.
+
+*** tstart() called on tcn115
+*** at Thu Oct 13 09:31:18 2022
+
+   => Loading Basis Set <=
+
+    Name: DEF2-SVP
+    Role: ORBITAL
+    Keyword: BASIS
+    atoms 1, 5, 7, 9, 11-12 entry H          line    15 file /home/matthak/.conda/envs/dock_M/share/psi4/basis/def2-svp.gbs 
+    atoms 2-4, 6, 8, 10     entry C          line    90 file /home/matthak/.conda/envs/dock_M/share/psi4/basis/def2-svp.gbs 
+    atoms 13                entry RU         line  1387 (ECP: line  2556) file /home/matthak/.conda/envs/dock_M/share/psi4/basis/def2-svp.gbs 
+    atoms 14-15             entry CL         line   356 file /home/matthak/.conda/envs/dock_M/share/psi4/basis/def2-svp.gbs 
+
+    !!!  WARNING: ECP capability is in beta. Please check occupations closely.  !!!
+
+   => B3LYP-D3(BJ): Empirical Dispersion <=
+
+    Grimme's -D3 (BJ-damping) Dispersion Correction
+    Grimme S.; Ehrlich S.; Goerigk L. (2011), J. Comput. Chem., 32: 1456
+
+        s6 =       1.000000
+        s8 =       1.988900
+        a1 =       0.398100
+        a2 =       4.421100
+
+
+         ---------------------------------------------------------
+                                   SCF
+               by Justin Turney, Rob Parrish, Andy Simmonett
+                          and Daniel G. A. Smith
+                              RKS Reference
+                      128 Threads,    500 MiB Core
+         ---------------------------------------------------------
+
+  ==> Geometry <==
+
+    Molecular point group: c1
+    Full point group: C1
+
+    Geometry (in Angstrom), charge = 0, multiplicity = 1:
+
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+         H            2.471724687051    -0.748411646383     2.230923361040     1.007825032230
+         C            1.631924687051    -0.361811646383     1.653423361040    12.000000000000
+         C            2.181924687051     0.050188353617     0.244423361040    12.000000000000
+         C            0.471924687051    -1.375811646383     1.788423361040    12.000000000000
+         H            3.245724687051    -0.187211646383     0.239423361040     1.007825032230
+         C            1.575924687051    -0.580811646383    -1.033576638960    12.000000000000
+         H            0.835324687051    -2.193211646383     2.411123361040     1.007825032230
+         C           -0.135075312949    -2.018811646383     0.502423361040    12.000000000000
+         H            2.387924687051    -1.051011646383    -1.588276638960     1.007825032230
+         C            0.420924687051    -1.630811646383    -0.897576638960    12.000000000000
+         H           -0.048475312949    -3.100711646383     0.602823361040     1.007825032230
+         H            0.781124687051    -2.551711646383    -1.356176638960     1.007825032230
+         RU           0.011924687051     0.137188353617     0.291423361040   101.904344100000
+         CL          -0.073075312949     1.798188353617    -1.391576638960    34.968852682000
+         CL          -2.350075312949     0.116188353617    -0.305576638960    34.968852682000
+
+  Running in c1 symmetry.
+
+  Rotational constants: A =      0.04598  B =      0.03252  C =      0.02488 [cm^-1]
+  Rotational constants: A =   1378.48258  B =    974.88890  C =    745.87788 [MHz]
+  Nuclear repulsion =  709.868198381240290
+
+  Charge       = 0
+  Multiplicity = 1
+  Electrons    = 92
+  Nalpha       = 46
+  Nbeta        = 46
+
+  ==> Algorithm <==
+
+  SCF Algorithm Type is DF.
+  DIIS enabled.
+  MOM disabled.
+  Fractional occupation disabled.
+  Guess Type is SAD.
+  Energy threshold   = 1.00e-08
+  Density threshold  = 1.00e-08
+  Integral threshold = 1.00e-12
+
+  ==> Primary Basis <==
+
+  Basis Set: DEF2-SVP
+    Blend: DEF2-SVP
+    Number of shells: 81
+    Number of basis functions: 181
+    Number of Cartesian functions: 194
+    Spherical Harmonics?: true
+    Max angular momentum: 3
+
+  Core potential: DEF2-SVP
+    Number of shells: 4
+    Number of ECP primitives: 14
+    Number of ECP core electrons: 28
+    Max angular momentum: 3
+
+  ==> DFT Potential <==
+
+   => LibXC <=
+
+    Version 5.1.5
+    S. Lehtola, C. Steigemann, M. J. Oliveira, and M. A. Marques, SoftwareX 7, 1 (2018) (10.1016/j.softx.2017.11.002)
+
+   => Composite Functional: B3LYP-D3BJ <= 
+
+    B3LYP-d3bj Hyb-GGA Exchange-Correlation Functional
+
+    P. J. Stephens, F. J. Devlin, C. F. Chabalowski, and M. J. Frisch, J. Phys. Chem. 98, 11623 (1994) (10.1021/j100096a001)
+
+    Deriv               =              1
+    GGA                 =           TRUE
+    Meta                =          FALSE
+
+    Exchange Hybrid     =           TRUE
+    MP2 Hybrid          =          FALSE
+
+   => Exchange Functionals <=
+
+    0.0800   Slater exchange
+    0.7200         Becke 88
+
+   => Exact (HF) Exchange <=
+
+    0.2000               HF 
+
+   => Correlation Functionals <=
+
+    0.1900   Vosko, Wilk & Nusair (VWN5_RPA)
+    0.8100   Lee, Yang & Parr
+
+   => LibXC Density Thresholds  <==
+
+    XC_HYB_GGA_XC_B3LYP:  1.00E-15 
+
+   => Molecular Quadrature <=
+
+    Radial Scheme          =       TREUTLER
+    Pruning Scheme         =           NONE
+    Nuclear Scheme         =       TREUTLER
+
+    BS radius alpha        =              1
+    Pruning alpha          =              1
+    Radial Points          =             75
+    Spherical Points       =            302
+    Total Points           =         314970
+    Total Blocks           =           2414
+    Max Points             =            256
+    Max Functions          =            169
+    Weights Tolerance      =       1.00E-15
+
+   => Loading Basis Set <=
+
+    Name: (DEF2-SVP AUX)
+    Role: JKFIT
+    Keyword: DF_BASIS_SCF
+    atoms 1, 5, 7, 9, 11-12 entry H          line    18 file /home/matthak/.conda/envs/dock_M/share/psi4/basis/def2-universal-jkfit.gbs 
+    atoms 2-4, 6, 8, 10     entry C          line   198 file /home/matthak/.conda/envs/dock_M/share/psi4/basis/def2-universal-jkfit.gbs 
+    atoms 13                entry RU         line  4046 file /home/matthak/.conda/envs/dock_M/share/psi4/basis/def2-universal-jkfit.gbs 
+    atoms 14-15             entry CL         line   986 file /home/matthak/.conda/envs/dock_M/share/psi4/basis/def2-universal-jkfit.gbs 
+
+/home/matthak/.conda/envs/dock_M/lib/python3.8/site-packages/psi4/driver/procrouting/empirical_dispersion.py:211: FutureWarning: Using the `local_options` keyword argument is deprecated in favor of using `task_config`, in version 0.30.0 it will stop working.
+  jobrec = qcng.compute(
+forrtl: severe (174): SIGSEGV, segmentation fault occurred
+Image              PC                Routine            Line        Source             
+libgdma.so         0000148872DA30DC  for__signal_handl     Unknown  Unknown
+libpthread-2.28.s  00001488DA2B7B20  Unknown               Unknown  Unknown
+core.cpython-38-x  000014887666BBB9  Unknown               Unknown  Unknown
+core.cpython-38-x  0000148875DE3C0F  Unknown               Unknown  Unknown
+core.cpython-38-x  0000148875D5B060  Unknown               Unknown  Unknown
+core.cpython-38-x  0000148875D524C3  _ZN3psi12TwoBodyA     Unknown  Unknown
+core.cpython-38-x  0000148876DAD16E  Unknown               Unknown  Unknown
+core.cpython-38-x  0000148876DC5B8C  Unknown               Unknown  Unknown
+core.cpython-38-x  0000148877249664  _ZN3psi15Integral     Unknown  Unknown
+core.cpython-38-x  000014887564525B  Unknown               Unknown  Unknown
+core.cpython-38-x  000014887563F019  Unknown               Unknown  Unknown
+core.cpython-38-x  0000148875912900  _ZN3psi7MemDFJK15     Unknown  Unknown
+core.cpython-38-x  0000148875A1D1A0  _ZN3psi2JK8build_     Unknown  Unknown
+core.cpython-38-x  0000148877AEC458  Unknown               Unknown  Unknown
+core.cpython-38-x  000014887795ED13  Unknown               Unknown  Unknown
+core.cpython-38-x  0000148877BD62E6  Unknown               Unknown  Unknown
+core.cpython-38-x  0000148877BD66BB  Unknown               Unknown  Unknown
+core.cpython-38-x  00001488777C6A5F  Unknown               Unknown  Unknown
+python3.8          000055B738C92E7E  PyCFunction_Call      Unknown  Unknown
+python3.8          000055B738C7B631  _PyObject_MakeTpC     Unknown  Unknown
+python3.8          000055B738C77481  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C71461  _PyEval_EvalCodeW     Unknown  Unknown
+python3.8          000055B738C8333C  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C73808  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C832A6  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C72AAB  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C832A6  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C72D9D  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C832A6  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C72D9D  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C71461  _PyEval_EvalCodeW     Unknown  Unknown
+python3.8          000055B738C8333C  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C9509C  PyObject_Call         Unknown  Unknown
+python3.8          000055B738C74870  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C71461  _PyEval_EvalCodeW     Unknown  Unknown
+python3.8          000055B738C8333C  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C9509C  PyObject_Call         Unknown  Unknown
+python3.8          000055B738C74870  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C71B76  _PyEval_EvalCodeW     Unknown  Unknown
+python3.8          000055B738C8333C  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C9509C  PyObject_Call         Unknown  Unknown
+python3.8          000055B738C74870  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C71B76  _PyEval_EvalCodeW     Unknown  Unknown
+python3.8          000055B738C8333C  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C9509C  PyObject_Call         Unknown  Unknown
+python3.8          000055B738C74870  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C71461  _PyEval_EvalCodeW     Unknown  Unknown
+python3.8          000055B738C8333C  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C73808  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C832A6  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C72AAB  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C832A6  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C76FFC  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C832A6  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C72AAB  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C832A6  _PyFunction_Vecto     Unknown  Unknown
+python3.8          000055B738C72AAB  _PyEval_EvalFrame     Unknown  Unknown
+python3.8          000055B738C71461  _PyEval_EvalCodeW     Unknown  Unknown
+python3.8          000055B738D30DE9  PyEval_EvalCodeEx     Unknown  Unknown
+python3.8          000055B738D30DAB  PyEval_EvalCode       Unknown  Unknown
+python3.8          000055B738D51903  Unknown               Unknown  Unknown
+python3.8          000055B738D508E3  Unknown               Unknown  Unknown
+python3.8          000055B738BF0F2F  Unknown               Unknown  Unknown
+python3.8          000055B738BF0A23  PyRun_SimpleFileE     Unknown  Unknown
+python3.8          000055B738BE40AC  Unknown               Unknown  Unknown
+python3.8          000055B738D25219  Py_BytesMain          Unknown  Unknown
+libc-2.28.so       00001488D9571493  __libc_start_main     Unknown  Unknown
+python3.8          000055B738D25125  Unknown               Unknown  Unknown
+
+JOB STATISTICS
+==============
+Job ID: 1691474
+Cluster: snellius
+User/Group: matthak/matthak
+State: RUNNING
+Nodes: 1
+Cores per node: 32
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 00:11:44 core-walltime
+Job Wall-clock time: 00:00:22
+Memory Utilized: 0.00 MB (estimated maximum)
+Memory Efficiency: 0.00% of 56.00 GB (1.75 GB/core)
+WARNING: Efficiency statistics may be misleading for RUNNING jobs.

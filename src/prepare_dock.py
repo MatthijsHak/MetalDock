@@ -102,17 +102,15 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     z_npts = (round(z_dist / spacing)) & (-2)
 
     max_side = max([x_npts,y_npts,z_npts])
-    print('Box size is {} {} {}'.format(max_side,max_side,max_side))
-    # Box dimensions in npts
-    npts = [max_side, max_side, max_side]
+    #print('Box size is {} {} {}'.format(max_side,max_side,max_side))
 
-    return npts
+    return max_side
 
 def prepare_receptor(name_protein):
     subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+name_protein+'.pdb'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
-def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_protein, energy, dock, box_size, dock_algorithm, random_pos, ga_dock, sa_dock):
+def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_protein, energy, dock, box_size, num_poses, dock_algorithm, random_pos, ga_dock, sa_dock):
     # subprocess.call(['cp '+os.environ['WORKING_DIR']+'/'+iv.var.parameter_file+' .'], shell=True)
     # subprocess.call(['cp '+os.environ['WORKING_DIR']+'/'+iv.var.name_ligand+'.mol2 .'], shell=True)
 
@@ -138,7 +136,7 @@ def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_
     subprocess.call([os.environ['AUTODOCK']+'/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     #create_dpf()
-    write_dpf_file('clean_'+name_protein+'.gpf', name_ligand, 'clean_'+name_protein, parameter_file, energy, dock_algorithm, random_pos=random_pos, SA=sa_dock, GA=ga_dock)
+    write_dpf_file('clean_'+name_protein+'.gpf', name_ligand, 'clean_'+name_protein, parameter_file, energy, num_poses, dock_algorithm, random_pos=random_pos, SA=sa_dock, GA=ga_dock)
 
     #autodock()
     subprocess.call([os.environ['AUTODOCK']+'/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -148,7 +146,7 @@ def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_
 
     return
 
-def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_ligand, dock_algorithm, random_pos=False, GA=False, SA=False):
+def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_ligand, num_poses, dock_algorithm, random_pos=False, GA=False, SA=False):
     gpf_file = open(gpf_file,'r')
     gpf_lines = [line.split() for line in gpf_file]
 
@@ -199,10 +197,11 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
         dpf_file.write('sw_rho 1.0                           # size of local search space to sample\n')
         dpf_file.write('sw_lb_rho 0.01                       # lower bound on rho\n')
         dpf_file.write('ls_search_freq 0.06                  # probability of performing local search on individual\n')
+        # dpf_file.write('do_local_only 20\n')
         dpf_file.write('# Activate LGA\n')
         dpf_file.write('set_ga                               # set the above parameters for GA or LGA\n')
         dpf_file.write('set_psw1                             # set the above pseudo-Solis & Wets parameters\n')
-        dpf_file.write('ga_run 10                            # do this many hybrid GA-LS runs\n')
+        dpf_file.write('ga_run '+str(num_poses)+'                            # do this many hybrid GA-LS runs\n')
     if SA == True:
         dpf_file.write('# SA Parameters\n')
         dpf_file.write('tstep 2.0\n')
@@ -220,14 +219,13 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, energy_l
         dpf_file.write('dihrf 1.0                            # per cycle reduction factor for torsional dihedral steps\n')
 
         dpf_file.write('# Activate SA\n')
-        dpf_file.write('simanneal 10                         # run this many SA docking\n')
+        dpf_file.write('simanneal '+str(num_poses)+'                         # run this many SA docking\n')
 
     dpf_file.write('# Perform Analysis\n')
     dpf_file.write('rmsref '+name_ligand+'.pdbqt              # RMSD will be calculated with this file\n')
     dpf_file.write('rmsmode atype                        # Method to calculate the RMSD\n')
     dpf_file.write('rmstol 2.0                           # RMSD tolerance\n')
     dpf_file.write('analysis                             # perforem a ranked cluster analysis\n')
-
     return
 
 

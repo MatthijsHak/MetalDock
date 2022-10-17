@@ -231,8 +231,8 @@ def plot_parameters(metal, output_dir):
     ax[4][0].set_ylabel('r {}-N (Å)'.format(metal))
     ax[4][1].set_ylabel('$\epsilon$ {}-N (kcal/mol)'.format(metal))
         
-    ax[5][0].set_ylabel('r {}-{} (Å)'.format(metal,metal))
-    ax[5][1].set_ylabel('$\epsilon$ {}-{} (kcal/mol)'.format(metal,metal))
+    ax[5][0].set_ylabel('r {}-H-bond (Å)'.format(metal,metal))
+    ax[5][1].set_ylabel('$\epsilon$ {}-H-bond (kcal/mol)'.format(metal,metal))
 
     ax[5][0].set_xlabel('N parents')
     ax[5][1].set_xlabel('N parents')

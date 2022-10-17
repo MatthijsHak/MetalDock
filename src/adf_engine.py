@@ -1,8 +1,10 @@
 import os, sys, subprocess
-from scm.plams import *
 
 
 def adf_engine(xyz_file, var, output_dir):
+
+    from scm import plams
+
     ## Geometry Optimization ##
     if var.geom_opt == True:
         if os.path.isdir('geom_opt') == False:

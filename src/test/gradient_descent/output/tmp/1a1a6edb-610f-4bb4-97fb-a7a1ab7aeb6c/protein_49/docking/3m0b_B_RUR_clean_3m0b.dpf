@@ -1,0 +1,47 @@
+autodock_parameter_version 4.2       # used by autodock to validate parameter set
+parameter_file ad4_parameters_HD.dat    # parameter library filename
+outlev 1                             # diagnostic output level
+intelec                              # calculate internal electrostatics
+seed pid time                        # seeds for random generator
+ligand_types A Ru C OA N     # atoms types in ligand
+fld clean_3m0b.maps.fld              # grid_data_file
+map clean_3m0b.A.map                 # atom-specific affinity map
+map clean_3m0b.Ru.map                 # atom-specific affinity map
+map clean_3m0b.C.map                 # atom-specific affinity map
+map clean_3m0b.OA.map                 # atom-specific affinity map
+map clean_3m0b.N.map                 # atom-specific affinity map
+elecmap clean_3m0b.e.map             # electrostatics map
+desolvmap clean_3m0b.d.map           # desolvation map
+
+# Unbound Ligand Parameters
+unbound_energy -12537.74                      # set the energy of the unbound state
+move 3m0b_B_RUR.pdbqt                # small molecule
+tran0 random  # initial coordinates/A or random
+quaternion0 random                   # initial orientation
+dihe0 random                         # initial dihedrals (relative) or random
+# GA parameters
+ga_pop_size 200                      # number of individuals in population
+ga_num_evals 2500000                 # maximum number of energy evaluations
+ga_num_generations 30000             # maximum number of generations
+ga_elitism 2                         # number of top individuals to survive to next generation
+ga_mutation_rate 0.2                # rate of gene mutation
+ga_crossover_rate 0.8                # rate of crossover
+ga_window_size 20                    # number of preceding generation when deciding threshold for worst individual current population
+ga_cauchy_alpha 0.0                  # Alpha parameter of Cauchy distribution
+ga_cauchy_beta 1.0                   # Beta parameter Cauchy distribution
+# Local Search Parameters
+sw_max_its 300                       # iterations of Solis & Wets local search
+sw_max_succ 4                        # consecutive successes before changing rho
+sw_max_fail 4                        # consecutive failures before changing rho
+sw_rho 1.0                           # size of local search space to sample
+sw_lb_rho 0.01                       # lower bound on rho
+ls_search_freq 0.06                  # probability of performing local search on individual
+# Activate LGA
+set_ga                               # set the above parameters for GA or LGA
+set_psw1                             # set the above pseudo-Solis & Wets parameters
+ga_run 10                            # do this many hybrid GA-LS runs
+# Perform Analysis
+rmsref 3m0b_B_RUR.pdbqt              # RMSD will be calculated with this file
+rmsmode atype                        # Method to calculate the RMSD
+rmstol 2.0                           # RMSD tolerance
+analysis                             # perforem a ranked cluster analysis

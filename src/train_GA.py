@@ -12,6 +12,7 @@ import numpy as np
 import multiprocessing as mp 
 import prepare_dock as d
 import figures as fig
+import optim as opt
 
 from scipy.stats import rankdata
 from multiprocessing import Pool
@@ -169,7 +170,7 @@ def fitness_func(solution, solution_idx):
         os.mkdir(f'protein_{n_prot}')
         os.chdir(f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}')
 
-        os.system(f"cp -r  ../../../data_set/protein_{n_prot}/output/docking .")
+        os.system(f"cp -r  ../../../../data_set/protein_{n_prot}/output/docking .")
         os.chdir(f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}/docking')
         output_temp_dir=f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}/docking'
 
@@ -204,13 +205,15 @@ def fitness_func(solution, solution_idx):
         dock = d.get_coordinates(f'{output_temp_dir}/ref.xyz',par.metal_symbol)
 
         subprocess.call([f'cp {input_dir}/'+par.parameter_file+' .'], shell=True)
-        d.docking_func(solution, par.parameter_file, par.metal_symbol, name_ligand, name_protein, energy, dock, npts, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock)
+        d.docking_func(solution, par.parameter_file, par.metal_symbol, name_ligand, name_protein, energy, dock, npts, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock)
 
         ##### Fitness function ######
         avg_list, min_list, output = d.rmsd_func(name_ligand, n_prot, gen, output_dir, num_gen=par.ga_num_generations, train=True)
 
         population_avg_list.append(avg_list)
         population_min_avg_list.append(min_list)
+
+        subprocess.call([f'rm -r {tmp_dir}/'+dir_name+f'/protein_{n_prot}'], shell=True)
 
 
     '''Compare previous generations with each. If the average of the solutions between each two generations is below a certain threshold
@@ -349,13 +352,13 @@ def train_GA(input_file):
         os.mkdir(f'{output_dir}/last_gen')
 
     with open('parameter_history', 'a') as f:
-        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_"+par.metal_symbol+"_"+par.metal_symbol+"     e_"+par.metal_symbol+"_"+par.metal_symbol+"|    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
+        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_"+par.metal_symbol+"_HD     e_"+par.metal_symbol+"_HD|    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
 
-    if os.path.isdir('data_set') == False:
-        subprocess.call([f'mv {input_dir}/data_set .'], shell=True)
-        os.chdir('data_set')
-    else:
-        os.chdir('data_set')
+    # if os.path.isdir('data_set') == False:
+    #     # subprocess.call([f'mv {input_dir}/data_set .'], shell=True)
+    #     os.chdir('data_set')
+    # else:
+    os.chdir(f'{input_dir}/data_set')
 
     # Make list of the protein numbers to iterate over
     dir_list = os.listdir(os.getcwd())
@@ -373,39 +376,39 @@ def train_GA(input_file):
 
     # initial_population = None
 
-    sol_per_pop = par.sol_per_pop
-    num_genes = 12
-    gene_space=[{'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25}]
+    # sol_per_pop = par.sol_per_pop
+    # num_genes = 12
+    # gene_space=[{'low': 1, 'high': 3},{'low': 0, 'high': 25},
+    #             {'low': 1, 'high': 3},{'low': 0, 'high': 25},
+    #             {'low': 1, 'high': 3},{'low': 0, 'high': 25},
+    #             {'low': 1, 'high': 3},{'low': 0, 'high': 25},
+    #             {'low': 1, 'high': 3},{'low': 0, 'high': 25},
+    #             {'low': 1, 'high': 3},{'low': 0, 'high': 25}]
 
-    parent_selection_type = par.par_type
-    keep_parents = par.keep_par
-    k_tournament = par.k_tour
+    # parent_selection_type = par.par_type
+    # keep_parents = par.keep_par
+    # k_tournament = par.k_tour
 
-    crossover_type = par.crossover_type
-    crossover_probability = par.cross_prob
+    # crossover_type = par.crossover_type
+    # crossover_probability = par.cross_prob
 
-    mutation_probability = par.mut_prob
-    mutation_type = mutation_func
+    # mutation_probability = par.mut_prob
+    # mutation_type = mutation_func
 
-    # Create Class
-    ga_instance = PooledGA(num_generations=num_generations,
-                           num_parents_mating=num_parents_mating,
-                           fitness_func=fitness_function,
-                           sol_per_pop=sol_per_pop,
-                           num_genes=num_genes,
-                           gene_space=gene_space,
-                           parent_selection_type=parent_selection_type,
-                           keep_parents=keep_parents,
-                           K_tournament=k_tournament,
-                           crossover_type=crossover_type,
-                           crossover_probability=crossover_probability,
-                           mutation_type=mutation_func,
-                           save_solutions=True)
+    # # Create Class
+    # ga_instance = PooledGA(num_generations=num_generations,
+    #                        num_parents_mating=num_parents_mating,
+    #                        fitness_func=fitness_function,
+    #                        sol_per_pop=sol_per_pop,
+    #                        num_genes=num_genes,
+    #                        gene_space=gene_space,
+    #                        parent_selection_type=parent_selection_type,
+    #                        keep_parents=keep_parents,
+    #                        K_tournament=k_tournament,
+    #                        crossover_type=crossover_type,
+    #                        crossover_probability=crossover_probability,
+    #                        mutation_type=mutation_func,
+    #                        save_solutions=True)
 
     if os.path.isdir(f'{output_dir}/tmp'):
         shutil.rmtree(f'{output_dir}/tmp', ignore_errors=True)
@@ -417,30 +420,35 @@ def train_GA(input_file):
 
     tmp_dir=os.getcwd()
 
-    even_list = np.zeros([1,12])
-    uneven_list = np.zeros([1,12])
+    # even_list = np.zeros([1,12])
+    # uneven_list = np.zeros([1,12])
 
-    with Pool(processes=sol_per_pop) as pool:
-        ga_instance.run()
+    # with Pool(processes=sol_per_pop) as pool:
+    #     ga_instance.run()
 
-        solution, solution_fitness, solution_idx = ga_instance.best_solution()
-        print("Parameters of the best solution : {solution}\n".format(solution=solution))
-        print("Fitness value of the best solution = {solution_fitness}\n".format(solution_fitness=solution_fitness))
+    #     solution, solution_fitness, solution_idx = ga_instance.best_solution()
+    #     print("Parameters of the best solution : {solution}\n".format(solution=solution))
+    #     print("Fitness value of the best solution = {solution_fitness}\n".format(solution_fitness=solution_fitness))
 
-    shutil.rmtree(f'{output_dir}/tmp',ignore_errors=True)
+    # shutil.rmtree(f'{output_dir}/tmp',ignore_errors=True)
 
-    if os.path.isdir(f'{output_dir}/figures'):
-        shutil.rmtree(f'{output_dir}/figures', ignore_errors=True)
-        os.mkdir(f'{output_dir}/figures')
-    else:
-        os.mkdir(f'{output_dir}/figures')
+    # if os.path.isdir(f'{output_dir}/figures'):
+    #     shutil.rmtree(f'{output_dir}/figures', ignore_errors=True)
+    #     os.mkdir(f'{output_dir}/figures')
+    # else:
+    #     os.mkdir(f'{output_dir}/figures')
 
-    os.chdir(f'{output_dir}/figures')
+    # os.chdir(f'{output_dir}/figures')
 
-    fig.plot_each_protein(dir_list, output_dir)
-    fig.plot_total_conformations(output_dir)
-    fig.plot_parameters(par.metal_symbol, output_dir)
+    # fig.plot_each_protein(dir_list, output_dir)
+    # fig.plot_total_conformations(output_dir)
+    # fig.plot_parameters(par.metal_symbol, output_dir)
 
-    print("TRAINING GA COMPLETED")
+    # print("TRAINING GA COMPLETED")
 
+    parameter_set = [ 2.30177, 0.21898, 1.28486, 16.28000, 1.00407, 5.22678, 1.83437, 23.93663, 1.55722, 8.68594, 1.49070, 11.85050]
+
+    parameter_set = opt.gradient_descent(tmp_dir, dir_list, par, parameter_set, learning_rate=0.5, n_iter=50)
+
+    print('Finale Parameter set is: {}'.format(parameter_set))
     return 

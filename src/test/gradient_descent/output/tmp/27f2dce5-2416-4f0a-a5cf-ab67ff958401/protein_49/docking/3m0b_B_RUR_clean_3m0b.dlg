@@ -1,0 +1,1273 @@
+          AutoDock 4.2 Release 4.2.6   
+         (C) 1989-2012 The Scripps Research Institute
+        AutoDock comes with ABSOLUTELY NO WARRANTY.
+        AutoDock is free software, and you are welcome
+        to redistribute it under certain conditions;
+        for details type 'autodock4 -C'
+
+                     main.cc  $Revision: 1.213 $
+
+                   Compiled on Jul 18 2014 at 18:34:22
+
+
+This file was created at:			4:39 47" p.m., 10/17/2022
+                   on host:		"tcn5"
+Current Working Directory = "/gpfs/home4/matthak/AutoDock_GA_par/autodock_metal_GA/src/test/gradient_descent/output/tmp/27f2dce5-2416-4f0a-a5cf-ab67ff958401/protein_49/docking"
+
+      ________________________________________________________________
+
+                   SETTING UP DEFAULT PARAMETER LIBRARY
+      ________________________________________________________________
+
+
+Random number generator was seeded with values 1361774, 1666017587.
+Docking parameter file (DPF) used for this docking:		3m0b_B_RUR_clean_3m0b.dpf
+DPF> autodock_parameter_version 4.2       # used by autodock to validate parameter set
+
+	Autodock parameter version 4.2.
+DPF> parameter_file ad4_parameters_HD.dat    # parameter library filename
+
+Using read_parameter_library() to try to open and read "ad4_parameters_HD.dat".
+
+DPF> outlev 1                             # diagnostic output level
+
+Output Level = 1  ADT-COMPATIBLE OUTPUT DURING DOCKING.
+DPF> intelec                              # calculate internal electrostatics
+
+Electrostatic energies will be calculated for all non-bonds between moving atoms.
+DPF> seed pid time                        # seeds for random generator
+
+Random number generator was seeded with values 1361774, 1666017587.
+DPF> ligand_types A Ru C OA N     # atoms types in ligand
+
+DPF> fld clean_3m0b.maps.fld              # grid_data_file
+
+Opening Grid Map Dimensions file:		clean_3m0b.maps.fld
+Grid Point Spacing =				0.375 Angstroms
+
+Even Number of User-specified Grid Points =	54 x-points
+						54 y-points
+						54 z-points
+
+Coordinates of Central Grid Point of Maps =	(-0.800, -23.000, -4.000)
+Macromolecule file used to create Grid Maps =	clean_3m0b.pdbqt
+Grid Parameter file used to create Grid Maps =	clean_3m0b.gpf
+Minimum coordinates in grid = (-10.925, -33.125, -14.125)
+Maximum coordinates in grid = (9.325, -12.875, 6.125)
+
+DPF> map clean_3m0b.A.map                 # atom-specific affinity map
+
+DPF> map clean_3m0b.Ru.map                 # atom-specific affinity map
+
+DPF> map clean_3m0b.C.map                 # atom-specific affinity map
+
+DPF> map clean_3m0b.OA.map                 # atom-specific affinity map
+
+DPF> map clean_3m0b.N.map                 # atom-specific affinity map
+
+DPF> elecmap clean_3m0b.e.map             # electrostatics map
+
+DPF> desolvmap clean_3m0b.d.map           # desolvation map
+
+DPF> 
+
+DPF> # Unbound Ligand Parameters
+
+DPF> unbound_energy -12537.74                      # set the energy of the unbound state
+
+The internal energy of the unbound state was set to -12537.740 kcal/mol
+The unbound ligand energy model was set to User
+
+DPF> move 3m0b_B_RUR.pdbqt                # small molecule
+
+1,4-interactions will be _ignored_ in the non-bonded internal energy calculation.
+
+Ligand PDBQT file = "3m0b_B_RUR.pdbqt"
+
+INPUT LIGAND PDBQT FILE:
+________________________
+
+INPUT-LIGAND-PDBQT: REMARK  Name    =  RUR                                                            
+INPUT-LIGAND-PDBQT: REMARK    13 active torsions:                                                            
+INPUT-LIGAND-PDBQT: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+INPUT-LIGAND-PDBQT: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+INPUT-LIGAND-PDBQT: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+INPUT-LIGAND-PDBQT: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+INPUT-LIGAND-PDBQT: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+INPUT-LIGAND-PDBQT: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+INPUT-LIGAND-PDBQT: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+INPUT-LIGAND-PDBQT: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+INPUT-LIGAND-PDBQT: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+INPUT-LIGAND-PDBQT: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+INPUT-LIGAND-PDBQT: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+INPUT-LIGAND-PDBQT: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+INPUT-LIGAND-PDBQT: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+INPUT-LIGAND-PDBQT: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+INPUT-LIGAND-PDBQT: REMARK     x    y    z vdW Elec           q    Type                                  
+INPUT-LIGAND-PDBQT: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+INPUT-LIGAND-PDBQT: ROOT                                                                            
+INPUT-LIGAND-PDBQT: ATOM     1  CHA  RUR A   1      -4.202 -12.257  11.542  0.00  0.00    -0.078 C  
+INPUT-LIGAND-PDBQT: ATOM     2  CHB  RUR A   1      -5.491 -15.515  14.806  0.00  0.00    -0.071 C  
+INPUT-LIGAND-PDBQT: ATOM     3  CHC  RUR A   1      -1.320 -17.845  14.102  0.00  0.00    +0.009 C  
+INPUT-LIGAND-PDBQT: ATOM     4  CHD  RUR A   1       0.288 -14.215  11.344  0.00  0.00    +0.275 C  
+INPUT-LIGAND-PDBQT: ATOM     5  C1A  RUR A   1      -5.042 -13.056  12.296  0.00  0.00    +0.013 A  
+INPUT-LIGAND-PDBQT: ATOM     6  C2A  RUR A   1      -6.481 -13.112  12.289  0.00  0.00    +0.121 A  
+INPUT-LIGAND-PDBQT: ATOM     7  C3A  RUR A   1      -6.831 -14.030  13.189  0.00  0.00    +0.131 A  
+INPUT-LIGAND-PDBQT: ATOM     8  C4A  RUR A   1      -5.645 -14.561  13.820  0.00  0.00    +0.017 A  
+INPUT-LIGAND-PDBQT: ATOM     9  CMA  RUR A   1      -8.239 -14.470  13.533  0.00  0.00    -0.337 C  
+INPUT-LIGAND-PDBQT: ATOM    10  C1B  RUR A   1      -4.531 -16.503  14.947  0.00  0.00    +0.872 C  
+INPUT-LIGAND-PDBQT: ATOM    11  C2B  RUR A   1      -4.535 -17.720  15.703  0.00  0.00    +0.107 C  
+INPUT-LIGAND-PDBQT: ATOM    12  C3B  RUR A   1      -3.374 -18.342  15.492  0.00  0.00    +0.108 C  
+INPUT-LIGAND-PDBQT: ATOM    13  C4B  RUR A   1      -2.581 -17.577  14.596  0.00  0.00    +0.111 C  
+INPUT-LIGAND-PDBQT: ATOM    14  CMB  RUR A   1      -5.675 -18.153  16.609  0.00  0.00    -0.324 C  
+INPUT-LIGAND-PDBQT: ATOM    15  C1C  RUR A   1      -0.427 -17.142  13.325  0.00  0.00    -0.402 C  
+INPUT-LIGAND-PDBQT: ATOM    16  C2C  RUR A   1       0.915 -17.425  12.916  0.00  0.00    -0.369 A  
+INPUT-LIGAND-PDBQT: ATOM    17  C3C  RUR A   1       1.346 -16.417  12.154  0.00  0.00    +0.132 A  
+INPUT-LIGAND-PDBQT: ATOM    18  C4C  RUR A   1       0.323 -15.427  12.027  0.00  0.00    +0.140 A  
+INPUT-LIGAND-PDBQT: ATOM    19  CMC  RUR A   1       1.701 -18.669  13.306  0.00  0.00    +0.496 A  
+INPUT-LIGAND-PDBQT: ATOM    20  C1D  RUR A   1      -0.730 -13.319  11.024  0.00  0.00    +0.125 C  
+INPUT-LIGAND-PDBQT: ATOM    21  C2D  RUR A   1      -0.738 -12.201  10.116  0.00  0.00    +0.147 C  
+INPUT-LIGAND-PDBQT: ATOM    22  C3D  RUR A   1      -2.136 -11.574  10.170  0.00  0.00    +0.140 C  
+INPUT-LIGAND-PDBQT: ATOM    23  C4D  RUR A   1      -2.884 -12.371  11.114  0.00  0.00    +0.017 C  
+INPUT-LIGAND-PDBQT: ATOM    24  CMD  RUR A   1       0.435 -11.755   9.266  0.00  0.00    +0.288 C  
+INPUT-LIGAND-PDBQT: ATOM    25   RU  RUR A   1      -2.662 -14.975  12.852  0.00  0.00    -0.021 Ru 
+INPUT-LIGAND-PDBQT: ATOM    26   NA  RUR A   1      -4.638 -13.905  13.244  0.00  0.00    +0.019 N  
+INPUT-LIGAND-PDBQT: ATOM    27   NB  RUR A   1      -3.351 -16.530  14.338  0.00  0.00    +0.027 N  
+INPUT-LIGAND-PDBQT: ATOM    28   NC  RUR A   1      -0.635 -15.965  12.749  0.00  0.00    -0.090 N  
+INPUT-LIGAND-PDBQT: ATOM    29   ND  RUR A   1      -1.979 -13.284  11.525  0.00  0.00    +0.130 N  
+INPUT-LIGAND-PDBQT: ENDROOT                                                                            
+INPUT-LIGAND-PDBQT: BRANCH    12   30                                                                 
+INPUT-LIGAND-PDBQT: ATOM    30  CAB  RUR A   1      -2.884 -19.654  16.068  0.00  0.00    -0.557 C  
+INPUT-LIGAND-PDBQT: ATOM    31  CBB  RUR A   1      -3.717 -20.650  16.224  0.00  0.00    +0.292 C  
+INPUT-LIGAND-PDBQT: ENDBRANCH    12   30                                                                 
+INPUT-LIGAND-PDBQT: BRANCH    17   32                                                                 
+INPUT-LIGAND-PDBQT: ATOM    32  CAC  RUR A   1       2.704 -16.268  11.499  0.00  0.00    -0.424 C  
+INPUT-LIGAND-PDBQT: ATOM    33  CBC  RUR A   1       2.987 -16.922  10.401  0.00  0.00    -0.687 C  
+INPUT-LIGAND-PDBQT: ENDBRANCH    17   32                                                                 
+INPUT-LIGAND-PDBQT: BRANCH     6   34                                                                 
+INPUT-LIGAND-PDBQT: ATOM    34  CAA  RUR A   1      -7.398 -12.309  11.351  0.00  0.00    -1.067 C  
+INPUT-LIGAND-PDBQT: BRANCH    34   35                                                                 
+INPUT-LIGAND-PDBQT: ATOM    35  CBA  RUR A   1      -7.493 -10.821  11.635  0.00  0.00    -0.354 C  
+INPUT-LIGAND-PDBQT: BRANCH    35   36                                                                 
+INPUT-LIGAND-PDBQT: ATOM    36  CGA  RUR A   1      -8.550 -10.551  12.645  0.00  0.00    +0.137 C  
+INPUT-LIGAND-PDBQT: ATOM    37  O1A  RUR A   1      -9.461 -11.311  12.789  0.00  0.00    +0.135 OA 
+INPUT-LIGAND-PDBQT: ATOM    38  O2A  RUR A   1      -8.497  -9.575  13.333  0.00  0.00    +0.121 OA 
+INPUT-LIGAND-PDBQT: ENDBRANCH    35   36                                                                 
+INPUT-LIGAND-PDBQT: ENDBRANCH    34   35                                                                 
+INPUT-LIGAND-PDBQT: ENDBRANCH     6   34                                                                 
+INPUT-LIGAND-PDBQT: BRANCH    22   39                                                                 
+INPUT-LIGAND-PDBQT: ATOM    39  CAD  RUR A   1      -2.662 -10.383   9.365  0.00  0.00    +0.053 C  
+INPUT-LIGAND-PDBQT: BRANCH    39   40                                                                 
+INPUT-LIGAND-PDBQT: ATOM    40  CBD  RUR A   1      -2.219  -9.048   9.875  0.00  0.00    +0.344 C  
+INPUT-LIGAND-PDBQT: BRANCH    40   41                                                                 
+INPUT-LIGAND-PDBQT: ATOM    41  CGD  RUR A   1      -2.637  -8.003   8.891  0.00  0.00    +0.129 C  
+INPUT-LIGAND-PDBQT: ATOM    42  O1D  RUR A   1      -2.618  -8.257   7.693  0.00  0.00    +0.128 OA 
+INPUT-LIGAND-PDBQT: ATOM    43  O2D  RUR A   1      -2.994  -6.922   9.315  0.00  0.00    +0.021 OA 
+INPUT-LIGAND-PDBQT: ENDBRANCH    40   41                                                                 
+INPUT-LIGAND-PDBQT: ENDBRANCH    39   40                                                                 
+INPUT-LIGAND-PDBQT: ENDBRANCH    22   39                                                                 
+INPUT-LIGAND-PDBQT: TORSDOF     8                                                                      
+________________________________________________________________________________
+
+Total charge on ligand                               =	+0.004 e
+REMARK  Name    =  RUR                                                            
+REMARK    13 active torsions:                                                            
+REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+REMARK     x    y    z vdW Elec           q    Type                                  
+REMARK _______ _______ _______ _____ _____      ______    ____                                  
+
+
+Number of Rotatable Bonds in Small Molecule =	8 torsions
+Number of atoms in ligand:  43
+
+Number of non-hydrogen atoms in ligand:  43
+
+Number of vibrational degrees of freedom of ligand:  123
+
+
+Number of torsional degrees of freedom = 8
+Estimated loss of torsional free energy upon binding = +2.3864 kcal/mol
+
+
+DPF> tran0 random  # initial coordinates/A or random
+
+Initial translation =			(-0.376, -21.766, 5.549) Angstroms
+DPF> quaternion0 random                   # initial orientation
+
+Each run will begin with a new, random initial orientation.
+Initial quaternion,  (x,y,z,w) =	( -0.280, -0.381, 0.108, 0.875 ),
+DPF> dihe0 random                         # initial dihedrals (relative) or random
+
+DPF> # GA parameters
+
+DPF> ga_pop_size 200                      # number of individuals in population
+
+A population of 200 individuals will be used
+DPF> ga_num_evals 2500000                 # maximum number of energy evaluations
+
+There will be at most 2500000 function evaluations used.
+DPF> ga_num_generations 30000             # maximum number of generations
+
+The GA will run for at most 30000 generations.
+DPF> ga_elitism 2                         # number of top individuals to survive to next generation
+
+The 2 best will be preserved each GA generation.
+DPF> ga_mutation_rate 0.2                # rate of gene mutation
+
+The mutation rate is 0.200000.
+DPF> ga_crossover_rate 0.8                # rate of crossover
+
+The crossover rate is 0.800000.
+DPF> ga_window_size 20                    # number of preceding generation when deciding threshold for worst individual current population
+
+The GA's selection window is 20 generations.
+DPF> ga_cauchy_alpha 0.0                  # Alpha parameter of Cauchy distribution
+
+The alpha parameter (for the Cauchy distribution) is being set to 0.000000.
+DPF> ga_cauchy_beta 1.0                   # Beta parameter Cauchy distribution
+
+The beta parameter (for the Cauchy distribution) is being set to 1.000000.
+DPF> # Local Search Parameters
+
+DPF> sw_max_its 300                       # iterations of Solis & Wets local search
+
+Solis & Wets algorithms will perform at most 300 iterations.
+DPF> sw_max_succ 4                        # consecutive successes before changing rho
+
+Solis & Wets algorithms expand rho every 4 in a row successes.
+DPF> sw_max_fail 4                        # consecutive failures before changing rho
+
+Solis & Wets algorithms contract rho every 4 in a row failures.
+DPF> sw_rho 1.0                           # size of local search space to sample
+
+rho is set to 1.000000.
+DPF> sw_lb_rho 0.01                       # lower bound on rho
+
+rho will never get smaller than 0.010000.
+DPF> ls_search_freq 0.06                  # probability of performing local search on individual
+
+Local search will be performed with frequency 0.060000.
+DPF> # Activate LGA
+
+DPF> set_ga                               # set the above parameters for GA or LGA
+
+DPF> set_psw1                             # set the above pseudo-Solis & Wets parameters
+
+Creating a new Local Search object using the pseudo-Solis-Wets algorithm (pSW1) with the current settings.
+
+DPF> ga_run 10                            # do this many hybrid GA-LS runs
+
+auto-centering ligand on root atoms: -2.728 -15.114 12.910
+Furthest true ligand atom from "about" center is 8.950 Angstroms (maxrad).
+Number of requested GA dockings = 10 runs
+Unbound model to be used is from file: "ad4_parameters_HD.dat".
+
+	BEGINNING GENETIC ALGORITHM DOCKING 1 of 10
+Run: 1 Seed: 2069669475 2002385482 [ Run 1 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -27.900
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans -1.177 -23.146 -4.070 quatxyzw -0.181268 0.650459 -0.119642 0.727826 center -2.728 -15.114 12.910 ntor 8 77.5483 13.7005 65.2688 31.7430 180.0000 27.9572 -63.1269 -57.1315
+State:	 -1.177 -23.146  -4.070  -0.264  0.949 -0.174 86.591     77.55   13.70   65.27   31.74  180.00   27.96  -63.13  -57.13
+
+DOCKED: MODEL        1
+DOCKED: USER    Run = 1
+DOCKED: USER    DPF = 3m0b_B_RUR_clean_3m0b.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +1.25e+04 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -26.71 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -26.96 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.25 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   -1.19 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +2.39 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -1.25e+04 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 3m0b_B_RUR.pdbqt
+DOCKED: USER    NEWDPF about -2.728241 -15.114310 12.910138
+DOCKED: USER    NEWDPF tran0 -1.177219 -23.145899 -4.069591
+DOCKED: USER    NEWDPF quaternion0 -0.181268 0.650459 -0.119642 0.727826
+DOCKED: USER    NEWDPF axisangle0 -0.264330 0.948520 -0.174466 86.591119
+DOCKED: USER    NEWDPF quat0 -0.264330 0.948520 -0.174466 86.591119
+DOCKED: USER    NEWDPF dihe0 77.55 13.70 65.27 31.74 180.00 27.96 -63.13 -57.13 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RUR                                                            
+DOCKED: REMARK    13 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+DOCKED: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+DOCKED: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+DOCKED: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+DOCKED: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+DOCKED: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+DOCKED: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+DOCKED: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+DOCKED: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+DOCKED: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+DOCKED: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+DOCKED: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+DOCKED: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1 CHA  RUR A   1      -1.297 -19.893  -5.340 -0.40 -0.03    -0.078 C 
+DOCKED: ATOM      2 CHB  RUR A   1      -3.072 -24.134  -6.682 -0.53 -0.01    -0.071 C 
+DOCKED: ATOM      3 CHC  RUR A   1      -0.958 -26.206  -2.866 -0.40 +0.00    +0.009 C 
+DOCKED: ATOM      4 CHD  RUR A   1       0.247 -21.860  -1.123 -0.20 +0.02    +0.275 C 
+DOCKED: ATOM      5 C1A  RUR A   1      -1.756 -20.881  -6.192 -0.32 +0.00    +0.013 A 
+DOCKED: ATOM      6 C2A  RUR A   1      -1.907 -20.841  -7.624 -0.29 +0.04    +0.121 A 
+DOCKED: ATOM      7 C3A  RUR A   1      -2.387 -22.028  -7.990 -0.33 +0.04    +0.131 A 
+DOCKED: ATOM      8 C4A  RUR A   1      -2.591 -22.847  -6.818 -0.43 +0.00    +0.017 A 
+DOCKED: ATOM      9 CMA  RUR A   1      -2.694 -22.484  -9.402 -0.38 -0.10    -0.337 C 
+DOCKED: ATOM     10 C1B  RUR A   1      -2.674 -25.147  -5.826 +0.16 +0.12    +0.872 C 
+DOCKED: ATOM     11 C2B  RUR A   1      -2.858 -26.566  -5.895 -0.47 +0.01    +0.107 C 
+DOCKED: ATOM     12 C3B  RUR A   1      -2.267 -27.112  -4.831 -0.44 +0.01    +0.108 C 
+DOCKED: ATOM     13 C4B  RUR A   1      -1.672 -26.093  -4.042 -0.36 +0.01    +0.111 C 
+DOCKED: ATOM     14 CMB  RUR A   1      -3.642 -27.268  -6.991 -0.32 -0.02    -0.324 C 
+DOCKED: ATOM     15 C1C  RUR A   1      -0.433 -25.298  -1.974 -0.01 -0.02    -0.402 C 
+DOCKED: ATOM     16 C2C  RUR A   1       0.221 -25.466  -0.712 -0.19 -0.01    -0.369 A 
+DOCKED: ATOM     17 C3C  RUR A   1       0.550 -24.260  -0.243 -0.38 +0.01    +0.132 A 
+DOCKED: ATOM     18 C4C  RUR A   1       0.131 -23.247  -1.160 -0.27 +0.01    +0.140 A 
+DOCKED: ATOM     19 CMC  RUR A   1       0.477 -26.804  -0.033 -0.13 +0.02    +0.496 A 
+DOCKED: ATOM     20 C1D  RUR A   1       0.041 -20.852  -2.063 -0.33 +0.02    +0.125 C 
+DOCKED: ATOM     21 C2D  RUR A   1       0.402 -19.458  -2.030 -0.31 +0.03    +0.147 C 
+DOCKED: ATOM     22 C3D  RUR A   1      -0.079 -18.827  -3.341 -0.34 +0.04    +0.140 C 
+DOCKED: ATOM     23 C4D  RUR A   1      -0.699 -19.898  -4.085 -0.42 +0.00    +0.017 C 
+DOCKED: ATOM     24 CMD  RUR A   1       1.134 -18.770  -0.895 -0.21 +0.05    +0.288 C 
+DOCKED: ATOM     25  RU  RUR A   1      -1.174 -22.999  -3.994-13.25 -0.04    -0.021 Ru
+DOCKED: ATOM     26  NA  RUR A   1      -2.214 -22.073  -5.800 -0.39 +0.01    +0.019 N 
+DOCKED: ATOM     27  NB  RUR A   1      -1.965 -24.989  -4.714 -0.31 +0.00    +0.027 N 
+DOCKED: ATOM     28  NC  RUR A   1      -0.421 -23.978  -2.103 +0.33 -0.01    -0.090 N 
+DOCKED: ATOM     29  ND  RUR A   1      -0.582 -20.953  -3.252 -0.10 +0.03    +0.130 N 
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH    12   30                                                                 
+DOCKED: ATOM     30 CAB  RUR A   1      -2.189 -28.572  -4.437 -0.13 -0.03    -0.557 C 
+DOCKED: ATOM     31 CBB  RUR A   1      -1.029 -29.175  -4.395 -0.41 +0.01    +0.292 C 
+DOCKED: ENDBRANCH    12   30                                                                 
+DOCKED: BRANCH    17   32                                                                 
+DOCKED: ATOM     32 CAC  RUR A   1       1.251 -23.934   1.060 -0.24 -0.03    -0.424 C 
+DOCKED: ATOM     33 CBC  RUR A   1       2.554 -23.823   1.104 -0.06 -0.06    -0.687 C 
+DOCKED: ENDBRANCH    17   32                                                                 
+DOCKED: BRANCH     6   34                                                                 
+DOCKED: ATOM     34 CAA  RUR A   1      -1.503 -19.663  -8.527 +0.35 -0.35    -1.067 C 
+DOCKED: BRANCH    34   35                                                                 
+DOCKED: ATOM     35 CBA  RUR A   1      -2.515 -19.267  -9.587 -0.29 -0.14    -0.354 C 
+DOCKED: BRANCH    35   36                                                                 
+DOCKED: ATOM     36 CGA  RUR A   1      -3.402 -18.187  -9.081 -0.56 +0.07    +0.137 C 
+DOCKED: ATOM     37 O1A  RUR A   1      -2.957 -17.294  -8.422 -0.82 +0.12    +0.135 OA
+DOCKED: ATOM     38 O2A  RUR A   1      -4.570 -18.191  -9.335 -0.56 +0.04    +0.121 OA
+DOCKED: ENDBRANCH    35   36                                                                 
+DOCKED: ENDBRANCH    34   35                                                                 
+DOCKED: ENDBRANCH     6   34                                                                 
+DOCKED: BRANCH    22   39                                                                 
+DOCKED: ATOM     39 CAD  RUR A   1       0.094 -17.378  -3.804 -0.45 +0.02    +0.053 C 
+DOCKED: BRANCH    39   40                                                                 
+DOCKED: ATOM     40 CBD  RUR A   1      -1.136 -16.767  -4.398 -0.27 +0.16    +0.344 C 
+DOCKED: BRANCH    40   41                                                                 
+DOCKED: ATOM     41 CGD  RUR A   1      -0.728 -15.591  -5.225 -0.56 +0.09    +0.129 C 
+DOCKED: ATOM     42 O1D  RUR A   1       0.448 -15.250  -5.255 -0.88 +0.10    +0.128 OA
+DOCKED: ATOM     43 O2D  RUR A   1      -1.585 -15.005  -5.857 -1.08 +0.02    +0.021 OA
+DOCKED: ENDBRANCH    40   41                                                                 
+DOCKED: ENDBRANCH    39   40                                                                 
+DOCKED: ENDBRANCH    22   39                                                                 
+DOCKED: TORSDOF     8                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+
+	BEGINNING GENETIC ALGORITHM DOCKING 2 of 10
+Run: 2 Seed: 1118708751 1204654841 [ Run 2 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -26.152
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans -1.176 -23.141 -4.086 quatxyzw -0.236548 0.628980 -0.105533 0.733002 center -2.728 -15.114 12.910 ntor 8 -85.9663 56.2923 179.8782 -36.0204 179.8849 -16.0224 -125.0933 -179.6808
+State:	 -1.176 -23.141  -4.086  -0.348  0.925 -0.155 85.723    -85.97   56.29  179.88  -36.02  179.88  -16.02 -125.09 -179.68
+
+DOCKED: MODEL        2
+DOCKED: USER    Run = 2
+DOCKED: USER    DPF = 3m0b_B_RUR_clean_3m0b.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +1.25e+04 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -25.33 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -25.47 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.14 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   -0.83 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +2.39 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -1.25e+04 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 3m0b_B_RUR.pdbqt
+DOCKED: USER    NEWDPF about -2.728241 -15.114310 12.910138
+DOCKED: USER    NEWDPF tran0 -1.175619 -23.140906 -4.085885
+DOCKED: USER    NEWDPF quaternion0 -0.236548 0.628980 -0.105533 0.733002
+DOCKED: USER    NEWDPF axisangle0 -0.347749 0.924663 -0.155145 85.722680
+DOCKED: USER    NEWDPF quat0 -0.347749 0.924663 -0.155145 85.722680
+DOCKED: USER    NEWDPF dihe0 -85.97 56.29 179.88 -36.02 179.88 -16.02 -125.09 -179.68 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RUR                                                            
+DOCKED: REMARK    13 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+DOCKED: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+DOCKED: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+DOCKED: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+DOCKED: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+DOCKED: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+DOCKED: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+DOCKED: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+DOCKED: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+DOCKED: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+DOCKED: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+DOCKED: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+DOCKED: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1 CHA  RUR A   1      -1.550 -19.800  -5.039 -0.37 -0.03    -0.078 C 
+DOCKED: ATOM      2 CHB  RUR A   1      -3.163 -24.002  -6.673 -0.53 -0.01    -0.071 C 
+DOCKED: ATOM      3 CHC  RUR A   1      -0.717 -26.278  -3.186 -0.47 +0.00    +0.009 C 
+DOCKED: ATOM      4 CHD  RUR A   1       0.346 -22.042  -1.113 -0.23 +0.02    +0.275 C 
+DOCKED: ATOM      5 C1A  RUR A   1      -2.002 -20.734  -5.954 -0.08 +0.00    +0.013 A 
+DOCKED: ATOM      6 C2A  RUR A   1      -2.239 -20.573  -7.365 +0.06 +0.04    +0.121 A 
+DOCKED: ATOM      7 C3A  RUR A   1      -2.674 -21.750  -7.815 -0.15 +0.04    +0.131 A 
+DOCKED: ATOM      8 C4A  RUR A   1      -2.763 -22.681  -6.714 -0.35 +0.00    +0.017 A 
+DOCKED: ATOM      9 CMA  RUR A   1      -3.038 -22.094  -9.244 -0.30 -0.12    -0.337 C 
+DOCKED: ATOM     10 C1B  RUR A   1      -2.660 -25.062  -5.938 +0.17 +0.12    +0.872 C 
+DOCKED: ATOM     11 C2B  RUR A   1      -2.770 -26.478  -6.129 -0.45 +0.01    +0.107 C 
+DOCKED: ATOM     12 C3B  RUR A   1      -2.088 -27.081  -5.154 -0.43 +0.01    +0.108 C 
+DOCKED: ATOM     13 C4B  RUR A   1      -1.505 -26.103  -4.307 -0.40 +0.01    +0.111 C 
+DOCKED: ATOM     14 CMB  RUR A   1      -3.577 -27.125  -7.242 -0.13 -0.03    -0.324 C 
+DOCKED: ATOM     15 C1C  RUR A   1      -0.191 -25.424  -2.243 -0.13 -0.02    -0.402 C 
+DOCKED: ATOM     16 C2C  RUR A   1       0.544 -25.665  -1.039 -0.17 -0.02    -0.369 A 
+DOCKED: ATOM     17 C3C  RUR A   1       0.833 -24.488  -0.478 -0.36 +0.01    +0.132 A 
+DOCKED: ATOM     18 C4C  RUR A   1       0.305 -23.424  -1.272 -0.31 +0.01    +0.140 A 
+DOCKED: ATOM     19 CMC  RUR A   1       0.913 -27.041  -0.503 -0.13 +0.03    +0.496 A 
+DOCKED: ATOM     20 C1D  RUR A   1       0.030 -20.967  -1.942 -0.33 +0.02    +0.125 C 
+DOCKED: ATOM     21 C2D  RUR A   1       0.315 -19.563  -1.798 -0.31 +0.03    +0.147 C 
+DOCKED: ATOM     22 C3D  RUR A   1      -0.277 -18.846  -3.018 -0.35 +0.04    +0.140 C 
+DOCKED: ATOM     23 C4D  RUR A   1      -0.879 -19.882  -3.824 -0.39 +0.00    +0.017 C 
+DOCKED: ATOM     24 CMD  RUR A   1       1.073 -18.937  -0.645 -0.18 +0.05    +0.288 C 
+DOCKED: ATOM     25  RU  RUR A   1      -1.176 -23.002  -3.997-13.27 -0.04    -0.021 Ru
+DOCKED: ATOM     26  NA  RUR A   1      -2.370 -21.981  -5.651 -0.33 +0.01    +0.019 N 
+DOCKED: ATOM     27  NB  RUR A   1      -1.897 -24.962  -4.856 -0.35 +0.00    +0.027 N 
+DOCKED: ATOM     28  NC  RUR A   1      -0.260 -24.099  -2.249 +0.04 -0.01    -0.090 N 
+DOCKED: ATOM     29  ND  RUR A   1      -0.656 -20.999  -3.100 +0.02 +0.03    +0.130 N 
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH    12   30                                                                 
+DOCKED: ATOM     30 CAB  RUR A   1      -1.906 -28.564  -4.903 -0.13 -0.04    -0.557 C 
+DOCKED: ATOM     31 CBB  RUR A   1      -2.941 -29.362  -4.930 -0.41 +0.02    +0.292 C 
+DOCKED: ENDBRANCH    12   30                                                                 
+DOCKED: BRANCH    17   32                                                                 
+DOCKED: ATOM     32 CAC  RUR A   1       1.590 -24.239   0.811 -0.26 -0.03    -0.424 C 
+DOCKED: ATOM     33 CBC  RUR A   1       2.523 -23.323   0.866 -0.08 -0.05    -0.687 C 
+DOCKED: ENDBRANCH    17   32                                                                 
+DOCKED: BRANCH     6   34                                                                 
+DOCKED: ATOM     34 CAA  RUR A   1      -1.955 -19.297  -8.176 +0.34 -0.41    -1.067 C 
+DOCKED: BRANCH    34   35                                                                 
+DOCKED: ATOM     35 CBA  RUR A   1      -1.899 -19.471  -9.682 -0.02 -0.12    -0.354 C 
+DOCKED: BRANCH    35   36                                                                 
+DOCKED: ATOM     36 CGA  RUR A   1      -3.230 -19.203 -10.287 -0.52 +0.07    +0.137 C 
+DOCKED: ATOM     37 O1A  RUR A   1      -3.321 -18.848 -11.424 -0.59 +0.07    +0.135 OA
+DOCKED: ATOM     38 O2A  RUR A   1      -4.228 -19.350  -9.646 -0.70 +0.05    +0.121 OA
+DOCKED: ENDBRANCH    35   36                                                                 
+DOCKED: ENDBRANCH    34   35                                                                 
+DOCKED: ENDBRANCH     6   34                                                                 
+DOCKED: BRANCH    22   39                                                                 
+DOCKED: ATOM     39 CAD  RUR A   1      -0.211 -17.354  -3.352 -0.46 +0.02    +0.053 C 
+DOCKED: BRANCH    39   40                                                                 
+DOCKED: ATOM     40 CBD  RUR A   1       0.802 -16.997  -4.394 -0.23 +0.15    +0.344 C 
+DOCKED: BRANCH    40   41                                                                 
+DOCKED: ATOM     41 CGD  RUR A   1       0.388 -15.714  -5.038 -0.50 +0.09    +0.129 C 
+DOCKED: ATOM     42 O1D  RUR A   1      -0.578 -15.698  -5.791 -0.56 +0.09    +0.128 OA
+DOCKED: ATOM     43 O2D  RUR A   1       1.025 -14.710  -4.787 -1.12 +0.02    +0.021 OA
+DOCKED: ENDBRANCH    40   41                                                                 
+DOCKED: ENDBRANCH    39   40                                                                 
+DOCKED: ENDBRANCH    22   39                                                                 
+DOCKED: TORSDOF     8                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+
+	BEGINNING GENETIC ALGORITHM DOCKING 3 of 10
+Run: 3 Seed: 2086449829 1290299499 [ Run 3 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -28.055
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans -1.170 -23.145 -4.076 quatxyzw -0.211935 0.642488 -0.131384 0.724590 center -2.728 -15.114 12.910 ntor 8 -180.0000 97.2557 -180.0000 -106.5916 -24.8699 19.1719 21.3466 -97.4402
+State:	 -1.170 -23.145  -4.076  -0.308  0.932 -0.191 87.131   -180.00   97.26 -180.00 -106.59  -24.87   19.17   21.35  -97.44
+
+DOCKED: MODEL        3
+DOCKED: USER    Run = 3
+DOCKED: USER    DPF = 3m0b_B_RUR_clean_3m0b.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +1.25e+04 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -26.95 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -27.18 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.23 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   -1.11 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +2.39 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -1.25e+04 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 3m0b_B_RUR.pdbqt
+DOCKED: USER    NEWDPF about -2.728241 -15.114310 12.910138
+DOCKED: USER    NEWDPF tran0 -1.170492 -23.145081 -4.076166
+DOCKED: USER    NEWDPF quaternion0 -0.211935 0.642488 -0.131384 0.724590
+DOCKED: USER    NEWDPF axisangle0 -0.307517 0.932250 -0.190639 87.130500
+DOCKED: USER    NEWDPF quat0 -0.307517 0.932250 -0.190639 87.130500
+DOCKED: USER    NEWDPF dihe0 -180.00 97.26 -180.00 -106.59 -24.87 19.17 21.35 -97.44 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RUR                                                            
+DOCKED: REMARK    13 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+DOCKED: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+DOCKED: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+DOCKED: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+DOCKED: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+DOCKED: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+DOCKED: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+DOCKED: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+DOCKED: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+DOCKED: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+DOCKED: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+DOCKED: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+DOCKED: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1 CHA  RUR A   1      -1.501 -19.871  -5.251 -0.40 -0.03    -0.078 C 
+DOCKED: ATOM      2 CHB  RUR A   1      -3.031 -24.172  -6.697 -0.53 -0.01    -0.071 C 
+DOCKED: ATOM      3 CHC  RUR A   1      -0.753 -26.219  -2.963 -0.45 +0.00    +0.009 C 
+DOCKED: ATOM      4 CHD  RUR A   1       0.206 -21.859  -1.108 -0.19 +0.02    +0.275 C 
+DOCKED: ATOM      5 C1A  RUR A   1      -1.909 -20.861  -6.127 -0.27 +0.00    +0.013 A 
+DOCKED: ATOM      6 C2A  RUR A   1      -2.078 -20.789  -7.555 -0.19 +0.04    +0.121 A 
+DOCKED: ATOM      7 C3A  RUR A   1      -2.490 -21.992  -7.951 -0.30 +0.04    +0.131 A 
+DOCKED: ATOM      8 C4A  RUR A   1      -2.631 -22.855  -6.801 -0.43 +0.00    +0.017 A 
+DOCKED: ATOM      9 CMA  RUR A   1      -2.785 -22.426  -9.372 -0.36 -0.11    -0.337 C 
+DOCKED: ATOM     10 C1B  RUR A   1      -2.563 -25.183  -5.875 +0.18 +0.12    +0.872 C 
+DOCKED: ATOM     11 C2B  RUR A   1      -2.662 -26.608  -5.983 -0.45 +0.01    +0.107 C 
+DOCKED: ATOM     12 C3B  RUR A   1      -2.027 -27.147  -4.941 -0.44 +0.01    +0.108 C 
+DOCKED: ATOM     13 C4B  RUR A   1      -1.486 -26.116  -4.129 -0.39 +0.01    +0.111 C 
+DOCKED: ATOM     14 CMB  RUR A   1      -3.415 -27.325  -7.091 -0.35 -0.02    -0.324 C 
+DOCKED: ATOM     15 C1C  RUR A   1      -0.273 -25.307  -2.051 -0.08 -0.02    -0.402 C 
+DOCKED: ATOM     16 C2C  RUR A   1       0.403 -25.470  -0.800 -0.18 -0.02    -0.369 A 
+DOCKED: ATOM     17 C3C  RUR A   1       0.664 -24.260  -0.300 -0.37 +0.01    +0.132 A 
+DOCKED: ATOM     18 C4C  RUR A   1       0.174 -23.249  -1.183 -0.28 +0.01    +0.140 A 
+DOCKED: ATOM     19 CMC  RUR A   1       0.747 -26.809  -0.164 -0.14 +0.02    +0.496 A 
+DOCKED: ATOM     20 C1D  RUR A   1      -0.071 -20.839  -2.016 -0.32 +0.02    +0.125 C 
+DOCKED: ATOM     21 C2D  RUR A   1       0.206 -19.427  -1.946 -0.32 +0.03    +0.147 C 
+DOCKED: ATOM     22 C3D  RUR A   1      -0.327 -18.789  -3.234 -0.35 +0.04    +0.140 C 
+DOCKED: ATOM     23 C4D  RUR A   1      -0.889 -19.875  -4.002 -0.40 +0.00    +0.017 C 
+DOCKED: ATOM     24 CMD  RUR A   1       0.908 -18.728  -0.798 -0.18 +0.05    +0.288 C 
+DOCKED: ATOM     25  RU  RUR A   1      -1.175 -23.001  -3.996-13.28 -0.04    -0.021 Ru
+DOCKED: ATOM     26  NA  RUR A   1      -2.290 -22.089  -5.765 -0.38 +0.01    +0.019 N 
+DOCKED: ATOM     27  NB  RUR A   1      -1.852 -25.013  -4.766 -0.35 +0.00    +0.027 N 
+DOCKED: ATOM     28  NC  RUR A   1      -0.343 -23.985  -2.142 +0.21 -0.01    -0.090 N 
+DOCKED: ATOM     29  ND  RUR A   1      -0.700 -20.945  -3.201 +0.01 +0.03    +0.130 N 
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH    12   30                                                                 
+DOCKED: ATOM     30 CAB  RUR A   1      -1.856 -28.610  -4.591 -0.15 -0.03    -0.557 C 
+DOCKED: ATOM     31 CBB  RUR A   1      -1.916 -28.994  -3.342 -0.28 -0.00    +0.292 C 
+DOCKED: ENDBRANCH    12   30                                                                 
+DOCKED: BRANCH    17   32                                                                 
+DOCKED: ATOM     32 CAC  RUR A   1       1.359 -23.929   1.005 -0.24 -0.03    -0.424 C 
+DOCKED: ATOM     33 CBC  RUR A   1       1.620 -22.686   1.322 -0.02 -0.03    -0.687 C 
+DOCKED: ENDBRANCH    17   32                                                                 
+DOCKED: BRANCH     6   34                                                                 
+DOCKED: ATOM     34 CAA  RUR A   1      -1.757 -19.564  -8.428 +0.35 -0.38    -1.067 C 
+DOCKED: BRANCH    34   35                                                                 
+DOCKED: ATOM     35 CBA  RUR A   1      -2.350 -18.247  -7.962 -0.29 -0.18    -0.354 C 
+DOCKED: BRANCH    35   36                                                                 
+DOCKED: ATOM     36 CGA  RUR A   1      -3.397 -17.784  -8.911 -0.52 +0.09    +0.137 C 
+DOCKED: ATOM     37 O1A  RUR A   1      -4.271 -17.056  -8.543 -1.05 +0.09    +0.135 OA
+DOCKED: ATOM     38 O2A  RUR A   1      -3.373 -18.126 -10.056 -0.62 +0.07    +0.121 OA
+DOCKED: ENDBRANCH    35   36                                                                 
+DOCKED: ENDBRANCH    34   35                                                                 
+DOCKED: ENDBRANCH     6   34                                                                 
+DOCKED: BRANCH    22   39                                                                 
+DOCKED: ATOM     39 CAD  RUR A   1      -0.247 -17.320  -3.656 -0.46 +0.02    +0.053 C 
+DOCKED: BRANCH    39   40                                                                 
+DOCKED: ATOM     40 CBD  RUR A   1      -0.957 -17.005  -4.935 -0.28 +0.16    +0.344 C 
+DOCKED: BRANCH    40   41                                                                 
+DOCKED: ATOM     41 CGD  RUR A   1      -0.574 -15.624  -5.361 -0.55 +0.09    +0.129 C 
+DOCKED: ATOM     42 O1D  RUR A   1      -1.413 -14.894  -5.873 -1.05 +0.13    +0.128 OA
+DOCKED: ATOM     43 O2D  RUR A   1       0.572 -15.262  -5.179 -1.04 +0.02    +0.021 OA
+DOCKED: ENDBRANCH    40   41                                                                 
+DOCKED: ENDBRANCH    39   40                                                                 
+DOCKED: ENDBRANCH    22   39                                                                 
+DOCKED: TORSDOF     8                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+
+	BEGINNING GENETIC ALGORITHM DOCKING 4 of 10
+Run: 4 Seed: 1668453938 42093303 [ Run 4 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -24.930
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans -1.165 -23.026 -3.835 quatxyzw 0.216585 -0.567148 0.449701 0.655136 center -2.728 -15.114 12.910 ntor 8 -129.1198 23.6257 -179.6568 -135.6708 -125.5984 -111.2447 -41.0485 -72.6045
+State:	 -1.165 -23.026  -3.835   0.287 -0.751  0.595 98.140   -129.12   23.63 -179.66 -135.67 -125.60 -111.24  -41.05  -72.60
+
+DOCKED: MODEL        4
+DOCKED: USER    Run = 4
+DOCKED: USER    DPF = 3m0b_B_RUR_clean_3m0b.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +1.25e+04 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -23.60 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -23.75 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.16 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   -1.33 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +2.39 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -1.25e+04 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 3m0b_B_RUR.pdbqt
+DOCKED: USER    NEWDPF about -2.728241 -15.114310 12.910138
+DOCKED: USER    NEWDPF tran0 -1.165311 -23.026378 -3.835121
+DOCKED: USER    NEWDPF quaternion0 0.216585 -0.567148 0.449701 0.655136
+DOCKED: USER    NEWDPF axisangle0 0.286674 -0.750681 0.595228 98.140122
+DOCKED: USER    NEWDPF quat0 0.286674 -0.750681 0.595228 98.140122
+DOCKED: USER    NEWDPF dihe0 -129.12 23.63 -179.66 -135.67 -125.60 -111.24 -41.05 -72.60 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RUR                                                            
+DOCKED: REMARK    13 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+DOCKED: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+DOCKED: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+DOCKED: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+DOCKED: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+DOCKED: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+DOCKED: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+DOCKED: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+DOCKED: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+DOCKED: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+DOCKED: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+DOCKED: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+DOCKED: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1 CHA  RUR A   1      -1.396 -20.053  -5.655 -0.40 -0.03    -0.078 C 
+DOCKED: ATOM      2 CHB  RUR A   1       0.607 -21.350  -1.504 -0.36 -0.01    -0.071 C 
+DOCKED: ATOM      3 CHC  RUR A   1      -1.053 -25.842  -2.126 +0.23 +0.00    +0.009 C 
+DOCKED: ATOM      4 CHD  RUR A   1      -2.469 -24.739  -6.615 -0.21 +0.05    +0.275 C 
+DOCKED: ATOM      5 C1A  RUR A   1      -0.924 -19.923  -4.362 -0.36 +0.00    +0.013 A 
+DOCKED: ATOM      6 C2A  RUR A   1      -0.881 -18.748  -3.530 -0.24 +0.04    +0.121 A 
+DOCKED: ATOM      7 C3A  RUR A   1      -0.335 -19.120  -2.373 -0.31 +0.03    +0.131 A 
+DOCKED: ATOM      8 C4A  RUR A   1       0.018 -20.519  -2.436 -0.35 +0.00    +0.017 A 
+DOCKED: ATOM      9 CMA  RUR A   1      -0.096 -18.243  -1.161 -0.20 -0.08    -0.337 C 
+DOCKED: ATOM     10 C1B  RUR A   1       0.354 -22.679  -1.209 +0.13 +0.06    +0.872 C 
+DOCKED: ATOM     11 C2B  RUR A   1       0.645 -23.457  -0.042 -0.44 +0.01    +0.107 C 
+DOCKED: ATOM     12 C3B  RUR A   1       0.178 -24.691  -0.240 -0.47 +0.01    +0.108 C 
+DOCKED: ATOM     13 C4B  RUR A   1      -0.437 -24.766  -1.518 +0.06 +0.00    +0.111 C 
+DOCKED: ATOM     14 CMB  RUR A   1       1.401 -22.928   1.165 -0.29 -0.02    -0.324 C 
+DOCKED: ATOM     15 C1C  RUR A   1      -1.583 -26.059  -3.378 +0.06 -0.02    -0.402 C 
+DOCKED: ATOM     16 C2C  RUR A   1      -2.128 -27.229  -3.997 -0.17 -0.02    -0.369 A 
+DOCKED: ATOM     17 C3C  RUR A   1      -2.517 -26.910  -5.234 -0.36 +0.01    +0.132 A 
+DOCKED: ATOM     18 C4C  RUR A   1      -2.247 -25.531  -5.492 -0.31 +0.02    +0.140 A 
+DOCKED: ATOM     19 CMC  RUR A   1      -2.227 -28.597  -3.338 +0.11 +0.00    +0.496 A 
+DOCKED: ATOM     20 C1D  RUR A   1      -2.413 -23.367  -6.852 -0.44 +0.03    +0.125 C 
+DOCKED: ATOM     21 C2D  RUR A   1      -2.880 -22.594  -7.974 -0.37 +0.04    +0.147 C 
+DOCKED: ATOM     22 C3D  RUR A   1      -2.547 -21.124  -7.691 +0.10 +0.05    +0.140 C 
+DOCKED: ATOM     23 C4D  RUR A   1      -1.900 -21.113  -6.400 -0.37 +0.01    +0.017 C 
+DOCKED: ATOM     24 CMD  RUR A   1      -3.580 -23.157  -9.194 -0.15 +0.09    +0.288 C 
+DOCKED: ATOM     25  RU  RUR A   1      -1.175 -22.999  -3.997-13.28 -0.04    -0.021 Ru
+DOCKED: ATOM     26  NA  RUR A   1      -0.345 -20.901  -3.660 -0.34 +0.00    +0.019 N 
+DOCKED: ATOM     27  NB  RUR A   1      -0.283 -23.540  -1.994 +0.16 +0.00    +0.027 N 
+DOCKED: ATOM     28  NC  RUR A   1      -1.709 -25.164  -4.350 -0.20 -0.01    -0.090 N 
+DOCKED: ATOM     29  ND  RUR A   1      -1.871 -22.420  -6.063 -0.34 +0.04    +0.130 N 
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH    12   30                                                                 
+DOCKED: ATOM     30 CAB  RUR A   1       0.244 -25.889   0.684 -0.16 -0.03    -0.557 C 
+DOCKED: ATOM     31 CBB  RUR A   1       1.256 -26.714   0.612 -0.45 +0.02    +0.292 C 
+DOCKED: ENDBRANCH    12   30                                                                 
+DOCKED: BRANCH    17   32                                                                 
+DOCKED: ATOM     32 CAC  RUR A   1      -3.145 -27.821  -6.269 -0.29 -0.03    -0.424 C 
+DOCKED: ATOM     33 CBC  RUR A   1      -4.434 -27.784  -6.491 +0.06 -0.03    -0.687 C 
+DOCKED: ENDBRANCH    17   32                                                                 
+DOCKED: BRANCH     6   34                                                                 
+DOCKED: ATOM     34 CAA  RUR A   1      -1.441 -17.367  -3.912 +0.87 -0.44    -1.067 C 
+DOCKED: BRANCH    34   35                                                                 
+DOCKED: ATOM     35 CBA  RUR A   1      -0.412 -16.268  -4.104 -0.30 -0.18    -0.354 C 
+DOCKED: BRANCH    35   36                                                                 
+DOCKED: ATOM     36 CGA  RUR A   1      -0.867 -15.307  -5.144 -0.51 +0.11    +0.137 C 
+DOCKED: ATOM     37 O1A  RUR A   1      -0.464 -14.182  -5.148 -1.28 +0.14    +0.135 OA
+DOCKED: ATOM     38 O2A  RUR A   1      -1.633 -15.651  -5.994 -0.66 +0.10    +0.121 OA
+DOCKED: ENDBRANCH    35   36                                                                 
+DOCKED: ENDBRANCH    34   35                                                                 
+DOCKED: ENDBRANCH     6   34                                                                 
+DOCKED: BRANCH    22   39                                                                 
+DOCKED: ATOM     39 CAD  RUR A   1      -2.868 -19.906  -8.559 -0.33 +0.02    +0.053 C 
+DOCKED: BRANCH    39   40                                                                 
+DOCKED: ATOM     40 CBD  RUR A   1      -1.897 -18.776  -8.422 -0.27 +0.15    +0.344 C 
+DOCKED: BRANCH    40   41                                                                 
+DOCKED: ATOM     41 CGD  RUR A   1      -0.544 -19.261  -8.834 -0.43 +0.04    +0.129 C 
+DOCKED: ATOM     42 O1D  RUR A   1       0.436 -18.551  -8.650 -0.32 +0.03    +0.128 OA
+DOCKED: ATOM     43 O2D  RUR A   1      -0.457 -20.363  -9.339 -0.55 +0.00    +0.021 OA
+DOCKED: ENDBRANCH    40   41                                                                 
+DOCKED: ENDBRANCH    39   40                                                                 
+DOCKED: ENDBRANCH    22   39                                                                 
+DOCKED: TORSDOF     8                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+
+	BEGINNING GENETIC ALGORITHM DOCKING 5 of 10
+Run: 5 Seed: 2042183405 877655054 [ Run 5 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -26.795
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans -1.163 -23.149 -4.066 quatxyzw 0.200193 -0.649657 0.164822 -0.714634 center -2.728 -15.114 12.910 ntor 8 -75.7380 35.6257 4.8728 179.8836 180.0000 -98.7028 -39.6308 93.1696
+State:	 -1.163 -23.149  -4.066   0.286 -0.929  0.236 -88.774    -75.74   35.63    4.87  179.88  180.00  -98.70  -39.63   93.17
+
+DOCKED: MODEL        5
+DOCKED: USER    Run = 5
+DOCKED: USER    DPF = 3m0b_B_RUR_clean_3m0b.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +1.25e+04 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -25.90 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -26.10 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.20 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   -0.89 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +2.39 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -1.25e+04 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 3m0b_B_RUR.pdbqt
+DOCKED: USER    NEWDPF about -2.728241 -15.114310 12.910138
+DOCKED: USER    NEWDPF tran0 -1.162531 -23.148843 -4.065979
+DOCKED: USER    NEWDPF quaternion0 0.200193 -0.649657 0.164822 -0.714634
+DOCKED: USER    NEWDPF axisangle0 0.286196 -0.928747 0.235629 -88.773510
+DOCKED: USER    NEWDPF quat0 0.286196 -0.928747 0.235629 -88.773510
+DOCKED: USER    NEWDPF dihe0 -75.74 35.63 4.87 179.88 180.00 -98.70 -39.63 93.17 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RUR                                                            
+DOCKED: REMARK    13 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+DOCKED: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+DOCKED: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+DOCKED: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+DOCKED: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+DOCKED: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+DOCKED: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+DOCKED: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+DOCKED: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+DOCKED: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+DOCKED: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+DOCKED: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+DOCKED: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1 CHA  RUR A   1      -1.548 -19.955  -5.430 -0.40 -0.03    -0.078 C 
+DOCKED: ATOM      2 CHB  RUR A   1      -2.880 -24.376  -6.699 -0.52 -0.01    -0.071 C 
+DOCKED: ATOM      3 CHC  RUR A   1      -0.694 -26.143  -2.772 -0.44 +0.00    +0.009 C 
+DOCKED: ATOM      4 CHD  RUR A   1       0.049 -21.661  -1.120 -0.12 +0.02    +0.275 C 
+DOCKED: ATOM      5 C1A  RUR A   1      -1.888 -21.003  -6.265 -0.29 +0.00    +0.013 A 
+DOCKED: ATOM      6 C2A  RUR A   1      -2.000 -21.013  -7.701 -0.28 +0.04    +0.121 A 
+DOCKED: ATOM      7 C3A  RUR A   1      -2.357 -22.249  -8.047 -0.35 +0.04    +0.131 A 
+DOCKED: ATOM      8 C4A  RUR A   1      -2.518 -23.054  -6.858 -0.46 +0.00    +0.017 A 
+DOCKED: ATOM      9 CMA  RUR A   1      -2.579 -22.768  -9.453 -0.40 -0.10    -0.337 C 
+DOCKED: ATOM     10 C1B  RUR A   1      -2.414 -25.326  -5.805 +0.20 +0.12    +0.872 C 
+DOCKED: ATOM     11 C2B  RUR A   1      -2.463 -26.757  -5.839 -0.42 +0.01    +0.107 C 
+DOCKED: ATOM     12 C3B  RUR A   1      -1.855 -27.218  -4.745 -0.44 +0.01    +0.108 C 
+DOCKED: ATOM     13 C4B  RUR A   1      -1.381 -26.127  -3.969 -0.38 +0.01    +0.111 C 
+DOCKED: ATOM     14 CMB  RUR A   1      -3.146 -27.557  -6.935 -0.40 -0.02    -0.324 C 
+DOCKED: ATOM     15 C1C  RUR A   1      -0.282 -25.168  -1.892 -0.03 -0.02    -0.402 C 
+DOCKED: ATOM     16 C2C  RUR A   1       0.348 -25.241  -0.609 -0.19 -0.02    -0.369 A 
+DOCKED: ATOM     17 C3C  RUR A   1       0.549 -23.998  -0.165 -0.38 +0.01    +0.132 A 
+DOCKED: ATOM     18 C4C  RUR A   1       0.064 -23.053  -1.121 -0.27 +0.01    +0.140 A 
+DOCKED: ATOM     19 CMC  RUR A   1       0.708 -26.532   0.113 -0.15 +0.03    +0.496 A 
+DOCKED: ATOM     20 C1D  RUR A   1      -0.223 -20.700  -2.092 -0.31 +0.02    +0.125 C 
+DOCKED: ATOM     21 C2D  RUR A   1       0.006 -19.278  -2.089 -0.33 +0.03    +0.147 C 
+DOCKED: ATOM     22 C3D  RUR A   1      -0.494 -18.728  -3.430 -0.35 +0.04    +0.140 C 
+DOCKED: ATOM     23 C4D  RUR A   1      -0.989 -19.872  -4.159 -0.40 +0.01    +0.017 C 
+DOCKED: ATOM     24 CMD  RUR A   1       0.637 -18.496  -0.954 -0.20 +0.06    +0.288 C 
+DOCKED: ATOM     25  RU  RUR A   1      -1.175 -23.001  -3.994-13.27 -0.04    -0.021 Ru
+DOCKED: ATOM     26  NA  RUR A   1      -2.244 -22.222  -5.853 -0.41 +0.01    +0.019 N 
+DOCKED: ATOM     27  NB  RUR A   1      -1.756 -25.073  -4.679 -0.33 +0.00    +0.027 N 
+DOCKED: ATOM     28  NC  RUR A   1      -0.389 -23.856  -2.058 +0.32 -0.01    -0.090 N 
+DOCKED: ATOM     29  ND  RUR A   1      -0.799 -20.890  -3.294 +0.02 +0.03    +0.130 N 
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH    12   30                                                                 
+DOCKED: ATOM     30 CAB  RUR A   1      -1.652 -28.654  -4.308 -0.15 -0.02    -0.557 C 
+DOCKED: ATOM     31 CBB  RUR A   1      -2.591 -29.539  -4.518 -0.42 +0.01    +0.292 C 
+DOCKED: ENDBRANCH    12   30                                                                 
+DOCKED: BRANCH    17   32                                                                 
+DOCKED: ATOM     32 CAC  RUR A   1       1.178 -23.575   1.147 -0.23 -0.03    -0.424 C 
+DOCKED: ATOM     33 CBC  RUR A   1       2.323 -22.940   1.160 -0.06 -0.04    -0.687 C 
+DOCKED: ENDBRANCH    17   32                                                                 
+DOCKED: BRANCH     6   34                                                                 
+DOCKED: ATOM     34 CAA  RUR A   1      -1.683 -19.826  -8.626 +0.36 -0.35    -1.067 C 
+DOCKED: BRANCH    34   35                                                                 
+DOCKED: ATOM     35 CBA  RUR A   1      -2.873 -19.201  -9.331 -0.32 -0.15    -0.354 C 
+DOCKED: BRANCH    35   36                                                                 
+DOCKED: ATOM     36 CGA  RUR A   1      -3.403 -18.058  -8.541 -0.53 +0.08    +0.137 C 
+DOCKED: ATOM     37 O1A  RUR A   1      -3.158 -17.960  -7.376 -0.51 +0.07    +0.135 OA
+DOCKED: ATOM     38 O2A  RUR A   1      -4.073 -17.218  -9.065 -1.11 +0.08    +0.121 OA
+DOCKED: ENDBRANCH    35   36                                                                 
+DOCKED: ENDBRANCH    34   35                                                                 
+DOCKED: ENDBRANCH     6   34                                                                 
+DOCKED: BRANCH    22   39                                                                 
+DOCKED: ATOM     39 CAD  RUR A   1      -0.443 -17.282  -3.928 -0.48 +0.02    +0.053 C 
+DOCKED: BRANCH    39   40                                                                 
+DOCKED: ATOM     40 CBD  RUR A   1       0.469 -16.390  -3.146 -0.25 +0.15    +0.344 C 
+DOCKED: BRANCH    40   41                                                                 
+DOCKED: ATOM     41 CGD  RUR A   1       1.881 -16.743  -3.485 -0.45 +0.06    +0.129 C 
+DOCKED: ATOM     42 O1D  RUR A   1       2.729 -15.861  -3.544 -0.70 +0.07    +0.128 OA
+DOCKED: ATOM     43 O2D  RUR A   1       2.151 -17.910  -3.687 -0.26 +0.01    +0.021 OA
+DOCKED: ENDBRANCH    40   41                                                                 
+DOCKED: ENDBRANCH    39   40                                                                 
+DOCKED: ENDBRANCH    22   39                                                                 
+DOCKED: TORSDOF     8                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+
+	BEGINNING GENETIC ALGORITHM DOCKING 6 of 10
+Run: 6 Seed: 1355056001 970763121 [ Run 6 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -27.302
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans -1.160 -23.150 -4.071 quatxyzw 0.213856 -0.627981 0.180083 -0.726275 center -2.728 -15.114 12.910 ntor 8 -57.9082 62.3296 -160.9716 92.1131 -160.2942 92.1394 -29.9769 179.9494
+State:	 -1.160 -23.150  -4.071   0.311 -0.914  0.262 -86.850    -57.91   62.33 -160.97   92.11 -160.29   92.14  -29.98  179.95
+
+DOCKED: MODEL        6
+DOCKED: USER    Run = 6
+DOCKED: USER    DPF = 3m0b_B_RUR_clean_3m0b.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +1.25e+04 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -26.16 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -26.40 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.24 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   -1.14 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +2.39 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -1.25e+04 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 3m0b_B_RUR.pdbqt
+DOCKED: USER    NEWDPF about -2.728241 -15.114310 12.910138
+DOCKED: USER    NEWDPF tran0 -1.160062 -23.150228 -4.070797
+DOCKED: USER    NEWDPF quaternion0 0.213856 -0.627981 0.180083 -0.726275
+DOCKED: USER    NEWDPF axisangle0 0.311107 -0.913554 0.261976 -86.849915
+DOCKED: USER    NEWDPF quat0 0.311107 -0.913554 0.261976 -86.849915
+DOCKED: USER    NEWDPF dihe0 -57.91 62.33 -160.97 92.11 -160.29 92.14 -29.98 179.95 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RUR                                                            
+DOCKED: REMARK    13 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+DOCKED: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+DOCKED: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+DOCKED: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+DOCKED: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+DOCKED: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+DOCKED: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+DOCKED: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+DOCKED: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+DOCKED: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+DOCKED: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+DOCKED: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+DOCKED: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1 CHA  RUR A   1      -1.748 -19.995  -5.451 -0.33 -0.03    -0.078 C 
+DOCKED: ATOM      2 CHB  RUR A   1      -2.935 -24.487  -6.610 -0.52 -0.01    -0.071 C 
+DOCKED: ATOM      3 CHC  RUR A   1      -0.502 -26.104  -2.766 -0.46 +0.00    +0.009 C 
+DOCKED: ATOM      4 CHD  RUR A   1       0.113 -21.572  -1.199 -0.14 +0.02    +0.275 C 
+DOCKED: ATOM      5 C1A  RUR A   1      -2.077 -21.068  -6.259 -0.06 +0.00    +0.013 A 
+DOCKED: ATOM      6 C2A  RUR A   1      -2.252 -21.101  -7.688 -0.21 +0.04    +0.121 A 
+DOCKED: ATOM      7 C3A  RUR A   1      -2.569 -22.356  -8.004 -0.34 +0.04    +0.131 A 
+DOCKED: ATOM      8 C4A  RUR A   1      -2.640 -23.151  -6.800 -0.46 +0.00    +0.017 A 
+DOCKED: ATOM      9 CMA  RUR A   1      -2.829 -22.902  -9.393 -0.39 -0.10    -0.337 C 
+DOCKED: ATOM     10 C1B  RUR A   1      -2.389 -25.403  -5.727 +0.20 +0.12    +0.872 C 
+DOCKED: ATOM     11 C2B  RUR A   1      -2.376 -26.835  -5.743 -0.41 +0.01    +0.107 C 
+DOCKED: ATOM     12 C3B  RUR A   1      -1.700 -27.255  -4.673 -0.44 +0.01    +0.108 C 
+DOCKED: ATOM     13 C4B  RUR A   1      -1.241 -26.134  -3.931 -0.39 +0.01    +0.111 C 
+DOCKED: ATOM     14 CMB  RUR A   1      -3.070 -27.679  -6.799 -0.40 -0.02    -0.324 C 
+DOCKED: ATOM     15 C1C  RUR A   1      -0.095 -25.100  -1.916 -0.12 -0.02    -0.402 C 
+DOCKED: ATOM     16 C2C  RUR A   1       0.594 -25.128  -0.661 -0.18 -0.02    -0.369 A 
+DOCKED: ATOM     17 C3C  RUR A   1       0.759 -23.872  -0.241 -0.37 +0.01    +0.132 A 
+DOCKED: ATOM     18 C4C  RUR A   1       0.190 -22.961  -1.185 -0.28 +0.01    +0.140 A 
+DOCKED: ATOM     19 CMC  RUR A   1       1.042 -26.393   0.058 -0.16 +0.03    +0.496 A 
+DOCKED: ATOM     20 C1D  RUR A   1      -0.244 -20.637  -2.168 -0.31 +0.02    +0.125 C 
+DOCKED: ATOM     21 C2D  RUR A   1      -0.080 -19.206  -2.191 -0.34 +0.03    +0.147 C 
+DOCKED: ATOM     22 C3D  RUR A   1      -0.662 -18.697  -3.514 -0.34 +0.04    +0.140 C 
+DOCKED: ATOM     23 C4D  RUR A   1      -1.137 -19.870  -4.208 -0.38 +0.01    +0.017 C 
+DOCKED: ATOM     24 CMD  RUR A   1       0.565 -18.382  -1.095 -0.22 +0.06    +0.288 C 
+DOCKED: ATOM     25  RU  RUR A   1      -1.176 -23.002  -4.000-13.27 -0.04    -0.021 Ru
+DOCKED: ATOM     26  NA  RUR A   1      -2.360 -22.296  -5.818 -0.40 +0.01    +0.019 N 
+DOCKED: ATOM     27  NB  RUR A   1      -1.693 -25.107  -4.635 -0.33 +0.00    +0.027 N 
+DOCKED: ATOM     28  NC  RUR A   1      -0.268 -23.796  -2.091 +0.15 -0.01    -0.090 N 
+DOCKED: ATOM     29  ND  RUR A   1      -0.864 -20.868  -3.341 +0.19 +0.03    +0.130 N 
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH    12   30                                                                 
+DOCKED: ATOM     30 CAB  RUR A   1      -1.413 -28.674  -4.230 -0.15 -0.02    -0.557 C 
+DOCKED: ATOM     31 CBB  RUR A   1      -2.143 -29.660  -4.685 -0.45 +0.01    +0.292 C 
+DOCKED: ENDBRANCH    12   30                                                                 
+DOCKED: BRANCH    17   32                                                                 
+DOCKED: ATOM     32 CAC  RUR A   1       1.425 -23.404   1.036 -0.24 -0.03    -0.424 C 
+DOCKED: ATOM     33 CBC  RUR A   1       2.187 -22.339   1.036 -0.04 -0.03    -0.687 C 
+DOCKED: ENDBRANCH    17   32                                                                 
+DOCKED: BRANCH     6   34                                                                 
+DOCKED: ATOM     34 CAA  RUR A   1      -2.029 -19.914  -8.640 +0.37 -0.37    -1.067 C 
+DOCKED: BRANCH    34   35                                                                 
+DOCKED: ATOM     35 CBA  RUR A   1      -3.284 -19.206  -9.119 -0.31 -0.16    -0.354 C 
+DOCKED: BRANCH    35   36                                                                 
+DOCKED: ATOM     36 CGA  RUR A   1      -3.345 -17.827  -8.568 -0.52 +0.08    +0.137 C 
+DOCKED: ATOM     37 O1A  RUR A   1      -4.204 -17.072  -8.915 -1.11 +0.09    +0.135 OA
+DOCKED: ATOM     38 O2A  RUR A   1      -2.542 -17.459  -7.763 -0.67 +0.08    +0.121 OA
+DOCKED: ENDBRANCH    35   36                                                                 
+DOCKED: ENDBRANCH    34   35                                                                 
+DOCKED: ENDBRANCH     6   34                                                                 
+DOCKED: BRANCH    22   39                                                                 
+DOCKED: ATOM     39 CAD  RUR A   1      -0.698 -17.256  -4.030 -0.49 +0.02    +0.053 C 
+DOCKED: BRANCH    39   40                                                                 
+DOCKED: ATOM     40 CBD  RUR A   1       0.342 -16.941  -5.059 -0.24 +0.16    +0.344 C 
+DOCKED: BRANCH    40   41                                                                 
+DOCKED: ATOM     41 CGD  RUR A   1       1.513 -16.316  -4.371 -0.46 +0.07    +0.129 C 
+DOCKED: ATOM     42 O1D  RUR A   1       2.070 -16.914  -3.459 -0.47 +0.05    +0.128 OA
+DOCKED: ATOM     43 O2D  RUR A   1       1.886 -15.223  -4.747 -0.92 +0.02    +0.021 OA
+DOCKED: ENDBRANCH    40   41                                                                 
+DOCKED: ENDBRANCH    39   40                                                                 
+DOCKED: ENDBRANCH    22   39                                                                 
+DOCKED: TORSDOF     8                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+
+	BEGINNING GENETIC ALGORITHM DOCKING 7 of 10
+Run: 7 Seed: 369958074 301782767 [ Run 7 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -27.364
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans -1.162 -23.147 -4.070 quatxyzw 0.201548 -0.652797 0.166871 -0.710907 center -2.728 -15.114 12.910 ntor 8 -116.5219 81.0134 -176.0909 77.8274 180.0000 -41.5301 -36.9885 103.2433
+State:	 -1.162 -23.147  -4.070   0.287 -0.928  0.237 -89.382   -116.52   81.01 -176.09   77.83  180.00  -41.53  -36.99  103.24
+
+DOCKED: MODEL        7
+DOCKED: USER    Run = 7
+DOCKED: USER    DPF = 3m0b_B_RUR_clean_3m0b.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +1.25e+04 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -26.41 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -26.70 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.30 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   -0.96 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +2.39 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -1.25e+04 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 3m0b_B_RUR.pdbqt
+DOCKED: USER    NEWDPF about -2.728241 -15.114310 12.910138
+DOCKED: USER    NEWDPF tran0 -1.162493 -23.147154 -4.069971
+DOCKED: USER    NEWDPF quaternion0 0.201548 -0.652797 0.166871 -0.710907
+DOCKED: USER    NEWDPF axisangle0 0.286580 -0.928210 0.237274 -89.382452
+DOCKED: USER    NEWDPF quat0 0.286580 -0.928210 0.237274 -89.382452
+DOCKED: USER    NEWDPF dihe0 -116.52 81.01 -176.09 77.83 180.00 -41.53 -36.99 103.24 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RUR                                                            
+DOCKED: REMARK    13 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+DOCKED: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+DOCKED: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+DOCKED: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+DOCKED: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+DOCKED: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+DOCKED: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+DOCKED: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+DOCKED: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+DOCKED: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+DOCKED: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+DOCKED: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+DOCKED: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1 CHA  RUR A   1      -1.550 -19.953  -5.432 -0.40 -0.03    -0.078 C 
+DOCKED: ATOM      2 CHB  RUR A   1      -2.848 -24.378  -6.722 -0.52 -0.01    -0.071 C 
+DOCKED: ATOM      3 CHC  RUR A   1      -0.693 -26.142  -2.777 -0.44 +0.00    +0.009 C 
+DOCKED: ATOM      4 CHD  RUR A   1       0.013 -21.659  -1.110 -0.11 +0.02    +0.275 C 
+DOCKED: ATOM      5 C1A  RUR A   1      -1.877 -21.001  -6.273 -0.30 +0.00    +0.013 A 
+DOCKED: ATOM      6 C2A  RUR A   1      -1.975 -21.009  -7.709 -0.29 +0.04    +0.121 A 
+DOCKED: ATOM      7 C3A  RUR A   1      -2.323 -22.246  -8.061 -0.35 +0.04    +0.131 A 
+DOCKED: ATOM      8 C4A  RUR A   1      -2.491 -23.053  -6.875 -0.45 +0.00    +0.017 A 
+DOCKED: ATOM      9 CMA  RUR A   1      -2.528 -22.763  -9.470 -0.40 -0.10    -0.337 C 
+DOCKED: ATOM     10 C1B  RUR A   1      -2.387 -25.326  -5.824 +0.21 +0.12    +0.872 C 
+DOCKED: ATOM     11 C2B  RUR A   1      -2.429 -26.758  -5.862 -0.41 +0.01    +0.107 C 
+DOCKED: ATOM     12 C3B  RUR A   1      -1.829 -27.219  -4.763 -0.44 +0.01    +0.108 C 
+DOCKED: ATOM     13 C4B  RUR A   1      -1.368 -26.127  -3.981 -0.38 +0.01    +0.111 C 
+DOCKED: ATOM     14 CMB  RUR A   1      -3.097 -27.559  -6.966 -0.40 -0.02    -0.324 C 
+DOCKED: ATOM     15 C1C  RUR A   1      -0.293 -25.166  -1.891 -0.03 -0.02    -0.402 C 
+DOCKED: ATOM     16 C2C  RUR A   1       0.324 -25.239  -0.602 -0.19 -0.02    -0.369 A 
+DOCKED: ATOM     17 C3C  RUR A   1       0.515 -23.995  -0.154 -0.38 +0.01    +0.132 A 
+DOCKED: ATOM     18 C4C  RUR A   1       0.035 -23.051  -1.113 -0.27 +0.01    +0.140 A 
+DOCKED: ATOM     19 CMC  RUR A   1       0.683 -26.529   0.121 -0.15 +0.03    +0.496 A 
+DOCKED: ATOM     20 C1D  RUR A   1      -0.253 -20.698  -2.083 -0.30 +0.02    +0.125 C 
+DOCKED: ATOM     21 C2D  RUR A   1      -0.032 -19.275  -2.074 -0.34 +0.03    +0.147 C 
+DOCKED: ATOM     22 C3D  RUR A   1      -0.521 -18.725  -3.419 -0.35 +0.04    +0.140 C 
+DOCKED: ATOM     23 C4D  RUR A   1      -1.003 -19.869  -4.156 -0.39 +0.01    +0.017 C 
+DOCKED: ATOM     24 CMD  RUR A   1       0.585 -18.492  -0.933 -0.20 +0.06    +0.288 C 
+DOCKED: ATOM     25  RU  RUR A   1      -1.176 -22.999  -3.998-13.29 -0.04    -0.021 Ru
+DOCKED: ATOM     26  NA  RUR A   1      -2.231 -22.222  -5.866 -0.42 +0.01    +0.019 N 
+DOCKED: ATOM     27  NB  RUR A   1      -1.741 -25.073  -4.692 -0.34 +0.00    +0.027 N 
+DOCKED: ATOM     28  NC  RUR A   1      -0.405 -23.854  -2.055 +0.35 -0.01    -0.090 N 
+DOCKED: ATOM     29  ND  RUR A   1      -0.817 -20.888  -3.290 +0.08 +0.03    +0.130 N 
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH    12   30                                                                 
+DOCKED: ATOM     30 CAB  RUR A   1      -1.624 -28.654  -4.327 -0.15 -0.02    -0.557 C 
+DOCKED: ATOM     31 CBB  RUR A   1      -2.613 -29.322  -3.791 -0.34 +0.01    +0.292 C 
+DOCKED: ENDBRANCH    12   30                                                                 
+DOCKED: BRANCH    17   32                                                                 
+DOCKED: ATOM     32 CAC  RUR A   1       1.130 -23.572   1.164 -0.23 -0.03    -0.424 C 
+DOCKED: ATOM     33 CBC  RUR A   1       1.620 -22.367   1.312 +0.02 -0.03    -0.687 C 
+DOCKED: ENDBRANCH    17   32                                                                 
+DOCKED: BRANCH     6   34                                                                 
+DOCKED: ATOM     34 CAA  RUR A   1      -1.654 -19.819  -8.629 +0.36 -0.35    -1.067 C 
+DOCKED: BRANCH    34   35                                                                 
+DOCKED: ATOM     35 CBA  RUR A   1      -2.847 -19.158  -9.296 -0.32 -0.15    -0.354 C 
+DOCKED: BRANCH    35   36                                                                 
+DOCKED: ATOM     36 CGA  RUR A   1      -3.330 -18.013  -8.480 -0.52 +0.08    +0.137 C 
+DOCKED: ATOM     37 O1A  RUR A   1      -3.988 -17.148  -8.977 -1.11 +0.10    +0.135 OA
+DOCKED: ATOM     38 O2A  RUR A   1      -3.075 -17.948  -7.314 -0.51 +0.06    +0.121 OA
+DOCKED: ENDBRANCH    35   36                                                                 
+DOCKED: ENDBRANCH    34   35                                                                 
+DOCKED: ENDBRANCH     6   34                                                                 
+DOCKED: BRANCH    22   39                                                                 
+DOCKED: ATOM     39 CAD  RUR A   1      -0.472 -17.277  -3.915 -0.48 +0.02    +0.053 C 
+DOCKED: BRANCH    39   40                                                                 
+DOCKED: ATOM     40 CBD  RUR A   1       0.596 -16.443  -3.281 -0.25 +0.15    +0.344 C 
+DOCKED: BRANCH    40   41                                                                 
+DOCKED: ATOM     41 CGD  RUR A   1       1.357 -15.747  -4.364 -0.49 +0.08    +0.129 C 
+DOCKED: ATOM     42 O1D  RUR A   1       0.752 -15.253  -5.308 -1.04 +0.11    +0.128 OA
+DOCKED: ATOM     43 O2D  RUR A   1       2.567 -15.684  -4.270 -0.75 +0.01    +0.021 OA
+DOCKED: ENDBRANCH    40   41                                                                 
+DOCKED: ENDBRANCH    39   40                                                                 
+DOCKED: ENDBRANCH    22   39                                                                 
+DOCKED: TORSDOF     8                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+
+	BEGINNING GENETIC ALGORITHM DOCKING 8 of 10
+Run: 8 Seed: 1547409275 67283993 [ Run 8 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -27.346
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans -1.167 -23.149 -4.070 quatxyzw -0.199909 0.609689 -0.178169 0.746037 center -2.728 -15.114 12.910 ntor 8 -123.4471 78.2596 -171.8800 -43.2101 -15.5426 48.9249 42.2152 -180.0000
+State:	 -1.167 -23.149  -4.070  -0.300  0.916 -0.268 83.503   -123.45   78.26 -171.88  -43.21  -15.54   48.92   42.22 -180.00
+
+DOCKED: MODEL        8
+DOCKED: USER    Run = 8
+DOCKED: USER    DPF = 3m0b_B_RUR_clean_3m0b.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =   +1.25e+04 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -26.19 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -26.42 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   +0.23 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   -1.16 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +2.39 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy         =   -1.25e+04 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move 3m0b_B_RUR.pdbqt
+DOCKED: USER    NEWDPF about -2.728241 -15.114310 12.910138
+DOCKED: USER    NEWDPF tran0 -1.167255 -23.148626 -4.070250
+DOCKED: USER    NEWDPF quaternion0 -0.199909 0.609689 -0.178169 0.746037
+DOCKED: USER    NEWDPF axisangle0 -0.300207 0.915580 -0.267560 83.503481
+DOCKED: USER    NEWDPF quat0 -0.300207 0.915580 -0.267560 83.503481
+DOCKED: USER    NEWDPF dihe0 -123.45 78.26 -171.88 -43.21 -15.54 48.92 42.22 -180.00 
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: REMARK  Name    =  RUR                                                            
+DOCKED: REMARK    13 active torsions:                                                            
+DOCKED: REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+DOCKED: REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+DOCKED: REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+DOCKED: REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+DOCKED: REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+DOCKED: REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+DOCKED: REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+DOCKED: REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+DOCKED: REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+DOCKED: REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+DOCKED: REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+DOCKED: REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+DOCKED: REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+DOCKED: REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+DOCKED: REMARK     x    y    z vdW Elec           q    Type                                  
+DOCKED: REMARK _______ _______ _______ _____ _____      ______    ____                                  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT                                                                            
+DOCKED: ATOM      1 CHA  RUR A   1      -1.761 -20.028  -5.526 -0.33 -0.03    -0.078 C 
+DOCKED: ATOM      2 CHB  RUR A   1      -3.086 -24.530  -6.478 -0.52 -0.01    -0.071 C 
+DOCKED: ATOM      3 CHC  RUR A   1      -0.503 -26.071  -2.700 -0.45 +0.00    +0.009 C 
+DOCKED: ATOM      4 CHD  RUR A   1       0.270 -21.504  -1.315 -0.20 +0.03    +0.275 C 
+DOCKED: ATOM      5 C1A  RUR A   1      -2.148 -21.120  -6.282 +0.01 +0.00    +0.013 A 
+DOCKED: ATOM      6 C2A  RUR A   1      -2.391 -21.196  -7.699 -0.10 +0.04    +0.121 A 
+DOCKED: ATOM      7 C3A  RUR A   1      -2.746 -22.454  -7.958 -0.31 +0.04    +0.131 A 
+DOCKED: ATOM      8 C4A  RUR A   1      -2.775 -23.208  -6.726 -0.46 +0.00    +0.017 A 
+DOCKED: ATOM      9 CMA  RUR A   1      -3.082 -23.039  -9.314 -0.36 -0.10    -0.337 C 
+DOCKED: ATOM     10 C1B  RUR A   1      -2.515 -25.428  -5.591 +0.17 +0.11    +0.872 C 
+DOCKED: ATOM     11 C2B  RUR A   1      -2.530 -26.860  -5.560 -0.45 +0.01    +0.107 C 
+DOCKED: ATOM     12 C3B  RUR A   1      -1.812 -27.259  -4.509 -0.44 +0.01    +0.108 C 
+DOCKED: ATOM     13 C4B  RUR A   1      -1.297 -26.124  -3.828 -0.37 +0.01    +0.111 C 
+DOCKED: ATOM     14 CMB  RUR A   1      -3.289 -27.723  -6.554 -0.40 -0.02    -0.324 C 
+DOCKED: ATOM     15 C1C  RUR A   1      -0.037 -25.049  -1.904 -0.14 -0.02    -0.402 C 
+DOCKED: ATOM     16 C2C  RUR A   1       0.709 -25.051  -0.683 -0.18 -0.02    -0.369 A 
+DOCKED: ATOM     17 C3C  RUR A   1       0.917 -23.785  -0.313 -0.36 +0.01    +0.132 A 
+DOCKED: ATOM     18 C4C  RUR A   1       0.322 -22.894  -1.259 -0.31 +0.01    +0.140 A 
+DOCKED: ATOM     19 CMC  RUR A   1       1.167 -26.300   0.056 -0.15 +0.04    +0.496 A 
+DOCKED: ATOM     20 C1D  RUR A   1      -0.115 -20.594  -2.298 -0.32 +0.02    +0.125 C 
+DOCKED: ATOM     21 C2D  RUR A   1       0.075 -19.169  -2.375 -0.33 +0.03    +0.147 C 
+DOCKED: ATOM     22 C3D  RUR A   1      -0.560 -18.690  -3.686 -0.35 +0.04    +0.140 C 
+DOCKED: ATOM     23 C4D  RUR A   1      -1.089 -19.876  -4.318 -0.40 +0.01    +0.017 C 
+DOCKED: ATOM     24 CMD  RUR A   1       0.787 -18.323  -1.339 -0.22 +0.07    +0.288 C 
+DOCKED: ATOM     25  RU  RUR A   1      -1.177 -22.998  -4.004-13.21 -0.04    -0.021 Ru
+DOCKED: ATOM     26  NA  RUR A   1      -2.432 -22.327  -5.787 -0.38 +0.01    +0.019 N 
+DOCKED: ATOM     27  NB  RUR A   1      -1.763 -25.111  -4.544 -0.28 +0.00    +0.027 N 
+DOCKED: ATOM     28  NC  RUR A   1      -0.194 -23.748  -2.114 +0.04 -0.01    -0.090 N 
+DOCKED: ATOM     29  ND  RUR A   1      -0.794 -20.850  -3.432 -0.07 +0.03    +0.130 N 
+DOCKED: ENDROOT                                                                            
+DOCKED: BRANCH    12   30                                                                 
+DOCKED: ATOM     30 CAB  RUR A   1      -1.532 -28.669  -4.033 -0.14 -0.02    -0.557 C 
+DOCKED: ATOM     31 CBB  RUR A   1      -2.389 -29.278  -3.256 -0.14 +0.00    +0.292 C 
+DOCKED: ENDBRANCH    12   30                                                                 
+DOCKED: BRANCH    17   32                                                                 
+DOCKED: ATOM     32 CAC  RUR A   1       1.653 -23.289   0.916 -0.24 -0.03    -0.424 C 
+DOCKED: ATOM     33 CBC  RUR A   1       2.176 -22.090   0.938 -0.03 -0.03    -0.687 C 
+DOCKED: ENDBRANCH    17   32                                                                 
+DOCKED: BRANCH     6   34                                                                 
+DOCKED: ATOM     34 CAA  RUR A   1      -2.191 -20.045  -8.699 +0.38 -0.38    -1.067 C 
+DOCKED: BRANCH    34   35                                                                 
+DOCKED: ATOM     35 CBA  RUR A   1      -2.389 -18.646  -8.144 -0.27 -0.16    -0.354 C 
+DOCKED: BRANCH    35   36                                                                 
+DOCKED: ATOM     36 CGA  RUR A   1      -3.715 -18.109  -8.550 -0.52 +0.07    +0.137 C 
+DOCKED: ATOM     37 O1A  RUR A   1      -4.189 -17.169  -7.983 -0.77 +0.06    +0.135 OA
+DOCKED: ATOM     38 O2A  RUR A   1      -4.319 -18.604  -9.455 -0.63 +0.04    +0.121 OA
+DOCKED: ENDBRANCH    35   36                                                                 
+DOCKED: ENDBRANCH    34   35                                                                 
+DOCKED: ENDBRANCH     6   34                                                                 
+DOCKED: BRANCH    22   39                                                                 
+DOCKED: ATOM     39 CAD  RUR A   1      -0.593 -17.267  -4.248 -0.49 +0.02    +0.053 C 
+DOCKED: BRANCH    39   40                                                                 
+DOCKED: ATOM     40 CBD  RUR A   1       0.402 -17.007  -5.335 -0.21 +0.15    +0.344 C 
+DOCKED: BRANCH    40   41                                                                 
+DOCKED: ATOM     41 CGD  RUR A   1       0.991 -15.649  -5.123 -0.43 +0.09    +0.129 C 
+DOCKED: ATOM     42 O1D  RUR A   1       0.358 -14.656  -5.459 -1.12 +0.13    +0.128 OA
+DOCKED: ATOM     43 O2D  RUR A   1       2.090 -15.571  -4.611 -0.93 +0.02    +0.021 OA
+DOCKED: ENDBRANCH    40   41                                                                 
+DOCKED: ENDBRANCH    39   40                                                                 
+DOCKED: ENDBRANCH    22   39                                                                 
+DOCKED: TORSDOF     8                                                                      
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+
+	BEGINNING GENETIC ALGORITHM DOCKING 9 of 10
+Run: 9 Seed: 1090823994 199420203 [ Run 9 of 10 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+

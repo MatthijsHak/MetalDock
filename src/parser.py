@@ -68,7 +68,10 @@ npts = int,int,int
 scale_factor = float
 
 # The position of the molecule will be randomized if True.
-random_pos = True
+random_pos = bool
+
+# The number of poses that will be docked.
+num_poses = int
 
 #### Docking Parameters ####
 # LJ parameters for a metal atom and a oxygen that accepts a hydrogen bond.
@@ -182,9 +185,9 @@ config['PROTEIN'] = { "pdb_file"                :           '',
 config['LIGAND'] =  { "geom_opt"                :       'False',
                       "xyz_file"                :        'None',
                       "charge"                  :           '0',
-                      "spin"                    :        'None'}
+                      "spin"                    :           '0'}
 
-config['QM'] =      { "engine"                  :         'adf',
+config['QM'] =      { "engine"                  :        'adf',
                       "basis_set"               :         'TZP',
                       "functional_type"         :      'hybrid',
                       "functional"              :       'B3LYP',
@@ -196,8 +199,9 @@ config['DOCKING'] = { "std"                     :        'True',
                       "dock_y"                  :        ' 0.0',
                       "dock_z"                  :        ' 0.0',
                       "box_size"                :          '54',
-                      "scale_factor"            :        'None',
+                      "scale_factor"            :           '0',
                       "random_pos"              :        'True',
+                      "num_poses"               :          '10',
                       "r_OA"                    :         '2.0',
                       "e_OA"                    :        '10.0',
                       "r_SA"                    :         '2.0',
@@ -274,6 +278,7 @@ class Parser:
     self.box_size                 = int(config['DOCKING']['box_size'])
     self.scale_factor             = float(config['DOCKING']['scale_factor'])
     self.random_pos               = config['DOCKING'].getboolean('random_pos')
+    self.num_poses                = int(config['DOCKING']['num_poses'])
     self.r_OA                     = float(config['DOCKING']['r_OA'])
     self.e_OA                     = float(config['DOCKING']['e_OA'])
     self.r_SA                     = float(config['DOCKING']['r_SA'])

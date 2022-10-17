@@ -1,0 +1,80 @@
+REMARK  Name    =  RUR                                                            
+REMARK    13 active torsions:                                                            
+REMARK status: ('A'  for Active; 'I'         for Inactive)                                  
+REMARK     1    A between atoms: C2A_6         and  CAA_10                                  
+REMARK     2    A between atoms: C3A_7         and   CMA_9                                  
+REMARK     3    A between atoms: CAA_10         and  CBA_11                                  
+REMARK     4    A between atoms: CBA_11         and  CGA_12                                  
+REMARK     5    A between atoms: C2B_16         and  CMB_19                                  
+REMARK     6    A between atoms: C3B_17         and  CAB_20                                  
+REMARK     7    A between atoms: CAB_20         and  CBB_21                                  
+REMARK     8    A between atoms: C3C_24         and  CAC_27                                  
+REMARK     9    A between atoms: CAC_27         and  CBC_28                                  
+REMARK    10    A between atoms: C2D_30         and  CMD_33                                  
+REMARK    11    A between atoms: C3D_31         and  CAD_34                                  
+REMARK    12    A between atoms: CAD_34         and  CBD_35                                  
+REMARK    13    A between atoms: CBD_35         and  CGD_36                                  
+REMARK     x    y    z vdW Elec           q    Type                                  
+REMARK _______ _______ _______ _____ _____      ______    ____                                  
+ROOT                                                                            
+ATOM     1  CHA  RUR A   1       1.369 -22.097  -1.563  0.00  0.00    -0.078 C  
+ATOM     2  CHB  RUR A   1      -0.230 -26.569  -2.177  0.00  0.00    -0.071 C  
+ATOM     3  CHC  RUR A   1      -2.298 -25.240  -6.334  0.00  0.00    +0.009 C  
+ATOM     4  CHD  RUR A   1      -0.120 -20.931  -6.086  0.00  0.00    +0.275 C  
+ATOM     5  C1A  RUR A   1       0.916 -23.357  -1.218  0.00  0.00    +0.013 A  
+ATOM     6  C2A  RUR A   1       0.750 -23.928   0.094  0.00  0.00    +0.121 A  
+ATOM     7  C3A  RUR A   1       0.292 -25.166  -0.085  0.00  0.00    +0.131 A  
+ATOM     8  C4A  RUR A   1       0.184 -25.439  -1.500  0.00  0.00    +0.017 A  
+ATOM     9  CMA  RUR A   1      -0.063 -26.165   0.997  0.00  0.00    -0.337 C  
+ATOM    10  C1B  RUR A   1      -0.979 -26.688  -3.336  0.00  0.00    +0.872 C  
+ATOM    11  C2B  RUR A   1      -1.740 -27.784  -3.857  0.00  0.00    +0.107 C  
+ATOM    12  C3B  RUR A   1      -2.299 -27.391  -5.003  0.00  0.00    +0.108 C  
+ATOM    13  C4B  RUR A   1      -1.941 -26.042  -5.269  0.00  0.00    +0.111 C  
+ATOM    14  CMB  RUR A   1      -1.823 -29.150  -3.198  0.00  0.00    -0.324 C  
+ATOM    15  C1C  RUR A   1      -1.937 -23.976  -6.743  0.00  0.00    -0.402 C  
+ATOM    16  C2C  RUR A   1      -2.263 -23.220  -7.913  0.00  0.00    -0.369 A  
+ATOM    17  C3C  RUR A   1      -1.658 -22.032  -7.832  0.00  0.00    +0.132 A  
+ATOM    18  C4C  RUR A   1      -0.906 -21.949  -6.619  0.00  0.00    +0.140 A  
+ATOM    19  CMC  RUR A   1      -3.147 -23.712  -9.051  0.00  0.00    +0.496 A  
+ATOM    20  C1D  RUR A   1       0.464 -20.718  -4.839  0.00  0.00    +0.125 C  
+ATOM    21  C2D  RUR A   1       1.070 -19.536  -4.282  0.00  0.00    +0.147 C  
+ATOM    22  C3D  RUR A   1       1.546 -19.886  -2.867  0.00  0.00    +0.140 C  
+ATOM    23  C4D  RUR A   1       1.184 -21.270  -2.666  0.00  0.00    +0.017 C  
+ATOM    24  CMD  RUR A   1       1.191 -18.200  -4.986  0.00  0.00    +0.288 C  
+ATOM    25   RU  RUR A   1      -0.375 -23.627  -4.031  0.00  0.00    -0.021 Ru 
+ATOM    26   NA  RUR A   1       0.600 -24.318  -2.089  0.00  0.00    +0.019 N  
+ATOM    27   NB  RUR A   1      -1.176 -25.729  -4.234  0.00  0.00    +0.027 N  
+ATOM    28   NC  RUR A   1      -1.149 -23.129  -6.094  0.00  0.00    -0.090 N  
+ATOM    29   ND  RUR A   1       0.616 -21.610  -3.842  0.00  0.00    +0.130 N  
+ENDROOT                                                                            
+BRANCH    12   30                                                                 
+ATOM    30  CAB  RUR A   1      -3.186 -28.180  -5.944  0.00  0.00    -0.557 C  
+ATOM    31  CBB  RUR A   1      -4.465 -27.918  -6.008  0.00  0.00    +0.292 C  
+ENDBRANCH    12   30                                                                 
+BRANCH    17   32                                                                 
+ATOM    32  CAC  RUR A   1      -1.704 -20.900  -8.837  0.00  0.00    -0.424 C  
+ATOM    33  CBC  RUR A   1      -1.715 -19.655  -8.435  0.00  0.00    -0.687 C  
+ENDBRANCH    17   32                                                                 
+BRANCH     6   34                                                                 
+ATOM    34  CAA  RUR A   1       0.989 -23.190   1.422  0.00  0.00    -1.067 C  
+BRANCH    34   35                                                                 
+ATOM    35  CBA  RUR A   1       2.434 -22.848   1.737  0.00  0.00    -0.354 C  
+BRANCH    35   36                                                                 
+ATOM    36  CGA  RUR A   1       3.354 -23.641   0.879  0.00  0.00    +0.137 C  
+ATOM    37  O1A  RUR A   1       4.403 -23.186   0.532  0.00  0.00    +0.135 OA 
+ATOM    38  O2A  RUR A   1       3.061 -24.747   0.534  0.00  0.00    +0.121 OA 
+ENDBRANCH    35   36                                                                 
+ENDBRANCH    34   35                                                                 
+ENDBRANCH     6   34                                                                 
+BRANCH    22   39                                                                 
+ATOM    39  CAD  RUR A   1       2.221 -18.964  -1.849  0.00  0.00    +0.053 C  
+BRANCH    39   40                                                                 
+ATOM    40  CBD  RUR A   1       1.429 -18.736  -0.600  0.00  0.00    +0.344 C  
+BRANCH    40   41                                                                 
+ATOM    41  CGD  RUR A   1       1.716 -19.853   0.352  0.00  0.00    +0.129 C  
+ATOM    42  O1D  RUR A   1       2.774 -19.866   0.968  0.00  0.00    +0.128 OA 
+ATOM    43  O2D  RUR A   1       0.877 -20.720   0.492  0.00  0.00    +0.021 OA 
+ENDBRANCH    40   41                                                                 
+ENDBRANCH    39   40                                                                 
+ENDBRANCH    22   39                                                                 
+TORSDOF     8                                                                      

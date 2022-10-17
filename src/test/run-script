@@ -1,9 +1,0 @@
-#!/bin/bash
-#SBATCH --nodes 1
-#SBATCH --tasks-per-node 32 
-#SBATCH --time 1:00:00
-
-module load 2021 
-module load AMS/2021.101-intelmpi
-
-/home/matthak/.conda/envs/MetPar/bin/python -u ../main.py -i input.ini -train
