@@ -1,5 +1,0 @@
-#!/bin/sh
-
-unset AMS_SWITCH_LOGFILE_AND_STDOUT
-AMS_JOBNAME="plamsjob" AMS_RESULTSDIR=. $AMSBIN/ams <"plamsjob.in"
-
