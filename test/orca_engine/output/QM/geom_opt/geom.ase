@@ -1,0 +1,5 @@
+dict(charge=0,
+     mult=1,
+     orcablocks='%pal nprocs 32 end % output Print[P_hirshfeld] 1 end',
+     orcasimpleinput='Opt PBE def2-SVP D3BJ',
+     task='gradient')

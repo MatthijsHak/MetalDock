@@ -1,0 +1,43 @@
+MODEL        1
+REMARK  Name = C19H15N3O5RuS optimized with DFTB in AMS.
+REMARK  3 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: RU_14  and  S_22
+REMARK    2  A    between atoms: S_22  and  C_30
+REMARK    3  A    between atoms: S_22  and  C_31
+REMARK                            x       y       z     vdW  Elec       q    Type
+REMARK                         _______ _______ _______ _____ _____    ______ ____
+ROOT
+ATOM      1  C   UNL A   1      13.706  24.277 -11.972  0.00  0.00    +0.003 C 
+ATOM      2  C   UNL A   1      14.417  24.293 -13.159  0.00  0.00    +0.012 C 
+ATOM      3  C   UNL A   1      14.236  24.938 -10.877  0.00  0.00    +0.021 C 
+ATOM      4  C   UNL A   1      15.608  25.006 -13.234  0.00  0.00    +0.040 C 
+ATOM      5  C   UNL A   1      15.444  25.613 -11.001  0.00  0.00    +0.049 C 
+ATOM      6  C   UNL A   1      16.431  25.134 -14.416  0.00  0.00    +0.041 C 
+ATOM      7  N   UNL A   1      16.102  25.675 -12.175  0.00  0.00    -0.124 N 
+ATOM      8  C   UNL A   1      16.159  26.245  -9.915  0.00  0.00    +0.053 C 
+ATOM      9  C   UNL A   1      16.275  24.464 -15.625  0.00  0.00    +0.018 C 
+ATOM     10  N   UNL A   1      17.427  26.016 -14.246  0.00  0.00    -0.118 N 
+ATOM     11 RU   UNL A   1      17.847  26.838 -12.358  0.00  0.00    +0.349 Ru
+ATOM     12  C   UNL A   1      15.766  26.320  -8.582  0.00  0.00    +0.024 C 
+ATOM     13  N   UNL A   1      17.344  26.738 -10.303  0.00  0.00    -0.110 N 
+ATOM     14  C   UNL A   1      17.154  24.713 -16.667  0.00  0.00    +0.017 C 
+ATOM     15  C   UNL A   1      18.261  26.279 -15.254  0.00  0.00    +0.045 C 
+ATOM     16  O   UNL A   1      18.958  27.809 -13.708  0.00  0.00    -0.229 OA
+ATOM     17  O   UNL A   1      19.327  27.626 -11.341  0.00  0.00    -0.236 OA
+ATOM     18  C   UNL A   1      16.615  26.887  -7.645  0.00  0.00    +0.021 C 
+ATOM     19  C   UNL A   1      18.164  27.282  -9.408  0.00  0.00    +0.048 C 
+ATOM     20  C   UNL A   1      18.160  25.649 -16.482  0.00  0.00    +0.028 C 
+ATOM     21  C   UNL A   1      19.211  27.396 -14.900  0.00  0.00    +0.170 C 
+ATOM     22  C   UNL A   1      19.433  27.764 -10.063  0.00  0.00    +0.165 C 
+ATOM     23  C   UNL A   1      17.850  27.363  -8.063  0.00  0.00    +0.032 C 
+ATOM     24  O   UNL A   1      20.027  27.851 -15.661  0.00  0.00    -0.278 OA
+ATOM     25  O   UNL A   1      20.383  28.197  -9.465  0.00  0.00    -0.285 OA
+ENDROOT
+BRANCH  11  26
+ATOM     26  S   UNL A   1      16.516  28.728 -12.501  0.00  0.00    +0.319 S 
+ATOM     27  C   UNL A   1      16.087  29.181 -14.176  0.00  0.00    +0.113 C 
+ATOM     28  C   UNL A   1      17.387  30.121 -11.799  0.00  0.00    +0.123 C 
+ATOM     29  O   UNL A   1      15.284  28.498 -11.754  0.00  0.00    -0.313 OA
+ENDBRANCH  11  26
+TORSDOF 1
