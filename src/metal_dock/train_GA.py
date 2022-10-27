@@ -12,7 +12,6 @@ import numpy as np
 import multiprocessing as mp 
 import prepare_dock as d
 import figures as fig
-import optim as opt
 
 from scipy.stats import rankdata
 from multiprocessing import Pool
@@ -73,73 +72,6 @@ def mutation_func(offspring, ga_instance):
                 offspring[i] = offspring[i]
 
     return offspring
-
-# def docking_centre(coordinate_file):
-#     dock_site = open(coordinate_file,'r')
-#     coord = [line.split() for line in dock_site]
-
-#     if is_float(coord[0][0]) == True:
-#         dock = [coord[0][0], coord[0][1], coord[0][2]]
-#     else:
-#         dock = [coord[0][1], coord[0][2], coord[0][3]]
-
-#     return dock
-
-# def rmsd_func(name_ligand, n_prot):
-#     rmsd_avg = []
-#     rmsd_list = []
-#     avg_list = []
-#     min_list = []
-#     rmsd_print_list = []
-                
-#     output = [f"-------------------------------------------     PROTEIN {n_prot}      --------------------------------------------\n"]
-              
-#     i = 1
-#     while os.path.exists(name_ligand+"_%i.pdbqt" % i):
-#         subprocess.call(os.environ['OBABEL']+" -ipdbqt "+name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+name_ligand+"_{}.xyz".format(i)+" -d > "+name_ligand+"_{}.xyz".format(i), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
-
-#         rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['DOCK_LIB_DIR']+'/calculate_rmsd.py ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' --reorder --rotation none --translation none']))
-#         rmsd = rmsd_non_rotate
-
-#         rmsd_print_list.append("RMSD for Conformation %i = %.4f\n"% (i, rmsd))
-#         rmsd_list.append(rmsd)
-#         i += 1
-
-#     for j in range(0,len(rmsd_print_list)):
-#         output.append(rmsd_print_list[j])
-
-#         if gen == 0:
-#             first_gen = open(f'{output_dir}/first_gen/all_conf_first_gen','a')
-#             first_gen.write(rmsd_print_list[j])
-
-#             protein = open(f'{output_dir}/first_gen/protein_{n_prot}','a')
-#             protein.write(rmsd_print_list[j])
-
-#         if gen == par.ga_num_generations+1:   
-#             last_gen = open(f'{output_dir}/last_gen/all_conf_last_gen','a')
-#             last_gen.write(rmsd_print_list[j])
-            
-#             protein = open(f'{output_dir}/last_gen/protein_{n_prot}','a')
-#             protein.write(rmsd_print_list[j])
-
-#     avg_output = np.mean(rmsd_list)
-#     avg_list.append(avg_output)
-#     output.append(f"Average RMSD: {avg_output:.4}\n")
-
-#     minimum_rmsd = min(rmsd_list)
-#     min_list.append(minimum_rmsd)
-#     output.append(f"Lowest RMSD: {minimum_rmsd:.4}\n")
-
-#     stdv_rmsd = np.std(rmsd_list)
-#     output.append(f"Standard Deviation RMSD: {stdv_rmsd:.4}\n")
-
-#     var_rmsd = np.var(rmsd_list)
-#     output.append(f"Variance RMSD: {var_rmsd:.4}\n")
-#     output.append("-----------------------------------------------------------------------------------------------------------\n")
-
-#     return avg_list, min_list, print(''.join(output))
-    
-
 
 def fitness_func(solution, solution_idx):
     global step
@@ -272,7 +204,7 @@ def fitness_func(solution, solution_idx):
         output.append("-----------------------------------------------------------------------------------------------------------\n")
 
         with open('parameter_history', 'a') as f:
-            f.write('Parameters generation {}         :  '.format(str(gen))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {:>10.5f}     {:>10.5f}\n'.format(fitness,population_avg, population_min_avg))
+            f.write('Parameters generation {}         :  '.format(str(gen))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+' | {:>10.5f}  {:>10.5f}     {:>10.5f}\n'.format(fitness,population_avg, population_min_avg))
     
     else:
         avg_output = np.mean(np.array((avg_list)))
@@ -286,7 +218,7 @@ def fitness_func(solution, solution_idx):
         output.append("-----------------------------------------------------------------------------------------------------------\n")
 
         with open('parameter_history', 'a') as f:
-            f.write('Parameters generation {}         :  '.format(str(gen))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+'| {:>10.5f}  {:>10.5f}     {:>10.5f}\n'.format(fitness, avg_output, min_avg_rmsd))
+            f.write('Parameters generation {}         :  '.format(str(gen))+'  '.join(format(solution[x], ">10.5f") for x in range(0,len(solution)))+' | {:>10.5f}  {:>10.5f}     {:>10.5f}\n'.format(fitness, avg_output, min_avg_rmsd))
 
     gen+=1
     shutil.rmtree(f'{tmp_dir_GA}',ignore_errors=True)

@@ -98,8 +98,8 @@ def orca_geom_opt(xyz_file, var):
     mol.calc = ORCA(label='geom',
                     charge=var.charge,
                     mult=M,
-                    orcasimpleinput='Opt '+var.functional+' '+var.basis_set+' '+var.dispersion,
-                    orcablocks='%pal nprocs 32 end % output Print[P_hirshfeld] 1 end',
+                    orcasimpleinput='Opt '+var.functional+' '+var.basis_set+' '+var.dispersion+' CPCM(Water)',
+                    orcablocks='%pal nprocs '+var.ncpu+' end % output Print[P_hirshfeld] 1 end',
                     )
 
     mol.get_potential_energy()
@@ -113,8 +113,8 @@ def orca_single_point(xyz_file, var):
     mol.calc = ORCA(label='single_point',
                     charge=var.charge,
                     mult=M,
-                    orcasimpleinput=var.functional+' '+var.basis_set+' '+var.dispersion,
-                    orcablocks='%pal nprocs 32 end % output Print[P_hirshfeld] 1 end',
+                    orcasimpleinput=var.functional+' '+var.basis_set+' '+var.dispersion+' CPCM(Water)',
+                    orcablocks='%pal nprocs '+var.ncpu+' end % output Print[P_hirshfeld] 1 end',
                     )
 
     mol.get_potential_energy()

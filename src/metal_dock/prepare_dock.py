@@ -127,13 +127,13 @@ def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_
     gpf.close()
 
     #autogrid()
-    subprocess.call([os.environ['AUTODOCK']+'/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     #create_dpf()
     write_dpf_file('clean_'+name_protein+'.gpf', name_ligand, 'clean_'+name_protein, parameter_file, energy, num_poses, dock_algorithm, random_pos=random_pos, SA=sa_dock, GA=ga_dock)
 
     #autodock()
-    subprocess.call([os.environ['AUTODOCK']+'/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     #write_all_conformations()
     subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+name_ligand+"_clean_"+name_protein+".dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -241,7 +241,7 @@ def rmsd_func(name_ligand, n_prot, generation, directory, num_gen=None, train=Fa
     while os.path.exists(name_ligand+"_%i.pdbqt" % i):
         subprocess.call(os.environ['OBABEL']+" -ipdbqt "+name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+name_ligand+"_{}.xyz".format(i)+" -d > "+name_ligand+"_{}.xyz".format(i), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
 
-        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['DOCK_LIB_DIR']+'/calculate_rmsd.py ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' --reorder --rotation none --translation none']))
+        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['ROOT_DIR']+'/metal_dock/calculate_rmsd.py ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' --reorder --rotation none --translation none']))
         rmsd = rmsd_non_rotate
 
         rmsd_print_list.append("RMSD for Conformation %i = %.4f\n"% (i, rmsd))

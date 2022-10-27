@@ -1,5 +1,6 @@
 import os,sys
 import subprocess
+import math
 import environment_variables
 
 import pdb_extraction as pdb
@@ -9,8 +10,27 @@ import adf_engine as adf
 import gaussian_engine as g
 import orca_engine as orca
 
-
 from parser import Parser
+
+
+             #         r_OA, e_OA, r_SA, e_SA, r_HD, e_HD, r_NA, e_NA,  r_N,  e_N, r_M_HD, e_M_HD
+standard_set = {'V' : [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'CR': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'FE': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'CO': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'NI': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'CU': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'Y' : [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'MO': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'RU': [ 1.171,  5.261,  1.114,  15.632,  1.116,  0.572,  2.900,  20.035,  1.733,  5.488,  1.975,  3.459],
+                'RH': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'PD': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'RE': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'OS': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'IR': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'PT': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
+                'AU': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0]
+            }
 
 def docking(input_file):
     par = Parser(input_file)
@@ -94,7 +114,14 @@ def docking(input_file):
         dock = d.get_coordinates(par.metal_symbol)
 
     if par.box_size != 0 and par.scale_factor == 0:
-        box_size = par.box_size
+        npts = par.box_size * 2.66 # Convert grid points to Å
+        if int(npts) == npts:
+            box_size =  npts
+        else:
+            box_size = math.ceil(npts)
+            print('SPACING BETWEEN GRID POINTS IS STANDARD SET TO 0.375 Å')
+            print('BOX SIZE MUST BE INTEGER GRID POINTS WHICH WAS NOT FOUND')
+            print('BOX SIZE SIDE ROUNDED UP AND SET TO {:.3f} Å\n'.format(box_size / 2.66))
     if par.box_size == 0 and par.scale_factor != 0:
         box_size = d.box_size_func(par.name_ligand+'_c.xyz', par.metal_symbol, 0.375, par.scale_factor)
     if par.box_size != 0 and par.scale_factor != 0:
@@ -105,7 +132,7 @@ def docking(input_file):
         sys.exit()
 
     if par.standard == True:
-        parameter_set = [2.0, 10.0, 2.0, 10.0, 2.0, 10.0, 2.0, 10.0, 2.0, 10.0, 2.0, 10.0]
+        parameter_set = standard_set.get(par.metal_symbol.upper())
         d.create_ligand_pdbqt_file(par.name_ligand)
         d.prepare_receptor(par.name_protein)
         d.docking_func(parameter_set, par.parameter_file, par.metal_symbol, par.name_ligand, par.name_protein, energy, dock, box_size, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock)
@@ -120,7 +147,7 @@ def docking(input_file):
         while os.path.exists(par.name_ligand+"_%i.pdbqt" % i):
             subprocess.call([os.environ['OBABEL']+" -ipdbqt "+par.name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+par.name_ligand+"_{}.xyz".format(i)+" -d > "+par.name_ligand+"_{}.xyz".format(i)], shell=True)
 
-            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['DOCK_LIB_DIR']+'/calculate_rmsd.py ref.xyz '+par.name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
+            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz '+par.name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
             rmsd = rmsd_non_rotate
 
             rmsd_list.append("RMSD for Conformation %i = %.4f"% (i, rmsd))
@@ -142,6 +169,6 @@ def docking(input_file):
     subprocess.call([f'mv {output_dir}/docking/'+par.name_ligand+'_*.pdbqt .'], shell=True)
     subprocess.call([f'mv {output_dir}/docking/clean_'+par.pdb_file+' .'], shell=True)
  
-    print("\nDOCKING SUCCESFULLY COMPLETED\n")
-    print("THE PRINTED POSES AND PROTEIN CAN BE FOUND IN THE RESULTS DIRECTORY\n")
+    print("DOCKING SUCCESFULLY COMPLETED")
+    print("THE PRINTED POSES AND PROTEIN CAN BE FOUND IN THE RESULTS DIRECTORY")
     return

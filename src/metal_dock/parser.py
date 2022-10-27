@@ -177,7 +177,8 @@ mut_prob = float [0.0:1.0]
 """
 config = configparser.ConfigParser()
 config['DEFAULT'] = { "metal_symbol"            :            '',
-                      "parameter_file"          :            '' }
+                      "parameter_file"          :            '',
+                      "ncpu"                     :           '1'}
 
 config['PROTEIN'] = { "pdb_file"                :           '',
                       "pH"                      :        '7.4',
@@ -249,6 +250,7 @@ class Parser:
     # [DEFAULT] #
     self.metal_symbol             = config['DEFAULT']['metal_symbol']
     self.parameter_file           = config['DEFAULT']['parameter_file']
+    self.ncpu                     = int(config['DEFAULT']['ncpu'])
 
     # [PROTEIN] # 
     self.pdb_file                 = config['PROTEIN']['pdb_file']

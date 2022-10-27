@@ -1,10 +1,7 @@
 import os, sys, subprocess
-
+import scm.plams as scm
 
 def adf_engine(xyz_file, var, output_dir):
-
-    from scm import plams
-
     ## Geometry Optimization ##
     if var.geom_opt == True:
         if os.path.isdir('geom_opt') == False:
@@ -20,36 +17,33 @@ def adf_engine(xyz_file, var, output_dir):
             adf_geom_opt(xyz_file, var)
             os.chdir(f'{output_dir}/QM/geom_opt/plams_workdir/plamsjob')
             adf_opt_converged('ams.log')
+            subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
+            energy = adf_extract_energy('ams.log')
         else:
             os.chdir(f'{output_dir}/QM/geom_opt/plams_workdir/plamsjob')
             adf_opt_converged('ams.log')
+            subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
+            energy = adf_extract_energy('ams.log')
 
-    ## Single Point ##
-    os.chdir(f'{output_dir}/QM')
-
-    if os.path.isdir('single_point') == False:
-        os.mkdir('single_point')
-        os.chdir('single_point')
     else:
-        os.chdir('single_point')
+        
+        if os.path.isdir('single_point') == False:
+            os.mkdir('single_point')
+            os.chdir('single_point')
+        else:
+            os.chdir('single_point')
 
-    if var.geom_opt == True:
-        subprocess.call([f'cp {output_dir}/QM/geom_opt/plams_workdir/plamsjob/output.xyz '+xyz_file], shell=True)
-    else:
-        subprocess.call([f'cp {output_dir}/file_prep/'+xyz_file+' .'], shell=True)
 
-    # If single point successful Skip otherwise Run Again#
-    if os.path.isdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob') == False:
-        adf_sp(xyz_file, var)
-        os.chdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob')
-        adf_extract_energy('ams.log')
-        subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
-        energy = adf_extract_energy('ams.log')
-    else:
-        os.chdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob')
-        adf_extract_energy('ams.log')
-        subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
-        energy = adf_extract_energy('ams.log')
+        # If single point successful Skip otherwise Run Again#
+        if os.path.isdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob') == False:
+            adf_sp(xyz_file, var)
+            os.chdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob')
+            subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
+            energy = adf_extract_energy('ams.log')
+        else:
+            os.chdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob')
+            subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
+            energy = adf_extract_energy('ams.log')
 
     return os.getcwd(), energy
 
@@ -79,14 +73,14 @@ def adf_sp_converged(ams_log):
             return print('\nSINGLE POINT SUCCESSFULLY PERFORMED\n')
 
 def adf_geom_opt(xyz_file, var):
-    init()
+    scm.init()
 
     #Molecule Structure
-    m = Molecule(xyz_file)
+    m = scm.Molecule(xyz_file)
     m.properties.charge = ''+str(var.charge)+''
 
     #Settings
-    s = Settings()
+    s = scm.Settings()
     #AMS driver input
     s.input.ams.Task = 'GeometryOptimization'
 
@@ -115,19 +109,19 @@ def adf_geom_opt(xyz_file, var):
     s.input.adf.Solvation.Solv = "Name=Water"
 
     #Run Job
-    j = AMSJob(molecule=m, settings=s)
+    j = scm.AMSJob(molecule=m, settings=s)
     result = j.run()
 
-    finish()
+    scm.finish()
 
 def adf_sp(xyz_file, var):
-    init()
+    scm.init()
     #Molecule Struture
-    m = Molecule(xyz_file)
+    m = scm.Molecule(xyz_file)
     m.properties.charge = ''+str(var.charge)+''
 
     #Settings
-    s = Settings()
+    s = scm.Settings()
     #AMS driver input
     s.input.ams.Task='SinglePoint'
 
@@ -156,7 +150,7 @@ def adf_sp(xyz_file, var):
     s.input.adf.Solvation.Solv = "Name=Water"
 
     #Run Job
-    j = AMSJob(molecule=m, settings=s)
+    j = scm.AMSJob(molecule=m, settings=s)
     result = j.run()
 
-    finish()
+    scm.finish()

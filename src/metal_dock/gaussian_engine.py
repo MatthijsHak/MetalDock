@@ -116,7 +116,7 @@ def gaussian_sp_converged(log_file):
             return sys.exit()
 
 def gaussian_geom_opt(xyz_file, var):
-    n_procs = 32 #multiprocessing.cpu_count()
+    n_procs = var.ncpu 
     M = 2 * var.spin + 1 
 
     mol = read(xyz_file)
@@ -138,29 +138,10 @@ def gaussian_geom_opt(xyz_file, var):
     opt.run(fmax='tight')
     opt.write('output.xyz')
     return 
-        
-# def extract_xyz(xyz_file):
-#     mol = read(xyz_file)
-#     symbols = list(mol.symbols)
-#     N = len(mol.positions) 
 
-#     subprocess.call(["grep -A10000 'Optimization completed' geom_opt.log > file_1"], shell=True)
-#     subprocess.call(["grep -A"+str(N+4)+" 'Input orientation' file_1 > file_2"], shell=True)
-
-#     with open('file_2','r') as fin:
-#         with open('output.xyz','w') as fout:
-#             fin_lines = [line.split() for line in fin]
-
-#             fout.write('{}\n\n'.format(len(mol.positions)))
-#             for idx, i in enumerate(fin_lines[5:]):
-#                 fout.write('{} {} {} {}\n'.format(symbols[idx],i[3], i[4], i[5]))
-
-#     subprocess.call(['rm file_1 file_2'], shell=True)
-
-#     return N
 
 def gaussian_sp(xyz_file, var):
-    n_procs = multiprocessing.cpu_count()
+    n_procs = var.ncpu
     M = 2 * var.spin + 1 
 
     mol = read(xyz_file)

@@ -178,17 +178,17 @@ def plot_parameters(metal, output_dir):
         r_HD.append(float(data_set_line[i][8]))
         e_HD.append(float(data_set_line[i][9]))
         
-        r_NA.append(float(data_set_line[i][8]))
-        e_NA.append(float(data_set_line[i][9]))
+        r_NA.append(float(data_set_line[i][10]))
+        e_NA.append(float(data_set_line[i][11]))
         
-        r_N.append(float(data_set_line[i][10]))
-        e_N.append(float(data_set_line[i][11]))
+        r_N.append(float(data_set_line[i][12]))
+        e_N.append(float(data_set_line[i][13]))
         
-        r_M.append(float(data_set_line[i][12]))
-        e_M.append(float(data_set_line[i][13]))
+        r_M.append(float(data_set_line[i][14]))
+        e_M.append(float(data_set_line[i][15]))
         
-        fitness.append(float(data_set_line[i][16]))
-        rmsd_min.append(float(data_set_line[i][18]))
+        fitness.append(float(data_set_line[i][17]))
+        rmsd_min.append(float(data_set_line[i][19]))
 
     x_axis = range(0,len(r_OA))
 
@@ -203,11 +203,8 @@ def plot_parameters(metal, output_dir):
     ax[2][0].plot(x_axis,r_HD, c='b')
     ax[2][1].plot(x_axis,e_HD, c='b')
 
-    ax[2][0].plot(x_axis,r_NA, c='b')
-    ax[2][1].plot(x_axis,e_NA, c='b')
-
-    ax[3][0].plot(x_axis,r_N, c='b')
-    ax[3][1].plot(x_axis,e_N, c='b')
+    ax[3][0].plot(x_axis,r_NA, c='b')
+    ax[3][1].plot(x_axis,e_NA, c='b')
 
     ax[4][0].plot(x_axis,r_N, c='b')
     ax[4][1].plot(x_axis,e_N, c='b')
@@ -237,12 +234,8 @@ def plot_parameters(metal, output_dir):
     ax[5][0].set_xlabel('N parents')
     ax[5][1].set_xlabel('N parents')
 
-    # for i in range(0,6):
-    #     for j in range(0,2):
-    #         ax[i][j].set_xlim(0,500)
-
     plt.tight_layout()
-    plt.savefig(f"parameters.png", bbox_inches='tight')
+    plt.savefig('parameters.png', bbox_inches='tight')
     plt.close()
 
     fig, ax = plt.subplots(1,2, figsize=(15,5), sharex=True)
@@ -259,5 +252,5 @@ def plot_parameters(metal, output_dir):
 
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"RMSD_fitness.png", bbox_inches='tight')
+    plt.savefig('RMSD_fitness.png', bbox_inches='tight')
     plt.close()
