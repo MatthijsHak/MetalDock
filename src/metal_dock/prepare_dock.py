@@ -1,7 +1,5 @@
-import os
-import glob
+import os, sys, glob, subprocess
 import random
-import subprocess
 
 import numpy as np
 from random import seed
@@ -13,6 +11,17 @@ def is_float(string):
         return True
     except ValueError:
         return False
+
+def check_pdbqt(pdbqt_file):
+    count = 0
+    with open(pdbqt_file) as fin:
+        for line in fin:
+            if 'MODEL' in line:
+                count+=1
+    if count > 1:
+        print('LIGAND CANNOT BE RECOGNIZED AS ONE MOLECULE')
+        print('REOPTIMIZE COMPOUND WITH DIFFERENT INITIAL SETTINGS OR DELETE NON-COVALENT LIGANDS\n')
+        sys.exit()
 
 def create_ligand_pdbqt_file(name_ligand):
     # Grep the correct part  of the itp file
@@ -37,6 +46,7 @@ def create_ligand_pdbqt_file(name_ligand):
 
     subprocess.call([os.environ['OBABEL']+' -imol2 '+name_ligand+'.mol2 -opdbqt '+name_ligand+'.pdbqt  > '+name_ligand+'.pdbqt'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
+    check_pdbqt(name_ligand+'.pdbqt')
     return
 
 def get_coordinates(xyz_file, metal_symbol):
@@ -107,17 +117,17 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     return max_side
 
 def prepare_receptor(name_protein):
-    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+name_protein+'.pdb'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+name_protein+'.pdb'],shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
 def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_protein, energy, dock, box_size, num_poses, dock_algorithm, random_pos, ga_dock, sa_dock):
     # Insert parameters for R and epsilon for H-bond
-    subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+'''") ($7 = '''+str(parameter_set[10])+''') && ($8 = '''+str(parameter_set[11])+'''); print $0}' '''+parameter_file+''' > file_1'''], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+parameter_file], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+'''") ($7 = '''+str(parameter_set[10])+''') && ($8 = '''+str(parameter_set[11])+'''); print $0}' '''+parameter_file+''' > file_1'''], shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+parameter_file], shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     subprocess.call(['rm file_1'], shell=True)
 
     #create_gpf():
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+parameter_file+" -p npts='{},{},{}'".format(box_size,box_size,box_size)+" -p gridcenter='{:.4},{:.4},{:.4}' ".format(dock[0],dock[1],dock[2])], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+parameter_file+" -p npts='{},{},{}'".format(box_size,box_size,box_size)+" -p gridcenter='{:.4},{:.4},{:.4}' ".format(dock[0],dock[1],dock[2])], shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     gpf = open('clean_'+name_protein+'.gpf', 'a')
     gpf.write('nbp_r_eps {:>.4f}  {:>.4f}'.format(parameter_set[0],parameter_set[1])+'    12 6 OA '+metal_symbol+'\n')
     gpf.write('nbp_r_eps {:>.4f}  {:>.4f}'.format(parameter_set[2],parameter_set[3])+'    12 6 SA '+metal_symbol+'\n')
@@ -127,16 +137,16 @@ def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_
     gpf.close()
 
     #autogrid()
-    subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     #create_dpf()
     write_dpf_file('clean_'+name_protein+'.gpf', name_ligand, 'clean_'+name_protein, parameter_file, energy, num_poses, dock_algorithm, random_pos=random_pos, SA=sa_dock, GA=ga_dock)
 
     #autodock()
-    subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     #write_all_conformations()
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+name_ligand+"_clean_"+name_protein+".dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+name_ligand+"_clean_"+name_protein+".dlg"], shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     return
 

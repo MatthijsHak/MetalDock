@@ -32,8 +32,12 @@ standard_set = {'V' : [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.
                 'AU': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0]
             }
 
-def docking(input_file):
-    par = Parser(input_file)
+def docking(input_file, par, test_GA=False):
+    
+    if test_GA == False:
+        par = Parser(input_file)
+    else:
+        pass
 
     input_dir = os.getcwd()
     output_dir = f'{input_dir}/output'
@@ -78,13 +82,13 @@ def docking(input_file):
         os.chdir('QM')
 
     if par.engine.lower() == 'adf':
-        qm_dir, energy = adf.adf_engine(par.name_ligand+'_c.xyz', par, output_dir)
+        qm_dir, energy = adf.adf_engine(f'{output_dir}/file_prep/'+par.name_ligand+'_c.xyz', par, output_dir)
 
     if par.engine.lower() == 'gaussian':
-        qm_dir, energy = g.gaussian_engine(par.name_ligand+'_c.xyz', par, output_dir)
+        qm_dir, energy = g.gaussian_engine(f'{output_dir}/file_prep/'+par.name_ligand+'_c.xyz', par, output_dir)
 
     if par.engine.lower() == 'orca':
-        qm_dir, energy = orca.orca_engine(par.name_ligand+'_c.xyz', par, output_dir)
+        qm_dir, energy = orca.orca_engine(f'{output_dir}/file_prep/'+par.name_ligand+'_c.xyz', par, output_dir)
 
     ##### AutoDock #####
     os.chdir(f'{output_dir}')
@@ -111,10 +115,10 @@ def docking(input_file):
     if par.dock_x and par.dock_y and par.dock_z != None:
         dock = d.users_coordinates(par.dock_x, par.dock_y, par.dock_z)
     else:
-        dock = d.get_coordinates(par.metal_symbol)
+        dock = d.get_coordinates(par.name_ligand+'_c.xyz', par.metal_symbol)
 
     if par.box_size != 0 and par.scale_factor == 0:
-        npts = par.box_size * 2.66 # Convert grid points to Å
+        npts = par.box_size * 2.66 # Convert Å to grid points
         if int(npts) == npts:
             box_size =  npts
         else:
@@ -141,13 +145,15 @@ def docking(input_file):
         d.prepare_receptor(par.name_protein)
         d.docking_func(par.parameter_set, par.parameter_file, par.metal_symbol, par.name_ligand, par.name_protein, energy, dock, box_size, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock)
 
+    print(par.rmsd)
+
     if par.rmsd == True:
         rmsd_list = []
         i = 1
         while os.path.exists(par.name_ligand+"_%i.pdbqt" % i):
             subprocess.call([os.environ['OBABEL']+" -ipdbqt "+par.name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+par.name_ligand+"_{}.xyz".format(i)+" -d > "+par.name_ligand+"_{}.xyz".format(i)], shell=True)
 
-            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['LIB_DIR']+'/calculate_rmsd.py ref.xyz '+par.name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
+            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['ROOT_DIR']+'/metal_dock/calculate_rmsd.py ref.xyz '+par.name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
             rmsd = rmsd_non_rotate
 
             rmsd_list.append("RMSD for Conformation %i = %.4f"% (i, rmsd))

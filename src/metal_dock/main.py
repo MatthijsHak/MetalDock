@@ -1,8 +1,10 @@
+#!/usr/bin/env python3 
+
 import argparse
 
 from docking import docking
 from train_GA import train_GA
-# from test_GA import test_GA 
+from test_GA import test_GA 
 
 def main():
     parser = argparse.ArgumentParser(description="Force Field Optimization System")

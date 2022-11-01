@@ -51,8 +51,8 @@ def adf_engine(xyz_file, var, output_dir):
 def adf_extract_energy(log_file):
     with open(log_file,'r') as fin:
         for line in fin:
-            if line.startswith('kcal/mol'):
-                energy = line.split()[3]
+            if 'kcal/mol' in line:
+                energy = line.split()[4]
                 return energy
 
 
