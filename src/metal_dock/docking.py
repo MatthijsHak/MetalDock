@@ -173,6 +173,6 @@ def docking(input_file, par=None, test_GA=False):
     subprocess.call([f'mv {output_dir}/docking/'+par.name_ligand+'_*.pdbqt .'], shell=True)
     subprocess.call([f'mv {output_dir}/docking/clean_'+par.pdb_file+' .'], shell=True)
  
-    print("DOCKING SUCCESFULLY COMPLETED")
+    print("\nDOCKING SUCCESFULLY COMPLETED")
     print("THE PRINTED POSES AND PROTEIN CAN BE FOUND IN THE RESULTS DIRECTORY")
     return

@@ -86,7 +86,7 @@ def adf_geom_opt(xyz_file, var):
 
     #ADF engine input
     s.input.adf.scf.iterations='500'
-    # s.input.adf.AtomicChargesTypeForAMS='CM5'
+    s.input.adf.AtomicChargesTypeForAMS='CM5'
     s.input.adf.basis.type=''+var.basis_set.upper()+''
     s.input.adf.basis.core='None'
 

@@ -10,7 +10,7 @@ import environment_variables
 
 import numpy as np
 import multiprocessing as mp 
-import prepare_dock as d
+import prepare_dock as dx
 import figures as fig
 
 from scipy.stats import rankdata
