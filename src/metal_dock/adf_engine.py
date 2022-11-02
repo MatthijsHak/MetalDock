@@ -10,7 +10,7 @@ def adf_engine(xyz_file, var, output_dir):
         else:
             os.chdir('geom_opt')
 
-        subprocess.call([f'cp {output_dir}/file_prep/'+xyz_file+' .'], shell=True)
+        subprocess.call([f'cp '+xyz_file+' .'], shell=True)
 
         # If Geometry Converged Skip otherwise Run Again#
         if os.path.isdir(f'{output_dir}/QM/geom_opt/plams_workdir/plamsjob') == False:

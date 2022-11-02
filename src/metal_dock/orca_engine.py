@@ -1,4 +1,7 @@
-import os, sys, subprocess
+import os, sys, csv, subprocess
+
+import orca2CM5 as oc
+
 from ase.calculators.orca import ORCA
 from ase.io import read, write
 
@@ -11,7 +14,7 @@ def orca_engine(xyz_file, var, output_dir):
         else:
             os.chdir('geom_opt')
 
-        subprocess.call([f'cp {output_dir}/file_prep/'+xyz_file+' .'], shell=True)
+        subprocess.call([f'cp '+xyz_file+' .'], shell=True)
 
         # If Geometry Converged Skip otherwise Run Again#
         if os.path.exists(f'{output_dir}/QM/geom_opt/geom.out') == False:
@@ -59,18 +62,23 @@ def orca_extract_energy(log_file):
                 return energy
                 
 def orca_extract_CM5(log_file, xyz_file):
-    mol = read(xyz_file)
-    N = len(mol.positions) 
+    # mol = read(xyz_file)
+    # N = len(mol.positions) 
 
-    subprocess.call(["grep -A"+str(N+6)+" 'HIRSHFELD ANALYSIS' "+log_file+" > charge_1"], shell=True)
-    with open('charge_1','r') as fin:
+    a0,rd,pt = oc.LoadModel() 
+    data = oc.GetLogFile(log_file, pt, rd)
+    qcm5 = oc.HirshfeldToCM5(xyz_file, data, a0)
+    qcm5.to_csv('CM5_charges.csv',index=False,float_format='%6.4f')
+
+    with open('CM5_charges.csv', newline='') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
         with open('CM5_charges','w') as fout:
-            fin_lines = [line.split() for line in fin]
             fout.write('\n')
-            for i in fin_lines[7:]:
-                fout.write('{} {}\n'.format(i[1],i[2]))
-
-    subprocess.call(['rm charge_1'], shell=True)
+            for i in data[1:]:
+                fout.write('{} {}\n'.format(i[0],i[8]))
+                
     return
 
 def orca_opt_converged(log_file):
@@ -99,7 +107,7 @@ def orca_geom_opt(xyz_file, var):
                     charge=var.charge,
                     mult=M,
                     orcasimpleinput='Opt '+var.functional+' '+var.basis_set+' '+var.dispersion+' CPCM(Water)',
-                    orcablocks='%pal nprocs '+var.ncpu+' end % output Print[P_hirshfeld] 1 end',
+                    orcablocks='%pal nprocs '+str(var.ncpu)+' end % output Print[P_hirshfeld] 1 end',
                     )
 
     mol.get_potential_energy()
@@ -114,7 +122,7 @@ def orca_single_point(xyz_file, var):
                     charge=var.charge,
                     mult=M,
                     orcasimpleinput=var.functional+' '+var.basis_set+' '+var.dispersion+' CPCM(Water)',
-                    orcablocks='%pal nprocs '+var.ncpu+' end % output Print[P_hirshfeld] 1 end',
+                    orcablocks='%pal nprocs '+str(var.ncpu)+' end % output Print[P_hirshfeld] 1 end',
                     )
 
     mol.get_potential_energy()

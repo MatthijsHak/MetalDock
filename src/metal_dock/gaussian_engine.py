@@ -15,17 +15,15 @@ def gaussian_engine(xyz_file, var, output_dir):
         else:
             os.chdir('geom_opt')
 
-        subprocess.call([f'cp {output_dir}/file_prep/'+xyz_file+' .'], shell=True)
+        subprocess.call([f'cp '+xyz_file+' .'], shell=True)
 
         # If Geometry Converged Skip otherwise Run Again#
         if os.path.exists(f'{output_dir}/QM/geom_opt/geom_opt.chk') == False:
             gaussian_geom_opt(xyz_file, var)
             gaussian_opt_converged('geom_opt.log')
         
-        if gaussian_opt_converged('geom_opt.log') == True:
-            pass
-
-        extract_xyz(xyz_file)
+        else: 
+            gaussian_opt_converged('geom_opt.log') 
 
         ## Single Point ##
         os.chdir(f'{output_dir}/QM')
@@ -40,11 +38,11 @@ def gaussian_engine(xyz_file, var, output_dir):
 
         if os.path.exists(f'{output_dir}/QM/single_point/single_point.chk') == False:
             gaussian_sp('output.xyz', var)
-            extract_CM5('single_point.log', 'output.xyz')
+            gaussian_extract_CM5('single_point.log', 'output.xyz')
             energy = gaussian_extract_energy('single_point.log')
         
         if gaussian_sp_converged('single_point.log') == True:
-            extract_CM5('single_point.log', 'output.xyz')
+            gaussian_extract_CM5('single_point.log', 'output.xyz')
             energy = gaussian_extract_energy('single_point.log')
         
     else:
@@ -66,7 +64,7 @@ def gaussian_engine(xyz_file, var, output_dir):
             energy = gaussian_extract_energy('single_point.log')
         
         if gaussian_sp_converged('single_point.log') == True:
-            extract_CM5('single_point.log', 'output.xyz')
+            gaussian_extract_CM5('single_point.log', 'output.xyz')
             energy = gaussian_extract_energy('single_point.log')
 
     return os.getcwd(), energy       
@@ -76,8 +74,8 @@ def gaussian_engine(xyz_file, var, output_dir):
 def gaussian_extract_energy(log_file):
     with open(log_file,'r') as fin:
         for line in fin:
-            if line.startswith('SCF Done'):
-                energy = line.split()[3]
+            if line.startswith(' SCF Done:') == True:
+                energy = line.split()[4]
                 return energy
 
 
@@ -91,11 +89,11 @@ def gaussian_extract_CM5(log_file, xyz_file):
             fin_lines = [line.split() for line in fin]
 
             for i in fin_lines[2:]:
-                fout.write('{} {}\n'.format(i[1],i[6]))
+                fout.write('{} {}\n'.format(i[1],i[7]))
 
     subprocess.call(['rm charge_1'], shell=True)
+    
     return
-
             
 def gaussian_opt_converged(log_file):
      with open(log_file) as log:
@@ -116,14 +114,12 @@ def gaussian_sp_converged(log_file):
             return sys.exit()
 
 def gaussian_geom_opt(xyz_file, var):
-    n_procs = var.ncpu 
     M = 2 * var.spin + 1 
 
     mol = read(xyz_file)
-    # symbols = list(mol.symbols)
 
     s   = Gaussian(label='geom_opt',
-                    nprocshared=n_procs,
+                    nprocshared=var.ncpu ,
                     mem='4GB',
                     chk='geom_opt.chk',
                     xc=var.functional,
@@ -136,17 +132,16 @@ def gaussian_geom_opt(xyz_file, var):
 
     opt = GaussianOptimizer(mol, s)
     opt.run(fmax='tight')
-    opt.write('output.xyz')
+    mol.write('output.xyz')
     return 
 
 
 def gaussian_sp(xyz_file, var):
-    n_procs = var.ncpu
     M = 2 * var.spin + 1 
 
     mol = read(xyz_file)
     mol.calc = Gaussian(label='single_point',
-                        nprocshared=n_procs,
+                        nprocshared= var.ncpu,
                         mem='4GB',
                         chk='single_point.chk',
                         xc=var.functional,

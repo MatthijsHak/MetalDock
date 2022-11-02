@@ -32,7 +32,7 @@ standard_set = {'V' : [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.
                 'AU': [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0]
             }
 
-def docking(input_file, par, test_GA=False):
+def docking(input_file, par=None, test_GA=False):
     
     if test_GA == False:
         par = Parser(input_file)
@@ -40,7 +40,7 @@ def docking(input_file, par, test_GA=False):
         pass
 
     input_dir = os.getcwd()
-    output_dir = f'{input_dir}/output'
+    output_dir = input_dir+'/output'
 
     ###### Generate Output Dir #######
     if os.path.isdir('output') == False:
@@ -110,7 +110,7 @@ def docking(input_file, par, test_GA=False):
 
     if par.rmsd == True:
         if os.path.isfile('ref.xyz') == False:
-            subprocess.call([os.environ['OBABEL']+" -ixyz "+par.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz"], shell=True)
+            subprocess.call([os.environ['OBABEL']+" -ixyz "+par.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if par.dock_x and par.dock_y and par.dock_z != None:
         dock = d.users_coordinates(par.dock_x, par.dock_y, par.dock_z)
@@ -139,19 +139,17 @@ def docking(input_file, par, test_GA=False):
         parameter_set = standard_set.get(par.metal_symbol.upper())
         d.create_ligand_pdbqt_file(par.name_ligand)
         d.prepare_receptor(par.name_protein)
-        d.docking_func(parameter_set, par.parameter_file, par.metal_symbol, par.name_ligand, par.name_protein, energy, dock, box_size, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock)
+        d.docking_func(parameter_set, par.parameter_file, par.metal_symbol, par.name_ligand, par.name_protein, dock, box_size, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock, energy)
     else:
         d.create_ligand_pdbqt_file(par.name_ligand)
         d.prepare_receptor(par.name_protein)
-        d.docking_func(par.parameter_set, par.parameter_file, par.metal_symbol, par.name_ligand, par.name_protein, energy, dock, box_size, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock)
-
-    print(par.rmsd)
+        d.docking_func(par.parameter_set, par.parameter_file, par.metal_symbol, par.name_ligand, par.name_protein, dock, box_size, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock, energy)
 
     if par.rmsd == True:
         rmsd_list = []
         i = 1
         while os.path.exists(par.name_ligand+"_%i.pdbqt" % i):
-            subprocess.call([os.environ['OBABEL']+" -ipdbqt "+par.name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+par.name_ligand+"_{}.xyz".format(i)+" -d > "+par.name_ligand+"_{}.xyz".format(i)], shell=True)
+            subprocess.call([os.environ['OBABEL']+" -ipdbqt "+par.name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+par.name_ligand+"_{}.xyz".format(i)+" -d > "+par.name_ligand+"_{}.xyz".format(i)], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['ROOT_DIR']+'/metal_dock/calculate_rmsd.py ref.xyz '+par.name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
             rmsd = rmsd_non_rotate

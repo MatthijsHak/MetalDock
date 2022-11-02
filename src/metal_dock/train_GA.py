@@ -130,14 +130,10 @@ def fitness_func(solution, solution_idx):
                 npts = d.box_size_func('ref.xyz', par.metal_symbol, 0.375, box_size[-1])
 
         ##### AutoDock ##### 
-        e = open(f'{output_temp_dir}/energy','r')
-        lines = [line.split() for line in e]
-        energy = lines[0][4]
-
         dock = d.get_coordinates(f'{output_temp_dir}/ref.xyz',par.metal_symbol)
 
         subprocess.call([f'cp {input_dir}/'+par.parameter_file+' .'], shell=True)
-        d.docking_func(solution, par.parameter_file, par.metal_symbol, name_ligand, name_protein, energy, dock, npts, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock)
+        d.docking_func(solution, par.parameter_file, par.metal_symbol, name_ligand, name_protein, dock, npts, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock, energy=None)
 
         ##### Fitness function ######
         avg_list, min_list, output = d.rmsd_func(name_ligand, n_prot, gen, output_dir, num_gen=par.ga_num_generations, train=True)
@@ -284,12 +280,8 @@ def train_GA(input_file):
         os.mkdir(f'{output_dir}/last_gen')
 
     with open('parameter_history', 'a') as f:
-        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_"+par.metal_symbol+"_HD     e_"+par.metal_symbol+"_HD|    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
+        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_"+par.metal_symbol+"_HD     e_"+par.metal_symbol+"_HD |    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
 
-    # if os.path.isdir('data_set') == False:
-    #     # subprocess.call([f'mv {input_dir}/data_set .'], shell=True)
-    #     os.chdir('data_set')
-    # else:
     os.chdir(f'{input_dir}/data_set')
 
     # Make list of the protein numbers to iterate over
@@ -297,6 +289,16 @@ def train_GA(input_file):
     dir_list = [str(i).replace('protein_','') for i in dir_list]
     dir_list = [int(i) for i in dir_list if convertible(i)]
     dir_list = sorted(dir_list)
+
+    for n_prot in dir_list:
+        os.chdir(f'{input_dir}/data_set/protein_{n_prot}/output/docking')
+
+        if os.path.exists('CM5_charges') == False:
+            print('PLEASE FIRST DOCK ALL COMPOUNDS ONCE SO THAT THERE WILL BE NO ERRORS DURING THE TRAINING')
+        else:
+            pass
+        
+
 
     fitness_function = fitness_func
 
