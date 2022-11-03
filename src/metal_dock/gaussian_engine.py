@@ -1,6 +1,6 @@
-import os,sys, subprocess
+import os, sys, shutil, subprocess
 import multiprocessing
-
+import itertools
 
 from ase.io import read
 from ase.calculators.gaussian import Gaussian, GaussianOptimizer
@@ -15,7 +15,7 @@ def gaussian_engine(xyz_file, var, output_dir):
         else:
             os.chdir('geom_opt')
 
-        subprocess.call([f'cp '+xyz_file+' .'], shell=True)
+        shutil.copyfile(xyz_file, os.getcwd()+f'/{var.name_ligand}_c.xyz')
 
         # If Geometry Converged Skip otherwise Run Again#
         if os.path.exists(f'{output_dir}/QM/geom_opt/geom_opt.chk') == False:
@@ -34,7 +34,7 @@ def gaussian_engine(xyz_file, var, output_dir):
         else:
             os.chdir('single_point')
 
-        subprocess.call([f'cp {output_dir}/QM/geom_opt/output.xyz .'], shell=True)
+        shutil.copyfile(f'{output_dir}/QM/geom_opt/output.xyz', os.getcwd()+'/output.xyz')
 
         if os.path.exists(f'{output_dir}/QM/single_point/single_point.chk') == False:
             gaussian_sp('output.xyz', var)
@@ -55,7 +55,7 @@ def gaussian_engine(xyz_file, var, output_dir):
         else:
             os.chdir('single_point')
 
-        subprocess.call([f'cp {output_dir}/file_prep/'+xyz_file+' output.xyz'], shell=True)
+        shutil.copyfile(xyz_file, os.getcwd()+'/output.xyz')
         
         if os.path.exists(f'{output_dir}/QM/single_point/single_point.chk') == False:
             gaussian_sp('output.xyz', var)
@@ -83,16 +83,15 @@ def gaussian_extract_CM5(log_file, xyz_file):
     mol = read(xyz_file)
     N = len(mol.positions) 
 
-    subprocess.call(["grep -A"+str(N+1)+" 'Hirshfeld charges, spin densities, dipoles, and CM5 charges' "+log_file+" > charge_1"], shell=True)
-    with open('charge_1','r') as fin:
-        with open('CM5_charges','w') as fout:
-            fin_lines = [line.split() for line in fin]
+    with open(log_file) as log:
+        for line in log:
+            if ' Hirshfeld charges, spin densities, dipoles, and CM5 charges' in line:
+                fin_lines = list(itertools.islice(log, N+1))
+                fin_lines = [line.strip().split() for line in fin_lines]
+                with open('CM5_charges','w') as fout:
+                    for i in fin_lines[1:]:
+                        fout.write('{} {}\n'.format(i[1],i[7]))
 
-            for i in fin_lines[2:]:
-                fout.write('{} {}\n'.format(i[1],i[7]))
-
-    subprocess.call(['rm charge_1'], shell=True)
-    
     return
             
 def gaussian_opt_converged(log_file):

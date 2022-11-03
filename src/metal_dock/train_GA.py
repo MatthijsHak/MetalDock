@@ -10,12 +10,12 @@ import environment_variables
 
 import numpy as np
 import multiprocessing as mp 
-import prepare_dock as dx
+import prepare_dock as d
 import figures as fig
 
+from distutils.dir_util import copy_tree
 from scipy.stats import rankdata
 from multiprocessing import Pool
-from parser import Parser
 
 input_dir = os.getcwd()
 output_dir = f'{input_dir}/output'
@@ -95,14 +95,13 @@ def fitness_func(solution, solution_idx):
 
     tmp_dir_GA=os.getcwd()
 
-    # os.system("cp -r ../../protein_* .")
-
     for n_prot in dir_list:
         os.chdir(f'{tmp_dir}/'+dir_name)
         os.mkdir(f'protein_{n_prot}')
         os.chdir(f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}')
 
-        os.system(f"cp -r  ../../../../data_set/protein_{n_prot}/output/docking .")
+        copy_tree(f'../../../../data_set/protein_{n_prot}/output/docking', os.getcwd()+'/docking')
+        #os.system(f"cp -r  ../../../../data_set/protein_{n_prot}/output/docking .")
         os.chdir(f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}/docking')
         output_temp_dir=f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}/docking'
 
@@ -132,7 +131,7 @@ def fitness_func(solution, solution_idx):
         ##### AutoDock ##### 
         dock = d.get_coordinates(f'{output_temp_dir}/ref.xyz',par.metal_symbol)
 
-        subprocess.call([f'cp {input_dir}/'+par.parameter_file+' .'], shell=True)
+        shutil.copyfile(f'{input_dir}/{par.parameter_file}', os.getcwd()+f'/{var.par.parameter_file}')
         d.docking_func(solution, par.parameter_file, par.metal_symbol, name_ligand, name_protein, dock, npts, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock, energy=None)
 
         ##### Fitness function ######
@@ -141,8 +140,8 @@ def fitness_func(solution, solution_idx):
         population_avg_list.append(avg_list)
         population_min_avg_list.append(min_list)
 
-        subprocess.call([f'rm -r {tmp_dir}/'+dir_name+f'/protein_{n_prot}'], shell=True)
 
+        shutil.rmtree(f'{tmp_dir}/{dir_name}/protein_{n_prot}', ignore_errors=True) 
 
     '''Compare previous generations with each. If the average of the solutions between each two generations is below a certain threshold
     then the size of the box will be increased.
@@ -251,7 +250,7 @@ def train_GA(input_file):
     global even_list
     global uneven_list
 
-    par = Parser(input_file)
+    par = input_file
 
     # Global variables
     step = 0

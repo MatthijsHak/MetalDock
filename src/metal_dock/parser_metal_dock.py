@@ -5,15 +5,27 @@ import configparser
 """
 All parameters that can be specified for the following three options:
 
-(1) Docking with metal ligand
-(2) Training the GA for a speficic metal 
-(3) Testing the GA for a specific metal
+(1) dock 
+Will perform docking proecedure with organometallic compound 
+
+(2) train
+Will start the training GA procedure a speficic metal 
+
+(3) test
+Will start the testing procedure
+
+#### Default settings ####
+# Specify one of the three previously mentioned options
+method = string
 
 # Atom symbol of metal. 
 metal_symbol = string
 
 # Parameter file used for docking / GA run. 
 parameter_file = string 
+
+# Specify the number of cpus for the calculations
+ncpu = int
 
 # If True docking procedure with standard parameters.
 std = bool
@@ -176,9 +188,10 @@ mut_prob = float [0.0:1.0]
 
 """
 config = configparser.ConfigParser()
-config['DEFAULT'] = { "metal_symbol"            :            '',
+config['DEFAULT'] = { "method"                  :        'dock',
+                      "metal_symbol"            :            '',
                       "parameter_file"          :            '',
-                      "ncpu"                     :           '1'}
+                      "ncpu"                    :            '1'}
 
 config['PROTEIN'] = { "pdb_file"                :           '',
                       "pH"                      :        '7.4',
@@ -248,6 +261,7 @@ class Parser:
 
     # Convert to correct datatype if necessary
     # [DEFAULT] #
+    self.method                   = config['DEFAULT']['method']
     self.metal_symbol             = config['DEFAULT']['metal_symbol']
     self.parameter_file           = config['DEFAULT']['parameter_file']
     self.ncpu                     = int(config['DEFAULT']['ncpu'])

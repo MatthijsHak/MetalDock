@@ -1,4 +1,4 @@
-import os, sys, glob, subprocess
+import os, sys, shutil, glob, subprocess
 import random
 
 import numpy as np
@@ -24,28 +24,22 @@ def check_pdbqt(pdbqt_file):
         sys.exit()
 
 def create_ligand_pdbqt_file(name_ligand):
-    # Grep the correct part  of the itp file
-    subprocess.call(["awk '/@<TRIPOS>ATOM/{flag=1; next} /@<TRIPOS>BOND/{flag=0} flag' "+name_ligand+".mol2  > almost"], shell=True)
+    with open(f'{name_ligand}.mol2','r') as fin_1:
+        with open('CM5_charges','r') as fin_2:
+            cm = [line.strip().split() for line in fin_2]
+            cm = cm[1:]
+            with open('output.mol2', 'w') as fout:
+                atom_id = 0
+                for line in fin_1:
+                    if 'UNL1' not in line:
+                        fout.write(line)
+                    else:
+                        line = line.strip().split()
+                        line[8] = cm[atom_id][1]
+                        atom_id+=1
+                        fout.write(f'     {line[0]:>2} {line[1]:<2}         {line[2]:>7}   {line[3]:>7}   {line[4]:>7} {line[5]:<5}   {line[6]:>1}  {line[7]:>4}       {line[8]:>6}\n')
 
-    # Create charge file if CM5
-    subprocess.call(["awk '{if (NR!=1) {print}}' CM5_charges > new"], shell=True)
-    subprocess.call([r'''awk '{printf "%8s\n",$2}' new > new_charge'''], shell=True)
-
-    # Insert extra column
-    subprocess.call(["paste -d' 'test almost new_charge > there"], shell=True)
-
-    # Switch Columns
-    subprocess.call([r'''awk '{ printf "%7s %-3s %14s %9s %9s %-5s %3s %5s %12s \n",$1,$2,$3,$4,$5,$6,$7,$8,$10}' there > correct'''], shell=True)
-
-    # Delete previous stuff
-    subprocess.call(["sed -n '1,/@<TRIPOS>ATOM/p;/@<TRIPOS>BOND/,$p' "+name_ligand+".mol2 > ligand_almost"], shell=True)
-
-    # Insert in ligand_par.itp
-    subprocess.call(["sed '/@<TRIPOS>ATOM/ r correct' ligand_almost > "+name_ligand+".mol2"], shell=True)
-    subprocess.call(["rm new new_charge ligand_almost correct there almost"], shell=True)
-
-    subprocess.call([os.environ['OBABEL']+' -imol2 '+name_ligand+'.mol2 -opdbqt '+name_ligand+'.pdbqt  > '+name_ligand+'.pdbqt'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-
+    subprocess.call([os.environ['OBABEL']+' -imol2 output.mol2 -opdbqt '+name_ligand+'.pdbqt  > '+name_ligand+'.pdbqt'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     check_pdbqt(name_ligand+'.pdbqt')
     return
 
@@ -122,9 +116,26 @@ def prepare_receptor(name_protein):
 
 def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_protein, dock, box_size, num_poses, dock_algorithm, random_pos, ga_dock, sa_dock, energy=None):
     # Insert parameters for R and epsilon for H-bond
-    subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+'''") ($7 = '''+str(parameter_set[10])+''') && ($8 = '''+str(parameter_set[11])+'''); print $0}' '''+parameter_file+''' > file_1'''], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+parameter_file], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    subprocess.call(['rm file_1'], shell=True)
+    # subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+'''") ($7 = '''+str(parameter_set[10])+''') && ($8 = '''+str(parameter_set[11])+'''); print $0}' '''+parameter_file+''' > file_1'''], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    # subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+parameter_file], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    # subprocess.call(['rm file_1'], shell=True)
+    with open('ad4_parameters_HD.dat','r') as fin:
+        with open('ad4_parameters_HD_2.dat','w') as fout:
+            for line in fin:
+                if 'atom_par RU' in line:
+                    ins = line.strip().split()
+                    ins[6] = str(parameter_set[10])
+                    ins[7] = str(parameter_set[11])
+                    fout.write(f'{ins[0]} {ins[1]}     {ins[2]}    {ins[3]}  {ins[4]}  {ins[5]} {ins[6]} {ins[7]} {ins[8]} {ins[9]}  {ins[10]}  {ins[11]} \n')
+                elif 'atom_par Ru' in line:
+                    ins = line.strip().split()
+                    ins[6] = str(parameter_set[10])
+                    ins[7] = str(parameter_set[11])
+                    fout.write(f'{ins[0]} {ins[1]}     {ins[2]}    {ins[3]}  {ins[4]}  {ins[5]} {ins[6]} {ins[7]} {ins[8]} {ins[9]}  {ins[10]}  {ins[11]} \n')
+                else:
+                    fout.write(line)
+
+    shutil.move('ad4_parameters_HD_2.dat','ad4_parameters_HD.dat')
 
     #create_gpf():
     subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+parameter_file+" -p npts='{},{},{}'".format(box_size,box_size,box_size)+" -p gridcenter='{:.4},{:.4},{:.4}' ".format(dock[0],dock[1],dock[2])], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -227,10 +238,6 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, num_pose
         dpf_file.write('# Activate SA\n')
         dpf_file.write('simanneal '+str(num_poses)+'                         # run this many SA docking\n')
 
-    # dpf_file.write('# Perform Analysis\n')
-    # dpf_file.write('rmsref '+name_ligand+'.pdbqt              # RMSD will be calculated with this file\n')
-    # dpf_file.write('rmsmode atype                        # Method to calculate the RMSD\n')
-    # dpf_file.write('rmstol 2.0                           # RMSD tolerance\n')
     dpf_file.write('analysis                             # perforem a ranked cluster analysis\n')
     return
 

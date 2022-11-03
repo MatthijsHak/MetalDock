@@ -1,4 +1,4 @@
-import os,sys
+import os,sys, shutil
 import subprocess
 import math
 import environment_variables
@@ -9,9 +9,6 @@ import prepare_dock as d
 import adf_engine as adf 
 import gaussian_engine as g
 import orca_engine as orca
-
-from parser import Parser
-
 
              #         r_OA, e_OA, r_SA, e_SA, r_HD, e_HD, r_NA, e_NA,  r_N,  e_N, r_M_HD, e_M_HD
 standard_set = {'V' : [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0],
@@ -35,7 +32,7 @@ standard_set = {'V' : [ 2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.0,  2.0,  5.
 def docking(input_file, par=None, test_GA=False):
     
     if test_GA == False:
-        par = Parser(input_file)
+        par = input_file
     else:
         pass
 
@@ -65,10 +62,10 @@ def docking(input_file, par=None, test_GA=False):
         subprocess.call([os.environ['OBABEL']+' -ixyz '+par.name_ligand+'_c.xyz -osdf '+par.name_ligand+'.sdf  > '+par.name_ligand+'.sdf'],shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     ###### Create pdb files ###### 
-    os.system(f'cp {input_dir}/'+par.pdb_file+' .')
+    shutil.copyfile(f'{input_dir}/{par.pdb_file}', os.getcwd()+f'/{par.pdb_file}')
 
     if os.path.exists('clean_'+par.name_protein+'.pdb') == False:
-        os.system(f"cp  {input_dir}/"+par.name_protein+".pdb .")
+        shutil.copyfile(f'{input_dir}/{par.name_protein}.pdb',os.getcwd()+f'/{par.name_protein}.pdb')
         pdb.protonate_pdb(par.pdb_file, par.pH)
         pdb.clean_protein_pdb(par.name_protein, par.pdb_file, par.clean_pdb)
 
@@ -98,16 +95,13 @@ def docking(input_file, par=None, test_GA=False):
         os.chdir('docking')
     else:
         os.chdir('docking')
-
-    subprocess.call([f'cp {input_dir}/'+par.parameter_file+' .'], shell=True)
-
-    subprocess.call([f'cp {output_dir}/file_prep/clean_'+par.name_protein+'.pdb .'], shell=True)
-
-    subprocess.call([f'cp {output_dir}/file_prep/'+par.name_ligand+'.mol2 .'], shell=True)
-    subprocess.call([f'cp {qm_dir}/CM5_charges .'], shell=True)
-
-    subprocess.call([f'cp {output_dir}/file_prep/'+par.name_ligand+'_c.xyz .'], shell=True)
-
+    
+    shutil.copyfile(f'{input_dir}/{par.parameter_file}', os.getcwd()+f'/{par.parameter_file}')
+    shutil.copyfile(f'{output_dir}/file_prep/clean_{par.name_protein}.pdb', os.getcwd()+f'/clean_{par.name_protein}.pdb')
+    shutil.copyfile(f'{output_dir}/file_prep/{par.name_ligand}.mol2', os.getcwd()+f'/{par.name_ligand}.mol2')
+    shutil.copyfile(f'{qm_dir}/CM5_charges', os.getcwd()+'/CM5_charges')
+    shutil.copyfile(f'{output_dir}/file_prep/{par.name_ligand}_c.xyz', os.getcwd()+f'/{par.name_ligand}_c.xyz')
+    
     if par.rmsd == True:
         if os.path.isfile('ref.xyz') == False:
             subprocess.call([os.environ['OBABEL']+" -ixyz "+par.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -148,7 +142,7 @@ def docking(input_file, par=None, test_GA=False):
     if par.rmsd == True:
         rmsd_list = []
         i = 1
-        while os.path.exists(par.name_ligand+"_%i.pdbqt" % i):
+        while os.path.exists(f'{output_dir}/docking/{par.name_ligand}_{i}.pdbqt'):
             subprocess.call([os.environ['OBABEL']+" -ipdbqt "+par.name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+par.name_ligand+"_{}.xyz".format(i)+" -d > "+par.name_ligand+"_{}.xyz".format(i)], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['ROOT_DIR']+'/metal_dock/calculate_rmsd.py ref.xyz '+par.name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
@@ -170,8 +164,14 @@ def docking(input_file, par=None, test_GA=False):
     else:
         os.chdir('results')
 
-    subprocess.call([f'mv {output_dir}/docking/'+par.name_ligand+'_*.pdbqt .'], shell=True)
-    subprocess.call([f'mv {output_dir}/docking/clean_'+par.pdb_file+' .'], shell=True)
+    i = 1
+    while os.path.exists(f'{output_dir}/docking/{par.name_ligand}_{i}.pdbqt'):
+        shutil.move(f'{output_dir}/docking/{par.name_ligand}_{i}.pdbqt', os.getcwd()+f'/{par.name_ligand}_{i}.pdbqt')
+        if par.rmsd == True:
+            shutil.move(f'{output_dir}/docking/{par.name_ligand}_{i}.xyz', os.getcwd()+f'/{par.name_ligand}_{i}.xyz')
+        i += 1
+    
+    shutil.move(f'{output_dir}/docking/clean_{par.pdb_file}', os.getcwd()+f'/clean_{par.pdb_file}')
  
     print("\nDOCKING SUCCESFULLY COMPLETED")
     print("THE PRINTED POSES AND PROTEIN CAN BE FOUND IN THE RESULTS DIRECTORY")

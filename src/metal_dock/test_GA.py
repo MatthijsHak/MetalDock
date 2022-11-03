@@ -1,6 +1,6 @@
 import os, glob, subprocess
 
-from parser import Parser
+from distutils.dir_util import copy_tree
 from docking import docking
 
 
@@ -37,7 +37,8 @@ def test_GA(input_file):
         os.chdir('output')
 
     for n_prot in dir_list:
-        subprocess.call(['cp','-r', f'{input_dir}/data_set/protein_{n_prot}', os.getcwd()], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        
+        copy_tree(f'{input_dir}/data_set/protein_{n_prot}', os.getcwd()+f'/protein_{n_prot}')
         os.chdir(f'{output_dir}/protein_{n_prot}')
 
         # Obtain ligand and protein names

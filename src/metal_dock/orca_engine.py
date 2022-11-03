@@ -14,7 +14,7 @@ def orca_engine(xyz_file, var, output_dir):
         else:
             os.chdir('geom_opt')
 
-        subprocess.call([f'cp '+xyz_file+' .'], shell=True)
+        shutil.copyfile(xyz_file, os.getcwd()+f'/{var.name_ligand}_c.xyz')
 
         # If Geometry Converged Skip otherwise Run Again#
         if os.path.exists(f'{output_dir}/QM/geom_opt/geom.out') == False:
@@ -38,7 +38,7 @@ def orca_engine(xyz_file, var, output_dir):
         else:
             os.chdir('single_point')
 
-        subprocess.call([f'cp {output_dir}/file_prep/'+xyz_file+' .'], shell=True)
+        shutil.copyfile(xyz_file, os.getcwd()+f'/{var.name_ligand}_c.xyz')
 
         # If Geometry Converged Skip otherwise Run Again#
         if os.path.exists(f'{output_dir}/QM/single_point/single_point.out') == False:
