@@ -106,11 +106,11 @@ def fitness_func(solution, solution_idx):
         output_temp_dir=f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}/docking'
 
         # Obtain ligand and protein names
-        for files in glob.glob("*_1.pdbqt"):
-            file_list = files.split('_1.pdbqt')
+        for files in glob.glob("*_c.xyz"):
+            file_list = files.split('_c.xyz')
             name_ligand = file_list[0]
 
-        for files in glob.glob("clean_*.pdb"):
+        for files in glob.glob("clean_*.pdbqt"):
             file_list = files.split('clean_')
             file_list = file_list[1].split('.')
             name_protein = file_list[0]
@@ -130,8 +130,8 @@ def fitness_func(solution, solution_idx):
 
         ##### AutoDock ##### 
         dock = d.get_coordinates(f'{output_temp_dir}/ref.xyz',par.metal_symbol)
-
-        shutil.copyfile(f'{input_dir}/{par.parameter_file}', os.getcwd()+f'/{var.par.parameter_file}')
+        
+        shutil.copyfile(f'{input_dir}/{par.parameter_file}', os.getcwd()+f'/{par.parameter_file}')
         d.docking_func(solution, par.parameter_file, par.metal_symbol, name_ligand, name_protein, dock, npts, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock, energy=None)
 
         ##### Fitness function ######

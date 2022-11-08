@@ -18,10 +18,10 @@ def check_pdbqt(pdbqt_file):
         for line in fin:
             if 'MODEL' in line:
                 count+=1
-    if count > 1:
-        print('LIGAND CANNOT BE RECOGNIZED AS ONE MOLECULE')
-        print('REOPTIMIZE COMPOUND WITH DIFFERENT INITIAL SETTINGS OR DELETE NON-COVALENT LIGANDS\n')
-        sys.exit()
+        if count > 1:
+            print('LIGAND CANNOT BE RECOGNIZED AS ONE MOLECULE')
+            print('REOPTIMIZE COMPOUND WITH DIFFERENT INITIAL SETTINGS OR DELETE NON-COVALENT LIGANDS\n')
+    return
 
 def create_ligand_pdbqt_file(name_ligand):
     with open(f'{name_ligand}.mol2','r') as fin_1:
@@ -44,17 +44,15 @@ def create_ligand_pdbqt_file(name_ligand):
     return
 
 def get_coordinates(xyz_file, metal_symbol):
-    subprocess.call(['''awk '$1 == "'''+metal_symbol+r'''" { print $0 }' '''+xyz_file+''' > coordinates'''], shell=True)
-
-    dock_site = open('coordinates','r')
-    coord = [line.split() for line in dock_site]
-
-    dock_x = str(coord[0][1])
-    dock_y = str(coord[0][2])
-    dock_z = str(coord[0][3])
+    with open(xyz_file, 'r') as fin:
+        for line in fin:
+            if metal_symbol in line:
+                 coordinates = line.strip().split()
+                 dock_x = coordinates[1]
+                 dock_y = coordinates[2]
+                 dock_z = coordinates[3]
 
     dock = [dock_x, dock_y, dock_z]
-
     return dock
 
 def users_coordinates(dock_x, dock_y, dock_z):
@@ -115,11 +113,7 @@ def prepare_receptor(name_protein):
     return
 
 def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_protein, dock, box_size, num_poses, dock_algorithm, random_pos, ga_dock, sa_dock, energy=None):
-    # Insert parameters for R and epsilon for H-bond
-    # subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+'''") ($7 = '''+str(parameter_set[10])+''') && ($8 = '''+str(parameter_set[11])+'''); print $0}' '''+parameter_file+''' > file_1'''], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    # subprocess.call([r'''awk '{ if ($2 == "'''+metal_symbol.upper()+'''" || $2 == "'''+metal_symbol+r'''") printf"%-8s %-3s %7s %8s %8s %9s %4s %4s %2s %3s %3s %2s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12; else print $0}' file_1 > '''+parameter_file], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    # subprocess.call(['rm file_1'], shell=True)
-    with open('ad4_parameters_HD.dat','r') as fin:
+    with open(os.environ['ROOT_DIR']+'/ad4_parameters_HD.dat','r') as fin:
         with open('ad4_parameters_HD_2.dat','w') as fout:
             for line in fin:
                 if 'atom_par RU' in line:

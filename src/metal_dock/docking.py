@@ -106,6 +106,7 @@ def docking(input_file, par=None, test_GA=False):
         if os.path.isfile('ref.xyz') == False:
             subprocess.call([os.environ['OBABEL']+" -ixyz "+par.name_ligand+"_c.xyz -oxyz ref.xyz -d > ref.xyz"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+
     if par.dock_x and par.dock_y and par.dock_z != None:
         dock = d.users_coordinates(par.dock_x, par.dock_y, par.dock_z)
     else:

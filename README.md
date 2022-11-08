@@ -30,17 +30,24 @@ export AMSRESOURCES=$AMSHOME/atomicdata
 export SCMLICENSE=$AMSHOME/license.txt
 ```
 
+Relativistic effects with ZORA
+
 # 2) Gaussian
 To run Gaussian as QM engine the following environment variables need to be exported
 ``` bash
 export g16root=/full/path/to/gaussian/g16
 ```
 
+Relativistic effects with DKH
+
 # 3) ORCA (free)
 To run ORCA as QM engine with correct parralelization the full path to the orca binary has to be exported with the following command:
 ``` bash
 export ASE_ORCA_COMMAND='/full/path/to/orca/orca PREFIX.inp > PREFIX.out'
 ```
+
+Relativistic effects with ZORA
+
 ##
 The program will protonate the protein/DNA/biomolecule at the specified pH. It will then generate two .pdbqt files that will be used in the AutoDock4.2 scheme. The parameter file consisting of the added metal parameters will be automatically generated, and our own derived parameters will be used. If desired, the standard parameters can be overwritten.
 

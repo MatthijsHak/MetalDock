@@ -127,7 +127,8 @@ def gaussian_geom_opt(xyz_file, var):
                     basis=var.basis_set,
                     pop='Hirshfeld',
                     SCRF='Solvent=Water',
-                    EmpiricalDispersion=var.dispersion)
+                    EmpiricalDispersion=var.dispersion,
+                    integral='dkh')
 
     opt = GaussianOptimizer(mol, s)
     opt.run(fmax='tight')
@@ -149,7 +150,8 @@ def gaussian_sp(xyz_file, var):
                         basis=var.basis_set,
                         pop='Hirshfeld',
                         SCRF='Solvent=Water',
-                        scf='tight')
+                        scf='tight',
+                        integral='dkh')
 
     mol.get_potential_energy()
     return
