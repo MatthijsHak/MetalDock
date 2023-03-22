@@ -1,27 +1,33 @@
 
 # MetalDock 
 
-MetalDock is an open software tool that can dock organometallic compounds to proteins with parameters that have been obtained with a genetic algorithm. The library consists of open docking software (AutoDock) and open quantum software (ORCA) and can be used by anyone. Three options are available:
+MetalDock is an open software docking tool that can dock several organometallic compounds in an easy and reproducible manner to biomolecules, proteins or DNA.
 
-1) Dock organometallic compounds
-2) Train the genetic algorithm on a dataset
-3) Test the parameters obtained from the genetic algorithm
+## Citation
+
+Please cite the following paper if you decide to use MetalDock in any project:
 
 
 ## Installation
 
+To install MetalDock, follow these steps:
 
+1. Download the latest release from the MetalDock GitHub repository.
+2. Extract the files to a folder on your computer.
+3. Install the required dependencies by running 'pip install .' from the command line
+4. MetalDock is now ready to use and can run be run by typing:
+```python
+python main.py -i input.ini 
+```
 
+## Usage
+To dock organometallic compounds, the user only has to supply:
+1) xyz file of the compound. 
+2) pdb file of the protein/DNA/biomolecule.
+3) input file consisting of the various parameters (see input_examples directory).
 
-
-## Dock organometallic compounds
-MetalDock has as main function to dock organometallic compounds easily and reproducible. The user only has to supply:
-1) xyz file of the compound 
-2) pdb file of the protein/DNA/biomolecule 
-3) input file consisting of the various parameters (see example_files directory) 
-
-The program will use QM software to optimize the geometry, if specified, and will extract CM5 charges via a single point calculation. The script can run on three different QM software packages:
-# 1) ADF 
+MetalDock can run on three different quantum chemistry software packages:
+### 1) ADF 
 To run ADF as QM engine the following environment variables need to be exported:
 ``` bash
 export AMSHOME=/full/path/to/ams/ams2022
@@ -30,25 +36,25 @@ export AMSRESOURCES=$AMSHOME/atomicdata
 export SCMLICENSE=$AMSHOME/license.txt
 ```
 
-Relativistic effects with ZORA
+Relativistic effects with ZORA.
 
-# 2) Gaussian
-To run Gaussian as QM engine the following environment variables need to be exported
+### 2) Gaussian
+To run Gaussian as QM engine the following environment variables need to be exported.
 ``` bash
 export g16root=/full/path/to/gaussian/g16
 ```
 
-Relativistic effects with DKH
+Relativistic effects with DKH.
 
-# 3) ORCA (free)
+### 3) ORCA (free)
 To run ORCA as QM engine with correct parralelization the full path to the orca binary has to be exported with the following command:
 ``` bash
 export ASE_ORCA_COMMAND='/full/path/to/orca/orca PREFIX.inp > PREFIX.out'
 ```
 
-Relativistic effects with ZORA
+Relativistic effects can be selected with input.
 
-##
+## Docking workflow
 The program will protonate the protein/DNA/biomolecule at the specified pH. It will then generate two .pdbqt files that will be used in the AutoDock4.2 scheme. The parameter file consisting of the added metal parameters will be automatically generated, and our own derived parameters will be used. If desired, the standard parameters can be overwritten.
 
 A workflow for the docking procedure is schematically given below.
@@ -161,67 +167,4 @@ linkStyle default fill:none, font-family:palatino;
 ```
 
 
-## Training procedure genetic algorithm 
-The only requirements for an input are a xyz file of the compound, a pdb file of the protein and a input.ini file. 
-```mermaid
-
-graph TD;
-
-%% Nodes
-
-A([Start GA])
-
-B([Initialize Parameter Sets])
-
-C([Calculate Fitness Function])
-
-D([Select Best Parameter Set])
-
-E([Exchange of Parameters Between Best Sets])
-
-F([Randomly Change Some Parameters])
-
-G([New Parameter Sets Created])
-
-H{{Exceeded Number of Generations? <br> OR <br> Fitness Function > Limit}}
-
-I([Best Solution])
-
-  
-
-%% Links
-
-A --> B
-
-B --> C
-
-C --> D
-
-D --> E
-
-E --> F
-
-F --> G
-
-G --> H
-
-H -- NO --> C
-
-H -- YES --> I
-
-  
-
-%% Class Definitions
-
-classDef Class fill:#FFFFFF, stroke:#0045A9,stroke-width:2px, font-size:15px, font-family:palatino;
-
-%% Assign Class Style to Nodes
-
-class A,B,C,D,E,F,G,H,I Class;
-
-  
-
-%% Changing color of links [NOTE: Link arrows will remain black]
-
-linkStyle default fill:none, font-family:palatino;
-```
+## Monte Carlo optimisation scheme 
