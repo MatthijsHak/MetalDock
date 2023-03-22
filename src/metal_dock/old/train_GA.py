@@ -6,6 +6,7 @@ import pygad
 import uuid
 import shutil
 import random
+import math
 import environment_variables
 
 import numpy as np
@@ -16,6 +17,7 @@ import figures as fig
 from distutils.dir_util import copy_tree
 from scipy.stats import rankdata
 from multiprocessing import Pool
+from test_GA import test_GA
 
 input_dir = os.getcwd()
 output_dir = f'{input_dir}/output'
@@ -47,9 +49,7 @@ def mutation_func(offspring, ga_instance):
 
     rank_list = rankdata(ga_instance.last_generation_fitness)
 
-    offspring_length = par.sol_per_pop - par.keep_par
-
-    for i in range(0,offspring_length):
+    for i in range(0,len(offspring)):
         mutation_probability = mutation_probability_list[int(rank_list[i])-1]
 
         for chromosome_idx in range(0,len(ga_instance.gene_space)):
@@ -75,6 +75,7 @@ def mutation_func(offspring, ga_instance):
 
 def fitness_func(solution, solution_idx):
     global step
+    global step_box
     global gen
     global population_avg_list
     global population_min_avg_list
@@ -101,38 +102,54 @@ def fitness_func(solution, solution_idx):
         os.chdir(f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}')
 
         copy_tree(f'../../../../data_set/protein_{n_prot}/output/docking', os.getcwd()+'/docking')
-        #os.system(f"cp -r  ../../../../data_set/protein_{n_prot}/output/docking .")
         os.chdir(f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}/docking')
         output_temp_dir=f'{tmp_dir}/'+dir_name+f'/protein_{n_prot}/docking'
 
-        # Obtain ligand and protein names
+        # Obtain metal complex and protein names
         for files in glob.glob("*_c.xyz"):
             file_list = files.split('_c.xyz')
             name_ligand = file_list[0]
 
-        for files in glob.glob("clean_*.pdbqt"):
+        for files in glob.glob("clean_*.pdb"):
             file_list = files.split('clean_')
             file_list = file_list[1].split('.')
             name_protein = file_list[0]
-
-
-        if par.scale_factor > 0:
-            npts = d.box_size_func('ref.xyz', par.metal_symbol, 0.375, par.scale_factor)
-        
-        if par.box_size > 0: 
-            npts = [par.box_size, par.box_size, par.box_size]
         
         if par.step_wise == True:    
             try:
-                npts = d.box_size_func('ref.xyz', par.metal_symbol, 0.375, box_size[step])
+                box_size = d.box_size_func('ref.xyz', par.metal_symbol, 0.375, step_box[step])
             except IndexError:
-                npts = d.box_size_func('ref.xyz', par.metal_symbol, 0.375, box_size[-1])
+                box_size = d.box_size_func('ref.xyz', par.metal_symbol, 0.375, step_box[-1])
+
+        else:
+            if par.box_size != 0 and par.scale_factor == 0:
+                box_size = par.box_size * 2.66 # Convert Å to grid points
+            if int(box_size) == box_size:
+                box_size =  int(box_size)
+            else:
+                box_size = math.ceil(box_size)
+                print('SPACING BETWEEN GRID POINTS IS STANDARD SET TO 0.375 Å')
+                print('BOX SIZE MUST BE INTEGER GRID POINTS WHICH WAS NOT FOUND')
+                print('BOX SIZE SIDE ROUNDED UP AND SET TO {:.3f} Å\n'.format(box_size / 2.66))
+            if par.box_size == 0 and par.scale_factor != 0:
+                box_size = d.box_size_func(par.name_ligand+'_c.xyz', par.metal_symbol, 0.375, par.scale_factor)
+            if par.box_size != 0 and par.scale_factor != 0:
+                print("CANNOT SELECT BOXSIZE AND SCALE FACTOR - SET ONE VALUE TO 0")
+                sys.exit()
+            if par.box_size == 0 and par.scale_factor == 0:
+                print("CANNOT SELECT BOXSIZE AND SCALE FACTOR - SET ONE VALUE GREATER THAN 0")
+                sys.exit()
 
         ##### AutoDock ##### 
         dock = d.get_coordinates(f'{output_temp_dir}/ref.xyz',par.metal_symbol)
         
-        shutil.copyfile(f'{input_dir}/{par.parameter_file}', os.getcwd()+f'/{par.parameter_file}')
-        d.docking_func(solution, par.parameter_file, par.metal_symbol, name_ligand, name_protein, dock, npts, par.num_poses, par.dock_algorithm, par.random_pos, par.ga_dock, par.sa_dock, energy=None)
+        if par.parameter_file == 'ad4_parameters_HD.dat':
+            shutil.copyfile(os.environ['ROOT_DIR']+'/ad4_parameters_HD.dat', os.getcwd()+f'/ad4_parameters_HD.dat')
+            d.docking_func(par, solution, name_ligand, name_protein, dock, box_size, energy=None)
+
+        else:
+            shutil.copyfile(f'{input_dir}/{par.parameter_file}', os.getcwd()+f'/{par.parameter_file}')
+            d.docking_func(par, solution, name_ligand, name_protein, dock, box_size, energy=None)
 
         ##### Fitness function ######
         avg_list, min_list, output = d.rmsd_func(name_ligand, n_prot, gen, output_dir, num_gen=par.ga_num_generations, train=True)
@@ -242,7 +259,7 @@ def train_GA(input_file):
     global par
     global step
     global gen
-    global box_size
+    global step_box
 
     global dir_list
     global tmp_dir
@@ -278,8 +295,14 @@ def train_GA(input_file):
     else:
         os.mkdir(f'{output_dir}/last_gen')
 
+
+    # with open('parameter_history', 'a') as f:
+    #     f.write(f"All old solutions are           :         r_A         e_A         r_C         e_C        r_OA        e_OA        r_SA        e_SA        r_HD        e_HD         r_N         e_N      r_{par.metal_symbol}_H      e_{par.metal_symbol}_H |    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
+
+
     with open('parameter_history', 'a') as f:
-        f.write("All old solutions are           :     r_OA        e_OA        r_SA        e_SA        r_HD        e_HD        r_NA        e_NA        r_N         e_N         r_"+par.metal_symbol+"_HD     e_"+par.metal_symbol+"_HD |    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
+        f.write(f"All old solutions are           :         e_OA        e_SA        e_HD         e_N      r_{par.metal_symbol}_H      e_{par.metal_symbol}_H |    fitness    RMSD_AVG   RMSD_MIN_AVG\n")
+
 
     os.chdir(f'{input_dir}/data_set')
 
@@ -297,12 +320,10 @@ def train_GA(input_file):
         else:
             pass
         
-
-
     fitness_function = fitness_func
 
     # Scale factor list
-    box_size = np.arange(1.3, 3.1, 0.1)
+    step_box = np.arange(1.3, 3.1, 0.1)
 
     num_generations = par.ga_num_generations
     num_parents_mating = par.ga_num_mating
@@ -310,13 +331,14 @@ def train_GA(input_file):
     initial_population = None
 
     sol_per_pop = par.sol_per_pop
-    num_genes = 12
-    gene_space=[{'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25},
-                {'low': 1, 'high': 3},{'low': 0, 'high': 25}]
+    num_genes = 5
+    gene_space=[{'low': 0, 'high': 6},{'low': 0, 'high': 6},
+                {'low': 0, 'high': 6},{'low': 0, 'high': 6},
+                {'low': 0, 'high': 6}]
+                # {'low': 1, 'high': 3},{'low': 0, 'high': 6}]
+                # {'low': 1, 'high': 3},{'low': 0, 'high': 6},
+                # {'low': 1, 'high': 3},{'low': 0, 'high': 6},
+                # {'low': 1, 'high': 3},{'low': 0, 'high': 6}]
 
     parent_selection_type = par.par_type
     keep_parents = par.keep_par
@@ -376,12 +398,14 @@ def train_GA(input_file):
     fig.plot_each_protein(dir_list, output_dir)
     fig.plot_total_conformations(output_dir)
     fig.plot_parameters(par.metal_symbol, output_dir)
-
     print("TRAINING GA COMPLETED")
 
-    # parameter_set = [ 2.30177, 0.21898, 1.28486, 16.28000, 1.00407, 5.22678, 1.83437, 23.93663, 1.55722, 8.68594, 1.49070, 11.85050]
 
-    # parameter_set = opt.gradient_descent(tmp_dir, dir_list, par, parameter_set, learning_rate=0.5, n_iter=50)
+    os.chdir(input_dir)
 
-    # print('FINAL PARAMETER SET IS: {}'.format(parameter_set))
+    if par.train_and_test == True:
+        os.chdir('../test')
+        par.parameter_set = solution
+        test_GA(par)
+
     return 

@@ -5,7 +5,6 @@ Input: Log File from Orca Calculation
 Output: CSV file with coordinates, raw CM5 charges, rdkit atomic FP averaged CM5 charges
 Written by: Leela S. Dodda (Jorgensen Group@Yale)
 Adjusted by: Matthijs Hakkennes (Leiden Univeristy)
-Email Id: leela.dodda@yale.edu
 '''
 import os, subprocess
 import pandas as pd

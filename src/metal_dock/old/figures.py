@@ -149,6 +149,12 @@ def plot_parameters(metal, output_dir):
     fitness = []
     rmsd_min = []
 
+    r_A = []
+    e_A = []
+
+    r_C = []
+    e_C = []
+
     r_OA = []
     e_OA = []
 
@@ -158,81 +164,88 @@ def plot_parameters(metal, output_dir):
     r_HD = []
     e_HD = []
 
-    r_NA = []
-    e_NA = []
-
     r_N = []
     e_N = []
 
-    r_M = []
-    e_M = []
+    r_M_H = []
+    e_M_H = []
     
 
     for i in range(1,len(data_set_line)):
-        r_OA.append(float(data_set_line[i][4]))
-        e_OA.append(float(data_set_line[i][5]))
+        r_A.append(float(data_set_line[i][4]))
+        e_A.append(float(data_set_line[i][5]))
         
-        r_SA.append(float(data_set_line[i][6]))
-        e_SA.append(float(data_set_line[i][7]))
+        r_C.append(float(data_set_line[i][6]))
+        e_C.append(float(data_set_line[i][7]))
         
-        r_HD.append(float(data_set_line[i][8]))
-        e_HD.append(float(data_set_line[i][9]))
+        r_OA.append(float(data_set_line[i][8]))
+        e_OA.append(float(data_set_line[i][9]))
         
-        r_NA.append(float(data_set_line[i][10]))
-        e_NA.append(float(data_set_line[i][11]))
+        r_SA.append(float(data_set_line[i][10]))
+        e_SA.append(float(data_set_line[i][11]))
         
-        r_N.append(float(data_set_line[i][12]))
-        e_N.append(float(data_set_line[i][13]))
+        r_HD.append(float(data_set_line[i][12]))
+        e_HD.append(float(data_set_line[i][13]))
         
-        r_M.append(float(data_set_line[i][14]))
-        e_M.append(float(data_set_line[i][15]))
+        r_N.append(float(data_set_line[i][14]))
+        e_N.append(float(data_set_line[i][15]))
+
+        r_M_H.append(float(data_set_line[i][16]))
+        e_M_H.append(float(data_set_line[i][17]))
         
-        fitness.append(float(data_set_line[i][17]))
-        rmsd_min.append(float(data_set_line[i][19]))
+        fitness.append(float(data_set_line[i][19]))
+        rmsd_min.append(float(data_set_line[i][20]))
 
-    x_axis = range(0,len(r_OA))
+    x_axis = range(0,len(r_A))
 
-    fig, ax = plt.subplots(6,2, figsize=(15,15), sharex=True)
+    fig, ax = plt.subplots(7,2, figsize=(15,15), sharex=True)
 
-    ax[0][0].plot(x_axis,r_OA, c='b')
-    ax[0][1].plot(x_axis,e_OA, c='b')
+    ax[0][0].plot(x_axis,r_A, c='b')
+    ax[0][1].plot(x_axis,e_A, c='b')
 
-    ax[1][0].plot(x_axis,r_SA, c='b')
-    ax[1][1].plot(x_axis,e_SA, c='b')
+    ax[1][0].plot(x_axis,r_C, c='b')
+    ax[1][1].plot(x_axis,e_C, c='b')
 
-    ax[2][0].plot(x_axis,r_HD, c='b')
-    ax[2][1].plot(x_axis,e_HD, c='b')
+    ax[2][0].plot(x_axis,r_OA, c='b')
+    ax[2][1].plot(x_axis,e_OA, c='b')
 
-    ax[3][0].plot(x_axis,r_NA, c='b')
-    ax[3][1].plot(x_axis,e_NA, c='b')
+    ax[3][0].plot(x_axis,r_SA, c='b')
+    ax[3][1].plot(x_axis,e_SA, c='b')
 
-    ax[4][0].plot(x_axis,r_N, c='b')
-    ax[4][1].plot(x_axis,e_N, c='b')
+    ax[4][0].plot(x_axis,r_HD, c='b')
+    ax[4][1].plot(x_axis,e_HD, c='b')
 
-    ax[5][0].plot(x_axis,r_M, c='b')
-    ax[5][1].plot(x_axis,e_M, c='b')
+    ax[5][0].plot(x_axis,r_N, c='b')
+    ax[5][1].plot(x_axis,e_N, c='b')
+
+    ax[6][0].plot(x_axis,r_M_H, c='b')
+    ax[6][1].plot(x_axis,e_M_H, c='b')
+
 
     #########################################################
-    ax[0][0].set_ylabel('r {}-OA (Å)'.format(metal))
-    ax[0][1].set_ylabel('$\epsilon$ {}-OA (kcal/mol)'.format(metal))
+    ax[0][0].set_ylabel(f'r {metal}-A (Å)')
+    ax[0][1].set_ylabel(f'$\epsilon$ {metal}-A (kcal/mol)')
 
-    ax[1][0].set_ylabel('r {}-SA (Å)'.format(metal))
-    ax[1][1].set_ylabel('$\epsilon$ {}-SA (kcal/mol)'.format(metal))
+    ax[1][0].set_ylabel(f'r {metal}-C (Å)')
+    ax[1][1].set_ylabel(f'$\epsilon$ {metal}-C (kcal/mol)')
 
-    ax[2][0].set_ylabel('r {}-HD (Å)'.format(metal))
-    ax[2][1].set_ylabel('$\epsilon$ {}-HD (kcal/mol)'.format(metal))
+    ax[2][0].set_ylabel(f'r {metal}-OA (Å)')
+    ax[2][1].set_ylabel(f'$\epsilon$ {metal}-OA (kcal/mol)')
 
-    ax[3][0].set_ylabel('r {}-NA (Å)'.format(metal))
-    ax[3][1].set_ylabel('$\epsilon$ {}-NA (kcal/mol)'.format(metal))
+    ax[3][0].set_ylabel(f'r {metal}-SA (Å)')
+    ax[3][1].set_ylabel(f'$\epsilon$ {metal}-SA (kcal/mol)')
 
-    ax[4][0].set_ylabel('r {}-N (Å)'.format(metal))
-    ax[4][1].set_ylabel('$\epsilon$ {}-N (kcal/mol)'.format(metal))
+    ax[4][0].set_ylabel(f'r {metal}-HD (Å)')
+    ax[4][1].set_ylabel(f'$\epsilon$ {metal}-HD (kcal/mol)')
         
-    ax[5][0].set_ylabel('r {}-H-bond (Å)'.format(metal,metal))
-    ax[5][1].set_ylabel('$\epsilon$ {}-H-bond (kcal/mol)'.format(metal,metal))
+    ax[5][0].set_ylabel(f'r {metal}-N (Å)')
+    ax[5][1].set_ylabel(f'$\epsilon$ {metal}-N (kcal/mol)')
 
-    ax[5][0].set_xlabel('N parents')
-    ax[5][1].set_xlabel('N parents')
+    ax[6][0].set_ylabel(f'r {metal}-H (Å)')
+    ax[6][1].set_ylabel(f'$\epsilon$ {metal}-H (kcal/mol)')
+
+    ax[6][0].set_xlabel('N parents')
+    ax[6][1].set_xlabel('N parents')
 
     plt.tight_layout()
     plt.savefig('parameters.png', bbox_inches='tight')

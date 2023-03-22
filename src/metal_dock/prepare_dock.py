@@ -1,9 +1,48 @@
-import os, sys, shutil, glob, subprocess
 import random
+import math
+import os, sys, shutil, glob, subprocess
 
+import itertools as it
 import numpy as np
-from random import seed
+import networkx as nx
+from networkx.algorithms.components.connected import connected_components
 
+from collections import defaultdict 
+from random import seed
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit import RDLogger
+
+# Dictionary of all elements matched with their atomic masses.
+mass_dict = {'H' : 1.008,'HE' : 4.003, 'LI' : 6.941, 'BE' : 9.012,\
+            'B' : 10.811, 'C' : 12.011, 'N' : 14.007, 'O' : 15.999,\
+            'F' : 18.998, 'NE' : 20.180, 'NA' : 22.990, 'MG' : 24.305,\
+            'AL' : 26.982, 'SI' : 28.086, 'P' : 30.974, 'S' : 32.066,\
+            'CL' : 35.453, 'AR' : 39.948, 'K' : 39.098, 'CA' : 40.078,\
+            'SC' : 44.956, 'TI' : 47.867, 'V' : 50.942, 'CR' : 51.996,\
+            'MN' : 54.938, 'FE' : 55.845, 'CO' : 58.933, 'NI' : 58.693,\
+            'CU' : 63.546, 'ZN' : 65.38, 'GA' : 69.723, 'GE' : 72.631,\
+            'AS' : 74.922, 'SE' : 78.971, 'BR' : 79.904, 'KR' : 84.798,\
+            'RB' : 84.468, 'SR' : 87.62, 'Y' : 88.906, 'ZR' : 91.224,\
+            'NB' : 92.906, 'MO' : 95.95, 'TC' : 98.907, 'RU' : 101.07,\
+            'RH' : 102.906, 'PD' : 106.42, 'AG' : 107.868, 'CD' : 112.414,\
+            'IN' : 114.818, 'SN' : 118.711, 'SB' : 121.760, 'TE' : 126.7,\
+            'I' : 126.904, 'XE' : 131.294, 'CS' : 132.905, 'BA' : 137.328,\
+            'LA' : 138.905, 'CE' : 140.116, 'PR' : 140.908, 'ND' : 144.243,\
+            'PM' : 144.913, 'SM' : 150.36, 'EU' : 151.964, 'GD' : 157.25,\
+            'TB' : 158.925, 'DY': 162.500, 'HO' : 164.930, 'ER' : 167.259,\
+            'TM' : 168.934, 'YB' : 173.055, 'LU' : 174.967, 'HF' : 178.49,\
+            'TA' : 180.948, 'W' : 183.84, 'RE' : 186.207, 'OS' : 190.23,\
+            'IR' : 192.217, 'PT' : 195.085, 'AU' : 196.967, 'HG' : 200.592,\
+            'TL' : 204.383, 'PB' : 207.2, 'BI' : 208.980, 'PO' : 208.982,\
+            'AT' : 209.987, 'RN' : 222.081, 'FR' : 223.020, 'RA' : 226.025,\
+            'AC' : 227.028, 'TH' : 232.038, 'PA' : 231.036, 'U' : 238.029,\
+            'NP' : 237, 'PU' : 244, 'AM' : 243, 'CM' : 247, 'BK' : 247,\
+            'CT' : 251, 'ES' : 252, 'FM' : 257, 'MD' : 258, 'NO' : 259,\
+            'LR' : 262, 'RF' : 261, 'DB' : 262, 'SG' : 266, 'BH' : 264,\
+            'HS' : 269, 'MT' : 268, 'DS' : 271, 'RG' : 272, 'CN' : 285,\
+            'NH' : 284, 'FL' : 289, 'MC' : 288, 'LV' : 292, 'TS' : 294,\
+            'OG' : 294}
 
 def is_float(string):
     try:
@@ -12,18 +51,173 @@ def is_float(string):
     except ValueError:
         return False
 
-def check_pdbqt(pdbqt_file):
-    count = 0
-    with open(pdbqt_file) as fin:
-        for line in fin:
-            if 'MODEL' in line:
-                count+=1
-        if count > 1:
-            print('LIGAND CANNOT BE RECOGNIZED AS ONE MOLECULE')
-            print('REOPTIMIZE COMPOUND WITH DIFFERENT INITIAL SETTINGS OR DELETE NON-COVALENT LIGANDS\n')
-    return
+def center_of_mass(ligand):
+    sum_mass = np.sum(ligand,axis=0)[3]
 
-def create_ligand_pdbqt_file(name_ligand):
+    centre = [sum([ligand[i][j]*ligand[i][3] for i in range(len(ligand))])  for j in range(3)]
+    centre /= sum_mass
+    return centre
+
+def distance(a,b):
+    d = np.sqrt( (a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2  )
+
+    return d
+
+def sphere_distance(r, a, b):
+    dot = np.dot(a,b)
+    cosine = dot / r**2 
+    cosine_radian = cosine * (math.pi/180)
+    d = r * np.arccos(cosine_radian)
+
+    return d
+
+def angle(a,b,c):
+    a = np.array(a)
+    b = np.array(b)
+    c = np.array(c)
+    ba = a - b
+    bc = c - b
+
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle = np.arccos(cosine_angle)
+    angle = np.degrees(angle)
+
+    return angle
+
+def flatten(l):
+    return [item for sublist in l for item in sublist]
+
+def readXYZ(xyz_file, no_hydrogen=True):
+    with open(xyz_file, 'r') as fin:
+        xyz = [line.strip().split() for line in fin]
+        xyz = xyz[2:]
+
+        if no_hydrogen == True:
+            coord = [[i[0], float(i[1]), float(i[2]), float(i[3])] for i in xyz if 'H' not in i]
+        else:
+            coord = [[float(i[1]), float(i[2]), float(i[3])] for i in xyz]
+      
+        return coord
+
+def pdbqtToMol2(name_ligand):
+    subprocess.call([os.environ['OBABEL']+f' -ipdbqt {name_ligand}.pdbqt -omol2 {name_ligand}.mol2 > {name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    lg = RDLogger.logger()
+    lg.setLevel(RDLogger.CRITICAL)
+    return Chem.MolFromMol2File(f'{name_ligand}.mol2',sanitize=False)
+
+def pdbqt_to_nx(mol2):
+    G = nx.Graph()
+
+    for atom in mol2.GetAtoms():
+        G.add_node(atom.GetIdx(),
+                   atomic_num=atom.GetAtomicNum(),
+                   is_aromatic=atom.GetIsAromatic(),
+                   atom_symbol=atom.GetSymbol())
+
+    for bond in mol2.GetBonds():
+        G.add_edge(bond.GetBeginAtomIdx(),
+                   bond.GetEndAtomIdx(),
+                   bond_type=bond.GetBondType())
+
+    return G
+
+def asCartesian(rthetaphi):
+    #takes list rthetaphi (single coord) in radians
+    r       = rthetaphi[0]
+    theta   = rthetaphi[1]
+    phi     = rthetaphi[2]
+    x = r * np.sin(theta) * np.cos(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(theta)
+    return [x,y,z]
+
+def asSpherical(xyz):
+    #takes list xyz (single coord) to radians
+    x       = xyz[0]
+    y       = xyz[1]
+    z       = xyz[2]
+    r       =  np.sqrt(x*x + y*y + z*z)
+    theta   =  np.arccos(z/r)
+    phi     =  np.arctan2(y,x)
+    return [r,theta,phi]
+
+def return_idx_max_list(list):
+    maxi = 0
+    row = 0 
+    for idx, x in enumerate(list):
+        sum = 0
+        for y in x:
+            sum+= np.sum(y)    
+        if sum > maxi:
+            maxi = sum
+            row = idx
+
+    return row
+
+def maximum_distance_sphere(n_ligands, atom_pos, metal_pos, radius=0.75):
+    # set metal at origin
+    atom_pos = [coord - metal_pos for coord in atom_pos]
+    # get r and scale each ligand to unit sphere 
+    new_atom_pos = [asSpherical(coord) for coord in atom_pos[1:]]
+    r_pos = [new_atom_pos[coord][0] for coord in range(len(new_atom_pos))]
+    scale_r = [radius / r_pos[coord] for coord in range(len(new_atom_pos))]
+
+    for i in range(len(new_atom_pos)):
+        new_atom_pos[i][0] = new_atom_pos[i][0] * scale_r[i]
+
+    # return to Cartesian 
+    new_atom_pos = [asCartesian(coord) for coord in new_atom_pos]
+
+    pos_hydrogen = []
+    dist_list = []
+    new_xyz = []
+    # generate equidistant points on sphere
+    n_points = 10000
+
+    alpha = (4 * np.pi * radius **2) / n_points
+    d = np.sqrt(alpha)
+    m_nu = int(np.round(np.pi/d))
+    d_nu = np.pi/m_nu
+    d_phi = alpha/d_nu
+    
+    for m in range (0,m_nu):
+        nu = np.pi*(m+0.5)/m_nu
+        m_phi = int(np.round(( 2 * np.pi *np.sin(nu))  / d_phi ))
+        for n in range (0,m_phi):
+            phi = 2*np.pi*n/m_phi
+            x = radius*np.sin(nu)*np.cos(phi)
+            y = radius*np.sin(nu)*np.sin(phi)
+            z = radius*np.cos(nu)
+            
+            new_xyz = [x,y,z]
+
+            sphere_dist = [sphere_distance(radius, atom, new_xyz)  for atom in new_atom_pos]
+            euclid_dist = [distance(atom, new_xyz) for atom in new_atom_pos]
+
+            dist = sphere_dist + euclid_dist
+            dist_list.append(dist)
+
+            pos_hydrogen.append([new_xyz[0],new_xyz[1],new_xyz[2]])
+
+    # return row where distance is maximum
+    row = return_idx_max_list(dist_list)
+    # translate back to original coordinates
+    new_pos_hydrogen = pos_hydrogen[row] + metal_pos
+    return [new_pos_hydrogen[0], new_pos_hydrogen[1], new_pos_hydrogen[2]]
+
+
+def delete_hydrogen(pdbqt_file):
+    with open(pdbqt_file,'r') as fin:
+        with open('output.pdbqt','w') as fout:
+            for line in fin:
+                if 'DD' in line:
+                    pass
+                else:
+                    fout.write(line)
+    shutil.move('output.pdbqt', pdbqt_file)
+    return 
+                
+def create_ligand_pdbqt_file(par, name_ligand):
     with open(f'{name_ligand}.mol2','r') as fin_1:
         with open('CM5_charges','r') as fin_2:
             cm = [line.strip().split() for line in fin_2]
@@ -31,27 +225,263 @@ def create_ligand_pdbqt_file(name_ligand):
             with open('output.mol2', 'w') as fout:
                 atom_id = 0
                 for line in fin_1:
-                    if 'UNL1' not in line:
+                    if len(line.strip().split()) < 7:
                         fout.write(line)
                     else:
                         line = line.strip().split()
                         line[8] = cm[atom_id][1]
                         atom_id+=1
-                        fout.write(f'     {line[0]:>2} {line[1]:<2}         {line[2]:>7}   {line[3]:>7}   {line[4]:>7} {line[5]:<5}   {line[6]:>1}  {line[7]:>4}       {line[8]:>6}\n')
+                        fout.write(f'     {line[0]:>2} {line[1]:<2}        {line[2]:>7}   {line[3]:>7}  {line[4]:>8} {line[5]:<5}   {line[6]:>1}  {line[7]:>4}       {line[8]:>6}\n')
 
     subprocess.call([os.environ['OBABEL']+' -imol2 output.mol2 -opdbqt '+name_ligand+'.pdbqt  > '+name_ligand+'.pdbqt'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    check_pdbqt(name_ligand+'.pdbqt')
+    n_mdl = 0 
+    with open(f'{name_ligand}.pdbqt','r') as fin:
+        for line in fin:
+            if 'MODEL' in line:
+                n_mdl+=1
+    
+    if n_mdl == 1:
+        one_model_file(par, name_ligand, f'{name_ligand}_c.xyz', f'{name_ligand}.pdbqt')
+    else:
+        multiple_model_file(par, name_ligand, f'{name_ligand}_c.xyz', f'{name_ligand}.pdbqt')
     return
 
+def one_model_file(par, name_ligand, xyz_file, pdbqt_file):
+    with open(pdbqt_file, 'r') as fin:
+        new_lines = [line.strip().split() for line in fin]
+
+    new_lines = [s for s in new_lines if "REMARK" not in s]
+
+    for item in new_lines:
+        try:
+            if item[2] == par.metal_symbol.upper():
+                metal_atom = item[1]
+        except IndexError:
+            pass
+
+    new_pdbqt = []
+    for line in new_lines:
+        if 'MODEL' in line:
+            pass
+        elif 'ENDMDL' in line:
+            pass
+        else:
+            new_pdbqt.append(line)
+
+    if par.vacant_site == True:
+        pos_hydrogen = find_pos_dummy(par, f'{name_ligand}_c.xyz', f'{name_ligand}.pdbqt',f'{name_ligand}')
+        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom, pos_hydrogen)
+    else:
+        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom)
+        
+    return
+
+def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
+    with open(pdbqt_file, 'r') as fin:
+        new_lines = [line.strip().split() for line in fin]
+
+    mdl = 1
+    atom = 0
+    mol_id = 0
+    torsdof = 0
+
+    new_pdbqt = []
+
+    mol = globals()
+
+    new_lines = [s for s in new_lines if "REMARK" not in s]
+    
+    for item in new_lines:
+        try:
+            if item[2] == par.metal_symbol.upper():
+                metal_atom = item[1]
+                metal_mdl = mdl 
+        except IndexError:
+            pass
+
+        if 'MODEL' in item:
+            mol[f'mol_{mdl}'] = []
+            mol_id+=1
+
+        if 'ENDMDL' not in item:
+            mol[f'mol_{mdl}'].append(item)
+        else:
+            mol[f'mol_{mdl}'].append(item)
+            mdl+=1
+
+    # first insert the part that contains the metal
+    for line in mol[f'mol_{metal_mdl}']:
+        if 'TORSDOF' in line:
+            torsdof+=int(line[1])
+        elif 'ATOM' in line:
+            atom+=1
+            new_pdbqt.append(line)
+        elif 'MODEL' in line:
+            pass
+        elif 'ENDMDL' in line:
+            pass
+        else:
+            new_pdbqt.append(line)
+
+    iter_over = list(range(mol_id))
+    iter_over.remove(metal_mdl-1)
+
+    for lig in iter_over:
+        branch = False
+        for line in mol[f'mol_{lig+1}']:
+            if 'ATOM' in line and line[2] != 'H':
+                branch_id = atom+int(line[1])
+                break
+
+        for line in mol[f'mol_{lig+1}']:
+            if 'TORSDOF' in line:
+                torsdof+=int(line[1])
+            elif 'MODEL' in line:
+                pass
+            elif 'ROOT' in line:
+                pass
+            elif 'ATOM' in line:
+                atom+=1
+                if branch == False:
+                    new_pdbqt.append(['BRANCH',f'{metal_atom}',f'{branch_id}'])
+                    branch = True 
+                new_pdbqt.append(line)
+                
+        new_pdbqt.append(['ENDBRANCH',f'{metal_atom}',f'{branch_id}'])
+    new_pdbqt.append(['TORSDOF', str(torsdof)])
+
+    if par.vacant_site == True:
+        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom)
+        pos_hydrogen = find_pos_dummy(par, f'{name_ligand}_c.xyz', f'{name_ligand}.pdbqt',f'{name_ligand}')
+        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom, pos_hydrogen)
+    else:
+        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom)
+
+    return
+
+def write_pdbqt(par, xyz_file, lines, metal_atom, pos_hydrogen=None):
+    n_atoms = 1
+    hydrogen_added = False
+    with open(f'{par.name_ligand}.pdbqt', 'w') as fout:
+        fout.write('ROOT\n')
+        for line in lines:
+            if pos_hydrogen != None and n_atoms == int(metal_atom)+1:
+                fout.write(f'ATOM     {n_atoms:>2}  H   LIG A   1     {pos_hydrogen[0]:>7.3f} {pos_hydrogen[1]:>7.3f} {pos_hydrogen[2]:>7.3f}  0.00  0.00     0.000 DD\n')
+                n_atoms+=1
+                hydrogen_added = True
+
+            if 'MODEL' in line:
+                pass
+
+            elif 'REMARK' in line:
+                pass
+            
+            elif 'ENDROOT' in line:
+                fout.write(f'ENDROOT\n')
+
+            elif 'ATOM' in line:
+                if len(line) < 13: 
+                    fout.write(f'{line[0]}     {n_atoms:>2} {line[2]:>2}   LIG A   1     {line[5]:>7} {line[6]:>7} {line[7]:>7}  {line[8]:>4}  {line[9]:>4}    {line[10]:>6} {line[11]:<2}\n')
+                    n_atoms+=1
+                else:
+                    fout.write(f'{line[0]}     {n_atoms:>2} {line[2]:>2}   LIG A   1     {line[6]:>7} {line[7]:>7} {line[8]:>7}  {line[9]:>4}  {line[10]:>4}    {line[11]:>6} {line[12]:<2}\n')
+                    n_atoms+=1
+
+            elif 'BRANCH' in line:
+                if hydrogen_added == True:
+                    if int(line[1]) > int(metal_atom):
+                        line[1] = int(line[1])+1
+                    if int(line[2]) > int(metal_atom):
+                        line[2] = int(line[2])+1
+                fout.write(f'{line[0]}   {line[1]}  {line[2]}\n')
+
+            elif 'ENDBRANCH' in line:
+                if hydrogen_added == True:
+                    if int(line[1]) > int(metal_atom):
+                        line[1] = int(line[1])+1
+                    if int(line[2]) > int(metal_atom):
+                        line[2] = int(line[2])+1
+                fout.write(f'{line[0]}   {line[1]}  {line[2]}\n')
+
+            elif 'TORSDOF' in line:
+                fout.write(f'{line[0]} {line[1]}\n')
+    return
+ 
+def merge_common(lists): 
+    neigh = defaultdict(set) 
+    visited = set() 
+    for each in lists: 
+        for item in each: 
+            neigh[item].update(each) 
+    def comp(node, neigh = neigh, visited = visited, vis = visited.add): 
+        nodes = set([node]) 
+        next_node = nodes.pop 
+        while nodes: 
+            node = next_node() 
+            vis(node) 
+            nodes |= neigh[node] - visited 
+            yield node 
+    for node in neigh: 
+        if node not in visited: 
+            yield sorted(comp(node))
+
+def find_pos_dummy(par, xyz_file, pdbqt_file, name_ligand):
+    mol2 = pdbqtToMol2(name_ligand)
+    G = pdbqt_to_nx(mol2)
+
+    #get positions of the atoms from the pdbqt:
+    coord = mol2.GetConformer(0).GetPositions()
+
+    for k,v in G.nodes(data=True):
+        if v['atom_symbol'].upper() == par.metal_symbol.upper():
+            metal = k
+
+    metal_pos = coord[metal]
+    neighbor_list = sorted(list(G.neighbors(metal)))
+    G.remove_node(metal)
+
+    # Calculate atoms that belong to each ligand
+    ligand_list = []
+    dict_ligands = {}
+    for n in neighbor_list:
+        n_list = list(G.neighbors(n))
+        n_list.append(n)
+        ligand_list.append(sorted(n_list))
+
+    ligand_list = list(merge_common(ligand_list))
+    n_ligands = len(ligand_list)
+    atom_pos = []
+    atom_pos.append(metal_pos)
+    G = pdbqt_to_nx(mol2)
+    # Calculate centre of mass of ligands 
+    for idx in range(n_ligands):
+        mass = []
+        for v in ligand_list[idx]:
+            if v in neighbor_list: # ensure that the 
+                xyz = list(coord[v])
+                xyz.append(mass_dict[nx.get_node_attributes(G,'atom_symbol')[v].upper()])
+                mass.append(xyz)
+
+        atom_pos.append(center_of_mass((mass)))
+
+    new_pos_hydrogen = maximum_distance_sphere(n_ligands, atom_pos, metal_pos)
+    return new_pos_hydrogen
+
 def get_coordinates(xyz_file, metal_symbol):
+    dock_x = None
+    
     with open(xyz_file, 'r') as fin:
+        for _ in range(2):
+            next(fin)
         for line in fin:
             if metal_symbol in line:
                  coordinates = line.strip().split()
                  dock_x = coordinates[1]
                  dock_y = coordinates[2]
                  dock_z = coordinates[3]
-
+        if dock_x == None:
+            raise ValueError('metal symbol not found in xyz file')
+            
     dock = [dock_x, dock_y, dock_z]
     return dock
 
@@ -104,54 +534,47 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     z_npts = (round(z_dist / spacing)) & (-2)
 
     max_side = max([x_npts,y_npts,z_npts])
-    #print('Box size is {} {} {}'.format(max_side,max_side,max_side))
 
     return max_side
 
 def prepare_receptor(name_protein):
-    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -A check_hydrogens -r clean_'+name_protein+'.pdb'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -U nphs -A None -r clean_'+name_protein+'.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
-def docking_func(parameter_set, parameter_file, metal_symbol, name_ligand, name_protein, dock, box_size, num_poses, dock_algorithm, random_pos, ga_dock, sa_dock, energy=None):
-    with open(os.environ['ROOT_DIR']+'/ad4_parameters_HD.dat','r') as fin:
-        with open('ad4_parameters_HD_2.dat','w') as fout:
-            for line in fin:
-                if 'atom_par RU' in line:
-                    ins = line.strip().split()
-                    ins[6] = str(parameter_set[10])
-                    ins[7] = str(parameter_set[11])
-                    fout.write(f'{ins[0]} {ins[1]}     {ins[2]}    {ins[3]}  {ins[4]}  {ins[5]} {ins[6]} {ins[7]} {ins[8]} {ins[9]}  {ins[10]}  {ins[11]} \n')
-                elif 'atom_par Ru' in line:
-                    ins = line.strip().split()
-                    ins[6] = str(parameter_set[10])
-                    ins[7] = str(parameter_set[11])
-                    fout.write(f'{ins[0]} {ins[1]}     {ins[2]}    {ins[3]}  {ins[4]}  {ins[5]} {ins[6]} {ins[7]} {ins[8]} {ins[9]}  {ins[10]}  {ins[11]} \n')
-                else:
-                    fout.write(line)
-
-    shutil.move('ad4_parameters_HD_2.dat','ad4_parameters_HD.dat')
-
+def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, energy=None):
     #create_gpf():
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+parameter_file+" -p npts='{},{},{}'".format(box_size,box_size,box_size)+" -p gridcenter='{:.4},{:.4},{:.4}' ".format(dock[0],dock[1],dock[2])], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+par.parameter_file+" -p npts='{},{},{}'".format(box_size,box_size,box_size)+" -p gridcenter='{:.4},{:.4},{:.4}' ".format(dock[0],dock[1],dock[2])], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     gpf = open('clean_'+name_protein+'.gpf', 'a')
-    gpf.write('nbp_r_eps {:>.4f}  {:>.4f}'.format(parameter_set[0],parameter_set[1])+'    12 6 OA '+metal_symbol+'\n')
-    gpf.write('nbp_r_eps {:>.4f}  {:>.4f}'.format(parameter_set[2],parameter_set[3])+'    12 6 SA '+metal_symbol+'\n')
-    gpf.write('nbp_r_eps {:>.4f}  {:>.4f}'.format(parameter_set[4],parameter_set[5])+'    12 6 HD '+metal_symbol+'\n')
-    gpf.write('nbp_r_eps {:>.4f}  {:>.4f}'.format(parameter_set[6],parameter_set[7])+'    12 6 NA '+metal_symbol+'\n')
-    gpf.write('nbp_r_eps {:>.4f}  {:>.4f}'.format(parameter_set[8],parameter_set[9])+'    12 6  N '+metal_symbol+'\n')
+    gpf.write(f'nbp_r_eps 0.25 23.2135   12 6  NA TZ\n')
+    gpf.write(f'nbp_r_eps 2.10  3.8453   12 6  OA Zn\n')
+    gpf.write(f'nbp_r_eps 2.25  7.5914   12 6  SA Zn\n')
+    gpf.write(f'nbp_r_eps 1.00  0.0000   12 6  HD Zn\n')
+    gpf.write(f'nbp_r_eps 2.00  0.0060   12 6  NA Zn\n')
+    gpf.write(f'nbp_r_eps 2.00  0.2966   12 6  N  Zn\n')
+    gpf.write(f'nbp_r_eps 2.20  {parameter_set[0]:>.4f}   12 10 NA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 2.25  {parameter_set[1]:>.4f}   12 10 OA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 2.30  {parameter_set[2]:>.4f}   12 10 SA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 1.00  {parameter_set[3]:>.4f}   12 6  HD {par.metal_symbol}\n')
+    # gpf.write(f'nbp_r_eps 2.20  {parameter_set[4]:>.4f}   12 6  N  {par.metal_symbol}\n')
     gpf.close()
 
     #autogrid()
-    subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    if par.method.lower() == 'train' or par.method.lower() == 'mc':
+        subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    else:
+        subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True)
 
     #create_dpf()
-    write_dpf_file('clean_'+name_protein+'.gpf', name_ligand, 'clean_'+name_protein, parameter_file, num_poses, dock_algorithm, random_pos=random_pos, SA=sa_dock, GA=ga_dock, energy_ligand=energy)
+    write_dpf_file('clean_'+name_protein+'.gpf', name_ligand, 'clean_'+name_protein, par.parameter_file, par.num_poses, par.dock_algorithm, random_pos=par.random_pos, SA=par.sa_dock, GA=par.ga_dock, energy_ligand=energy)
 
     #autodock()
-    subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    if par.method.lower() == 'train' or par.method.lower() == 'mc':
+        subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    else:
+        subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True)
 
     #write_all_conformations()
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+name_ligand+"_clean_"+name_protein+".dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+name_ligand+"_clean_"+name_protein+".dlg"], shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     return
 
@@ -235,8 +658,7 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, num_pose
     dpf_file.write('analysis                             # perforem a ranked cluster analysis\n')
     return
 
-
-def rmsd_func(name_ligand, n_prot, generation, directory, num_gen=None, train=False, standard=False, test=False):
+def rmsd_func(name_ligand, n_prot, directory, generation=None, num_gen=None, train=False, standard=False, test=False):
     rmsd_avg = []
     rmsd_list = []
     avg_list = []
@@ -251,14 +673,16 @@ def rmsd_func(name_ligand, n_prot, generation, directory, num_gen=None, train=Fa
         output = [f"-------------------------------------------     PROTEIN {n_prot}      --------------------------------------------\n"]
 
     i = 1
-    while os.path.exists(name_ligand+"_%i.pdbqt" % i):
-        subprocess.call(os.environ['OBABEL']+" -ipdbqt "+name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+name_ligand+"_{}.xyz".format(i)+" -d > "+name_ligand+"_{}.xyz".format(i), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
+    while os.path.exists(f'{directory}/docking/{name_ligand}_{i}.pdbqt'):
+        d.delete_hydrogen(f'{output_dir}/docking/{par.name_ligand}_{i}.pdbqt')
+        subprocess.call([os.environ['OBABEL']+" -ipdbqt "+name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+name_ligand+"_{}.xyz".format(i)+" -d > "+name_ligand+"_{}.xyz".format(i)], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['ROOT_DIR']+'/metal_dock/calculate_rmsd.py ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' --reorder --rotation none --translation none']))
+        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['ROOT_DIR']+'/metal_dock/calculate_rmsd.py ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
         rmsd = rmsd_non_rotate
 
-        rmsd_print_list.append("RMSD for Conformation %i = %.4f\n"% (i, rmsd))
         rmsd_list.append(rmsd)
+
+        rmsd_list.append("RMSD for Conformation %i = %.4f"% (i, rmsd))
         i += 1
     
 
@@ -312,13 +736,6 @@ def rmsd_func(name_ligand, n_prot, generation, directory, num_gen=None, train=Fa
 
     return avg_list, min_list, print(''.join(output))
 
-
-# def distance(x1,x2,y1,y2,z1,z2):
-
-#     d = np.sqrt( (x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2  )
-#     d = format(d, '.4f')
-
-#     return str(d)
 
 # # Translation Matrix - Translation is switched from column to row because we work with (1,4) coordinate matrix
 # def translation_matrix(matrix,dx,dy,dz):
@@ -377,80 +794,3 @@ def rmsd_func(name_ligand, n_prot, generation, directory, num_gen=None, train=Fa
 #     new_arr = np.delete(new_extra_dim_arr, (3), 1)
 
 #     return new_arr
-
-# def randomize_translation_rotation(pdbqt_file):
-#     os.system('''awk '{if ($1 == "ATOM") print $0}' '''+pdbqt_file+''' > temp_1''')
-
-#     dock_site = open('temp_1','r')
-#     coord = [line.split() for line in dock_site]
-
-#     for i in range(0,len(coord)):
-#         del coord[i][0:6]
-#         del coord[i][3:7]
-
-#     coord_float = [[float(j) for j in i] for i in coord]
-#     coord_array = np.array(coord_float)
-
-#     # Random Coordinates
-#     random.seed()
-
-#     theta = random.uniform(0, 2*np.pi) # rotation angle
-
-#     box_size = list(iv.var.box_size.split(','))
-#     box_size = [float(x) for x in box_size]
-#     box_size = [(x*0.375) / 2 for x in box_size]
-
-#     dx = random.uniform(-box_size[0], box_size[0]) # translation x-direction
-#     dy = random.uniform(-box_size[1], box_size[1]) # translation y-direction
-#     dz = random.uniform(-box_size[2], box_size[2]) # translation z-direction
-
-#     random_coord = translation_matrix(coord_array,dx,dy,dz)
-#     random_coord = x_axis_rotation(random_coord,theta)
-#     random_coord = y_axis_rotation(random_coord,theta)
-#     random_coord = z_axis_rotation(random_coord,theta)
-
-#     output_array = [["%.3f" % j for j in i] for i in random_coord]
-#     output_array = [[str(j) for j in i] for i in output_array]
-
-#     output = open('output_test','w')
-
-#     for elem in output_array:
-#         output.write('\t'.join(elem))
-#         output.write('\n')
-
-#     output.close()
-
-#     os.system("paste -d' 'temp_1 temp_1 output_test> temp_2")
-#     os.system(r'''awk '{ printf "%-4s %6s %2s %5s %1s %3s %11s %7s %7s %5s %5s %9s %-3s\n",$1,$2,$3,$4,$5,$6,$14,$15,$16,$10,$11,$12,$13}' temp_2 > temp_3''')
-
-#     new_file = open('temp_3','r')
-#     new_file_coord = [line.split() for line in new_file]
-
-#     old_file = open(''+pdbqt_file+'','r')
-#     old_file_coord = [line.split() for line in old_file]
-
-#     new_pdbqt = []
-#     k = 0
-
-#     for i in range(0,len(old_file_coord)):
-#         for j in range(0,len(new_file_coord)):
-#             if old_file_coord[i][0] == new_file_coord[j][0]:
-#                 new_pdbqt.append(new_file_coord[k])
-#                 k+=1
-#                 break
-#             else:
-#                 new_pdbqt.append(old_file_coord[i])
-#                 break
-
-#     new_output = open('new_output_test','w')
-
-#     for elem in new_pdbqt:
-#         new_output.write('\t'.join(elem))
-#         new_output.write('\n')
-
-#     new_output.close()
-#     os.system(r'''awk '{ printf "%-4s %5s %4s %4s %1s %3s %11s %7s %7s %5s %5s %9s %-3s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13}' new_output_test > '''+iv.var.name_ligand+'''.pdbqt''')
-
-#     os.system("rm temp_1 temp_2 temp_3 output_test new_output_test")
-
-

@@ -131,11 +131,20 @@ def adf_sp(xyz_file, var):
     s.input.adf.basis.type=''+var.basis_set.upper()+''
     s.input.adf.basis.core='None'
 
+    if var.functional_type.lower() == 'lda':
+        s.input.adf.xc.lda=''+var.functional.upper()+''
+
+    if var.functional_type.lower() == 'metagga':
+        s.input.adf.xc.metagga=''+var.functional.upper()+''
+
     if var.functional_type.lower() == 'gga':
         s.input.adf.xc.gga=''+var.functional.upper()+''
 
     if var.functional_type.lower() == 'hybrid':
         s.input.adf.xc.hybrid=''+var.functional.upper()+''
+
+    if var.functional_type.lower() == 'metahybrid':
+        s.input.adf.xc.metahybrid=''+var.functional.upper()+''
 
     if var.dispersion != None:
         s.input.adf.xc.dispersion=''+var.dispersion.upper()+''
@@ -147,10 +156,13 @@ def adf_sp(xyz_file, var):
     s.input.adf.relativity.formalism='ZORA'
     s.input.adf.relativity.level='Scalar'
 
-    s.input.adf.Solvation.Solv = "Name=Water"
+    if var.solvent != '':
+        s.input.adf.Solvation.Solv = f"Name={var.solvent}"
 
     #Run Job
     j = scm.AMSJob(molecule=m, settings=s)
     result = j.run()
 
     scm.finish()
+
+    

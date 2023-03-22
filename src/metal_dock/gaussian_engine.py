@@ -100,7 +100,7 @@ def gaussian_opt_converged(log_file):
             print('GEOMETRY CONVERGED')
             return True
         else:
-            print('GEOMETRY NOT CONVERGED - DELETE .chk AND RERUN')
+            print('GEOMETRY NOT CONVERGED - DELETE .chk, .com & .log FILES TO RERUN')
             return sys.exit()
 
 def gaussian_sp_converged(log_file):
@@ -109,7 +109,7 @@ def gaussian_sp_converged(log_file):
             print('\nSINGLE POINT SUCCESSFULLY PERFORMED\n')
             return True
         else:
-            print('\nSINGLE POINT NOT SUCCESSFUL\n')
+            print('\nSINGLE POINT NOT SUCCESSFUL - DELETE .chk, .com & .log FILES TO RERUN\n')
             return sys.exit()
 
 def gaussian_geom_opt(xyz_file, var):
@@ -117,18 +117,31 @@ def gaussian_geom_opt(xyz_file, var):
 
     mol = read(xyz_file)
 
-    s   = Gaussian(label='geom_opt',
-                    nprocshared=var.ncpu ,
-                    mem='4GB',
-                    chk='geom_opt.chk',
-                    xc=var.functional,
-                    charge=var.charge,
-                    mult=M,
-                    basis=var.basis_set,
-                    pop='Hirshfeld',
-                    SCRF='Solvent=Water',
-                    EmpiricalDispersion=var.dispersion,
-                    integral='dkh')
+    if var.solvent == '':
+        s   = Gaussian(label='geom_opt',
+                        nprocshared=var.ncpu ,
+                        mem='4GB',
+                        chk='geom_opt.chk',
+                        xc=var.functional,
+                        charge=var.charge,
+                        mult=M,
+                        basis=var.basis_set,
+                        pop='Hirshfeld',
+                        EmpiricalDispersion=var.dispersion,
+                        integral='dkh')
+    else:
+        s   = Gaussian(label='geom_opt',
+                nprocshared=var.ncpu ,
+                mem='4GB',
+                chk='geom_opt.chk',
+                xc=var.functional,
+                charge=var.charge,
+                mult=M,
+                basis=var.basis_set,
+                pop='Hirshfeld',
+                SCRF=f'PCM, solvent={var.solvent}',
+                EmpiricalDispersion=var.dispersion,
+                integral='dkh')
 
     opt = GaussianOptimizer(mol, s)
     opt.run(fmax='tight')
@@ -140,18 +153,31 @@ def gaussian_sp(xyz_file, var):
     M = 2 * var.spin + 1 
 
     mol = read(xyz_file)
-    mol.calc = Gaussian(label='single_point',
-                        nprocshared= var.ncpu,
-                        mem='4GB',
-                        chk='single_point.chk',
-                        xc=var.functional,
-                        charge=var.charge,
-                        mult=M,
-                        basis=var.basis_set,
-                        pop='Hirshfeld',
-                        SCRF='Solvent=Water',
-                        scf='tight',
-                        integral='dkh')
+    if var.solvent == '':
+        mol.calc = Gaussian(label='single_point',
+                            nprocshared= var.ncpu,
+                            mem='4GB',
+                            chk='single_point.chk',
+                            xc=var.functional,
+                            charge=var.charge,
+                            mult=M,
+                            basis=var.basis_set,
+                            pop='Hirshfeld',
+                            scf='tight',
+                            integral='dkh')
+    else:
+        mol.calc = Gaussian(label='single_point',
+                    nprocshared= var.ncpu,
+                    mem='4GB',
+                    chk='single_point.chk',
+                    xc=var.functional,
+                    charge=var.charge,
+                    mult=M,
+                    basis=var.basis_set,
+                    pop='Hirshfeld',
+                    SCRF=f'PCM, solvent={var.solvent}',
+                    scf='tight',
+                    integral='dkh')
 
     mol.get_potential_energy()
     return

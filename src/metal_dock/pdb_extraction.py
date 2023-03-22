@@ -2,7 +2,7 @@ import os,sys, shutil
 import subprocess
 
 def protonate_pdb(pdb_file, pH):
-    subprocess.call(os.environ['PDB2PQR']+' --pdb-output pdb_prot.pdb --pH '+str(pH)+' --drop-water '+pdb_file+' pdb_prot.pdb', shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.call(os.environ['PDB2PQR']+f' --noopt --pdb-output pdb_prot.pdb --with-ph {str(pH)} --drop-water {pdb_file} pdb_prot.pdb', shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return
 
 # Get clean.pdb
@@ -14,5 +14,7 @@ def clean_protein_pdb(name_protein, pdb_file, clean_pdb=True):
                 for line in fin:
                     if 'HETATM'  not in line:
                         fout.write(line)
+    else:
+        shutil.move('pdb_prot.pdb', f'clean_{pdb_file}')
 
     return
