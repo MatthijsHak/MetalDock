@@ -38,8 +38,8 @@ def dock_pool(n_prot, par, parameter_set, input_dir, tmp_dir):
     ##### AutoDock ##### 
     dock = d.get_coordinates(f'{output_temp_dir}/ref.xyz',par.metal_symbol)
     
-    if par.parameter_file == 'ad4_parameters_HD.dat':
-        shutil.copyfile(os.environ['ROOT_DIR']+'/ad4_parameters_HD.dat', os.getcwd()+f'/ad4_parameters_HD.dat')
+    if par.parameter_file == 'metal_dock.dat':
+        shutil.copyfile(os.environ['ROOT_DIR']+'/metal_dock.dat', os.getcwd()+f'/metal_dock.dat')
         d.docking_func(par, parameter_set, name_ligand, name_protein, dock, par.box_size, energy=None)
 
     ##### Fitness function ######
@@ -65,8 +65,8 @@ def dock_pool(n_prot, par, parameter_set, input_dir, tmp_dir):
 
 
 def calculate_rmsd(par, parameter_set, input_dir, tmp_dir, dir_list):
-    global parameter_average
-    parameter_average = []
+    # global parameter_average
+    # parameter_average = []
 
     with Pool(processes=len(dir_list)) as pool:
         rmsd_avg_list = pool.starmap(dock_pool, zip(dir_list, repeat(par), repeat(parameter_set), repeat(input_dir), repeat(tmp_dir)))

@@ -100,7 +100,7 @@ def gaussian_opt_converged(log_file):
             print('GEOMETRY CONVERGED')
             return True
         else:
-            print('GEOMETRY NOT CONVERGED - DELETE .chk, .com & .log FILES TO RERUN')
+            print('GEOMETRY NOT CONVERGED\n CHECK .log FILE IN QM DIRECTORY\nDELETE .chk, .com & .log FILES TO RERUN\n')
             return sys.exit()
 
 def gaussian_sp_converged(log_file):
@@ -109,7 +109,7 @@ def gaussian_sp_converged(log_file):
             print('\nSINGLE POINT SUCCESSFULLY PERFORMED\n')
             return True
         else:
-            print('\nSINGLE POINT NOT SUCCESSFUL - DELETE .chk, .com & .log FILES TO RERUN\n')
+            print('\nSINGLE POINT NOT SUCCESSFUL\nCHECK .log FILE IN QM DIRECTORY\nDELETE .chk, .com & .log FILES TO RERUN\n')
             return sys.exit()
 
 def gaussian_geom_opt(xyz_file, var):

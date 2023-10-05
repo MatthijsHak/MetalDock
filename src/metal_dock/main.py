@@ -4,8 +4,6 @@ import argparse
 
 from parser_metal_dock import Parser
 from docking import docking
-# from train_GA import train_GA
-# from test_GA import test_GA
 
 from monte_carlo import optimize_MC
 
@@ -20,17 +18,11 @@ def main():
     if par.method.lower() == 'dock':
         docking(par)
         
-    # elif par.method.lower() == 'train':
-    #     train_GA(par)
-
-    # elif par.method.lower() == 'test':
-    #     test_GA(par)
-
     elif par.method.lower() == 'mc':
         optimize_MC(par)
 
     else:
-        print("SPECIFY ONE OF THE THREE OPTIONS FOR MetalDock")
+        print("SPECIFY ONE OF THE TWO OPTIONS FOR MetalDock")
         print("(1) dock")
         print("(2) MC")
 

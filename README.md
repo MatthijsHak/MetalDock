@@ -1,7 +1,7 @@
 
 # MetalDock 
 
-MetalDock is an open software docking tool that can dock several organometallic compounds in an easy and reproducible manner to biomolecules, proteins or DNA.
+MetalDock is an open software docking tool that can dock organometallic compounds for various transition metals in an easy and reproducible manner to biomolecules, proteins or DNA.
 
 ## Citation
 
@@ -15,7 +15,7 @@ To install MetalDock, follow these steps:
 1. Download the latest release from the MetalDock GitHub repository.
 2. Extract the files to a folder on your computer.
 3. Install the required dependencies by running 'pip install .' from the command line
-4. MetalDock is now ready to use and can run be run by typing:
+4. MetalDock is now ready to use and can be run by typing:
 ```python
 python main.py -i input.ini 
 ```

@@ -26,12 +26,7 @@ standard_set = {'V' : [ 4.696,	6.825,	5.658,	3.984],
                 'PT': [ 6.532,	2.020,	6.332,	1.844],
             }
 
-def docking(input_file, par=None):#, test_GA=False):
-    
-    # if test_GA == False:
-    #     par = input_file
-    # else:
-    #     pass
+def docking(input_file, par=None):
 
     par = input_file
 
@@ -65,7 +60,7 @@ def docking(input_file, par=None):#, test_GA=False):
 
     if os.path.exists(f'clean_{par.name_protein}.pdb') == False:
         shutil.copyfile(f'{input_dir}/{par.name_protein}.pdb',os.getcwd()+f'/{par.name_protein}.pdb')
-        pdb.protonate_pdb(par.pdb_file, par.pH)
+        pdb.protonate_pdb(par.pdb_file, par.pH, par.clean_pdb)
         pdb.clean_protein_pdb(par.name_protein, par.pdb_file, par.clean_pdb)
 
     ###### Quantum Calculations ######
@@ -95,8 +90,8 @@ def docking(input_file, par=None):#, test_GA=False):
     else:
         os.chdir('docking')
     
-    if par.parameter_file == 'ad4_parameters_HD.dat':
-        shutil.copyfile(os.environ['ROOT_DIR']+'/ad4_parameters_HD.dat', os.getcwd()+f'/ad4_parameters_HD.dat')
+    if par.parameter_file == 'metal_dock.dat':
+        shutil.copyfile(os.environ['ROOT_DIR']+'/metal_dock.dat', os.getcwd()+f'/metal_dock.dat')
     else:
         shutil.copyfile(f'{input_dir}/{par.parameter_file}', os.getcwd()+f'/{par.parameter_file}')
 

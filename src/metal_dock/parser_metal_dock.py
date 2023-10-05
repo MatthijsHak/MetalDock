@@ -1,11 +1,14 @@
-import sys
+import sys, os
+import re
 import configparser
+
+from docking import standard_set 
 
 
 config = configparser.ConfigParser(interpolation=None)
 config['DEFAULT']       =   { "method"                  :       'dock',
                               "metal_symbol"            :           '',
-                              "parameter_file"          :           '',
+                              "parameter_file"          :'metal_dock.dat',
                               "ncpu"                    :           '1'}
 
 config['PROTEIN']       =   { "pdb_file"                :           '',
@@ -44,7 +47,7 @@ config['DOCKING']       =   { "standard"                :        'True',
                               "e_OA"                    :         '5.0',
                               "e_SA"                    :         '5.0',
                               "e_HD"                    :         '5.0',
-                              "ga_dock"                 :        'True',
+                              "ga_dock"                 :       'False',
                               "ga_dock_pop_size"        :         '150',
                               "ga_dock_num_evals"       :     '2500000',
                               "ga_dock_num_generations" :       '27000',
@@ -69,8 +72,11 @@ class Parser:
     # [DEFAULT] #
     self.method                   = config['DEFAULT']['method']
     self.metal_symbol             = config['DEFAULT']['metal_symbol']
+
     self.parameter_file           = config['DEFAULT']['parameter_file']
     self.ncpu                     = int(config['DEFAULT']['ncpu'])
+
+    self.atom_types_included()
 
     # [PROTEIN] # 
     self.pdb_file                 = config['PROTEIN']['pdb_file']
@@ -150,3 +156,46 @@ class Parser:
 
     # [MC] #
     self.mc_steps                 = int(config['MC']['mc_steps'])
+
+    if self.ga_dock == False and self.sa_dock == False:
+        print('At least ga_dock or sa_dock must be set to True for MetalDock to run properly')
+        sys.exit(1)
+
+  def atom_types_included(self):
+    if self.parameter_file == 'metal_dock.dat':
+      param_file = os.environ['ROOT_DIR']+'/metal_dock.dat'
+    else:
+      param_file = self.parameter_file
+
+    # Open the text file for reading
+    with open(param_file, 'r') as file:
+        # Initialize an empty list to store the symbols
+        symbols_list = []
+
+        # Iterate through each line in the file
+        for line in file:
+            # Use regular expressions to find matches and extract symbols
+            matches = re.findall(r'atom_par\s+([A-Za-z]+)', line)
+            
+            # Extend the symbols list with the matches (if any)
+            symbols_list.extend(matches)
+
+    # Remove following atom symbols:
+    rmv_list = ['H','HD','HS','C','A','N','NA','NS','OA','OS','F','MG','P','SA','S','Cl','CL','CA','MN','FE','ZN','BR','I','Z','G','GA','J','Q','DD']  
+
+    for rmv in rmv_list:
+      if rmv in symbols_list:
+        symbols_list.remove(rmv)
+
+    # Print the list of symbols
+    if self.metal_symbol not in symbols_list and self.parameter_file == 'metal_dock.dat':
+      print('The metal symbol you have chosen is currently not supported by MetalDock')
+      print('The following atom types are present in the parameter file: ')
+      print(' '.join(symbols_list))
+      sys.exit()
+    elif self.metal_symbol not in symbols_list and self.parameter_file != 'metal_dock.dat':
+      print('The metal symbol you have chosen is currently not supported by your selected parameter file')
+      print('The following atom types are present in the parameter file: ')
+      print(' '.join(symbols_list))
+      print('Please choose a different parameter file or add the missing atom types to the parameter file')
+      sys.exit()

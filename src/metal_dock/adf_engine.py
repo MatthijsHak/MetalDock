@@ -61,16 +61,16 @@ def adf_opt_converged(ams_log):
         if 'Geometry optimization converged' in log.read():
             return print('\nGEOMETRY CONVERGED\n')
         else:
-            print('\nGEOMETRY NOT CONVERGED\n')
+            print('\nGEOMETRY NOT CONVERGED\nPLEASE CHECK THE ams.log FILE IN THE QM DIRECTORY\n')
             return sys.exit()
 
 def adf_sp_converged(ams_log):
     with open(ams_log) as log:
         if 'WARNING: partially occupied orbitals' in log.read() or 'ERROR' in log.read():
-            print('\nSINGLE POINT NOT SUCCESSFUL\n')
+            print('\nSINGLE POINT NOT SUCCESSFUL\nPLEASE CHECK THE ams.log FILE IN THE QM DIRECTORY\n')
             return sys.exit()
         else:
-            return print('\nSINGLE POINT SUCCESSFULLY PERFORMED\n')
+            return print('\nSINGLE POINT SUCCESSFULLY PERFORMED\n' )
 
 def adf_geom_opt(xyz_file, var):
     scm.init()
@@ -90,11 +90,23 @@ def adf_geom_opt(xyz_file, var):
     s.input.adf.basis.type=''+var.basis_set.upper()+''
     s.input.adf.basis.core='None'
 
+    if var.functional_type.lower() == '':
+        raise ValueError('Functional type not specified. Please specify functional type (LDA, GGA, METAGGA, HYBRID, METAHYBRID) in the input file')
+
+    if var.functional_type.lower() == 'lda':
+        s.input.adf.xc.lda=''+var.functional.upper()+''
+
+    if var.functional_type.lower() == 'metagga':
+        s.input.adf.xc.metagga=''+var.functional.upper()+''
+
     if var.functional_type.lower() == 'gga':
         s.input.adf.xc.gga=''+var.functional.upper()+''
 
     if var.functional_type.lower() == 'hybrid':
         s.input.adf.xc.hybrid=''+var.functional.upper()+''
+
+    if var.functional_type.lower() == 'metahybrid':
+        s.input.adf.xc.metahybrid=''+var.functional.upper()+''
 
     if var.dispersion != None:
         s.input.adf.xc.dispersion=''+var.dispersion.upper()+''
@@ -106,7 +118,8 @@ def adf_geom_opt(xyz_file, var):
     s.input.adf.relativity.formalism='ZORA'
     s.input.adf.relativity.level='Scalar'
 
-    s.input.adf.Solvation.Solv = "Name=Water"
+    if var.solvent != '':
+        s.input.adf.Solvation.Solv = f"Name={var.solvent}"
 
     #Run Job
     j = scm.AMSJob(molecule=m, settings=s)
@@ -130,6 +143,9 @@ def adf_sp(xyz_file, var):
     s.input.adf.AtomicChargesTypeForAMS='CM5'
     s.input.adf.basis.type=''+var.basis_set.upper()+''
     s.input.adf.basis.core='None'
+
+    if var.functional_type.lower() == '':
+        raise ValueError('Functional type not specified. Please specify functional type (LDA, GGA, METAGGA, HYBRID, METAHYBRID)')
 
     if var.functional_type.lower() == 'lda':
         s.input.adf.xc.lda=''+var.functional.upper()+''

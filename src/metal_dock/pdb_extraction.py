@@ -1,8 +1,11 @@
 import os,sys, shutil
 import subprocess
 
-def protonate_pdb(pdb_file, pH):
-    subprocess.call(os.environ['PDB2PQR']+f' --noopt --pdb-output pdb_prot.pdb --with-ph {str(pH)} --drop-water {pdb_file} pdb_prot.pdb', shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def protonate_pdb(pdb_file, pH, clean_pdb=True):
+    if clean_pdb == True:
+        subprocess.call(os.environ['PDB2PQR']+f' --noopt --pdb-output pdb_prot.pdb --with-ph {str(pH)} --drop-water {pdb_file} pdb_prot.pdb', shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    else:
+        subprocess.call(os.environ['PDB2PQR']+f' --noopt --pdb-output pdb_prot.pdb --with-ph {str(pH)} {pdb_file} pdb_prot.pdb', shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return
 
 # Get clean.pdb

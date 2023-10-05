@@ -231,7 +231,7 @@ def create_ligand_pdbqt_file(par, name_ligand):
                         line = line.strip().split()
                         line[8] = cm[atom_id][1]
                         atom_id+=1
-                        fout.write(f'     {line[0]:>2} {line[1]:<2}        {line[2]:>7}   {line[3]:>7}  {line[4]:>8} {line[5]:<5}   {line[6]:>1}  {line[7]:>4}       {line[8]:>6}\n')
+                        fout.write(f'     {line[0]:>2} {line[1]:<2}      {line[2]:>9} {line[3]:>9} {line[4]:>9} {line[5]:<5}   {line[6]:>1}  {line[7]:>4}       {line[8]:>6}\n')
 
     subprocess.call([os.environ['OBABEL']+' -imol2 output.mol2 -opdbqt '+name_ligand+'.pdbqt  > '+name_ligand+'.pdbqt'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     n_mdl = 0 
@@ -381,10 +381,10 @@ def write_pdbqt(par, xyz_file, lines, metal_atom, pos_hydrogen=None):
 
             elif 'ATOM' in line:
                 if len(line) < 13: 
-                    fout.write(f'{line[0]}     {n_atoms:>2} {line[2]:>2}   LIG A   1     {line[5]:>7} {line[6]:>7} {line[7]:>7}  {line[8]:>4}  {line[9]:>4}    {line[10]:>6} {line[11]:<2}\n')
+                    fout.write(f'{line[0]}   {n_atoms:>4} {line[2]:>2}   LIG A   1     {line[5]:>7} {line[6]:>7} {line[7]:>7}  {line[8]:>4}  {line[9]:>4}    {line[10]:>6} {line[11]:<2}\n')
                     n_atoms+=1
                 else:
-                    fout.write(f'{line[0]}     {n_atoms:>2} {line[2]:>2}   LIG A   1     {line[6]:>7} {line[7]:>7} {line[8]:>7}  {line[9]:>4}  {line[10]:>4}    {line[11]:>6} {line[12]:<2}\n')
+                    fout.write(f'{line[0]}   {n_atoms:>4} {line[2]:>2}   LIG A   1     {line[6]:>7} {line[7]:>7} {line[8]:>7}  {line[9]:>4}  {line[10]:>4}    {line[11]:>6} {line[12]:<2}\n')
                     n_atoms+=1
 
             elif 'BRANCH' in line:
@@ -538,13 +538,13 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     return max_side
 
 def prepare_receptor(name_protein):
-    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+'/prepare_receptor4.py -U nphs -A None -r clean_'+name_protein+'.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+f'/prepare_receptor4.py -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
 def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, energy=None):
     #create_gpf():
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/prepare_gpf4.py -l "+name_ligand+".pdbqt  -r clean_"+name_protein+".pdbqt -p parameter_file="+par.parameter_file+" -p npts='{},{},{}'".format(box_size,box_size,box_size)+" -p gridcenter='{:.4},{:.4},{:.4}' ".format(dock[0],dock[1],dock[2])], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    gpf = open('clean_'+name_protein+'.gpf', 'a')
+    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+f"/prepare_gpf4.py -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.4},{dock[1]:.4},{dock[2]:.4}'"], shell=True ) #, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    gpf = open(f'clean_{name_protein}.gpf', 'a')
     gpf.write(f'nbp_r_eps 0.25 23.2135   12 6  NA TZ\n')
     gpf.write(f'nbp_r_eps 2.10  3.8453   12 6  OA Zn\n')
     gpf.write(f'nbp_r_eps 2.25  7.5914   12 6  SA Zn\n')
@@ -555,26 +555,25 @@ def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, 
     gpf.write(f'nbp_r_eps 2.25  {parameter_set[1]:>.4f}   12 10 OA {par.metal_symbol}\n')
     gpf.write(f'nbp_r_eps 2.30  {parameter_set[2]:>.4f}   12 10 SA {par.metal_symbol}\n')
     gpf.write(f'nbp_r_eps 1.00  {parameter_set[3]:>.4f}   12 6  HD {par.metal_symbol}\n')
-    # gpf.write(f'nbp_r_eps 2.20  {parameter_set[4]:>.4f}   12 6  N  {par.metal_symbol}\n')
     gpf.close()
 
     #autogrid()
-    if par.method.lower() == 'train' or par.method.lower() == 'mc':
-        subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    if par.method.lower() == 'mc':
+        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autogrid4 -p clean_{name_protein}.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     else:
-        subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autogrid4 -p clean_'+name_protein+'.gpf'], shell=True)
+        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autogrid4 -p clean_{name_protein}.gpf'], shell=True)
 
     #create_dpf()
-    write_dpf_file('clean_'+name_protein+'.gpf', name_ligand, 'clean_'+name_protein, par.parameter_file, par.num_poses, par.dock_algorithm, random_pos=par.random_pos, SA=par.sa_dock, GA=par.ga_dock, energy_ligand=energy)
+    write_dpf_file(f'clean_{name_protein}.gpf', name_ligand, f'clean_{name_protein}', par.parameter_file, par.num_poses, par.dock_algorithm, random_pos=par.random_pos, SA=par.sa_dock, GA=par.ga_dock, energy_ligand=energy)
 
     #autodock()
     if par.method.lower() == 'train' or par.method.lower() == 'mc':
-        subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autodock4 -p {name_ligand}_clean_{name_protein}.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     else:
-        subprocess.call([os.environ['ROOT_DIR']+'/external/AutoDock/autodock4 -p '+name_ligand+'_clean_'+name_protein+'.dpf'], shell=True)
+        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autodock4 -p {name_ligand}_clean_{name_protein}.dpf'], shell=True)
 
     #write_all_conformations()
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+"/write_conformations_from_dlg.py -d "+name_ligand+"_clean_"+name_protein+".dlg"], shell=True)#, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+f"/write_conformations_from_dlg.py -d {name_ligand}_clean_{name_protein}.dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     return
 
@@ -612,7 +611,7 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, num_pose
         dpf_file.write('quaternion0 random                   # initial orientation\n')
         dpf_file.write('dihe0 random                         # initial dihedrals (relative) or random\n')
 
-    if GA == True:
+    if GA == True and SA == False:
         dpf_file.write('# GA parameters\n')
         dpf_file.write('ga_pop_size '+str(dock_algorithm[0])+'                      # number of individuals in population\n')
         dpf_file.write('ga_num_evals '+str(dock_algorithm[1])+'                 # maximum number of energy evaluations\n')
@@ -636,7 +635,7 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, num_pose
         dpf_file.write('set_ga                               # set the above parameters for GA or LGA\n')
         dpf_file.write('set_psw1                             # set the above pseudo-Solis & Wets parameters\n')
         dpf_file.write('ga_run '+str(num_poses)+'                             # do this many hybrid GA-LS runs\n')
-    if SA == True:
+    if GA == False and SA == True:
         dpf_file.write('# SA Parameters\n')
         dpf_file.write('tstep 2.0\n')
         #dpf_file.write('e0max 0.0 10000                      # max initial energy; max number of retries\n')
