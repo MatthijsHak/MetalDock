@@ -1,0 +1,9 @@
+site_name: My Docs
+site_url: https://metal_dock_docs.com/
+
+nav: 
+  - Home: index.md
+  - Installation: installation.md
+  - Running: running.md
+ 
+theme: readthedocs
