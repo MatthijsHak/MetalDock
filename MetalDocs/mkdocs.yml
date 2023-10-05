@@ -1,6 +1,0 @@
-site_name: MetalDock
-site_url: https://metaldock_docs.com/ 
-nav:
-  - Home: index.md
-  - About: about.md
-theme: readthedocs
