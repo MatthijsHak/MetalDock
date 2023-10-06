@@ -143,6 +143,10 @@ class Parser:
     self.ga_dock_crossover_rate   = float(config['DOCKING']['ga_dock_crossover_rate'])
     self.ga_dock_window_size      = int(config['DOCKING']['ga_dock_window_size'])
 
+    if self.ga_dock == True and self.sa_dock == True:
+        print('Only one docking algorithm can be chosen, set either ga_dock or sa_dock to False')
+        sys.exit()
+    
     if self.ga_dock == True:
       self.dock_algorithm         = [self.ga_dock_pop_size, self.ga_dock_num_evals, self.ga_dock_num_generations, self.ga_dock_elitism, self.ga_dock_mutation_rate, self.ga_dock_crossover_rate, self.ga_dock_window_size]
 
@@ -159,7 +163,7 @@ class Parser:
 
     if self.ga_dock == False and self.sa_dock == False:
         print('At least ga_dock or sa_dock must be set to True for MetalDock to run properly')
-        sys.exit(1)
+        sys.exit()
 
   def atom_types_included(self):
     if self.parameter_file == 'metal_dock.dat':
