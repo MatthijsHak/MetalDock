@@ -1,6 +1,6 @@
 import os, sys, csv, subprocess, shutil
 
-import orca2CM5 as oc
+from . import orca2CM5 as oc
 
 from ase.calculators.orca import ORCA
 from ase.io import read, write

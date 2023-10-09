@@ -6,7 +6,7 @@ import scipy as sc
 from distutils.dir_util import copy_tree
 
 from itertools import repeat
-import prepare_dock as d
+from . import prepare_dock as d
 from multiprocessing import Pool
 from scipy.stats import randint
 

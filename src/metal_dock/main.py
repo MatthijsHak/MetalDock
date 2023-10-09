@@ -2,10 +2,9 @@
 
 import argparse
 
-from parser_metal_dock import Parser
-from docking import docking
-
-from monte_carlo import optimize_MC
+from .parser_metal_dock import Parser
+from .docking import docking
+from .monte_carlo import optimize_MC
 
 def main():
     parser = argparse.ArgumentParser(description="Docking of organometallic compounds")

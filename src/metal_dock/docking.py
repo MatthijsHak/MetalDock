@@ -1,15 +1,16 @@
 import os,sys, shutil
 import subprocess
 import math
-import environment_variables
-
 import numpy as np
-import pdb_extraction as pdb
-import prepare_dock as d
 
-import adf_engine as adf 
-import gaussian_engine as g
-import orca_engine as orca
+from . import environment_variables
+
+from . import pdb_extraction as pdb
+from . import prepare_dock as d
+
+from . import adf_engine as adf 
+from . import gaussian_engine as g
+from . import orca_engine as orca
 
              #         e_NA, e_OA, e_SA,  e_HD,
 standard_set = {'V' : [ 4.696,	6.825,	5.658,	3.984],

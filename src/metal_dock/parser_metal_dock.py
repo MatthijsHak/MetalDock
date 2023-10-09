@@ -2,7 +2,7 @@ import sys, os
 import re
 import configparser
 
-from docking import standard_set 
+#from . import docking.standard_set 
 
 
 config = configparser.ConfigParser(interpolation=None)

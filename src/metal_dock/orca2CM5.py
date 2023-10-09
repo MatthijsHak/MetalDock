@@ -13,7 +13,7 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-import environment_variables
+from . import environment_variables
 
 def AtomFPProgram(hmol,atomNum,radii=2):
     env = Chem.FindAtomEnvironmentOfRadiusN(hmol,radii,atomNum,useHs=True)

@@ -1,17 +1,22 @@
-# Welcome to MkDocs
+# Installation   
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+To install MetalDock correctly please follow the instructions below:
 
-## Commands
+## Create Conda Environment  
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+To create a conda envrionment you must first install the miniconda or anaconda distribtution. Infromation can found in the following link.  
 
-## Project layout
+Once installed create an envrionment as follow:
+```
+conda create -n MetalDock python=3.8 
+```
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+```
+conda activate MetalDock 
+```
+
+```
+conda install -c bioconda mgltools
+```
+
+## Install mgltools  

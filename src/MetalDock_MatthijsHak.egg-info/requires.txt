@@ -1,0 +1,8 @@
+python>=3.8
+mgltools
+rdkit
+pdb2pqr
+networkx
+numpy
+ase
+plams
