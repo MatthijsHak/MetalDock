@@ -1,10 +1,10 @@
-site_name: My Docs
+site_name: MetalDock 
 site_url: https://metal_dock_docs.com/
 
 nav: 
   - Home: index.md  
   - Installation: installation.md
   - Run MetalDock: run.md
-  - Input: input.md
+  - Input Parameters: input_parameters.md
   - Output: output.md
 theme: readthedocs
