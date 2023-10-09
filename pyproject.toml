@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "MetalDock_MatthijsHak"
-version = "1.0.1"
+version = "1.0.2"
 authors = [
           { name = "Matthijs Hakkennes", email = "m.l.a.hakkennes@lic.leidenuniv.nl" },
           ]
