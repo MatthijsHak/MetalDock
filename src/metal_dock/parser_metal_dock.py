@@ -2,65 +2,62 @@ import sys, os
 import re
 import configparser
 
-#from . import docking.standard_set 
-
-
 config = configparser.ConfigParser(interpolation=None)
-config['DEFAULT']       =   { "method"                  :       'dock',
-                              "metal_symbol"            :           '',
-                              "parameter_file"          :'metal_dock.dat',
-                              "ncpu"                    :           '1'}
+config['DEFAULT']       =   { "method"                  :              'dock',
+                              "metal_symbol"            :                'Ru',
+                              "parameter_file"          :    'metal_dock.dat',
+                              "ncpu"                    :                 '1'}
 
-config['PROTEIN']       =   { "pdb_file"                :           '',
-                              "pH"                      :        '7.4',
-                              "clean_pdb"               :        'True'}
+config['PROTEIN']       =   { "pdb_file"                :       'protein.pdb',
+                              "pH"                      :               '7.4',
+                              "clean_pdb"               :              'True'}
 
-config['METAL_COMPLEX'] =   { "geom_opt"                :       'False',
-                              "xyz_file"                :        'None',
-                              "charge"                  :           '0',
-                              "spin"                    :           '0',
-                              "vacant_site"             :         'True',}
+config['METAL_COMPLEX'] =   { "geom_opt"                :              'True',
+                              "xyz_file"                : 'metal_complex.xyz',
+                              "charge"                  :                 '0',
+                              "spin"                    :                 '0',
+                              "vacant_site"             :              'True',}
 
-config['QM']            =   { "engine"                  :            '',
+config['QM']            =   { "engine"                  :                'ADF',
 
                               # ADF & Gaussian input keywords
-                              "basis_set"               :            '',
-                              "functional_type"         :            '',
-                              "functional"              :            '',
-                              "dispersion"              :            '',
-                              "solvent"                 :            '',
+                              "basis_set"               :                'TZP',
+                              "functional_type"         :                'GGA',
+                              "functional"              :                'PBE',
+                              "dispersion"              :    'GRIMME3 -BJDAMP',
+                              "solvent"                 :              'Water',
 
                               # ORCA input keywords
-                              "orcasimpleinput"         :            '',
-                              "orcablocks"              :            ''}
+                              "orcasimpleinput"         : 'PBE def2-TZVP CPCMC(Water)',
+                              "orcablocks"              :                  ''}
 
-config['DOCKING']       =   { "standard"                :        'True',
-                              "rmsd"                    :       'False',
-                              "dock_x"                  :         '0.0',
-                              "dock_y"                  :        ' 0.0',
-                              "dock_z"                  :        ' 0.0',
-                              "box_size"                :            '',
-                              "scale_factor"            :            '',
-                              "random_pos"              :        'True',
-                              "num_poses"               :          '10',
-                              "e_NA"                    :         '5.0',
-                              "e_OA"                    :         '5.0',
-                              "e_SA"                    :         '5.0',
-                              "e_HD"                    :         '5.0',
-                              "ga_dock"                 :       'False',
-                              "ga_dock_pop_size"        :         '150',
-                              "ga_dock_num_evals"       :     '2500000',
-                              "ga_dock_num_generations" :       '27000',
-                              "ga_dock_elitism"         :           '1',
-                              "ga_dock_mutation_rate"   :        '0.02',
-                              "ga_dock_crossover_rate"  :        '0.80',
-                              "ga_dock_window_size"     :          '10',
-                              "sa_dock"                 :       'False',
-                              "temp_reduction_factor"   :        '0.90',
-                              "number_of_runs"          :          '50',
-                              "max_cycles"              :          '50'}
+config['DOCKING']       =   { "ini_parameters"          :              'False',
+                              "rmsd"                    :              'False',
+                              "dock_x"                  :                '0.0',
+                              "dock_y"                  :               ' 0.0',
+                              "dock_z"                  :               ' 0.0',
+                              "box_size"                :                 '20',
+                              "scale_factor"            :                   '',
+                              "random_pos"              :               'True',
+                              "num_poses"               :                 '10',
+                              "e_NA"                    :                '5.0',
+                              "e_OA"                    :                '5.0',
+                              "e_SA"                    :                '5.0',
+                              "e_HD"                    :                '5.0',
+                              "ga_dock"                 :              'True',
+                              "ga_dock_pop_size"        :                '150',
+                              "ga_dock_num_evals"       :            '2500000',
+                              "ga_dock_num_generations" :              '27000',
+                              "ga_dock_elitism"         :                  '1',
+                              "ga_dock_mutation_rate"   :               '0.02',
+                              "ga_dock_crossover_rate"  :               '0.80',
+                              "ga_dock_window_size"     :                 '10',
+                              "sa_dock"                 :              'False',
+                              "temp_reduction_factor"   :               '0.90',
+                              "number_of_runs"          :                 '50',
+                              "max_cycles"              :                 '50'}
 
-config['MC']            =   { "mc_steps"                 :       '250'}
+config['MC']            =   { "mc_steps"                 :               '250'}
 
 
 class Parser:
@@ -108,9 +105,9 @@ class Parser:
       sys.exit()
 
     # [DOCKING] #
-    self.standard                 = config['DOCKING'].getboolean('standard')
-    if self.standard == False:
-      self.parameter_set            = [self.e_NA, self.e_OA, self.e_SA, self.e_HD]
+    self.ini_parameters           = config['DOCKING'].getboolean('ini_parameters')
+    if self.ini_parameters == True:
+      self.parameter_set          = [self.e_NA, self.e_OA, self.e_SA, self.e_HD]
 
     self.rmsd                     = config['DOCKING'].getboolean('rmsd')
     self.dock_x                   = float(config['DOCKING']['dock_x'])
