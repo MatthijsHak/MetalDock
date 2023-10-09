@@ -4,13 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "MetalDock_MatthijsHak"
-version = "1.0.2"
+version = "1.0.0"
 authors = [
           { name = "Matthijs Hakkennes", email = "m.l.a.hakkennes@lic.leidenuniv.nl" },
           ]
 description = "Package to dock metal-organic complexes to biomolecules"
 readme = "README.md"
-requires-python = ">=3.8.0"
 classifiers = [
               "Programming Language :: Python :: 3",
               "License :: OSI Approved :: MIT License", 

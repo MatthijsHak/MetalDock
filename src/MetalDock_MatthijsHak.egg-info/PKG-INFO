@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: MetalDock-MatthijsHak
-Version: 1.0.1
+Version: 1.0.13
 Summary: Package to dock metal-organic complexes to biomolecules
 Author-email: Matthijs Hakkennes <m.l.a.hakkennes@lic.leidenuniv.nl>
 Project-URL: Homepage, https://github.com/MatthijsHak/MetalDock
@@ -9,17 +9,8 @@ Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: POSIX :: Linux
 Classifier: Operating System :: MacOS :: MacOS X
-Requires-Python: >=3.7.12
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: python>=3.8
-Requires-Dist: mgltools
-Requires-Dist: rdkit
-Requires-Dist: pdb2pqr
-Requires-Dist: networkx
-Requires-Dist: numpy
-Requires-Dist: ase
-Requires-Dist: plams
 
 
 # MetalDock 

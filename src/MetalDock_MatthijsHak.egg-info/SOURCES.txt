@@ -5,6 +5,5 @@ setup.cfg
 src/MetalDock_MatthijsHak.egg-info/PKG-INFO
 src/MetalDock_MatthijsHak.egg-info/SOURCES.txt
 src/MetalDock_MatthijsHak.egg-info/dependency_links.txt
-src/MetalDock_MatthijsHak.egg-info/requires.txt
 src/MetalDock_MatthijsHak.egg-info/top_level.txt
 src/MetalDock_MatthijsHak.egg-info/zip-safe

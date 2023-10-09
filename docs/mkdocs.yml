@@ -6,5 +6,5 @@ nav:
   - Installation: installation.md
   - Run MetalDock: run.md
   - Input: input.md
-
+  - Output: output.md
 theme: readthedocs
