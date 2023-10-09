@@ -1,6 +1,6 @@
 # Input  
 
-MetalDock is run with a .ini file in which all the different parameters are set.
+MetalDock is configured using a **'.ini'** file in which various parameters are set. This section provides an overview of the input parameters, categorized into the different headers of the **'.ini'** file. For examples, see **'input_examples'** of the GitHub repository.
 
 ## DEFAULT keywords 
 
@@ -129,7 +129,7 @@ xyz_file = metal_complex.xyz
 ---
 
 ### charge
-The total charge of the metal-organic compound. 
+The total charge of the metal-organic compound. Spin is here defined as the number of spin-alpha electrons in excess of spin-beta electrons.
 
 **Default input:**  
 charge = 0 
@@ -194,7 +194,7 @@ basis_set = TZP
 The functional type used for the DFT calculations.
 
 **Default input:**  
-basis_set = GGA
+functional_type = GGA
 
 **Valid values:**  
 `ADF` valid inputs can be found [here](https://www.scm.com/doc/ADF/Input/Density_Functional.html)   
@@ -206,7 +206,7 @@ basis_set = GGA
 The basis set used for the DFT calculations.
 
 **Default input:**  
-basis_set = PBE
+functional = PBE
 
 **Valid values:**  
 `ADF` valid inputs can be found [here](https://www.scm.com/doc/ADF/Input/Density_Functional.html)   
@@ -218,7 +218,7 @@ basis_set = PBE
 The basis set used for the DFT calculations.
 
 **Default input:**  
-basis_set = Grimme3 BJDAMP
+dispsersion = Grimme3 BJDAMP
 
 **Valid values:**  
 `ADF` valid inputs can be found [here](https://www.scm.com/doc/ADF/Input/Density_Functional.html#dispersion-corrections)   
@@ -230,7 +230,7 @@ basis_set = Grimme3 BJDAMP
 The basis set used for the DFT calculations.
 
 **Default input:**  
-basis_set = water
+solvent = water
 
 **Valid values:**  
 `ADF` valid inputs can be found [here](https://www.scm.com/doc/ADF/Input/COSMO.html)   
@@ -242,7 +242,7 @@ basis_set = water
 This keyword accepts a string for the values where you in an ORCA run script would put a ! in front
 
 **Default input:**  
-basis_set = PBE def2-TZVP
+orcasimpleinput = PBE def2-TZVP
 
 **Valid values:**  
 `ORCA` valid inputs can be found [here](https://sites.google.com/site/orcainputlibrary/home) 
@@ -253,7 +253,7 @@ basis_set = PBE def2-TZVP
 This keywords accepts a string for the values where you in an ORCA run script would put a % in front. You should **NOT** specify here the number of CPUs, as that is already taken of with ncpu keyword.
 
 **Default input:**  
-basis_set = water
+orcablocks = 
 
 **Valid values:**  
 `ORCA` valid inputs can be found [here](https://sites.google.com/site/orcainputlibrary/home) 
@@ -277,7 +277,7 @@ rmsd = False
 The x coordinate of the centre of the box used in the docking procedure.
 
 **Default input:**  
-dock_x = 0
+dock_x = 0.0
 
 **Valid values:**  
 `float`
@@ -288,7 +288,7 @@ dock_x = 0
 The y coordinate of the centre of the box used in the docking procedure.
 
 **Default input:**  
-dock_y = 0
+dock_y = 0.0
 
 **Valid values:**  
 `float`
@@ -299,7 +299,7 @@ dock_y = 0
 The x coordinate of the centre of the box used in the docking procedure.
 
 **Default input:**  
-dock_z = 0
+dock_z = 0.0
 
 **Valid values:**  
 `float`
@@ -332,7 +332,7 @@ box_size = 20
 This keyword scales the box to the volume of the metal-organic compound. 
 
 **Default input:**  
-box_size = 3
+box_size = 
 
 **Valid values:**  
 `float`
@@ -350,14 +350,14 @@ box_size = True
 
 ---
 
-### standard
-Keyword that needs to be activated if the well-depth parameters of the metal protein interaction are specified in the .ini file
+### ini_parameters
+Keyword that needs to be activated if the well-depth parameters of the metal protein interaction are specified in the **'.ini'** file
 
 **Default input:**  
-basis_set = water
+ini_parameters = False
 
 **Valid values:**  
-`ORCA` valid inputs can be found [here](https://sites.google.com/site/orcainputlibrary/home) 
+`boolean`
 
 ---
 
@@ -402,6 +402,17 @@ box_size = 5.0
 
 **Valid values:**  
 `float`
+
+---
+
+### num_poses
+Number of poses that are docked. 
+
+**Default input:**  
+num_poses = 10
+
+**Valid values:**  
+`int`
 
 ---
 
