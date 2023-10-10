@@ -21,3 +21,5 @@ If you're new to MetalDock, start with our [Installation](installation.md) chapt
 ## Citation
 
 If you use MetalDock for any project, please cite the following paper: 
+
+[10.26434/chemrxiv-2023-5f3q9] (https://chemrxiv.org/engage/chemrxiv/article-details/65252ef68bab5d2055071cb0)
