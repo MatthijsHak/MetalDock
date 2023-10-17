@@ -538,42 +538,42 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     return max_side
 
 def prepare_receptor(name_protein):
-    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+f'/prepare_receptor4.py -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+f'/prepare_receptor4.py -U nphs -A None -r clean_{par.name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
-def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, energy=None):
+def docking_func(par, dock, box_size, energy=None):
     #create_gpf():
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+f"/prepare_gpf4.py -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.4},{dock[1]:.4},{dock[2]:.4}'"], shell=True ) #, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    gpf = open(f'clean_{name_protein}.gpf', 'a')
+    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+f"/prepare_gpf4.py -l {par.name_ligand}.pdbqt  -r clean_{par.name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.4},{dock[1]:.4},{dock[2]:.4}'"], shell=True ) #, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    gpf = open(f'clean_{par.name_protein}.gpf', 'a')
     gpf.write(f'nbp_r_eps 0.25 23.2135   12 6  NA TZ\n')
     gpf.write(f'nbp_r_eps 2.10  3.8453   12 6  OA Zn\n')
     gpf.write(f'nbp_r_eps 2.25  7.5914   12 6  SA Zn\n')
     gpf.write(f'nbp_r_eps 1.00  0.0000   12 6  HD Zn\n')
     gpf.write(f'nbp_r_eps 2.00  0.0060   12 6  NA Zn\n')
     gpf.write(f'nbp_r_eps 2.00  0.2966   12 6  N  Zn\n')
-    gpf.write(f'nbp_r_eps 2.20  {parameter_set[0]:>.4f}   12 10 NA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 2.25  {parameter_set[1]:>.4f}   12 10 OA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 2.30  {parameter_set[2]:>.4f}   12 10 SA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 1.00  {parameter_set[3]:>.4f}   12 6  HD {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 2.20  {par.parameter_set[0]:>.4f}   12 10 NA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 2.25  {par.parameter_set[1]:>.4f}   12 10 OA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 2.30  {par.parameter_set[2]:>.4f}   12 10 SA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 1.00  {par.parameter_set[3]:>.4f}   12 6  HD {par.metal_symbol}\n')
     gpf.close()
 
     #autogrid()
     if par.method.lower() == 'mc':
-        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autogrid4 -p clean_{name_protein}.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autogrid4 -p clean_{par.name_protein}.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     else:
-        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autogrid4 -p clean_{name_protein}.gpf'], shell=True)
+        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autogrid4 -p clean_{par.name_protein}.gpf'], shell=True)
 
     #create_dpf()
-    write_dpf_file(f'clean_{name_protein}.gpf', name_ligand, f'clean_{name_protein}', par.parameter_file, par.num_poses, par.dock_algorithm, random_pos=par.random_pos, SA=par.sa_dock, GA=par.ga_dock, energy_ligand=energy)
+    write_dpf_file(f'clean_{par.name_protein}.gpf', par.name_ligand, f'clean_{par.name_protein}', par.parameter_file, par.num_poses, par.dock_algorithm, random_pos=par.random_pos, SA=par.sa_dock, GA=par.ga_dock, energy_ligand=energy)
 
     #autodock()
     if par.method.lower() == 'train' or par.method.lower() == 'mc':
-        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autodock4 -p {name_ligand}_clean_{name_protein}.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autodock4 -p {par.name_ligand}_clean_{par.name_protein}.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     else:
-        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autodock4 -p {name_ligand}_clean_{name_protein}.dpf'], shell=True)
+        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autodock4 -p {par.name_ligand}_clean_{par.name_protein}.dpf'], shell=True)
 
     #write_all_conformations()
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+f"/write_conformations_from_dlg.py -d {name_ligand}_clean_{name_protein}.dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+f"/write_conformations_from_dlg.py -d {par.name_ligand}_clean_{par.name_protein}.dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     return
 
