@@ -2,6 +2,21 @@ import sys, os
 import re
 import configparser
 
+             #         e_NA, e_OA, e_SA,  e_HD,
+standard_set = {'V' : [ 4.696,	6.825,	5.658,	3.984],
+                'CR': [ 6.371,	1.998,	0.144,	3.625],
+                'CO': [ 5.280,	0.050,	6.673,	5.929],
+                'NI': [ 0.630,	2.732,	4.462,	2.820],
+                'CU': [ 4.696,	1.277,	6.791,	1.114],
+                'MO': [ 1.330,	0.014,	0.168,	5.620],
+                'RU': [ 6.936,	2.796,	4.295,	6.357],
+                'RH': [ 5.559,	2.056,	0.573,	5.471],
+                'PD': [ 4.688,	0.845,	5.574,	3.159],
+                'RE': [ 6.738,	0.645,	3.309,	4.502],
+                'OS': [ 5.958,	0.135,	4.102,	6.589],
+                'PT': [ 6.532,	2.020,	6.332,	1.844],
+            }
+
 config = configparser.ConfigParser(interpolation=None)
 config['DEFAULT']       =   { "method"                  :              'dock',
                               "metal_symbol"            :                'Ru',
@@ -108,6 +123,8 @@ class Parser:
     self.ini_parameters           = config['DOCKING'].getboolean('ini_parameters')
     if self.ini_parameters == True:
       self.parameter_set          = [self.e_NA, self.e_OA, self.e_SA, self.e_HD]
+    else:
+      self.parameter_set          = standard_set.get(self.metal_symbol.upper())
 
     self.rmsd                     = config['DOCKING'].getboolean('rmsd')
     self.dock_x                   = float(config['DOCKING']['dock_x'])
@@ -140,6 +157,14 @@ class Parser:
     self.ga_dock_crossover_rate   = float(config['DOCKING']['ga_dock_crossover_rate'])
     self.ga_dock_window_size      = int(config['DOCKING']['ga_dock_window_size'])
 
+    self.sa_dock                  = config['DOCKING'].getboolean('sa_dock')
+    self.temp_reduction_factor    = float(config['DOCKING']['temp_reduction_factor'])
+    self.number_of_runs           = int(config['DOCKING']['number_of_runs'])
+    self.max_cycles               = int(config['DOCKING']['max_cycles'])
+
+    # [MC] #
+    self.mc_steps                 = int(config['MC']['mc_steps'])
+
     if self.ga_dock == True and self.sa_dock == True:
         print('Only one docking algorithm can be chosen, set either ga_dock or sa_dock to False')
         sys.exit()
@@ -147,16 +172,8 @@ class Parser:
     if self.ga_dock == True:
       self.dock_algorithm         = [self.ga_dock_pop_size, self.ga_dock_num_evals, self.ga_dock_num_generations, self.ga_dock_elitism, self.ga_dock_mutation_rate, self.ga_dock_crossover_rate, self.ga_dock_window_size]
 
-    self.sa_dock                  = config['DOCKING'].getboolean('sa_dock')
-    self.temp_reduction_factor    = float(config['DOCKING']['temp_reduction_factor'])
-    self.number_of_runs           = int(config['DOCKING']['number_of_runs'])
-    self.max_cycles               = int(config['DOCKING']['max_cycles'])
-
     if self.sa_dock == True:
       self.dock_algorithm        = [self.temp_reduction_factor, self.number_of_runs, self.max_cycles]
-
-    # [MC] #
-    self.mc_steps                 = int(config['MC']['mc_steps'])
 
     if self.ga_dock == False and self.sa_dock == False:
         print('At least ga_dock or sa_dock must be set to True for MetalDock to run properly')

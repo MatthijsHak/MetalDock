@@ -12,21 +12,6 @@ from . import adf_engine as adf
 from . import gaussian_engine as g
 from . import orca_engine as orca
 
-             #         e_NA, e_OA, e_SA,  e_HD,
-standard_set = {'V' : [ 4.696,	6.825,	5.658,	3.984],
-                'CR': [ 6.371,	1.998,	0.144,	3.625],
-                'CO': [ 5.280,	0.050,	6.673,	5.929],
-                'NI': [ 0.630,	2.732,	4.462,	2.820],
-                'CU': [ 4.696,	1.277,	6.791,	1.114],
-                'MO': [ 1.330,	0.014,	0.168,	5.620],
-                'RU': [ 6.936,	2.796,	4.295,	6.357],
-                'RH': [ 5.559,	2.056,	0.573,	5.471],
-                'PD': [ 4.688,	0.845,	5.574,	3.159],
-                'RE': [ 6.738,	0.645,	3.309,	4.502],
-                'OS': [ 5.958,	0.135,	4.102,	6.589],
-                'PT': [ 6.532,	2.020,	6.332,	1.844],
-            }
-
 def docking(input_file, par=None):
 
     par = input_file
@@ -129,17 +114,10 @@ def docking(input_file, par=None):
         print("CANNOT SELECT BOXSIZE AND SCALE FACTOR - SET ONE VALUE GREATER THAN 0")
         sys.exit()
 
-    if par.standard == True:
-        parameter_set = standard_set.get(par.metal_symbol.upper())
-        d.create_ligand_pdbqt_file(par, par.name_ligand)
-        if os.path.isfile(f'clean_{par.name_protein}.pdbqt') == False:
-            d.prepare_receptor(par.name_protein)
-        d.docking_func(par, parameter_set, par.name_ligand, par.name_protein, dock, box_size, energy)
-    else:
-        d.create_ligand_pdbqt_file(par, par.name_ligand)
-        if os.path.isfile(f'clean_{par.name_protein}.pdbqt') == False:
-            d.prepare_receptor(par.name_protein)
-        d.docking_func(par, par.parameter_set, par.name_ligand, par.name_protein, dock, box_size, energy)
+    d.create_ligand_pdbqt_file(par, par.name_ligand)
+    if os.path.isfile(f'clean_{par.name_protein}.pdbqt') == False:
+        d.prepare_receptor(par.name_protein)
+    d.docking_func(par, par.parameter_set, par.name_ligand, par.name_protein, dock, box_size, energy)
 
     if par.rmsd == True:
         rmsd_list = []
