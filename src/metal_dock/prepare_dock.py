@@ -538,7 +538,7 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     return max_side
 
 def prepare_receptor(name_protein):
-    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+f'/prepare_receptor4.py -U nphs -A None -r clean_{par.name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+f'/prepare_receptor4.py -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
 def docking_func(par, dock, box_size, energy=None):
