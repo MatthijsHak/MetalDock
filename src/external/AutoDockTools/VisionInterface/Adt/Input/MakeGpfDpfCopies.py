@@ -32,10 +32,10 @@ class MakeGpfDpfCopies(NetworkNode):
     
     def __init__(self, name='MakeDPFCopies', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='gpf_template', name='gpf_file', required=False)
         ip.append(datatype='dpf_template', name='dpf_file', required=False)

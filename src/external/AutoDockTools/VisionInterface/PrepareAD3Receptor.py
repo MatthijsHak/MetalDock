@@ -23,7 +23,7 @@ class PrepareAD3Receptor(MacroNode):
 
     def __init__(self, constrkw={}, name='Prepare AD3Receptor', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -57,7 +57,7 @@ class PrepareAD3Receptor(MacroNode):
             input_Ports_17 = self.macroNetwork.ipNode
             input_Ports_17.move(165, 26)
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_17=None
 
@@ -66,7 +66,7 @@ class PrepareAD3Receptor(MacroNode):
             output_Ports_18 = self.macroNetwork.opNode
             output_Ports_18.move(165, 345)
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_18=None
 
@@ -75,11 +75,11 @@ class PrepareAD3Receptor(MacroNode):
             from MolKit.VisionInterface.MolKitNodes import AddHydrogens
             Add_Hydrogens_19 = AddHydrogens(constrkw = {}, name='Add Hydrogens', library=molkitlib)
             self.macroNetwork.addNode(Add_Hydrogens_19,182,83)
-            apply(Add_Hydrogens_19.inputPortByName['molecules'].configure, (), {'color': '#c64e70', 'cast': True, 'shape': 'oval'})
-            apply(Add_Hydrogens_19.outputPortByName['molecules'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
-            apply(Add_Hydrogens_19.outputPortByName['new_h_ct'].configure, (), {'color': 'yellow', 'shape': 'circle'})
+            Add_Hydrogens_19.inputPortByName['molecules'].configure(*(), **{'color': '#c64e70', 'cast': True, 'shape': 'oval'})
+            Add_Hydrogens_19.outputPortByName['molecules'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
+            Add_Hydrogens_19.outputPortByName['new_h_ct'].configure(*(), **{'color': 'yellow', 'shape': 'circle'})
         except:
-            print "WARNING: failed to restore AddHydrogens named Add Hydrogens in network self.macroNetwork"
+            print("WARNING: failed to restore AddHydrogens named Add Hydrogens in network self.macroNetwork")
             print_exc()
             Add_Hydrogens_19=None
 
@@ -88,11 +88,11 @@ class PrepareAD3Receptor(MacroNode):
             from MolKit.VisionInterface.MolKitNodes import AddKollmanCharges
             Add_Kollman_Charges_20 = AddKollmanCharges(constrkw = {}, name='Add Kollman Charges', library=molkitlib)
             self.macroNetwork.addNode(Add_Kollman_Charges_20,182,135)
-            apply(Add_Kollman_Charges_20.inputPortByName['mols'].configure, (), {'color': '#c64e70', 'cast': True, 'shape': 'oval'})
-            apply(Add_Kollman_Charges_20.outputPortByName['mols'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
-            apply(Add_Kollman_Charges_20.outputPortByName['charge_total'].configure, (), {'color': 'green', 'shape': 'circle'})
+            Add_Kollman_Charges_20.inputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'cast': True, 'shape': 'oval'})
+            Add_Kollman_Charges_20.outputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
+            Add_Kollman_Charges_20.outputPortByName['charge_total'].configure(*(), **{'color': 'green', 'shape': 'circle'})
         except:
-            print "WARNING: failed to restore AddKollmanCharges named Add Kollman Charges in network self.macroNetwork"
+            print("WARNING: failed to restore AddKollmanCharges named Add Kollman Charges in network self.macroNetwork")
             print_exc()
             Add_Kollman_Charges_20=None
 
@@ -101,11 +101,11 @@ class PrepareAD3Receptor(MacroNode):
             from AutoDockTools.VisionInterface.AdtNodes import Add_SolvationParameters
             Add_Solvation_Parameters_21 = Add_SolvationParameters(constrkw = {}, name='Add Solvation Parameters', library=adtlib)
             self.macroNetwork.addNode(Add_Solvation_Parameters_21,182,288)
-            apply(Add_Solvation_Parameters_21.inputPortByName['mols'].configure, (), {'color': '#c64e70', 'cast': True, 'shape': 'oval'})
-            apply(Add_Solvation_Parameters_21.outputPortByName['typed_mols'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
-            apply(Add_Solvation_Parameters_21.outputPortByName['AtSolPar'].configure, (), {'color': 'cyan', 'shape': 'oval'})
+            Add_Solvation_Parameters_21.inputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'cast': True, 'shape': 'oval'})
+            Add_Solvation_Parameters_21.outputPortByName['typed_mols'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
+            Add_Solvation_Parameters_21.outputPortByName['AtSolPar'].configure(*(), **{'color': 'cyan', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore Add_SolvationParameters named Add Solvation Parameters in network self.macroNetwork"
+            print("WARNING: failed to restore Add_SolvationParameters named Add Solvation Parameters in network self.macroNetwork")
             print_exc()
             Add_Solvation_Parameters_21=None
 
@@ -114,12 +114,12 @@ class PrepareAD3Receptor(MacroNode):
             from AutoDockTools.VisionInterface.AdtNodes import MergeNonPolarHydrogens
             Merge_NonPolar_Hydrogens_22 = MergeNonPolarHydrogens(constrkw = {}, name='Merge NonPolar Hydrogens', library=adtlib)
             self.macroNetwork.addNode(Merge_NonPolar_Hydrogens_22,182,236)
-            apply(Merge_NonPolar_Hydrogens_22.inputPortByName['mols'].configure, (), {'color': '#c64e70', 'cast': True, 'shape': 'oval'})
-            apply(Merge_NonPolar_Hydrogens_22.inputPortByName['renumber'].configure, (), {'color': 'yellow', 'cast': True, 'shape': 'circle'})
-            apply(Merge_NonPolar_Hydrogens_22.outputPortByName['mols'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
-            apply(Merge_NonPolar_Hydrogens_22.outputPortByName['num_nphs'].configure, (), {'color': 'yellow', 'shape': 'circle'})
+            Merge_NonPolar_Hydrogens_22.inputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'cast': True, 'shape': 'oval'})
+            Merge_NonPolar_Hydrogens_22.inputPortByName['renumber'].configure(*(), **{'color': 'yellow', 'cast': True, 'shape': 'circle'})
+            Merge_NonPolar_Hydrogens_22.outputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
+            Merge_NonPolar_Hydrogens_22.outputPortByName['num_nphs'].configure(*(), **{'color': 'yellow', 'shape': 'circle'})
         except:
-            print "WARNING: failed to restore MergeNonPolarHydrogens named Merge NonPolar Hydrogens in network self.macroNetwork"
+            print("WARNING: failed to restore MergeNonPolarHydrogens named Merge NonPolar Hydrogens in network self.macroNetwork")
             print_exc()
             Merge_NonPolar_Hydrogens_22=None
 
@@ -128,12 +128,12 @@ class PrepareAD3Receptor(MacroNode):
             from AutoDockTools.VisionInterface.AdtNodes import MergeLonePairs
             Merge_Lone_Pairs_23 = MergeLonePairs(constrkw = {}, name='Merge Lone Pairs', library=adtlib)
             self.macroNetwork.addNode(Merge_Lone_Pairs_23,182,184)
-            apply(Merge_Lone_Pairs_23.inputPortByName['mols'].configure, (), {'color': '#c64e70', 'cast': True, 'shape': 'oval'})
-            apply(Merge_Lone_Pairs_23.inputPortByName['renumber'].configure, (), {'color': 'yellow', 'cast': True, 'shape': 'circle'})
-            apply(Merge_Lone_Pairs_23.outputPortByName['mols'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
-            apply(Merge_Lone_Pairs_23.outputPortByName['num_lps'].configure, (), {'color': 'yellow', 'shape': 'circle'})
+            Merge_Lone_Pairs_23.inputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'cast': True, 'shape': 'oval'})
+            Merge_Lone_Pairs_23.inputPortByName['renumber'].configure(*(), **{'color': 'yellow', 'cast': True, 'shape': 'circle'})
+            Merge_Lone_Pairs_23.outputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
+            Merge_Lone_Pairs_23.outputPortByName['num_lps'].configure(*(), **{'color': 'yellow', 'shape': 'circle'})
         except:
-            print "WARNING: failed to restore MergeLonePairs named Merge Lone Pairs in network self.macroNetwork"
+            print("WARNING: failed to restore MergeLonePairs named Merge Lone Pairs in network self.macroNetwork")
             print_exc()
             Merge_Lone_Pairs_23=None
 
@@ -146,38 +146,38 @@ class PrepareAD3Receptor(MacroNode):
                 self.macroNetwork.connectNodes(
                     input_Ports_17, Add_Hydrogens_19, "new", "molecules", blocking=True)
             except:
-                print "WARNING: failed to restore connection between input_Ports_17 and Add_Hydrogens_19 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_17 and Add_Hydrogens_19 in network self.macroNetwork")
         if Add_Hydrogens_19 is not None and Add_Kollman_Charges_20 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Add_Hydrogens_19, Add_Kollman_Charges_20, "molecules", "mols", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Add_Hydrogens_19 and Add_Kollman_Charges_20 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Add_Hydrogens_19 and Add_Kollman_Charges_20 in network self.macroNetwork")
         if Add_Kollman_Charges_20 is not None and Merge_Lone_Pairs_23 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Add_Kollman_Charges_20, Merge_Lone_Pairs_23, "mols", "mols", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Add_Kollman_Charges_20 and Merge_Lone_Pairs_23 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Add_Kollman_Charges_20 and Merge_Lone_Pairs_23 in network self.macroNetwork")
         if Merge_Lone_Pairs_23 is not None and Merge_NonPolar_Hydrogens_22 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Merge_Lone_Pairs_23, Merge_NonPolar_Hydrogens_22, "mols", "mols", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Merge_Lone_Pairs_23 and Merge_NonPolar_Hydrogens_22 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Merge_Lone_Pairs_23 and Merge_NonPolar_Hydrogens_22 in network self.macroNetwork")
         if Merge_NonPolar_Hydrogens_22 is not None and Add_Solvation_Parameters_21 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Merge_NonPolar_Hydrogens_22, Add_Solvation_Parameters_21, "mols", "mols", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Merge_NonPolar_Hydrogens_22 and Add_Solvation_Parameters_21 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Merge_NonPolar_Hydrogens_22 and Add_Solvation_Parameters_21 in network self.macroNetwork")
         output_Ports_18 = self.macroNetwork.opNode
         if Add_Solvation_Parameters_21 is not None and output_Ports_18 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Add_Solvation_Parameters_21, output_Ports_18, "typed_mols", "new", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Add_Solvation_Parameters_21 and output_Ports_18 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Add_Solvation_Parameters_21 and output_Ports_18 in network self.macroNetwork")
         self.macroNetwork.unfreeze()
 
         Prepare_AD3Receptor_16.shrink()

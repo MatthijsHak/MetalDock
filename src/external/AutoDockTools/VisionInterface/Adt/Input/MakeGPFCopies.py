@@ -28,10 +28,10 @@ class MakeGPFCopies(NetworkNode):
     
     def __init__(self, name='MakeGPFCopies', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='gpf_template', name='gpf_file')
         ip.append(datatype='string', name='struct_dir')

@@ -75,13 +75,13 @@ class PropertyTable:
         Nat = 4
         NotStdAT = 5
         Atypes = 6
-        nameLength = max( map(len, self.table.keys()))
+        nameLength = max( list(map(len, list(self.table.keys()))))
         f = open(filename, 'w')
         pad = max(0, nameLength-7)
         f.write('folder %s\n'%self.folder)
         f.write('# file '+' '*pad+' #TORS HbD HbA  MW   Nat nstd Types\n')
         fmt = "%"+str(nameLength)+"s %3d  %3d %3d %5.2f  %3d  %d"
-        for key, v in self.table.items():
+        for key, v in list(self.table.items()):
             f.write(fmt%(key, v[TORSDOF], v[HbD], v[HbA], v[MW],
                     v[Nat], v[NotStdAT]))
             for t in v[Atypes]:
@@ -98,9 +98,9 @@ class PropertyTable:
 
 
     def fillFromURL(self, url):
-        import urllib
+        import urllib.request, urllib.parse, urllib.error
         
-        fp = urllib.urlopen(url)
+        fp = urllib.request.urlopen(url)
         lines = fp.read().split('\n')
         fp.close()
         self._parseLines(lines)
@@ -240,8 +240,8 @@ class CalculateProperties:
 
         self.processingTime = time.time()-t1
         if self.verbose>1:
-            print 'Processed %d molecules in %.2f seconds'%(
-                len(propT), self.processingTime)
+            print('Processed %d molecules in %.2f seconds'%(
+                len(propT), self.processingTime))
         return propTab
 
 
@@ -265,8 +265,8 @@ class CalculateProperties:
 
         self.processingTime = time.time()-t1
         if self.verbose>1:
-            print 'Processed %d molecules in %.2f seconds'%(
-                len(propT), self.processingTime)
+            print('Processed %d molecules in %.2f seconds'%(
+                len(propT), self.processingTime))
         return propTab
     
 
@@ -333,7 +333,7 @@ class CalculateProperties:
                         break
 
         propT[key] = [ TORSDOF, HbD, HbA, MW, Nat, BAD_ATOM_TYPE, 
-                       current_atypes.keys() ]
+                       list(current_atypes.keys()) ]
 #            {
 #            "Atypes": current_atypes.keys(),
 #            "TORSDOF": TORSDOF,
@@ -345,9 +345,9 @@ class CalculateProperties:
 #            }
 
         if self.verbose > 10:
-            print "tors %d hbd:%d hba: %d mw: %.2f nat:%d nstd: %d, types: %s\n"%(
+            print("tors %d hbd:%d hba: %d mw: %.2f nat:%d nstd: %d, types: %s\n"%(
                 TORSDOF, HbD, HbA, MW, Nat, BAD_ATOM_TYPE,
-                current_atypes.keys()) 
+                list(current_atypes.keys()))) 
            
 
        
@@ -397,7 +397,7 @@ class FilterLigands:
             self.TORSDOFMin = 0
             self.TORSDOFMax = 32
         else:
-            for key, value in kw.items():
+            for key, value in list(kw.items()):
                 if key=='HbDMin':
                     self.HbDMin = value
                 elif key=='HbDMax':
@@ -493,7 +493,7 @@ class FilterLigands:
         
         # get all keys in case none were given
         if subset is None:
-            subset = table.keys()
+            subset = list(table.keys())
 
         from time import time
         t1 = time()
@@ -542,14 +542,14 @@ class FilterLigands:
         table = propertyTable.table
         # get all keys in case none were given
         if subset is None:
-            subset = table.keys()
+            subset = list(table.keys())
 
         atypes = {}
         
         for key in subset:
             for t in table[key][6]:
                atypes[t] = 1
-        return atypes.keys()
+        return list(atypes.keys())
     
 
 class LigandList:
@@ -571,7 +571,7 @@ class LigandList:
 
 if __name__=='__main__':
     import sys, os, time
-    print sys.argv[1]
+    print(sys.argv[1])
     calcProp = CalculateProperties(verbose=2)
     propT = calcProp.processDirectory(sys.argv[1], "*.pdbqt")
 
@@ -587,33 +587,33 @@ if __name__=='__main__':
     lfilter = FilterLigands()
     lfilter.setFilter('None')
     accepted, rejected = lfilter.filterTable(pt)
-    print 'No filter in %f second accepted %d rejected %d'%(
-        lfilter.filteringTime, len(accepted.filenames), len(rejected))
-    print accepted.atomTypes
+    print('No filter in %f second accepted %d rejected %d'%(
+        lfilter.filteringTime, len(accepted.filenames), len(rejected)))
+    print(accepted.atomTypes)
 
     lfilter.setFilter('default')
     accepted, rejected = lfilter.filterTable(pt)
-    print 'default filter in %f second accepted %d rejected %d'%(
-        lfilter.filteringTime, len(accepted.filenames), len(rejected))
-    print accepted.atomTypes
+    print('default filter in %f second accepted %d rejected %d'%(
+        lfilter.filteringTime, len(accepted.filenames), len(rejected)))
+    print(accepted.atomTypes)
 
     lfilter.setFilter('Lipinski-like')
     accepted, rejected = lfilter.filterTable(pt)
-    print 'Lipinski filter in %f second accepted %d rejected %d'%(
-        lfilter.filteringTime, len(accepted.filenames), len(rejected))
-    print accepted.atomTypes
+    print('Lipinski filter in %f second accepted %d rejected %d'%(
+        lfilter.filteringTime, len(accepted.filenames), len(rejected)))
+    print(accepted.atomTypes)
     
     lfilter.setFilter('Drug-like')
     accepted, rejected = lfilter.filterTable(pt)
-    print 'Drug filter in %f second accepted %d rejected %d'%(
-        lfilter.filteringTime, len(accepted.filenames), len(rejected))
-    print accepted.atomTypes
+    print('Drug filter in %f second accepted %d rejected %d'%(
+        lfilter.filteringTime, len(accepted.filenames), len(rejected)))
+    print(accepted.atomTypes)
     
     lfilter.setFilter('Drug-like frag')
     accepted, rejected = lfilter.filterTable(pt)
-    print 'Drug frag filter in %f second accepted %d rejected %d'%(
-        lfilter.filteringTime, len(accepted.filenames), len(rejected))
-    print accepted.atomTypes
+    print('Drug frag filter in %f second accepted %d rejected %d'%(
+        lfilter.filteringTime, len(accepted.filenames), len(rejected)))
+    print(accepted.atomTypes)
 
 ##     raise
 ##     # chaining filters

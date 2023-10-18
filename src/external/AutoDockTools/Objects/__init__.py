@@ -27,16 +27,16 @@ del hostDict['localhost']
 # first try to find a adthost file in current directory
 import os,sys
 if os.path.isfile('./adthosts.py'):
-    execfile('./adthosts.py')
-    if globals().has_key('hostMacros'):
+    exec(compile(open('./adthosts.py', "rb").read(), './adthosts.py', 'exec'))
+    if 'hostMacros' in globals():
         hostDict.update(hostMacros)
 elif os.name != 'nt':#sys.platform!='win32':
     # try to find the user's home directory
     import posix
-    if 'HOME' in posix.environ.keys():
+    if 'HOME' in list(posix.environ.keys()):
 	try:
-            execfile(os.path.join(posix.environ['HOME'],'adthosts.py'))
-            if globals().has_key('hostMacros'):
+            exec(compile(open(os.path.join(posix.environ['HOME'],'adthosts.py'), "rb").read(), os.path.join(posix.environ['HOME'],'adthosts.py'), 'exec'))
+            if 'hostMacros' in globals():
                 hostDict.update(hostMacros)
 	except:
 	    pass

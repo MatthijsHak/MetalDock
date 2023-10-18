@@ -55,7 +55,7 @@ class AutoDockBondClassifier(BondClassifier):
         resultDict = {}
         rotatables = self.d['rotatable'].select(bonds)
 
-        for k, v in self.dict.items():
+        for k, v in list(self.dict.items()):
             if k=='bondOrder2':
                 resultDict[k] = v.select(bonds,2)
             elif k=='cycle':

@@ -43,7 +43,7 @@ class FilterLigandsNode(NetworkNode):
 
     def __init__(self, name='filterLigands', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         # create filter object
         lfilter = self.lfilter = FilterLigands()

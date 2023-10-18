@@ -23,7 +23,7 @@ class AD3Gpf(MacroNode):
 
     def __init__(self, constrkw={}, name='AD3Gpf', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -63,7 +63,7 @@ class AD3Gpf(MacroNode):
             ## saving node input Ports ##
             input_Ports_16 = self.macroNetwork.ipNode
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_16=None
 
@@ -71,7 +71,7 @@ class AD3Gpf(MacroNode):
             ## saving node output Ports ##
             output_Ports_17 = self.macroNetwork.opNode
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_17=None
 
@@ -80,11 +80,11 @@ class AD3Gpf(MacroNode):
             from AutoDockTools.VisionInterface.AdtNodes import GridParameterFileBrowserNE
             Grid_Parameter_File_Browser_18 = GridParameterFileBrowserNE(constrkw = {}, name='Grid Parameter File Browser', library=adtlib)
             self.macroNetwork.addNode(Grid_Parameter_File_Browser_18,310,99)
-            apply(Grid_Parameter_File_Browser_18.inputPortByName['filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Grid_Parameter_File_Browser_18.outputPortByName['filename'].configure, (), {'color': 'white', 'shape': 'oval'})
+            Grid_Parameter_File_Browser_18.inputPortByName['filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Grid_Parameter_File_Browser_18.outputPortByName['filename'].configure(*(), **{'color': 'white', 'shape': 'oval'})
             Grid_Parameter_File_Browser_18.inputPortByName['filename'].widget.set("/mgl/work4/rhuey/dev23/fri2.gpf", run=False)
         except:
-            print "WARNING: failed to restore GridParameterFileBrowserNE named Grid Parameter File Browser in network self.macroNetwork"
+            print("WARNING: failed to restore GridParameterFileBrowserNE named Grid Parameter File Browser in network self.macroNetwork")
             print_exc()
             Grid_Parameter_File_Browser_18=None
 
@@ -93,10 +93,10 @@ class AD3Gpf(MacroNode):
             from MolKit.VisionInterface.MolKitNodes import ReadMolecule
             Read_Molecule_19 = ReadMolecule(constrkw = {}, name='Read Molecule', library=molkitlib)
             self.macroNetwork.addNode(Read_Molecule_19,156,96)
-            apply(Read_Molecule_19.inputPortByName['filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Read_Molecule_19.outputPortByName['MolSets'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
+            Read_Molecule_19.inputPortByName['filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Read_Molecule_19.outputPortByName['MolSets'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore ReadMolecule named Read Molecule in network self.macroNetwork"
+            print("WARNING: failed to restore ReadMolecule named Read Molecule in network self.macroNetwork")
             print_exc()
             Read_Molecule_19=None
 
@@ -105,10 +105,10 @@ class AD3Gpf(MacroNode):
             from MolKit.VisionInterface.MolKitNodes import ReadMolecule
             Read_Molecule_20 = ReadMolecule(constrkw = {}, name='Read Molecule', library=molkitlib)
             self.macroNetwork.addNode(Read_Molecule_20,234,98)
-            apply(Read_Molecule_20.inputPortByName['filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Read_Molecule_20.outputPortByName['MolSets'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
+            Read_Molecule_20.inputPortByName['filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Read_Molecule_20.outputPortByName['MolSets'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore ReadMolecule named Read Molecule in network self.macroNetwork"
+            print("WARNING: failed to restore ReadMolecule named Read Molecule in network self.macroNetwork")
             print_exc()
             Read_Molecule_20=None
 
@@ -117,10 +117,10 @@ class AD3Gpf(MacroNode):
             from Vision.StandardNodes import FileBrowserNE
             File_Browser_21 = FileBrowserNE(constrkw = {}, name='File Browser', library=stdlib)
             self.macroNetwork.addNode(File_Browser_21,332,163)
-            apply(File_Browser_21.inputPortByName['filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(File_Browser_21.outputPortByName['filename'].configure, (), {'color': 'white', 'shape': 'oval'})
+            File_Browser_21.inputPortByName['filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            File_Browser_21.outputPortByName['filename'].configure(*(), **{'color': 'white', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore FileBrowserNE named File Browser in network self.macroNetwork"
+            print("WARNING: failed to restore FileBrowserNE named File Browser in network self.macroNetwork")
             print_exc()
             File_Browser_21=None
 
@@ -129,14 +129,14 @@ class AD3Gpf(MacroNode):
             from AutoDockTools.VisionInterface.AdtNodes import AdtPrepareGpf3
             Prepare_AD3Gpf_22 = AdtPrepareGpf3(constrkw = {}, name='Prepare AD3Gpf', library=adtlib)
             self.macroNetwork.addNode(Prepare_AD3Gpf_22,217,216)
-            apply(Prepare_AD3Gpf_22.inputPortByName['ligand_filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Gpf_22.inputPortByName['receptor_filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Gpf_22.inputPortByName['gpf_filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Gpf_22.inputPortByName['parameters'].configure, (), {'color': 'cyan', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Gpf_22.inputPortByName['outputfilename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Gpf_22.outputPortByName['ag3_parameter_file'].configure, (), {'color': 'white', 'shape': 'oval'})
+            Prepare_AD3Gpf_22.inputPortByName['ligand_filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Gpf_22.inputPortByName['receptor_filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Gpf_22.inputPortByName['gpf_filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Gpf_22.inputPortByName['parameters'].configure(*(), **{'color': 'cyan', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Gpf_22.inputPortByName['outputfilename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Gpf_22.outputPortByName['ag3_parameter_file'].configure(*(), **{'color': 'white', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore AdtPrepareGpf3 named Prepare AD3Gpf in network self.macroNetwork"
+            print("WARNING: failed to restore AdtPrepareGpf3 named Prepare AD3Gpf in network self.macroNetwork")
             print_exc()
             Prepare_AD3Gpf_22=None
 
@@ -148,32 +148,32 @@ class AD3Gpf(MacroNode):
                 self.macroNetwork.connectNodes(
                     Read_Molecule_19, Prepare_AD3Gpf_22, "MolSets", "ligand_filename", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Read_Molecule_19 and Prepare_AD3Gpf_22 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Read_Molecule_19 and Prepare_AD3Gpf_22 in network self.macroNetwork")
         if Read_Molecule_20 is not None and Prepare_AD3Gpf_22 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Read_Molecule_20, Prepare_AD3Gpf_22, "MolSets", "receptor_filename", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Read_Molecule_20 and Prepare_AD3Gpf_22 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Read_Molecule_20 and Prepare_AD3Gpf_22 in network self.macroNetwork")
         if Grid_Parameter_File_Browser_18 is not None and Prepare_AD3Gpf_22 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Grid_Parameter_File_Browser_18, Prepare_AD3Gpf_22, "filename", "gpf_filename", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Grid_Parameter_File_Browser_18 and Prepare_AD3Gpf_22 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Grid_Parameter_File_Browser_18 and Prepare_AD3Gpf_22 in network self.macroNetwork")
         if File_Browser_21 is not None and Prepare_AD3Gpf_22 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     File_Browser_21, Prepare_AD3Gpf_22, "filename", "outputfilename", blocking=True)
             except:
-                print "WARNING: failed to restore connection between File_Browser_21 and Prepare_AD3Gpf_22 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between File_Browser_21 and Prepare_AD3Gpf_22 in network self.macroNetwork")
         output_Ports_17 = self.macroNetwork.opNode
         if Prepare_AD3Gpf_22 is not None and output_Ports_17 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Prepare_AD3Gpf_22, output_Ports_17, "ag3_parameter_file", "new", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Prepare_AD3Gpf_22 and output_Ports_17 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Prepare_AD3Gpf_22 and output_Ports_17 in network self.macroNetwork")
         self.macroNetwork.unfreeze()
 
         AD3Gpf_15.shrink()

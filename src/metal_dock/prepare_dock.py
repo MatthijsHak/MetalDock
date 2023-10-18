@@ -538,14 +538,14 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     return max_side
 
 def prepare_receptor(name_protein):
-    prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_gpf4.py')
-    subprocess.call([os.environ['PYTHON_2']+f' {prepare_gpf4} -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_receptor4.py')
+    subprocess.call([os.environ['PYTHON_3']+f' {prepare_gpf4} -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
 def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, energy=None):
     #create_gpf():
     prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_gpf4.py')
-    subprocess.call([os.environ['PYTHON_2']+f" {prepare_gpf4} -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.4},{dock[1]:.4},{dock[2]:.4}'"], shell=True )
+    subprocess.call([os.environ['PYTHON_3']+f" {prepare_gpf4} -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.6},{dock[1]:.6},{dock[2]:.6}'"], shell=True )
     gpf = open(f'clean_{name_protein}.gpf', 'a')
     gpf.write(f'nbp_r_eps 0.25 23.2135   12 6  NA TZ\n')
     gpf.write(f'nbp_r_eps 2.10  3.8453   12 6  OA Zn\n')
@@ -577,10 +577,35 @@ def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, 
         subprocess.call([f'{autodock4} -p {name_ligand}_clean_{name_protein}.dpf'], shell=True)
 
     #write_all_conformations()
-    write_conformations = os.path.join(os.environ['MGLTOOLS'], 'write_conformations_from_dlg.py')
-    subprocess.call([os.environ['PYTHON_2']+f" {write_conformations} -d {name_ligand}_clean_{name_protein}.dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    write_conformations(name_ligand, name_protein)
+    # write_conformations = os.path.join(os.environ['MGLTOOLS'], 'write_conformations_from_dlg.py')
+    # subprocess.call([os.environ['PYTHON_3']+f" {write_conformations} -d {name_ligand}_clean_{name_protein}.dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     return
+
+def write_conformations(name_ligand, name_protein):
+    with open(f'{name_ligand}_clean_{name_protein}.dlg', 'r') as fin:
+        pose = []
+        atom_id = 0
+        mol_id = 1
+        in_docked_block = False  
+        docked_block = []  
+        for line in fin:
+            if 'DOCKED: ROOT' in line:
+                in_docked_block = True
+                docked_block.append(line)
+            elif in_docked_block and 'TER' in line:
+                in_docked_block = False
+                docked_block.append(line)
+                with open(f'{name_ligand}_{mol_id}.pdbqt', 'w') as output_file:
+                    for block_line in docked_block:
+                        cleaned_line = block_line.replace('DOCKED: ', '', 1)
+                        output_file.write(cleaned_line)
+                mol_id += 1
+                docked_block = []  
+            elif in_docked_block:
+                docked_block.append(line)
+
 
 def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, num_poses, dock_algorithm, random_pos=False, GA=False, SA=False, energy_ligand=None):
     gpf_file = open(gpf_file,'r')

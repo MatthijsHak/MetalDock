@@ -18,12 +18,12 @@
 # /home/vareille/.mgltools/1.6.0/Vision/UserLibs/MyDefaultLib/libTypes.py
 # Vision will generate this file automatically if it can't find it
 #
-from LigandDB import LigandDB
-from receptor import receptor
-from receptor_prepared import receptor_prepared
-from dpf_template import dpf_template
-from gpf_template import gpf_template
-from autogrid_results import autogrid_results
+from .LigandDB import LigandDB
+from .receptor import receptor
+from .receptor_prepared import receptor_prepared
+from .dpf_template import dpf_template
+from .gpf_template import gpf_template
+from .autogrid_results import autogrid_results
 from NetworkEditor.datatypes import AnyArrayType
 
 ###################################################

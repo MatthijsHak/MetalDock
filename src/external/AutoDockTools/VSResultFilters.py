@@ -116,7 +116,7 @@ class EnergyFilter(Filter):
                 break
         if not found:
             msg =  "improperly formatted file "+ VSResult
-            print msg
+            print(msg)
             return 0
             #raise RuntimeError(msg)
         this_energy = float(ll[1])
@@ -152,7 +152,7 @@ class EnergyRangeFilter(Filter):
         self.inclusive = inclusive
         if min_energy>max_energy:
             msg = "minimum energy %f greater than maximum energy %f"%(min_energy, max_energy)
-            print msg
+            print(msg)
             return 0
             #raise RuntimeError(msg)
 
@@ -169,7 +169,7 @@ class EnergyRangeFilter(Filter):
                 break
         if not found:
             msg =  "improperly formatted file "+ VSResult
-            print msg
+            print(msg)
             return 0
             #raise RuntimeError(msg)
         best_energy = float(ll[1])
@@ -209,7 +209,7 @@ class ClusterSizeFilter(Filter):
                 break
         if not found:
             msg =  "improperly formatted file "+ VSResult
-            print msg
+            print(msg)
             return 0
             #raise RuntimeError(msg)
         clu_size = ll[2]
@@ -256,14 +256,14 @@ class ClusterPercentageFilter(Filter):
                 break
         if not found:
             msg =  "improperly formatted file "+ VSResult
-            print msg
+            print(msg)
             return 0
             #raise RuntimeError(msg)
         this_cl_nruns = int(ll[2])
-        if self.verbose: print "this_cl_nruns = ", this_cl_nruns
+        if self.verbose: print("this_cl_nruns = ", this_cl_nruns)
         percent = 100.*(float(this_cl_nruns)/float(nruns))
         if self.verbose: 
-            print "percent =", percent, " self.cluster_percentage=", self.cluster_percentage
+            print("percent =", percent, " self.cluster_percentage=", self.cluster_percentage)
         result =  percent >= self.cluster_percentage
         return result
 
@@ -422,9 +422,9 @@ class LigandEfficiencyFilter(Filter):
             result = lig_eff<=self.ligand_efficiency
         else:
             #@@make this safer
-            print VSResult, " missing expected line: 'USER  AD> ligand efficiency float'"
+            print(VSResult, " missing expected line: 'USER  AD> ligand efficiency float'")
             msg =  "improperly formatted file "+ VSResult
-            print msg + ": missing expected line: 'USER  AD> ligand efficiency float'"
+            print(msg + ": missing expected line: 'USER  AD> ligand efficiency float'")
             return 0
             #raise RuntimeError(msg)
         return result
@@ -556,7 +556,7 @@ class VinaEnergyFilter(VinaFilter):
             found = 1
         else:
             msg =  "improperly formatted file "+ VSResult
-            print msg
+            print(msg)
             return 0
             #raise RuntimeError(msg)
         this_energy = float(ll[2][:-1])
@@ -584,7 +584,7 @@ class VinaEnergyRangeFilter(VinaFilter):
     def __init__(self, min_energy=0, max_energy=0, inclusive=False):
         if min_energy>max_energy:
             msg = "minimum energy %f greater than maximum energy %f"%(min_energy, max_energy)
-            print msg
+            print(msg)
             return 0
         self.criteria = "Energy"  
         VinaFilter.__init__(self, self.criteria)
@@ -628,7 +628,7 @@ class VinaLigandEfficiencyFilter(VinaFilter):
             found = 1
         else:
             msg =  "improperly formatted file "+ VinaVSResult
-            print msg
+            print(msg)
             return 0
             #raise RuntimeError(msg)
         this_efficiency = float(ll[4].strip())

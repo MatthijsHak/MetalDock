@@ -24,7 +24,7 @@ class VirtualScreeningCSF(MacroNode):
 
     def __init__(self, constrkw={}, name='VirtualScreeningCSF', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -76,19 +76,19 @@ class VirtualScreeningCSF(MacroNode):
         try:
             ## saving node input Ports ##
             input_Ports_121 = self.macroNetwork.ipNode
-            apply(input_Ports_121.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            input_Ports_121.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_121=None
 
         try:
             ## saving node output Ports ##
             output_Ports_122 = self.macroNetwork.opNode
-            apply(output_Ports_122.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            output_Ports_122.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             output_Ports_122.move(217, 330)
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_122=None
 
@@ -97,7 +97,7 @@ class VirtualScreeningCSF(MacroNode):
             from Adt.Macro.PrepareReceptor import PrepareReceptor
             PrepareReceptor_141 = PrepareReceptor(constrkw={}, name='PrepareReceptor', library=Adt)
             self.macroNetwork.addNode(PrepareReceptor_141,115,96)
-            apply(PrepareReceptor_141.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            PrepareReceptor_141.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             Pdb2pqrWS_144 = PrepareReceptor_141.macroNetwork.nodes[2]
             Pdb2pqrOpalService_ws_nbcr_net_148 = Pdb2pqrWS_144.macroNetwork.nodes[3]
             Pdb2pqrOpalService_ws_nbcr_net_148.inputPortByName['noopt'].widget.set(0, run=False)
@@ -209,9 +209,9 @@ class VirtualScreeningCSF(MacroNode):
             PrepareReceptor_141.outputPorts[1].configure(datatype='string')
             ## configure MacroNode output ports
             PrepareReceptor_141.shrink()
-            apply(PrepareReceptor_141.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            PrepareReceptor_141.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore PrepareReceptor named PrepareReceptor in network self.macroNetwork"
+            print("WARNING: failed to restore PrepareReceptor named PrepareReceptor in network self.macroNetwork")
             print_exc()
             PrepareReceptor_141=None
 
@@ -220,7 +220,7 @@ class VirtualScreeningCSF(MacroNode):
             from Adt.Macro.ComputeGrids import ComputeGrids
             ComputeGrids_159 = ComputeGrids(constrkw={}, name='ComputeGrids', library=Adt)
             self.macroNetwork.addNode(ComputeGrids_159,136,207)
-            apply(ComputeGrids_159.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            ComputeGrids_159.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             prepareGPF_kryptonite_nbcr_net_163 = ComputeGrids_159.macroNetwork.nodes[3]
             prepareGPF_kryptonite_nbcr_net_163.inputPortByName['singlelib'].widget.set(r"", run=False)
             prepareGPF_kryptonite_nbcr_net_163.inputPortByName['r_url'].widget.set(r"", run=False)
@@ -277,9 +277,9 @@ class VirtualScreeningCSF(MacroNode):
             ComputeGrids_159.outputPorts[1].configure(datatype='string')
             ## configure MacroNode output ports
             ComputeGrids_159.shrink()
-            apply(ComputeGrids_159.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            ComputeGrids_159.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore ComputeGrids named ComputeGrids in network self.macroNetwork"
+            print("WARNING: failed to restore ComputeGrids named ComputeGrids in network self.macroNetwork")
             print_exc()
             ComputeGrids_159=None
 
@@ -288,7 +288,7 @@ class VirtualScreeningCSF(MacroNode):
             from Adt.Macro.AutodockVsCSF import AutodockVsCSF
             AutodockVsCSF_168 = AutodockVsCSF(constrkw={}, name='AutodockVsCSF', library=Adt)
             self.macroNetwork.addNode(AutodockVsCSF_168,234,272)
-            apply(AutodockVsCSF_168.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            AutodockVsCSF_168.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             autodock_kryptonite_nbcr_net_172 = AutodockVsCSF_168.macroNetwork.nodes[3]
             autodock_kryptonite_nbcr_net_172.inputPortByName['ga_run'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_172.inputPortByName['lib'].widget.set(r"", run=False)
@@ -331,9 +331,9 @@ class VirtualScreeningCSF(MacroNode):
             AutodockVsCSF_168.outputPorts[0].configure(datatype='string')
             ## configure MacroNode output ports
             AutodockVsCSF_168.shrink()
-            apply(AutodockVsCSF_168.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            AutodockVsCSF_168.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore AutodockVsCSF named AutodockVsCSF in network self.macroNetwork"
+            print("WARNING: failed to restore AutodockVsCSF named AutodockVsCSF in network self.macroNetwork")
             print_exc()
             AutodockVsCSF_168=None
 
@@ -348,56 +348,56 @@ class VirtualScreeningCSF(MacroNode):
                     input_Ports_121, PrepareReceptor_141, "new", "Pdb2pqrWS_CheckFileFormat_value", blocking=True
                     , splitratio=[0.70852617526621731, 0.39749336046566702])
             except:
-                print "WARNING: failed to restore connection between input_Ports_121 and PrepareReceptor_141 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_121 and PrepareReceptor_141 in network self.macroNetwork")
         if PrepareReceptor_141 is not None and ComputeGrids_159 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     PrepareReceptor_141, ComputeGrids_159, "PrepareReceptorWS_UpdateReceptor_receptor_prepared_obj", "GetComputeGridsInputs_receptor_pdbqt", blocking=True
                     , splitratio=[0.35807693100671723, 0.50862337251735745])
             except:
-                print "WARNING: failed to restore connection between PrepareReceptor_141 and ComputeGrids_159 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareReceptor_141 and ComputeGrids_159 in network self.macroNetwork")
         if input_Ports_121 is not None and ComputeGrids_159 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_121, ComputeGrids_159, "new", "GetComputeGridsInputs_ligands", blocking=True
                     , splitratio=[0.40102167589221782, 0.6253111040879471])
             except:
-                print "WARNING: failed to restore connection between input_Ports_121 and ComputeGrids_159 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_121 and ComputeGrids_159 in network self.macroNetwork")
         if input_Ports_121 is not None and AutodockVsCSF_168 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_121, AutodockVsCSF_168, "ComputeGrids_GetComputeGridsInputs_ligands", "PrepareADVSInputs_ligands", blocking=True
                     , splitratio=[0.65260935115862417, 0.64296744661832661])
             except:
-                print "WARNING: failed to restore connection between input_Ports_121 and AutodockVsCSF_168 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_121 and AutodockVsCSF_168 in network self.macroNetwork")
         if ComputeGrids_159 is not None and AutodockVsCSF_168 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     ComputeGrids_159, AutodockVsCSF_168, "MakeAutogridResultObj_autogrid_result_obj", "PrepareADVSInputs_autogrid_results", blocking=True
                     , splitratio=[0.50054097826587762, 0.55954672420260165])
             except:
-                print "WARNING: failed to restore connection between ComputeGrids_159 and AutodockVsCSF_168 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between ComputeGrids_159 and AutodockVsCSF_168 in network self.macroNetwork")
         if input_Ports_121 is not None and ComputeGrids_159 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_121, ComputeGrids_159, "new", "GetComputeGridsInputs_gpf_obj", blocking=True
                     , splitratio=[0.73607423731241384, 0.54225043834950515])
             except:
-                print "WARNING: failed to restore connection between input_Ports_121 and ComputeGrids_159 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_121 and ComputeGrids_159 in network self.macroNetwork")
         if input_Ports_121 is not None and AutodockVsCSF_168 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_121, AutodockVsCSF_168, "new", "PrepareADVSInputs_dpf_template_obj", blocking=True
                     , splitratio=[0.24404719659126095, 0.41822006352735946])
             except:
-                print "WARNING: failed to restore connection between input_Ports_121 and AutodockVsCSF_168 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_121 and AutodockVsCSF_168 in network self.macroNetwork")
         if input_Ports_121 is not None and PrepareReceptor_141 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_121, PrepareReceptor_141, "new", "PrepareReceptorWS_PrepareReceptorOpalService_ws_nbcr_net_C", blocking=True
                     , splitratio=[0.73098254809437191, 0.23999050334763958])
             except:
-                print "WARNING: failed to restore connection between input_Ports_121 and PrepareReceptor_141 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_121 and PrepareReceptor_141 in network self.macroNetwork")
         output_Ports_122 = self.macroNetwork.opNode
         if AutodockVsCSF_168 is not None and output_Ports_122 is not None:
             try:
@@ -405,7 +405,7 @@ class VirtualScreeningCSF(MacroNode):
                     AutodockVsCSF_168, output_Ports_122, "GetMainURLFromList_newurl", "new", blocking=True
                     , splitratio=[0.55528494083678659, 0.33476142488031579])
             except:
-                print "WARNING: failed to restore connection between AutodockVsCSF_168 and output_Ports_122 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between AutodockVsCSF_168 and output_Ports_122 in network self.macroNetwork")
         self.macroNetwork.runOnNewData.value = False
 
         ## modifying MacroInputNode dynamic ports

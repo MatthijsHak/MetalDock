@@ -39,7 +39,7 @@ class LocalLigandDirectory(MacroNode):
 
     def __init__(self, constrkw={}, name='LocalLigandDirectory', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -72,19 +72,19 @@ class LocalLigandDirectory(MacroNode):
         try:
             ## saving node input Ports ##
             input_Ports_1 = self.macroNetwork.ipNode
-            apply(input_Ports_1.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            input_Ports_1.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_1=None
 
         try:
             ## saving node output Ports ##
             output_Ports_2 = self.macroNetwork.opNode
-            apply(output_Ports_2.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            output_Ports_2.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             output_Ports_2.move(294, 448)
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_2=None
 
@@ -93,12 +93,12 @@ class LocalLigandDirectory(MacroNode):
             from Vision.StandardNodes import MakeZipFileNE
             Make_Zip_File_3 = MakeZipFileNE(constrkw={}, name='Make Zip File', library=stdlib)
             self.macroNetwork.addNode(Make_Zip_File_3,136,158)
-            apply(Make_Zip_File_3.inputPortByName['input_directory'].configure, (), {'defaultValue': None})
-            apply(Make_Zip_File_3.inputPortByName['output_directory'].configure, (), {'defaultValue': None})
-            apply(Make_Zip_File_3.inputPortByName['output_name'].configure, (), {'defaultValue': None})
-            apply(Make_Zip_File_3.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            Make_Zip_File_3.inputPortByName['input_directory'].configure(*(), **{'defaultValue': None})
+            Make_Zip_File_3.inputPortByName['output_directory'].configure(*(), **{'defaultValue': None})
+            Make_Zip_File_3.inputPortByName['output_name'].configure(*(), **{'defaultValue': None})
+            Make_Zip_File_3.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MakeZipFileNE named Make Zip File in network self.macroNetwork"
+            print("WARNING: failed to restore MakeZipFileNE named Make Zip File in network self.macroNetwork")
             print_exc()
             Make_Zip_File_3=None
 
@@ -107,11 +107,11 @@ class LocalLigandDirectory(MacroNode):
             from Vision.StandardNodes import EntryNE
             Entry_4 = EntryNE(constrkw={}, name='Entry', library=stdlib)
             self.macroNetwork.addNode(Entry_4,312,18)
-            apply(Entry_4.inputPortByName['entry'].configure, (), {'defaultValue': None})
+            Entry_4.inputPortByName['entry'].configure(*(), **{'defaultValue': None})
             Entry_4.inputPortByName['entry'].widget.set(r"my_ligands.zip", run=False)
-            apply(Entry_4.configure, (), {'paramPanelImmediate': 1})
+            Entry_4.configure(*(), **{'paramPanelImmediate': 1})
         except:
-            print "WARNING: failed to restore EntryNE named Entry in network self.macroNetwork"
+            print("WARNING: failed to restore EntryNE named Entry in network self.macroNetwork")
             print_exc()
             Entry_4=None
 
@@ -120,12 +120,12 @@ class LocalLigandDirectory(MacroNode):
             from NetworkEditor.items import FunctionNode
             LigandDBUpload_kryptonite_nbcr_net_5 = FunctionNode(functionOrString='LigandDBUpload_kryptonite_nbcr_net', host="http://kryptonite.nbcr.net/opal2", namedArgs={'username': '', 'userlib': '', 'password': '', 'localRun': False, 'execPath': '', 'desc': ''}, constrkw={'functionOrString': "'LigandDBUpload_kryptonite_nbcr_net'", 'host': '"http://kryptonite.nbcr.net/opal2"', 'namedArgs': {'username': '', 'userlib': '', 'password': '', 'localRun': False, 'execPath': '', 'desc': ''}}, name='LigandDBUpload_kryptonite_nbcr_net', library=wslib)
             self.macroNetwork.addNode(LigandDBUpload_kryptonite_nbcr_net_5,136,216)
-            apply(LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['username'].configure, (), {'defaultValue': None})
-            apply(LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['userlib'].configure, (), {'defaultValue': None})
-            apply(LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['password'].configure, (), {'defaultValue': None})
-            apply(LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['localRun'].configure, (), {'defaultValue': None})
-            apply(LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['execPath'].configure, (), {'defaultValue': None})
-            apply(LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['desc'].configure, (), {'defaultValue': None})
+            LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['username'].configure(*(), **{'defaultValue': None})
+            LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['userlib'].configure(*(), **{'defaultValue': None})
+            LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['password'].configure(*(), **{'defaultValue': None})
+            LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['localRun'].configure(*(), **{'defaultValue': None})
+            LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['execPath'].configure(*(), **{'defaultValue': None})
+            LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['desc'].configure(*(), **{'defaultValue': None})
             LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['username'].widget.set(r"", run=False)
             LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['userlib'].rebindWidget()
             LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['userlib'].widget.set(r"", run=False)
@@ -134,9 +134,9 @@ class LocalLigandDirectory(MacroNode):
             LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['localRun'].widget.set(0, run=False)
             LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['execPath'].widget.set(r"", run=False)
             LigandDBUpload_kryptonite_nbcr_net_5.inputPortByName['desc'].widget.set(r"", run=False)
-            apply(LigandDBUpload_kryptonite_nbcr_net_5.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            LigandDBUpload_kryptonite_nbcr_net_5.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore FunctionNode named LigandDBUpload_kryptonite_nbcr_net in network self.macroNetwork"
+            print("WARNING: failed to restore FunctionNode named LigandDBUpload_kryptonite_nbcr_net in network self.macroNetwork")
             print_exc()
             LigandDBUpload_kryptonite_nbcr_net_5=None
 
@@ -145,14 +145,14 @@ class LocalLigandDirectory(MacroNode):
             from Vision.StandardNodes import Index
             Index_6 = Index(constrkw={}, name='Index', library=stdlib)
             self.macroNetwork.addNode(Index_6,136,273)
-            apply(Index_6.inputPortByName['data'].configure, (), {'defaultValue': None})
-            apply(Index_6.inputPortByName['index'].configure, (), {'defaultValue': None})
-            apply(Index_6.outputPortByName['data'].configure, (), {'datatype': 'string'})
-            apply(Index_6.inputPortByName['index'].widget.configure, (), {'max': 7, 'min': -8})
+            Index_6.inputPortByName['data'].configure(*(), **{'defaultValue': None})
+            Index_6.inputPortByName['index'].configure(*(), **{'defaultValue': None})
+            Index_6.outputPortByName['data'].configure(*(), **{'datatype': 'string'})
+            Index_6.inputPortByName['index'].widget.configure(*(), **{'max': 7, 'min': -8})
             Index_6.inputPortByName['index'].widget.set(0, run=False)
-            apply(Index_6.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            Index_6.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore Index named Index in network self.macroNetwork"
+            print("WARNING: failed to restore Index named Index in network self.macroNetwork")
             print_exc()
             Index_6=None
 
@@ -161,14 +161,14 @@ class LocalLigandDirectory(MacroNode):
             from WebServices.VisionInterface.WSNodes import ReplaceURLNode
             ReplaceURL_7 = ReplaceURLNode(constrkw={}, name='ReplaceURL', library=wslib)
             self.macroNetwork.addNode(ReplaceURL_7,328,327)
-            apply(ReplaceURL_7.inputPortByName['url'].configure, (), {'defaultValue': None})
-            apply(ReplaceURL_7.inputPortByName['newfilename'].configure, (), {'defaultValue': None})
+            ReplaceURL_7.inputPortByName['url'].configure(*(), **{'defaultValue': None})
+            ReplaceURL_7.inputPortByName['newfilename'].configure(*(), **{'defaultValue': None})
             ReplaceURL_7.inputPortByName['url'].rebindWidget()
             ReplaceURL_7.inputPortByName['url'].widget.set(r"", run=False)
             ReplaceURL_7.inputPortByName['url'].unbindWidget()
-            apply(ReplaceURL_7.configure, (), {'paramPanelImmediate': 1})
+            ReplaceURL_7.configure(*(), **{'paramPanelImmediate': 1})
         except:
-            print "WARNING: failed to restore ReplaceURLNode named ReplaceURL in network self.macroNetwork"
+            print("WARNING: failed to restore ReplaceURLNode named ReplaceURL in network self.macroNetwork")
             print_exc()
             ReplaceURL_7=None
 
@@ -177,9 +177,9 @@ class LocalLigandDirectory(MacroNode):
             from Vision.StandardNodes import Generic
             CreateLigandDBObj_8 = Generic(constrkw={}, name='CreateLigandDBObj', library=stdlib)
             self.macroNetwork.addNode(CreateLigandDBObj_8,217,385)
-            apply(CreateLigandDBObj_8.addInputPort, (), {'singleConnection': True, 'name': 'ligand_lib_url', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
-            apply(CreateLigandDBObj_8.addInputPort, (), {'singleConnection': True, 'name': 'log_file', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': False, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
-            apply(CreateLigandDBObj_8.addOutputPort, (), {'name': 'ligand_db_obj', 'datatype': 'LigandDB', 'height': 8, 'width': 12, 'shape': 'rect', 'color': '#FFCCFF'})
+            CreateLigandDBObj_8.addInputPort(*(), **{'singleConnection': True, 'name': 'ligand_lib_url', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
+            CreateLigandDBObj_8.addInputPort(*(), **{'singleConnection': True, 'name': 'log_file', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': False, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
+            CreateLigandDBObj_8.addOutputPort(*(), **{'name': 'ligand_db_obj', 'datatype': 'LigandDB', 'height': 8, 'width': 12, 'shape': 'rect', 'color': '#FFCCFF'})
             code = """def doit(self, ligand_lib_url, log_file):
         if log_file == None:
             log_file = "ligand_lib_uploads.log"
@@ -226,9 +226,9 @@ class LocalLigandDirectory(MacroNode):
 
 """
             CreateLigandDBObj_8.configure(function=code)
-            apply(CreateLigandDBObj_8.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            CreateLigandDBObj_8.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore Generic named CreateLigandDBObj in network self.macroNetwork"
+            print("WARNING: failed to restore Generic named CreateLigandDBObj in network self.macroNetwork")
             print_exc()
             CreateLigandDBObj_8=None
 
@@ -237,12 +237,12 @@ class LocalLigandDirectory(MacroNode):
             from Vision.StandardNodes import Generic
             get_paths_9 = Generic(constrkw={}, name='get_paths', library=stdlib)
             self.macroNetwork.addNode(get_paths_9,136,105)
-            apply(get_paths_9.addInputPort, (), {'singleConnection': True, 'name': 'directory', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
-            apply(get_paths_9.addInputPort, (), {'singleConnection': True, 'name': 'zip_name', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
-            apply(get_paths_9.addOutputPort, (), {'name': 'input_directory', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(get_paths_9.addOutputPort, (), {'name': 'output_directory', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(get_paths_9.addOutputPort, (), {'name': 'output_name', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(get_paths_9.addOutputPort, (), {'name': 'output_basedir', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            get_paths_9.addInputPort(*(), **{'singleConnection': True, 'name': 'directory', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
+            get_paths_9.addInputPort(*(), **{'singleConnection': True, 'name': 'zip_name', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
+            get_paths_9.addOutputPort(*(), **{'name': 'input_directory', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            get_paths_9.addOutputPort(*(), **{'name': 'output_directory', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            get_paths_9.addOutputPort(*(), **{'name': 'output_name', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            get_paths_9.addOutputPort(*(), **{'name': 'output_basedir', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
             code = """def doit(self, directory, zip_name):
         input_directory = os.path.abspath(directory)
 
@@ -269,9 +269,9 @@ class LocalLigandDirectory(MacroNode):
 
 """
             get_paths_9.configure(function=code)
-            apply(get_paths_9.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            get_paths_9.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore Generic named get_paths in network self.macroNetwork"
+            print("WARNING: failed to restore Generic named get_paths in network self.macroNetwork")
             print_exc()
             get_paths_9=None
 
@@ -285,28 +285,28 @@ class LocalLigandDirectory(MacroNode):
                     Make_Zip_File_3, LigandDBUpload_kryptonite_nbcr_net_5, "zipfile", "userlib", blocking=True
                     , splitratio=[0.67700056401206909, 0.41786522052018427])
             except:
-                print "WARNING: failed to restore connection between Make_Zip_File_3 and LigandDBUpload_kryptonite_nbcr_net_5 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Make_Zip_File_3 and LigandDBUpload_kryptonite_nbcr_net_5 in network self.macroNetwork")
         if LigandDBUpload_kryptonite_nbcr_net_5 is not None and Index_6 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     LigandDBUpload_kryptonite_nbcr_net_5, Index_6, "result", "data", blocking=True
                     , splitratio=[0.27868065815947218, 0.69101010116597561])
             except:
-                print "WARNING: failed to restore connection between LigandDBUpload_kryptonite_nbcr_net_5 and Index_6 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between LigandDBUpload_kryptonite_nbcr_net_5 and Index_6 in network self.macroNetwork")
         if Index_6 is not None and ReplaceURL_7 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Index_6, ReplaceURL_7, "data", "url", blocking=True
                     , splitratio=[0.0, 0.50910496731074983])
             except:
-                print "WARNING: failed to restore connection between Index_6 and ReplaceURL_7 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Index_6 and ReplaceURL_7 in network self.macroNetwork")
         if ReplaceURL_7 is not None and CreateLigandDBObj_8 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     ReplaceURL_7, CreateLigandDBObj_8, "newurl", "ligand_lib_url", blocking=True
                     , splitratio=[0.7375258387145982, 0.34433018843468416])
             except:
-                print "WARNING: failed to restore connection between ReplaceURL_7 and CreateLigandDBObj_8 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between ReplaceURL_7 and CreateLigandDBObj_8 in network self.macroNetwork")
         output_Ports_2 = self.macroNetwork.opNode
         if CreateLigandDBObj_8 is not None and output_Ports_2 is not None:
             try:
@@ -314,7 +314,7 @@ class LocalLigandDirectory(MacroNode):
                     CreateLigandDBObj_8, output_Ports_2, "ligand_db_obj", "new", blocking=True
                     , splitratio=[0.25450332220506922, 0.49254602433654382])
             except:
-                print "WARNING: failed to restore connection between CreateLigandDBObj_8 and output_Ports_2 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between CreateLigandDBObj_8 and output_Ports_2 in network self.macroNetwork")
         input_Ports_1 = self.macroNetwork.ipNode
         if input_Ports_1 is not None and get_paths_9 is not None:
             try:
@@ -322,56 +322,56 @@ class LocalLigandDirectory(MacroNode):
                     input_Ports_1, get_paths_9, "new", "directory", blocking=True
                     , splitratio=[0.73592256661833422, 0.40050624233195609])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and get_paths_9 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and get_paths_9 in network self.macroNetwork")
         if Entry_4 is not None and get_paths_9 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Entry_4, get_paths_9, "string", "zip_name", blocking=True
                     , splitratio=[0.74641701362897139, 0.56047721560743557])
             except:
-                print "WARNING: failed to restore connection between Entry_4 and get_paths_9 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Entry_4 and get_paths_9 in network self.macroNetwork")
         if get_paths_9 is not None and Make_Zip_File_3 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     get_paths_9, Make_Zip_File_3, "input_directory", "input_directory", blocking=True
                     , splitratio=[0.24975092021298884, 0.59053364249853169])
             except:
-                print "WARNING: failed to restore connection between get_paths_9 and Make_Zip_File_3 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between get_paths_9 and Make_Zip_File_3 in network self.macroNetwork")
         if get_paths_9 is not None and Make_Zip_File_3 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     get_paths_9, Make_Zip_File_3, "output_name", "output_name", blocking=True
                     , splitratio=[0.44934886807300634, 0.5145630699734256])
             except:
-                print "WARNING: failed to restore connection between get_paths_9 and Make_Zip_File_3 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between get_paths_9 and Make_Zip_File_3 in network self.macroNetwork")
         if get_paths_9 is not None and Make_Zip_File_3 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     get_paths_9, Make_Zip_File_3, "output_directory", "output_directory", blocking=True
                     , splitratio=[0.65054191214838031, 0.31030412383438832])
             except:
-                print "WARNING: failed to restore connection between get_paths_9 and Make_Zip_File_3 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between get_paths_9 and Make_Zip_File_3 in network self.macroNetwork")
         if get_paths_9 is not None and ReplaceURL_7 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     get_paths_9, ReplaceURL_7, "output_basedir", "newfilename", blocking=True
                     , splitratio=[0.5380996717918376, 0.39023381726820411])
             except:
-                print "WARNING: failed to restore connection between get_paths_9 and ReplaceURL_7 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between get_paths_9 and ReplaceURL_7 in network self.macroNetwork")
         if input_Ports_1 is not None and CreateLigandDBObj_8 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_1, CreateLigandDBObj_8, "new", "log_file", blocking=True
                     , splitratio=[0.49268182912115838, 0.67412763774649975])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and CreateLigandDBObj_8 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and CreateLigandDBObj_8 in network self.macroNetwork")
         if ReplaceURL_7 is not None and output_Ports_2 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     ReplaceURL_7, output_Ports_2, "newurl", "new", blocking=True
                     , splitratio=[0.67446600768034171, 0.74989471765767979])
             except:
-                print "WARNING: failed to restore connection between ReplaceURL_7 and output_Ports_2 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between ReplaceURL_7 and output_Ports_2 in network self.macroNetwork")
         self.macroNetwork.runOnNewData.value = False
 
         ## modifying MacroInputNode dynamic ports

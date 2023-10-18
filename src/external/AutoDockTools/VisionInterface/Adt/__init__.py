@@ -36,7 +36,7 @@ try:
     from Vision import ed
 except:
     ed = None
-if ed is not None and ed.libraries.has_key(libInstanceName):
+if ed is not None and libInstanceName in ed.libraries:
     locals()[libInstanceName] = ed.libraries[libInstanceName]
 else:
     locals()[libInstanceName] = NodeLibrary(libInstanceName, libraryColor, mode='readWrite')

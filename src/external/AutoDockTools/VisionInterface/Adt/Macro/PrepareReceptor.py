@@ -41,7 +41,7 @@ class PrepareReceptor(MacroNode):
 
     def __init__(self, constrkw={}, name='PrepareReceptor', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -74,18 +74,18 @@ class PrepareReceptor(MacroNode):
         try:
             ## saving node input Ports ##
             input_Ports_1 = self.macroNetwork.ipNode
-            apply(input_Ports_1.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            input_Ports_1.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_1=None
 
         try:
             ## saving node output Ports ##
             output_Ports_2 = self.macroNetwork.opNode
-            apply(output_Ports_2.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            output_Ports_2.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_2=None
 
@@ -95,18 +95,18 @@ class PrepareReceptor(MacroNode):
             Pdb2pqrWS_3 = MacroNode(name='Pdb2pqrWS')
             self.macroNetwork.addNode(Pdb2pqrWS_3, 153, 86)
             input_Ports_4 = Pdb2pqrWS_3.macroNetwork.ipNode
-            apply(input_Ports_4.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            input_Ports_4.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             input_Ports_4.move(65, 10)
             output_Ports_5 = Pdb2pqrWS_3.macroNetwork.opNode
-            apply(output_Ports_5.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            output_Ports_5.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             output_Ports_5.move(65, 310)
             from Vision.StandardNodes import Generic
             CheckFileFormat_6 = Generic(constrkw={}, name='CheckFileFormat', library=stdlib)
             Pdb2pqrWS_3.macroNetwork.addNode(CheckFileFormat_6,82,62)
-            apply(CheckFileFormat_6.addInputPort, (), {'singleConnection': True, 'name': 'value', 'cast': True, 'datatype': 'receptor', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33', 'originalDatatype': 'None'})
-            apply(CheckFileFormat_6.addOutputPort, (), {'name': 'receptor_obj', 'datatype': 'receptor', 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33'})
-            apply(CheckFileFormat_6.addOutputPort, (), {'name': 'pqr_name', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(CheckFileFormat_6.addOutputPort, (), {'name': 'pdb_path', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            CheckFileFormat_6.addInputPort(*(), **{'singleConnection': True, 'name': 'value', 'cast': True, 'datatype': 'receptor', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33', 'originalDatatype': 'None'})
+            CheckFileFormat_6.addOutputPort(*(), **{'name': 'receptor_obj', 'datatype': 'receptor', 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33'})
+            CheckFileFormat_6.addOutputPort(*(), **{'name': 'pqr_name', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            CheckFileFormat_6.addOutputPort(*(), **{'name': 'pdb_path', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
             code = """def doit(self, value):
     if value.get_ext_loc('''pqr''') != None or value.get_ext_loc('''pdbqt''') != None:
         self.outputData(receptor_obj=value)
@@ -120,12 +120,12 @@ class PrepareReceptor(MacroNode):
 
 """
             CheckFileFormat_6.configure(function=code)
-            apply(CheckFileFormat_6.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            CheckFileFormat_6.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             from NetworkEditor.items import FunctionNode
             Pdb2pqrOpalService_ws_nbcr_net_7 = FunctionNode(functionOrString='Pdb2pqrOpalService_ws_nbcr_net', host="http://ws.nbcr.net/opal2", namedArgs={'noopt': False, 'phi': False, 'psi': False, 'verbose': True, 'chain': False, 'nodebump': False, 'chi': False, 'output_file': '', 'ligand': '', 'hbond': False, 'inFile': '', 'with_ph': '', 'forcefield': 'AMBER', 'clean': False, 'inId': '', 'apbs_input': False, 'ffout': '', 'localRun': False, 'rama': False, 'execPath': '', 'assign_only': False}, constrkw={'functionOrString': "'Pdb2pqrOpalService_ws_nbcr_net'", 'host': '"http://ws.nbcr.net/opal2"', 'namedArgs': {'noopt': False, 'phi': False, 'psi': False, 'verbose': True, 'chain': False, 'nodebump': False, 'chi': False, 'output_file': '', 'ligand': '', 'hbond': False, 'inFile': '', 'with_ph': '', 'forcefield': 'AMBER', 'clean': False, 'inId': '', 'apbs_input': False, 'ffout': '', 'localRun': False, 'rama': False, 'execPath': '', 'assign_only': False}}, name='Pdb2pqrOpalService_ws_nbcr_net', library=wslib)
             Pdb2pqrWS_3.macroNetwork.addNode(Pdb2pqrOpalService_ws_nbcr_net_7,99,115)
-            apply(Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['output_file'].configure, (), {'defaultValue': None, 'required': True})
-            apply(Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['inFile'].configure, (), {'defaultValue': None, 'required': True})
+            Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['output_file'].configure(*(), **{'defaultValue': None, 'required': True})
+            Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['inFile'].configure(*(), **{'defaultValue': None, 'required': True})
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['noopt'].widget.set(0, run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['phi'].widget.set(0, run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['psi'].widget.set(0, run=False)
@@ -142,30 +142,30 @@ class PrepareReceptor(MacroNode):
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['inFile'].widget.set(r"", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['inFile'].unbindWidget()
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['with_ph'].widget.set(r"", run=False)
-            apply(Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['forcefield'].widget.configure, (), {'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
+            Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['forcefield'].widget.configure(*(), **{'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['forcefield'].widget.set(r"AMBER", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['clean'].widget.set(0, run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['inId'].widget.set(r"", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['apbs_input'].widget.set(0, run=False)
-            apply(Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['ffout'].widget.configure, (), {'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
+            Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['ffout'].widget.configure(*(), **{'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['ffout'].widget.set(r"", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['localRun'].widget.set(0, run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['rama'].widget.set(0, run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['execPath'].widget.set(r"", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_7.inputPortByName['assign_only'].widget.set(0, run=False)
-            apply(Pdb2pqrOpalService_ws_nbcr_net_7.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            Pdb2pqrOpalService_ws_nbcr_net_7.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             from WebServices.VisionInterface.WSNodes import GetURLFromListNode
             GetURLFromList_8 = GetURLFromListNode(constrkw={}, name='GetURLFromList', library=wslib)
             Pdb2pqrWS_3.macroNetwork.addNode(GetURLFromList_8,117,169)
             GetURLFromList_8.inputPortByName['ext'].widget.set(r"pqr", run=False)
-            apply(GetURLFromList_8.configure, (), {'paramPanelImmediate': 1})
+            GetURLFromList_8.configure(*(), **{'paramPanelImmediate': 1})
             from Vision.StandardNodes import Generic
             UpdateReceptor_9 = Generic(constrkw={}, name='UpdateReceptor', library=stdlib)
             Pdb2pqrWS_3.macroNetwork.addNode(UpdateReceptor_9,82,256)
-            apply(UpdateReceptor_9.addInputPort, (), {'singleConnection': True, 'name': 'receptor_obj', 'cast': True, 'datatype': 'receptor', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33', 'originalDatatype': 'None'})
-            apply(UpdateReceptor_9.addInputPort, (), {'singleConnection': True, 'name': 'pqr', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': False, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
-            apply(UpdateReceptor_9.addOutputPort, (), {'name': 'receptor_obj', 'datatype': 'receptor', 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33'})
-            apply(UpdateReceptor_9.addOutputPort, (), {'name': 'pdb2pqr_result', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            UpdateReceptor_9.addInputPort(*(), **{'singleConnection': True, 'name': 'receptor_obj', 'cast': True, 'datatype': 'receptor', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33', 'originalDatatype': 'None'})
+            UpdateReceptor_9.addInputPort(*(), **{'singleConnection': True, 'name': 'pqr', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': False, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
+            UpdateReceptor_9.addOutputPort(*(), **{'name': 'receptor_obj', 'datatype': 'receptor', 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33'})
+            UpdateReceptor_9.addOutputPort(*(), **{'name': 'pdb2pqr_result', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
             code = """def doit(self, receptor_obj, pqr):
         if pqr != '''no data yet''':
             pdb2pqr_result = pqr
@@ -188,7 +188,7 @@ class PrepareReceptor(MacroNode):
 
 """
             UpdateReceptor_9.configure(function=code)
-            apply(UpdateReceptor_9.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            UpdateReceptor_9.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
 
             ## saving connections for network Pdb2pqrWS ##
             Pdb2pqrWS_3.macroNetwork.freeze()
@@ -198,35 +198,35 @@ class PrepareReceptor(MacroNode):
                         CheckFileFormat_6, Pdb2pqrOpalService_ws_nbcr_net_7, "pqr_name", "output_file", blocking=True
                         , splitratio=[0.43278717885693868, 0.65281492247209427])
                 except:
-                    print "WARNING: failed to restore connection between CheckFileFormat_6 and Pdb2pqrOpalService_ws_nbcr_net_7 in network Pdb2pqrWS_3.macroNetwork"
+                    print("WARNING: failed to restore connection between CheckFileFormat_6 and Pdb2pqrOpalService_ws_nbcr_net_7 in network Pdb2pqrWS_3.macroNetwork")
             if CheckFileFormat_6 is not None and Pdb2pqrOpalService_ws_nbcr_net_7 is not None:
                 try:
                     Pdb2pqrWS_3.macroNetwork.connectNodes(
                         CheckFileFormat_6, Pdb2pqrOpalService_ws_nbcr_net_7, "pdb_path", "inFile", blocking=True
                         , splitratio=[0.61978340673276544, 0.69977512898866912])
                 except:
-                    print "WARNING: failed to restore connection between CheckFileFormat_6 and Pdb2pqrOpalService_ws_nbcr_net_7 in network Pdb2pqrWS_3.macroNetwork"
+                    print("WARNING: failed to restore connection between CheckFileFormat_6 and Pdb2pqrOpalService_ws_nbcr_net_7 in network Pdb2pqrWS_3.macroNetwork")
             if Pdb2pqrOpalService_ws_nbcr_net_7 is not None and GetURLFromList_8 is not None:
                 try:
                     Pdb2pqrWS_3.macroNetwork.connectNodes(
                         Pdb2pqrOpalService_ws_nbcr_net_7, GetURLFromList_8, "result", "urllist", blocking=True
                         , splitratio=[0.73247388879852338, 0.69014271703344965])
                 except:
-                    print "WARNING: failed to restore connection between Pdb2pqrOpalService_ws_nbcr_net_7 and GetURLFromList_8 in network Pdb2pqrWS_3.macroNetwork"
+                    print("WARNING: failed to restore connection between Pdb2pqrOpalService_ws_nbcr_net_7 and GetURLFromList_8 in network Pdb2pqrWS_3.macroNetwork")
             if GetURLFromList_8 is not None and UpdateReceptor_9 is not None:
                 try:
                     Pdb2pqrWS_3.macroNetwork.connectNodes(
                         GetURLFromList_8, UpdateReceptor_9, "url", "pqr", blocking=True
                         , splitratio=[0.35224914715245104, 0.47693375858097758])
                 except:
-                    print "WARNING: failed to restore connection between GetURLFromList_8 and UpdateReceptor_9 in network Pdb2pqrWS_3.macroNetwork"
+                    print("WARNING: failed to restore connection between GetURLFromList_8 and UpdateReceptor_9 in network Pdb2pqrWS_3.macroNetwork")
             if CheckFileFormat_6 is not None and UpdateReceptor_9 is not None:
                 try:
                     Pdb2pqrWS_3.macroNetwork.connectNodes(
                         CheckFileFormat_6, UpdateReceptor_9, "receptor_obj", "receptor_obj", blocking=True
                         , splitratio=[0.57865377076653579, 0.45824116584600394])
                 except:
-                    print "WARNING: failed to restore connection between CheckFileFormat_6 and UpdateReceptor_9 in network Pdb2pqrWS_3.macroNetwork"
+                    print("WARNING: failed to restore connection between CheckFileFormat_6 and UpdateReceptor_9 in network Pdb2pqrWS_3.macroNetwork")
             input_Ports_4 = Pdb2pqrWS_3.macroNetwork.ipNode
             if input_Ports_4 is not None and CheckFileFormat_6 is not None:
                 try:
@@ -234,7 +234,7 @@ class PrepareReceptor(MacroNode):
                         input_Ports_4, CheckFileFormat_6, "new", "value", blocking=True
                         , splitratio=[0.28291581858817416, 0.70581213384962171])
                 except:
-                    print "WARNING: failed to restore connection between input_Ports_4 and CheckFileFormat_6 in network Pdb2pqrWS_3.macroNetwork"
+                    print("WARNING: failed to restore connection between input_Ports_4 and CheckFileFormat_6 in network Pdb2pqrWS_3.macroNetwork")
             output_Ports_5 = Pdb2pqrWS_3.macroNetwork.opNode
             if UpdateReceptor_9 is not None and output_Ports_5 is not None:
                 try:
@@ -242,14 +242,14 @@ class PrepareReceptor(MacroNode):
                         UpdateReceptor_9, output_Ports_5, "receptor_obj", "new", blocking=True
                         , splitratio=[0.24354423773729619, 0.72115604180615911])
                 except:
-                    print "WARNING: failed to restore connection between UpdateReceptor_9 and output_Ports_5 in network Pdb2pqrWS_3.macroNetwork"
+                    print("WARNING: failed to restore connection between UpdateReceptor_9 and output_Ports_5 in network Pdb2pqrWS_3.macroNetwork")
             if UpdateReceptor_9 is not None and output_Ports_5 is not None:
                 try:
                     Pdb2pqrWS_3.macroNetwork.connectNodes(
                         UpdateReceptor_9, output_Ports_5, "pdb2pqr_result", "new", blocking=True
                         , splitratio=[0.31141907324539131, 0.41794097665671487])
                 except:
-                    print "WARNING: failed to restore connection between UpdateReceptor_9 and output_Ports_5 in network Pdb2pqrWS_3.macroNetwork"
+                    print("WARNING: failed to restore connection between UpdateReceptor_9 and output_Ports_5 in network Pdb2pqrWS_3.macroNetwork")
             Pdb2pqrWS_3.macroNetwork.unfreeze()
 
             ## modifying MacroInputNode dynamic ports
@@ -269,9 +269,9 @@ class PrepareReceptor(MacroNode):
             Pdb2pqrWS_3.outputPorts[1].configure(datatype='string')
             ## configure MacroNode output ports
             Pdb2pqrWS_3.shrink()
-            apply(Pdb2pqrWS_3.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            Pdb2pqrWS_3.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroNode named Pdb2pqrWS in network self.macroNetwork"
+            print("WARNING: failed to restore MacroNode named Pdb2pqrWS in network self.macroNetwork")
             print_exc()
             Pdb2pqrWS_3=None
 
@@ -281,19 +281,19 @@ class PrepareReceptor(MacroNode):
             PrepareReceptorWS_10 = MacroNode(name='PrepareReceptorWS')
             self.macroNetwork.addNode(PrepareReceptorWS_10, 217, 140)
             input_Ports_11 = PrepareReceptorWS_10.macroNetwork.ipNode
-            apply(input_Ports_11.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            input_Ports_11.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             input_Ports_11.move(145, 8)
             output_Ports_12 = PrepareReceptorWS_10.macroNetwork.opNode
-            apply(output_Ports_12.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            output_Ports_12.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             output_Ports_12.move(29, 412)
             from Vision.StandardNodes import Generic
             CheckFileFormat_13 = Generic(constrkw={}, name='CheckFileFormat', library=stdlib)
             PrepareReceptorWS_10.macroNetwork.addNode(CheckFileFormat_13,46,64)
-            apply(CheckFileFormat_13.addInputPort, (), {'singleConnection': True, 'name': 'value', 'cast': True, 'datatype': 'receptor', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33', 'originalDatatype': 'None'})
-            apply(CheckFileFormat_13.addOutputPort, (), {'name': 'receptor_obj', 'datatype': 'receptor', 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33'})
-            apply(CheckFileFormat_13.addOutputPort, (), {'name': 'receptor_url', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(CheckFileFormat_13.addOutputPort, (), {'name': 'receptor_local', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(CheckFileFormat_13.addOutputPort, (), {'name': 'download_loc', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            CheckFileFormat_13.addInputPort(*(), **{'singleConnection': True, 'name': 'value', 'cast': True, 'datatype': 'receptor', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33', 'originalDatatype': 'None'})
+            CheckFileFormat_13.addOutputPort(*(), **{'name': 'receptor_obj', 'datatype': 'receptor', 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33'})
+            CheckFileFormat_13.addOutputPort(*(), **{'name': 'receptor_url', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            CheckFileFormat_13.addOutputPort(*(), **{'name': 'receptor_local', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            CheckFileFormat_13.addOutputPort(*(), **{'name': 'download_loc', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
             code = """def doit(self, value):
     if value.get_ext_loc('''pdbqt''') != None:
         self.outputData(receptor_obj=value)
@@ -331,13 +331,13 @@ class PrepareReceptor(MacroNode):
 
 """
             CheckFileFormat_13.configure(function=code)
-            apply(CheckFileFormat_13.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            CheckFileFormat_13.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             from NetworkEditor.items import FunctionNode
             PrepareReceptorOpalService_ws_nbcr_net_14 = FunctionNode(functionOrString='PrepareReceptorOpalService_ws_nbcr_net', host="http://ws.nbcr.net/opal2", namedArgs={'C': False, 'url': '', 'o': '', 'r': '', 'v': False, 'localRun': False, 'execPath': ''}, constrkw={'functionOrString': "'PrepareReceptorOpalService_ws_nbcr_net'", 'host': '"http://ws.nbcr.net/opal2"', 'namedArgs': {'C': False, 'url': '', 'o': '', 'r': '', 'v': False, 'localRun': False, 'execPath': ''}}, name='PrepareReceptorOpalService_ws_nbcr_net', library=wslib)
             PrepareReceptorWS_10.macroNetwork.addNode(PrepareReceptorOpalService_ws_nbcr_net_14,180,128)
-            apply(PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['C'].configure, (), {'defaultValue': None})
-            apply(PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['url'].configure, (), {'defaultValue': None, 'required': True})
-            apply(PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['r'].configure, (), {'defaultValue': None, 'required': True})
+            PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['C'].configure(*(), **{'defaultValue': None})
+            PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['url'].configure(*(), **{'defaultValue': None, 'required': True})
+            PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['r'].configure(*(), **{'defaultValue': None, 'required': True})
             PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['C'].rebindWidget()
             PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['C'].widget.set(0, run=False)
             PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['C'].unbindWidget()
@@ -351,17 +351,17 @@ class PrepareReceptor(MacroNode):
             PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['v'].widget.set(0, run=False)
             PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['localRun'].widget.set(0, run=False)
             PrepareReceptorOpalService_ws_nbcr_net_14.inputPortByName['execPath'].widget.set(r"", run=False)
-            apply(PrepareReceptorOpalService_ws_nbcr_net_14.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            PrepareReceptorOpalService_ws_nbcr_net_14.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             from WebServices.VisionInterface.WSNodes import GetURLFromListNode
             GetURLFromList_15 = GetURLFromListNode(constrkw={}, name='GetURLFromList', library=wslib)
             PrepareReceptorWS_10.macroNetwork.addNode(GetURLFromList_15,180,186)
             GetURLFromList_15.inputPortByName['ext'].widget.set(r"pdbqt", run=False)
-            apply(GetURLFromList_15.configure, (), {'paramPanelImmediate': 1})
+            GetURLFromList_15.configure(*(), **{'paramPanelImmediate': 1})
             from WebServices.VisionInterface.WSNodes import DownloadToFileNode
             DownloadToFile_16 = DownloadToFileNode(constrkw={}, name='DownloadToFile', library=wslib)
             PrepareReceptorWS_10.macroNetwork.addNode(DownloadToFile_16,80,272)
-            apply(DownloadToFile_16.inputPortByName['url'].configure, (), {'defaultValue': None})
-            apply(DownloadToFile_16.inputPortByName['filename'].configure, (), {'defaultValue': None})
+            DownloadToFile_16.inputPortByName['url'].configure(*(), **{'defaultValue': None})
+            DownloadToFile_16.inputPortByName['filename'].configure(*(), **{'defaultValue': None})
             DownloadToFile_16.inputPortByName['url'].rebindWidget()
             DownloadToFile_16.inputPortByName['url'].widget.set(r"", run=False)
             DownloadToFile_16.inputPortByName['url'].unbindWidget()
@@ -369,14 +369,14 @@ class PrepareReceptor(MacroNode):
             DownloadToFile_16.inputPortByName['filename'].widget.set(r"", run=False)
             DownloadToFile_16.inputPortByName['filename'].unbindWidget()
             DownloadToFile_16.inputPortByName['overwrite'].widget.set(1, run=False)
-            apply(DownloadToFile_16.configure, (), {'paramPanelImmediate': 1})
+            DownloadToFile_16.configure(*(), **{'paramPanelImmediate': 1})
             from Vision.StandardNodes import Generic
             UpdateReceptor_17 = Generic(constrkw={}, name='UpdateReceptor', library=stdlib)
             PrepareReceptorWS_10.macroNetwork.addNode(UpdateReceptor_17,46,358)
-            apply(UpdateReceptor_17.addInputPort, (), {'singleConnection': True, 'name': 'receptor_obj', 'cast': True, 'datatype': 'receptor', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33', 'originalDatatype': 'None'})
-            apply(UpdateReceptor_17.addInputPort, (), {'singleConnection': True, 'name': 'pdbqt', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': False, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
-            apply(UpdateReceptor_17.addOutputPort, (), {'name': 'receptor_prepared_obj', 'datatype': 'receptor_prepared', 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#009900'})
-            apply(UpdateReceptor_17.addOutputPort, (), {'name': 'receptor_result', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            UpdateReceptor_17.addInputPort(*(), **{'singleConnection': True, 'name': 'receptor_obj', 'cast': True, 'datatype': 'receptor', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#99FF33', 'originalDatatype': 'None'})
+            UpdateReceptor_17.addInputPort(*(), **{'singleConnection': True, 'name': 'pdbqt', 'cast': True, 'datatype': 'string', 'defaultValue': None, 'required': False, 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white', 'originalDatatype': 'None'})
+            UpdateReceptor_17.addOutputPort(*(), **{'name': 'receptor_prepared_obj', 'datatype': 'receptor_prepared', 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#009900'})
+            UpdateReceptor_17.addOutputPort(*(), **{'name': 'receptor_result', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
             code = """def doit(self, receptor_obj, pdbqt):
         from AutoDockTools.VisionInterface.Adt.receptor_prepared import receptor_prepared
         if pdbqt != '''no data yet''':
@@ -396,7 +396,7 @@ class PrepareReceptor(MacroNode):
 
 """
             UpdateReceptor_17.configure(function=code)
-            apply(UpdateReceptor_17.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            UpdateReceptor_17.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
 
             ## saving connections for network PrepareReceptorWS ##
             PrepareReceptorWS_10.macroNetwork.freeze()
@@ -407,63 +407,63 @@ class PrepareReceptor(MacroNode):
                         input_Ports_11, CheckFileFormat_13, "new", "value", blocking=True
                         , splitratio=[0.64907843562020084, 0.47057253960060474])
                 except:
-                    print "WARNING: failed to restore connection between input_Ports_11 and CheckFileFormat_13 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between input_Ports_11 and CheckFileFormat_13 in network PrepareReceptorWS_10.macroNetwork")
             if CheckFileFormat_13 is not None and PrepareReceptorOpalService_ws_nbcr_net_14 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         CheckFileFormat_13, PrepareReceptorOpalService_ws_nbcr_net_14, "receptor_url", "url", blocking=True
                         , splitratio=[0.6171192646814192, 0.42883431331137822])
                 except:
-                    print "WARNING: failed to restore connection between CheckFileFormat_13 and PrepareReceptorOpalService_ws_nbcr_net_14 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between CheckFileFormat_13 and PrepareReceptorOpalService_ws_nbcr_net_14 in network PrepareReceptorWS_10.macroNetwork")
             if CheckFileFormat_13 is not None and PrepareReceptorOpalService_ws_nbcr_net_14 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         CheckFileFormat_13, PrepareReceptorOpalService_ws_nbcr_net_14, "receptor_local", "r", blocking=True
                         , splitratio=[0.66136144381723583, 0.28482114514549767])
                 except:
-                    print "WARNING: failed to restore connection between CheckFileFormat_13 and PrepareReceptorOpalService_ws_nbcr_net_14 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between CheckFileFormat_13 and PrepareReceptorOpalService_ws_nbcr_net_14 in network PrepareReceptorWS_10.macroNetwork")
             if input_Ports_11 is not None and PrepareReceptorOpalService_ws_nbcr_net_14 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         input_Ports_11, PrepareReceptorOpalService_ws_nbcr_net_14, "new", "C", blocking=True
                         , splitratio=[0.53817543437956172, 0.61119702937572407])
                 except:
-                    print "WARNING: failed to restore connection between input_Ports_11 and PrepareReceptorOpalService_ws_nbcr_net_14 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between input_Ports_11 and PrepareReceptorOpalService_ws_nbcr_net_14 in network PrepareReceptorWS_10.macroNetwork")
             if PrepareReceptorOpalService_ws_nbcr_net_14 is not None and GetURLFromList_15 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         PrepareReceptorOpalService_ws_nbcr_net_14, GetURLFromList_15, "result", "urllist", blocking=True
                         , splitratio=[0.43369347916867251, 0.26566786648658042])
                 except:
-                    print "WARNING: failed to restore connection between PrepareReceptorOpalService_ws_nbcr_net_14 and GetURLFromList_15 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between PrepareReceptorOpalService_ws_nbcr_net_14 and GetURLFromList_15 in network PrepareReceptorWS_10.macroNetwork")
             if GetURLFromList_15 is not None and DownloadToFile_16 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         GetURLFromList_15, DownloadToFile_16, "url", "url", blocking=True
                         , splitratio=[0.70502483723033316, 0.71683158018466053])
                 except:
-                    print "WARNING: failed to restore connection between GetURLFromList_15 and DownloadToFile_16 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between GetURLFromList_15 and DownloadToFile_16 in network PrepareReceptorWS_10.macroNetwork")
             if CheckFileFormat_13 is not None and DownloadToFile_16 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         CheckFileFormat_13, DownloadToFile_16, "download_loc", "filename", blocking=True
                         , splitratio=[0.60455581032885575, 0.35606890231085681])
                 except:
-                    print "WARNING: failed to restore connection between CheckFileFormat_13 and DownloadToFile_16 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between CheckFileFormat_13 and DownloadToFile_16 in network PrepareReceptorWS_10.macroNetwork")
             if CheckFileFormat_13 is not None and UpdateReceptor_17 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         CheckFileFormat_13, UpdateReceptor_17, "receptor_obj", "receptor_obj", blocking=True
                         , splitratio=[0.74908230670336207, 0.38226563370205602])
                 except:
-                    print "WARNING: failed to restore connection between CheckFileFormat_13 and UpdateReceptor_17 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between CheckFileFormat_13 and UpdateReceptor_17 in network PrepareReceptorWS_10.macroNetwork")
             if DownloadToFile_16 is not None and UpdateReceptor_17 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         DownloadToFile_16, UpdateReceptor_17, "filename", "pdbqt", blocking=True
                         , splitratio=[0.38698393490575966, 0.2874426709930199])
                 except:
-                    print "WARNING: failed to restore connection between DownloadToFile_16 and UpdateReceptor_17 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between DownloadToFile_16 and UpdateReceptor_17 in network PrepareReceptorWS_10.macroNetwork")
             output_Ports_12 = PrepareReceptorWS_10.macroNetwork.opNode
             if UpdateReceptor_17 is not None and output_Ports_12 is not None:
                 try:
@@ -471,14 +471,14 @@ class PrepareReceptor(MacroNode):
                         UpdateReceptor_17, output_Ports_12, "receptor_prepared_obj", "new", blocking=True
                         , splitratio=[0.69589857263374943, 0.59566078506240416])
                 except:
-                    print "WARNING: failed to restore connection between UpdateReceptor_17 and output_Ports_12 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between UpdateReceptor_17 and output_Ports_12 in network PrepareReceptorWS_10.macroNetwork")
             if UpdateReceptor_17 is not None and output_Ports_12 is not None:
                 try:
                     PrepareReceptorWS_10.macroNetwork.connectNodes(
                         UpdateReceptor_17, output_Ports_12, "receptor_result", "new", blocking=True
                         , splitratio=[0.44926362052272689, 0.38628711158860896])
                 except:
-                    print "WARNING: failed to restore connection between UpdateReceptor_17 and output_Ports_12 in network PrepareReceptorWS_10.macroNetwork"
+                    print("WARNING: failed to restore connection between UpdateReceptor_17 and output_Ports_12 in network PrepareReceptorWS_10.macroNetwork")
             PrepareReceptorWS_10.macroNetwork.unfreeze()
 
             ## modifying MacroInputNode dynamic ports
@@ -501,9 +501,9 @@ class PrepareReceptor(MacroNode):
             PrepareReceptorWS_10.outputPorts[1].configure(datatype='string')
             ## configure MacroNode output ports
             PrepareReceptorWS_10.shrink()
-            apply(PrepareReceptorWS_10.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            PrepareReceptorWS_10.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroNode named PrepareReceptorWS in network self.macroNetwork"
+            print("WARNING: failed to restore MacroNode named PrepareReceptorWS in network self.macroNetwork")
             print_exc()
             PrepareReceptorWS_10=None
 
@@ -519,7 +519,7 @@ class PrepareReceptor(MacroNode):
                     input_Ports_1, Pdb2pqrWS_3, "new", "CheckFileFormat_value", blocking=True
                     , splitratio=[0.73531020066010289, 0.24042404972613104])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and Pdb2pqrWS_3 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and Pdb2pqrWS_3 in network self.macroNetwork")
         PrepareReceptorWS_10 = self.macroNetwork.nodes[3]
         if Pdb2pqrWS_3 is not None and PrepareReceptorWS_10 is not None:
             try:
@@ -527,14 +527,14 @@ class PrepareReceptor(MacroNode):
                     Pdb2pqrWS_3, PrepareReceptorWS_10, "UpdateReceptor_receptor_obj", "CheckFileFormat_value", blocking=True
                     , splitratio=[0.54479169827535734, 0.4847384502006486])
             except:
-                print "WARNING: failed to restore connection between Pdb2pqrWS_3 and PrepareReceptorWS_10 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Pdb2pqrWS_3 and PrepareReceptorWS_10 in network self.macroNetwork")
         if input_Ports_1 is not None and PrepareReceptorWS_10 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_1, PrepareReceptorWS_10, "new", "PrepareReceptorOpalService_ws_nbcr_net_C", blocking=True
                     , splitratio=[0.37730151685222141, 0.48897820190498614])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and PrepareReceptorWS_10 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and PrepareReceptorWS_10 in network self.macroNetwork")
         output_Ports_2 = self.macroNetwork.opNode
         if PrepareReceptorWS_10 is not None and output_Ports_2 is not None:
             try:
@@ -542,14 +542,14 @@ class PrepareReceptor(MacroNode):
                     PrepareReceptorWS_10, output_Ports_2, "UpdateReceptor_receptor_prepared_obj", "new", blocking=True
                     , splitratio=[0.64110508898616414, 0.45535290355389196])
             except:
-                print "WARNING: failed to restore connection between PrepareReceptorWS_10 and output_Ports_2 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareReceptorWS_10 and output_Ports_2 in network self.macroNetwork")
         if PrepareReceptorWS_10 is not None and output_Ports_2 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     PrepareReceptorWS_10, output_Ports_2, "UpdateReceptor_receptor_result", "new", blocking=True
                     , splitratio=[0.45846842546122241, 0.44240009354017412])
             except:
-                print "WARNING: failed to restore connection between PrepareReceptorWS_10 and output_Ports_2 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareReceptorWS_10 and output_Ports_2 in network self.macroNetwork")
         self.macroNetwork.runOnNewData.value = False
 
         ## modifying MacroInputNode dynamic ports

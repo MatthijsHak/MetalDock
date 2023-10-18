@@ -2,14 +2,14 @@
 #$Id: WebServices.py,v 1.21 2009/08/12 21:40:05 lclement Exp $
 # Author: Sargis Dallakyan (sargis@scripps.edu)
 
-import Tkinter, Pmw, os, httplib, webbrowser, urllib, re
+import tkinter, Pmw, os, http.client, webbrowser, urllib.request, urllib.parse, urllib.error, re
 from ViewerFramework.VFCommand import CommandGUI, Command
 from Pmv.mvCommand import MVCommand
-from autostartCommands import menuText
+from .autostartCommands import menuText
 from mglutil.gui.InputForm.Tk.gui import InputFormDescr
 from mglutil.util.packageFilePath import getResourceFolderWithVersion
-from tkFileDialog import *
-from tkMessageBox import *
+from tkinter.filedialog import *
+from tkinter.messagebox import *
 from mglutil.gui.BasicWidgets.Tk.progressBar import ProgressBar
 from mglutil.web.services.AppService_client import AppServiceLocator, launchJobRequest, \
 getOutputsRequest, queryStatusRequest
@@ -26,15 +26,15 @@ class WebServices(MVCommand):
         self.rc_ad = rc + "rc_ad"
         self.login = False
         if hasattr(self, 'vf.GUI.ROOT'):
-            self.dpf = Tkinter.StringVar(self.vf.GUI.ROOT)
-            self.gpf = Tkinter.StringVar(self.vf.GUI.ROOT)
-            self.prev_dir = Tkinter.StringVar(self.vf.GUI.ROOT)
-            self.ad_radio = Tkinter.IntVar(self.vf.GUI.ROOT)
+            self.dpf = tkinter.StringVar(self.vf.GUI.ROOT)
+            self.gpf = tkinter.StringVar(self.vf.GUI.ROOT)
+            self.prev_dir = tkinter.StringVar(self.vf.GUI.ROOT)
+            self.ad_radio = tkinter.IntVar(self.vf.GUI.ROOT)
         else:
-            self.dpf = Tkinter.StringVar()
-            self.gpf = Tkinter.StringVar()
-            self.prev_dir = Tkinter.StringVar()
-            self.ad_radio = Tkinter.IntVar()
+            self.dpf = tkinter.StringVar()
+            self.gpf = tkinter.StringVar()
+            self.prev_dir = tkinter.StringVar()
+            self.ad_radio = tkinter.IntVar()
         self.current_job = None
             
     def guiCallback(self, event=None):
@@ -97,7 +97,7 @@ class WebServices(MVCommand):
                     'gridcfg':{'sticky':'nswe'}
                     })
         
-        ifd.append({'widgetType':Tkinter.Button, 'name':'Run_autogrid',
+        ifd.append({'widgetType':tkinter.Button, 'name':'Run_autogrid',
                     'parent':'AutoGrid', 
                     'wcfg':{'text':'Run AutoGrid ',
                             'command':self.startAutogrid},
@@ -105,12 +105,12 @@ class WebServices(MVCommand):
                     })
 
         ifd.append( {'name': 'gpf_entry', 'parent':'AutoGrid',
-                     'widgetType':Tkinter.Entry, 
+                     'widgetType':tkinter.Entry, 
                      'wcfg':{'width':30,'textvariable':self.gpf},
                      'gridcfg':{'sticky':'w','row':0,'column':1}
                      })
 
-        ifd.append({'name': 'browse_gpf', 'widgetType': Tkinter.Button,
+        ifd.append({'name': 'browse_gpf', 'widgetType': tkinter.Button,
                     'parent':'AutoGrid', 'text':'Browse',
                     'command':self.browse_gpf,
                     'gridcfg':{'sticky':'w','row':0, 'column':2}
@@ -122,7 +122,7 @@ class WebServices(MVCommand):
                     'gridcfg':{'sticky':'nswe'}
                     })
 
-        ifd.append({'widgetType':Tkinter.Button, 'name':'Run_autodock',
+        ifd.append({'widgetType':tkinter.Button, 'name':'Run_autodock',
                     'parent':'AutoDock', 
                     'wcfg':{'text':'Run AutoDock',
                             'command':self.startAutodock},
@@ -130,18 +130,18 @@ class WebServices(MVCommand):
                     })
 
         ifd.append( {'name': 'dpf_entry', 'parent':'AutoDock',
-                     'widgetType':Tkinter.Entry, 
+                     'widgetType':tkinter.Entry, 
                      'wcfg':{'width':30,'textvariable':self.dpf},
                      'gridcfg':{'sticky':'w','row':0,'column':1}
                      })
 
-        ifd.append({'name': 'browse_dpf', 'widgetType': Tkinter.Button,
+        ifd.append({'name': 'browse_dpf', 'widgetType': tkinter.Button,
                     'parent':'AutoDock', 'text':'Browse',
                     'command':self.browse_dpf,
                     'gridcfg':{'sticky':'w','row':0, 'column':2}
                     })
 
-        ifd.append({'name': 'ag_local', 'widgetType': Tkinter.Radiobutton,
+        ifd.append({'name': 'ag_local', 'widgetType': tkinter.Radiobutton,
                     'parent':'AutoDock', 'text':'Use local grids',
                     'tooltip':"This option sends locally stored grid files with Web Services request",
                     'wcfg':{'variable':self.ad_radio,'value':0},
@@ -155,7 +155,7 @@ class WebServices(MVCommand):
 #                    'gridcfg':{'sticky':'w','row':2, 'column':0,'columnspan':2}
 #                    })
 
-        ifd.append({'name': 'use_remote', 'widgetType': Tkinter.Radiobutton,
+        ifd.append({'name': 'use_remote', 'widgetType': tkinter.Radiobutton,
                     'parent':'AutoDock', 'text':'Use grids from server directory',
                     'tooltip':"This option copies map files from previous AutoGrid run",
                     'wcfg':{'variable':self.ad_radio,'value':2,},
@@ -163,7 +163,7 @@ class WebServices(MVCommand):
                     })
 
         ifd.append( {'name': 'remote_dir', 'parent':'AutoDock',
-                     'widgetType':Tkinter.Entry, 
+                     'widgetType':tkinter.Entry, 
                      'wcfg':{'width':23,'textvariable':self.prev_dir},
                      'gridcfg':{'sticky':'e','row':3,'column':1,'columnspan':2}
                      })
@@ -175,24 +175,24 @@ class WebServices(MVCommand):
                     'gridcfg':{'sticky':'nswe'}
                     })
         
-        ifd.append({'widgetType':Tkinter.Label, 'name':'status0',
+        ifd.append({'widgetType':tkinter.Label, 'name':'status0',
                     'parent':'StatusGroup', 
                     'wcfg':{'text':'   ',},
                     'gridcfg':{'sticky':'w', 'row':0, 'column':0}
                     })
 
-        ifd.append({'widgetType':Tkinter.Label, 'name':'status1',
+        ifd.append({'widgetType':tkinter.Label, 'name':'status1',
                     'parent':'StatusGroup', 
                     'wcfg':{'text':'   ',},
                     'gridcfg':{'sticky':'w', 'row':1, 'column':0}
                     })
 
-        ifd.append({'name':'WS_ProgressBar', 'widgetType':Tkinter.Frame,
+        ifd.append({'name':'WS_ProgressBar', 'widgetType':tkinter.Frame,
                     'parent':'StatusGroup', 'wcfg':{'height':30},
                      'gridcfg':{'sticky':'ew', 'row':2,'column':0}
                     })
         
-        ifd.append({'widgetType':Tkinter.Label, 'name':'down_label',
+        ifd.append({'widgetType':tkinter.Label, 'name':'down_label',
                     'parent':'StatusGroup', 
                     'wcfg':{'text':'   ',},
                     'gridcfg':{'sticky':'w', 'row':3, 'column':0}
@@ -436,7 +436,7 @@ class WebServices(MVCommand):
         
     def isOpal2(self):
         """return True if we are using Opal2"""
-        print "self.host is: " + self.host
+        print("self.host is: " + self.host)
         if self.host.find("/opal2/") != -1:
             return True
         else:
@@ -458,7 +458,7 @@ class WebServices(MVCommand):
             descr.entryByName['WS_ProgressBar']['widget'].grid(sticky='ew', 
                                                                 row=2, column=0)
 
-            self.opener = urllib.FancyURLopener(cert_file=self.proxy_gama, 
+            self.opener = urllib.request.FancyURLopener(cert_file=self.proxy_gama, 
                                                        key_file=self.proxy_gama)
             self.download_finished = False
             self.new_download = True
@@ -536,7 +536,7 @@ class WebServices(MVCommand):
                                       SecuritymyproxyloginImplServiceLocator
         gamaLoginLocator = SecuritymyproxyloginImplServiceLocator()
         gamaLoginService = gamaLoginLocator.getSecuritymyproxyloginImpl(
-                                    ssl=1,transport=httplib.HTTPSConnection)
+                                    ssl=1,transport=http.client.HTTPSConnection)
         req = loginUserMyProxyRequestWrapper()
         username =  self.cmdForms['default'].descr.\
                                entryByName['UserName_Entry']['widget'].get()

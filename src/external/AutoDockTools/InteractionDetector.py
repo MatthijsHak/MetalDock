@@ -87,7 +87,7 @@ class InteractionDetector:
             self.aromatic_cycle_bond_selector = AromaticCycleBondSelector()
         if detect_pi:
             self.report_list.extend(['pi_cation','pi_pi', 'cation_pi', 't_shaped'])
-        if self.verbose: print "self.report_list=", self.report_list
+        if self.verbose: print("self.report_list=", self.report_list)
 
 
     def processLigand(self, ligand_file, percentCutoff=None, output=1, outputfilename=None, comment="USER  AD> ", buildHB=1, remove_modelStr=False):
@@ -119,7 +119,7 @@ class InteractionDetector:
         if buildHB:
             has_hbonds = True
             hbondStr = self.buildHydrogenBonds(ligand, comment=comment)           #
-            if self.verbose: print "hbondStr=", hbondStr
+            if self.verbose: print("hbondStr=", hbondStr)
             hblist = hbondStr.split('\n') # hbond info
             if hblist[0]=='lig_hb_atoms : 0':
                 has_hbonds = False
@@ -131,12 +131,12 @@ class InteractionDetector:
             if self.results['pi_cation']:
                 self.piResults = self.get_pi_cation_result(print_ctr=1, comment=comment)
                 if self.verbose: 
-                    print "found pi_cation in ", ligand_file
-                    print "set self.piResults to ", self.piResults
+                    print("found pi_cation in ", ligand_file)
+                    print("set self.piResults to ", self.piResults)
             if self.results['pi_pi']:
                 self.piResults += self.get_pi_pi(print_ctr=1, comment=comment)
                 if self.verbose: 
-                    print "set self.piResults to ", self.piResults
+                    print("set self.piResults to ", self.piResults)
         macro_cclist = macrocloseContactStr.split(';')
         lig_cclist = ligcloseContactStr.split(';')
         if has_hbonds or len(macro_cclist):
@@ -190,12 +190,12 @@ class InteractionDetector:
             v = self.results[k]
             #key:atom1.full_name();
             if len(v):
-                if verbose: print "gRS: report for ", k
-                if verbose: print  "USER:  " + k + ":" + str(len(v)) 
-                if verbose: print  "     start ss= ", ss
+                if verbose: print("gRS: report for ", k)
+                if verbose: print("USER:  " + k + ":" + str(len(v))) 
+                if verbose: print("     start ss= ", ss)
                 ss +=  k + ":" + str(len(v))  + "\n"
                 if k=='lig_hb_atoms':
-                    if verbose: print "@@ getResultStr lig_hb_atoms"
+                    if verbose: print("@@ getResultStr lig_hb_atoms")
                     hbstr = ""
                     for lig_at in v:
                         for hb in lig_at.hbonds:
@@ -203,10 +203,10 @@ class InteractionDetector:
                                 hbstr += 'USER %s-%s~%s\n'%(hb.donAt.full_name(), hb.hAt.full_name(),hb.accAt.full_name())
                             else:
                                 hbstr += 'USER %s~%s\n'%(hb.donAt.full_name(), hb.accAt.full_name())
-                    if verbose: print "hbstr="
+                    if verbose: print("hbstr=")
                     #add it to ss here
                     ss += hbstr
-                    if verbose: print "with hbstr: ss=", ss
+                    if verbose: print("with hbstr: ss=", ss)
                 #if self.verbose:
                 elif k == 'pi_cation':
                     for res in v:
@@ -219,14 +219,14 @@ class InteractionDetector:
                         ss += "USER %s~~%s\n"%(res[0].full_name(), res[1][0].full_name())
                 else:
                     for w in v:
-                        if verbose: print "@@ getResultStr w=", w
+                        if verbose: print("@@ getResultStr w=", w)
                         try:
                             ss += 'USER ' + w.full_name()+'\n;'
                         except:
-                            if verbose: print "except on ", w
+                            if verbose: print("except on ", w)
                             ss += "USER " + str(w)
                 ss += "\n" 
-                if verbose: print  "     end ss= ", ss
+                if verbose: print("     end ss= ", ss)
         return ss
 
 
@@ -236,11 +236,11 @@ class InteractionDetector:
         #keys should be from lig, values from macro 
         #sometimes are not...@@check this@@
         h_results = {}
-        for k, v in h_pairDict.items():
+        for k, v in list(h_pairDict.items()):
             h_results[k] = 1
             for at in v:
                 h_results[at] = 1
-        all_hb_ats = AtomSet(h_results.keys())  #all
+        all_hb_ats = AtomSet(list(h_results.keys()))  #all
         d = self.results
         macro_hb_ats = d['macro_hb_atoms'] = all_hb_ats.get(lambda x: x.top==self.macro)
         self.macro_hb_ats = macro_hb_ats
@@ -265,8 +265,8 @@ class InteractionDetector:
         #ligHStr = ligand.allAtoms.get(lambda x: hasattr(x, 'hbonds') and len(x.hbonds)).full_name()
         #return  macroHStr + '==' + ligHStr
         if self.verbose: 
-            print  "buildHB returning:"
-            print outS
+            print("buildHB returning:")
+            print(outS)
         return outS
 
 
@@ -279,13 +279,13 @@ class InteractionDetector:
         lig_close_ats = AtomSet()
         macro_close_ats = AtomSet()
         cdict = {}
-        for k,v in pairDict.items():
+        for k,v in list(pairDict.items()):
             if len(v):
                 cdict[k] = 1
             for at in v:
                 if at not in macro_close_ats:
                     cdict[at] = 1
-        closeAtoms = AtomSet(cdict.keys())
+        closeAtoms = AtomSet(list(cdict.keys()))
         lig_close_ats = closeAtoms.get(lambda x: x.top==ligand).uniq()
         #ligClAtStr = lig_close_ats.full_name()
         ligClAtStr = comment + "lig_close_ats: %d\n" %( len(lig_close_ats))
@@ -299,9 +299,9 @@ class InteractionDetector:
         rdict = self.results
         rdict['lig_close_atoms'] = lig_close_ats
         rdict['macro_close_atoms'] = macro_close_ats
-        if self.verbose: print "macroClAtStr=", macroClAtStr
-        if self.verbose: print "ligClAtStr=", ligClAtStr
-        if self.verbose: print "returning "+ macroClAtStr + '==' + ligClAtStr
+        if self.verbose: print("macroClAtStr=", macroClAtStr)
+        if self.verbose: print("ligClAtStr=", ligClAtStr)
+        if self.verbose: print("returning "+ macroClAtStr + '==' + ligClAtStr)
         return  macroClAtStr , ligClAtStr
 
 
@@ -332,7 +332,7 @@ class InteractionDetector:
 
 
     def detectPiInteractions(self, tolerance=0.95, debug=False, use_all_cycles=False):
-        if debug: print "in detectPiInteractions"
+        if debug: print("in detectPiInteractions")
         self.results['pi_pi'] = []        #stacked rings...?
         self.results['t_shaped'] = []     #one ring perpendicular to the other
         self.results['cation_pi'] = []    #
@@ -351,9 +351,9 @@ class InteractionDetector:
         #Ligand
         l_rf.findRings2(lig_atoms, lig_atoms.bonds[0])
         #rf.rings is list of dictionaries, one per ring, with keys 'bonds' and 'atoms'
-        if debug: print "LIG: len(l_rf.rings)=", len(l_rf.rings)
+        if debug: print("LIG: len(l_rf.rings)=", len(l_rf.rings))
         if not len(l_rf.rings):
-            if debug: print "no lig rings found by l_rf!"
+            if debug: print("no lig rings found by l_rf!")
             return
         acbs = self.aromatic_cycle_bond_selector
         #acbs = AromaticCycleBondSelector()
@@ -366,7 +366,7 @@ class InteractionDetector:
                 arom_bnds = acbs.select(ring_bnds)
                 if len(arom_bnds)>4:
                     lig_rings.append(arom_bnds)
-        if debug: print "LIG: len(lig_arom_rings)=", len(lig_rings)
+        if debug: print("LIG: len(lig_arom_rings)=", len(lig_rings))
         self.results['lig_rings'] = lig_rings
         self.results['lig_ring_atoms'] = AtomSet()
         #only check for pi-cation if lig_rings exist
@@ -379,20 +379,20 @@ class InteractionDetector:
                 for a in BondSet(r).getAtoms():
                     u[a] = 1
             if len(u): 
-                lig_ring_atoms = AtomSet(u.keys())
+                lig_ring_atoms = AtomSet(list(u.keys()))
                 lig_ring_atoms.sort()
                 self.results['lig_ring_atoms'] = lig_ring_atoms
             if len(macro_cations):
-                if debug: print "check distances from lig_rings to macro_cations here"
+                if debug: print("check distances from lig_rings to macro_cations here")
                 #macro cations->lig rings
                 pairDict2 = self.distanceSelector.select(lig_ring_atoms,macro_cations)
                 z = {}
-                for key,v in pairDict2.items():
+                for key,v in list(pairDict2.items()):
                     val = v.tolist()[0]
                     if val in macro_cations:
                         z[val] = [key]
                 if len(z):
-                    self.results['pi_cation'] = (z.items())
+                    self.results['pi_cation'] = (list(z.items()))
                 else:
                     self.results['pi_cation'] = []
         #check the distance between the rings and the macro_cations
@@ -404,9 +404,9 @@ class InteractionDetector:
         m_rf = RingFinder()
         m_rf.findRings2(macro_res.atoms, macro_res.atoms.bonds[0])
         #rf.rings is list of dictionaries, one per ring, with keys 'bonds' and 'atoms'
-        if debug: print "MACRO: len(m_rf.rings)=", len(m_rf.rings)
+        if debug: print("MACRO: len(m_rf.rings)=", len(m_rf.rings))
         if not len(m_rf.rings):
-            if debug: print "no macro rings found by m_rf!"
+            if debug: print("no macro rings found by m_rf!")
             return
         macro_rings = []
         for r in m_rf.rings:
@@ -417,7 +417,7 @@ class InteractionDetector:
                 arom_bnds = acbs.select(ring_bnds)
                 if len(arom_bnds)>4:
                     macro_rings.append(arom_bnds)
-        if debug: print "len(macro_arom_rings)=", len(macro_rings)
+        if debug: print("len(macro_arom_rings)=", len(macro_rings))
         self.results['macro_rings'] = macro_rings
         self.results['macro_ring_atoms'] = AtomSet()
         #only check for pi-cation if macro_rings exist
@@ -428,18 +428,18 @@ class InteractionDetector:
                 for a in BondSet(r).getAtoms(): #new method of bondSets
                     u[a] = 1
             if len(u):
-                macro_ring_atoms = AtomSet(u.keys())
+                macro_ring_atoms = AtomSet(list(u.keys()))
                 macro_ring_atoms.sort()
                 self.results['macro_ring_atoms'] = macro_ring_atoms
             if len(lig_cations):
-                if debug: print "check distances from macro_rings to lig_cations here"
+                if debug: print("check distances from macro_rings to lig_cations here")
                 pairDict3 = self.distanceSelector.select(macro_ring_atoms,lig_cations)
                 z = {}
-                for x in pairDict3.items():
+                for x in list(pairDict3.items()):
                     #lig cations->macro rings
                     z.setdefault(x[1].tolist()[0], []).append(x[0])
                 if len(z):
-                    self.results['cation_pi'] = (z.items())
+                    self.results['cation_pi'] = (list(z.items()))
                 else:
                     self.results['cation_pi'] = []
                 #macro_pi_atoms = AtomSet(pairDict3.keys())
@@ -454,23 +454,23 @@ class InteractionDetector:
         for lig_ring_bnds in lig_rings:
             lig_atoms = acbs.getAtoms(lig_ring_bnds)
             lig_atoms.sort()
-            if debug: print "len(lig_atoms)=", len(lig_atoms)
+            if debug: print("len(lig_atoms)=", len(lig_atoms))
             #---------------------------------
             # compute the normal to lig ring
             #---------------------------------
             a1 = numpy.array(lig_atoms[0].coords)
             a2 = numpy.array(lig_atoms[2].coords)
             a3 = numpy.array(lig_atoms[4].coords)
-            if debug: print "a1,a2, a3=", a1.tolist(), a2.tolist(), a3.tolist()
+            if debug: print("a1,a2, a3=", a1.tolist(), a2.tolist(), a3.tolist())
             for macro_ring_bnds in macro_rings:
                 macro_atoms = acbs.getAtoms(macro_ring_bnds)
                 macro_atoms.sort()
-                if debug: print "len(macro_atoms)=", len(macro_atoms)
+                if debug: print("len(macro_atoms)=", len(macro_atoms))
                 pD_dist = self.distanceSelectorWithCutoff.select(macro_ring_atoms, lig_atoms, cutoff=self.dist_cutoff)
                 if not len(pD_dist[0]):
                     if debug: 
-                        print "skipping ligand ring ", lig_rings.index(lig_ring_bnds), " vs ",
-                        print "macro ring", macro_rings.index(macro_ring_bnds)
+                        print("skipping ligand ring ", lig_rings.index(lig_ring_bnds), " vs ", end=' ')
+                        print("macro ring", macro_rings.index(macro_ring_bnds))
                     continue
                 #---------------------------------
                 # compute the normal to macro ring
@@ -478,30 +478,30 @@ class InteractionDetector:
                 b1 = numpy.array(macro_atoms[0].coords)
                 b2 = numpy.array(macro_atoms[2].coords)
                 b3 = numpy.array(macro_atoms[4].coords)
-                if debug: print "b1,b2, b3=", b1.tolist(), b2.tolist(), b3.tolist()
+                if debug: print("b1,b2, b3=", b1.tolist(), b2.tolist(), b3.tolist())
                 # check for stacking 
                 a2_1 = a2-a1
                 a3_1 = a3-a1
                 b2_1 = b2-b1
                 b3_1 = b3-b1
-                if debug: print "a2_1 = ", a2-a1
-                if debug: print "a3_1 = ", a3-a1
-                if debug: print "b2_1 = ", b2-b1
-                if debug: print "b3_1 = ", b3-b1
+                if debug: print("a2_1 = ", a2-a1)
+                if debug: print("a3_1 = ", a3-a1)
+                if debug: print("b2_1 = ", b2-b1)
+                if debug: print("b3_1 = ", b3-b1)
                 n1 = crossProduct(a3_1,a2_1) #to get the normal for the first ring
                 n2 = crossProduct(b3_1,b2_1) #to get the normal for the second ring
-                if debug: print "n1=", n1
-                if debug: print "n2=", n2
+                if debug: print("n1=", n1)
+                if debug: print("n2=", n2)
                 n1 = numpy.array(n1)
                 n2 = numpy.array(n2)
                 n1_dot_n2 = numpy.dot(n1,n2)
-                if debug: print "n1_dot_n2", numpy.dot(n1,n2)
+                if debug: print("n1_dot_n2", numpy.dot(n1,n2))
                 if abs(n1_dot_n2) >= 1*tolerance: 
-                    if debug: print "The rings are stacked vertically" 
+                    if debug: print("The rings are stacked vertically") 
                     new_result = (acbs.getAtoms(lig_ring_bnds), acbs.getAtoms(macro_ring_bnds))
                     self.results['pi_pi'].append(new_result)
                 if abs(n1_dot_n2) <= 0.01*tolerance: 
-                    if debug: print "The rings are stacked perpendicularly" 
+                    if debug: print("The rings are stacked perpendicularly") 
                     new_result = (acbs.getAtoms(lig_ring_bnds), acbs.getAtoms(macro_ring_bnds))
                     self.results['t_shaped'].append(new_result)
 
@@ -603,20 +603,20 @@ class InteractionDetector:
         # need to build lists of unique parents of keys 
         # and lists of unique parents of corresponding values
         res_d = {}
-        for at in self.pairDict.keys():
-            if at.parent not in res_d.keys():
+        for at in list(self.pairDict.keys()):
+            if at.parent not in list(res_d.keys()):
                 res_d[at.parent] = {}
             for close_at in self.pairDict[at]:
                 res_d[at.parent][close_at.parent] = 1
         #print it out
-        for lig_res in res_d.keys():
+        for lig_res in list(res_d.keys()):
             if print_ctr:
-                print ctr, lig_res.parent.name+':'+ lig_res.name + '->',
+                print(ctr, lig_res.parent.name+':'+ lig_res.name + '->', end=' ')
             else:
-                print lig_res.parent.name+':'+ lig_res.name + '->',
+                print(lig_res.parent.name+':'+ lig_res.name + '->', end=' ')
             for macro_res in res_d[lig_res]:
-                print macro_res.parent.name + ':' + macro_res.name + ',',
-            print
+                print(macro_res.parent.name + ':' + macro_res.name + ',', end=' ')
+            print()
             ctr += 1
         return res_d
 
@@ -628,20 +628,20 @@ class InteractionDetector:
         # need to build lists of unique parents of keys 
         # and lists of unique parents of corresponding values
         res_d = {}
-        for at_key, at_list in self.pairDict.items():
+        for at_key, at_list in list(self.pairDict.items()):
             for at in at_list:
-                if at.parent not in res_d.keys():
+                if at.parent not in list(res_d.keys()):
                     res_d[at.parent] = {}
                 res_d[at.parent][at_key.parent] = 1
         #print it out
-        for macro_res in res_d.keys():
+        for macro_res in list(res_d.keys()):
             if print_ctr:
-                print ctr, macro_res.parent.name+':'+ macro_res.name + '->',
+                print(ctr, macro_res.parent.name+':'+ macro_res.name + '->', end=' ')
             else:
-                print macro_res.parent.name+':'+ macro_res.name + '->',
+                print(macro_res.parent.name+':'+ macro_res.name + '->', end=' ')
             for lig_res in res_d[macro_res]:
-                print lig_res.parent.name + ':' + lig_res.name + ',',
-            print
+                print(lig_res.parent.name + ':' + lig_res.name + ',', end=' ')
+            print()
             ctr += 1
         return res_d
 
@@ -657,28 +657,28 @@ class InteractionDetector:
         d = self.results
         if self.verbose:
             for k in keylist:
-                print k, ':', len(d[k]), '-', d[k].__class__
+                print(k, ':', len(d[k]), '-', d[k].__class__)
 
 
     def print_hb_residue(self, print_ctr=1):
         ctr = 1
         #pairDict is atom-based 
         res_d = {}
-        for at in self.h_pairDict.keys():
-            if at.parent not in res_d.keys():
+        for at in list(self.h_pairDict.keys()):
+            if at.parent not in list(res_d.keys()):
                 res_d[at.parent] = {}
             for close_at in self.h_pairDict[at]:
                 res_d[at.parent][close_at.parent] = 1
         # print it out
         # Hbond instance are define with donAt,hAt ~ accAtt  (tilde)
-        for don_res in res_d.keys():
+        for don_res in list(res_d.keys()):
             if print_ctr:
-                print ctr, don_res.top.name+':'+don_res.parent.name+':'+ don_res.name + '->',
+                print(ctr, don_res.top.name+':'+don_res.parent.name+':'+ don_res.name + '->', end=' ')
             else:
-                print don_res.top.name+':'+don_res.parent.name+':'+ don_res.name + '->',
+                print(don_res.top.name+':'+don_res.parent.name+':'+ don_res.name + '->', end=' ')
             for acc_res in res_d[don_res]:
-                print acc_res.top.name+':'+acc_res.parent.name + ':' + acc_res.name + ',',
-            print
+                print(acc_res.top.name+':'+acc_res.parent.name + ':' + acc_res.name + ',', end=' ')
+            print()
             ctr += 1
         return res_d
 

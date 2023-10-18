@@ -65,7 +65,7 @@ last line of the pdbq file.
 
 
 
-from MoleculePreparation import LigandPreparation, AD4LigandPreparation, LigandRandomizer
+from .MoleculePreparation import LigandPreparation, AD4LigandPreparation, LigandRandomizer
 from DejaVu import viewerConst
 from DejaVu.Geom  import Geom
 from PyBabel.cycle import RingFinder
@@ -90,9 +90,9 @@ from mglutil.gui.BasicWidgets.Tk.thumbwheel import ThumbWheel
 
 from Pmv.guiTools import MoleculeChooser
 from Pmv.qkollua import q
-from SimpleDialog import SimpleDialog
+from tkinter.simpledialog import SimpleDialog
 
-import types, Tkinter, math, os, Pmw, tkMessageBox
+import types, tkinter, math, os, Pmw, tkinter.messagebox
 from string import split, find
 
 #create global geometries for this module
@@ -118,7 +118,7 @@ MAXTORS = 32
 
 def enter_cb(event=None):
     try:
-        print event.widget
+        print(event.widget)
     except:
         pass
 
@@ -238,7 +238,7 @@ def set_autoMergeNPHS(name, oldval, newval):
 
 def initLPO(mol, mode='interactive',repairs="", root=0, outputfilename=None,
                     cleanup='nphs_lps'):
-    hs = AtomSet(filter(lambda x:x.element=='H', mol.allAtoms))
+    hs = AtomSet([x for x in mol.allAtoms if x.element=='H'])
     #do NOT add hydrogens here
     repairs = 'bonds'
     #if len(hs):
@@ -247,7 +247,7 @@ def initLPO(mol, mode='interactive',repairs="", root=0, outputfilename=None,
     chargeType = mol.allAtoms[0].chargeSet
     num_zero_charge = len(mol.allAtoms.get(lambda x: hasattr(x, 'charge') and x.charge==0))
     if num_zero_charge==len(mol.allAtoms):
-        print 'forcing addition of gasteiger charges to molecule with all zero charges'
+        print('forcing addition of gasteiger charges to molecule with all zero charges')
         charges_to_add = 'gasteiger'
     elif chargeType!=None:
         charges_to_add = None
@@ -268,7 +268,7 @@ def initLPO(mol, mode='interactive',repairs="", root=0, outputfilename=None,
 
 def initLPO4(mol, mode='interactive',repairs="", root=0, outputfilename=None,
                     cleanup='nphs_lps'):
-    hs = AtomSet(filter(lambda x:x.element=='H', mol.allAtoms))
+    hs = AtomSet([x for x in mol.allAtoms if x.element=='H'])
     #do NOT add hydrogens here
     repairs = 'bonds'
     #if len(hs):
@@ -278,7 +278,7 @@ def initLPO4(mol, mode='interactive',repairs="", root=0, outputfilename=None,
     num_zero_charge = len(mol.allAtoms.get(lambda x: hasattr(x, 'charge') and x.charge==0))
     if num_zero_charge==len(mol.allAtoms):
         charges_to_add = 'gasteiger'
-        print 'forcing addition of gasteiger charges to molecule with all zero charges'
+        print('forcing addition of gasteiger charges to molecule with all zero charges')
     elif chargeType!=None:
         charges_to_add = None
     else:
@@ -313,7 +313,7 @@ class AdtSetMode(MVCommand):
 
     def onAddCmdToViewer(self):
         self.first = 1
-        import Tkinter, types
+        import tkinter, types
         from AutoDockTools import autotors4Commands, autotors41Commands, autotors3Commands
         from AutoDockTools import autogpf4Commands, autogpf41Commands, autogpf3Commands
         from AutoDockTools import autodpf4Commands, autodpf41Commands, autodpf3Commands
@@ -350,17 +350,17 @@ class AdtSetMode(MVCommand):
             }
 
         if self.vf.hasGui:
-            import Tkinter
-            self.modeVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            import tkinter
+            self.modeVar = tkinter.StringVar(master=self.vf.GUI.ROOT)
             #for the moment, the default should be 4.0
             #self.modeVar.set(self.levels[1])
             self.modeVar.set(self.levels[0])
-            self.oldModeVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            if 'AutoTools4Bar' in self.vf.GUI.menuBars.keys():
+            self.oldModeVar = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            if 'AutoTools4Bar' in list(self.vf.GUI.menuBars.keys()):
                 self.oldModeVar.set('AD4.0')
-            elif 'AutoTools41Bar' in self.vf.GUI.menuBars.keys():
+            elif 'AutoTools41Bar' in list(self.vf.GUI.menuBars.keys()):
                 self.oldModeVar.set('AD4.2')
-            elif 'AutoTools3Bar' in self.vf.GUI.menuBars.keys():
+            elif 'AutoTools3Bar' in list(self.vf.GUI.menuBars.keys()):
                 self.oldModeVar.set('AD3.05')
             if hasattr(self.vf.GUI, 'adt4ModeLabel'):
                 self.vf.GUI.adt4ModeLabel.bind("<Double-Button-1>", self.guiCallback)
@@ -388,18 +388,18 @@ class AdtSetMode(MVCommand):
         """ADMode <- ADTSetMode(ModeStr, **kw)
         set the current AutoDock MODE and activate commands for this level and inactivate others.
         """
-        return apply( self.doitWrapper, (ModeStr,), kw)
+        return self.doitWrapper(*(ModeStr,), **kw)
 
 
     def doit(self, ModeStr, **kw):
-        if type(ModeStr)!=types.StringType:
+        if type(ModeStr)!=bytes:
             return "ERROR"
         if ModeStr not in self.levels:
             msg = ModeStr + "string does not map to a valid level"
             self.warningMsg(msg)
             return "ERROR"
         if ModeStr == 'AD4.2' and not hasattr(self, 'oldModeVar'):
-            self.oldModeVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)          
+            self.oldModeVar = tkinter.StringVar(master=self.vf.GUI.ROOT)          
         oldModeStr = self.oldModeVar.get()
         if ModeStr==oldModeStr:
             if self.first: 
@@ -412,11 +412,11 @@ class AdtSetMode(MVCommand):
         #hide old toolbar
         if oldModeStr!='':
             oldBarName = self.levelBarNames[oldModeStr]
-            if self.vf.GUI.menuBars.has_key(oldBarName):
+            if oldBarName in self.vf.GUI.menuBars:
                 self.vf.GUI.menuBars[oldBarName].pack_forget()
         #pack new toolbar
         barName = self.levelBarNames[ModeStr]
-        if self.vf.GUI.menuBars.has_key(barName):
+        if barName in self.vf.GUI.menuBars:
             self.vf.GUI.menuBars[barName].pack(fill='x',expand=1)
         else:
             #load its cmds and pack it here
@@ -424,15 +424,15 @@ class AdtSetMode(MVCommand):
                 self.vf.browseCommands(modName, commands=None, package='AutoDockTools')
         self.vf.GUI.currentADTBar = barName
         self.vf.GUI.menuBars[barName]._frame.master.config({'bg':'tan','height':25,'relief':'flat'})
-        import Tkinter
+        import tkinter
         col = self.levelColors[ModeStr]
         frame = self.frameNames[ModeStr]
         if not hasattr(self.vf.GUI, frame):
-            setattr(self.vf.GUI, frame, self.vf.GUI.menuBars[barName].menubuttons.values()[0].master)
+            setattr(self.vf.GUI, frame, list(self.vf.GUI.menuBars[barName].menubuttons.values())[0].master)
         frameInst = getattr(self.vf.GUI, frame)
         modeLabelName = self.modeLabelNames[ModeStr]
         if not hasattr(self.vf.GUI, modeLabelName):
-            setattr(self.vf.GUI, modeLabelName,  Tkinter.Label(frameInst, text=ModeStr, width=len(ModeStr),
+            setattr(self.vf.GUI, modeLabelName,  tkinter.Label(frameInst, text=ModeStr, width=len(ModeStr),
                                  relief='sunken', borderwidth=1, fg='DarkGreen',
                                  bg = 'ivory',anchor='w' ))
             getattr(self.vf.GUI, modeLabelName).pack(side='left')
@@ -449,7 +449,7 @@ class AdtSetMode(MVCommand):
         try:
             self.Close_cb()
         except:
-            print "exception line 450"
+            print("exception line 450")
         
 
     def updateCmds(self, ModeStr ):
@@ -511,7 +511,7 @@ class AdtSetMode(MVCommand):
     def buildForm(self):
         if not hasattr(self, 'ifd'):
             from mglutil.gui.InputForm.Tk.gui import InputFormDescr
-            import Tkinter
+            import tkinter
             ifd = self.ifd = InputFormDescr(title = "AutoDock Mode:")
             #6_23_10levelLabels = ['AutoDock 4.2', 'AutoDock 3.05']
             #levelLabels = ['AutoDock 4.2', 'AutoDock 3.05']
@@ -521,7 +521,7 @@ class AdtSetMode(MVCommand):
             levels = ['AD4.2', 'AD4.0', 'AD3.05']
             for level, levlabel in zip(levels, levelLabels):
                 ifd.append({'name':level, 
-                            'widgetType': Tkinter.Radiobutton,
+                            'widgetType': tkinter.Radiobutton,
                             'wcfg':{'text':levlabel,
                                     'variable':self.modeVar,
                                     'value':level,
@@ -531,7 +531,7 @@ class AdtSetMode(MVCommand):
                                     'command':self.setMode_cb},
                             'gridcfg':{'sticky':'we'}})
             ifd.append({'name':'dismiss',
-                        'widgetType':Tkinter.Button,
+                        'widgetType':tkinter.Button,
                         'defaultValue':1,
                         'wcfg':{'text':'Dismiss',
                                 'command':self.Close_cb},
@@ -573,7 +573,7 @@ class AtorsMoleculeChooser(MVCommand):
     def guiCallback(self):
         self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Autotors Molecule',
                                  'wcfg':{'bd':6},
                                  'gridcfg':{'sticky':'we'},
@@ -587,7 +587,7 @@ class AtorsMoleculeChooser(MVCommand):
         """None<-ADtors_chooseLigand(nodes)
 nodes:ligand for autodock
         """
-        apply(self.doitWrapper, (nodes,), kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes, **kw):
@@ -608,7 +608,7 @@ nodes:ligand for autodock
                 buttons=['No','Yes'], default=1, 
                 title='Use Previous Torsion Tree?')
             useTorTree=d.go()
-            print 'set useTorTree to', useTorTree
+            print('set useTorTree to', useTorTree)
 
         #include user_preferences here...
         #what about reprocessing?
@@ -722,7 +722,7 @@ class AtorsReader(MVCommand):
 filename:file to read to get ligand for autodock
         """
         kw['log'] = log
-        apply(self.doitWrapper, (filename,),kw)
+        self.doitWrapper(*(filename,), **kw)
 
 
     def doit(self, filename, **kw):
@@ -819,7 +819,7 @@ class Ators4MoleculeChooser(MVCommand):
     def guiCallback(self):
         self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Molecule for AutoDock4',
                                  'wcfg':{'bd':6},
                                  'gridcfg':{'sticky':'we'},
@@ -833,7 +833,7 @@ class Ators4MoleculeChooser(MVCommand):
         """None<-ADtors4_chooseLigand(nodes)
 nodes:ligand for autodock4
         """
-        apply(self.doitWrapper, (nodes,), kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes, **kw):
@@ -849,7 +849,7 @@ nodes:ligand for autodock4
             return
         useTorTree=0
         if hasattr(mol, 'torTree'):
-            if 'useTorTree' in kw.keys():
+            if 'useTorTree' in list(kw.keys()):
                 useTorTree = kw['useTorTree']
             else:
                 msg = mol.name + ' already has a a torsion tree. Do you want to use it to set the activity of rotatable bonds?'
@@ -857,7 +857,7 @@ nodes:ligand for autodock4
                     buttons=['No','Yes'], default=1, 
                     title='Use Previous Torsion Tree?')
                 useTorTree=d.go()
-                print 'set useTorTree to', useTorTree
+                print('set useTorTree to', useTorTree)
 
         #include user_preferences here...
         #what about reprocessing?
@@ -975,7 +975,7 @@ class Ators4Reader(MVCommand):
 filename:file to read to get ligand for autodock
         """
         kw['log'] = log
-        apply(self.doitWrapper, (filename,),kw)
+        self.doitWrapper(*(filename,), **kw)
 
 
     def doit(self, filename, **kw):
@@ -1080,7 +1080,7 @@ ligfile: written output file
 reffile:input file to reorder to be rms reference for autodock
         """
         kw['log'] = log
-        apply(self.doitWrapper, (ligfile, reffile,),kw)
+        self.doitWrapper(*(ligfile, reffile,), **kw)
 
 
     def doit(self, ligfile, reffile, **kw):
@@ -1147,7 +1147,7 @@ reffile:input file to reorder to be rms reference for autodock
                                     foundAt = 1
                                     break
                     if not foundAt:
-                        print 'could not match ', a.full_name(), ' ', a.number
+                        print('could not match ', a.full_name(), ' ', a.number)
             #mark this pair of atoms as written
             a.written = 1
             a2.written = 1
@@ -1194,7 +1194,7 @@ outFile: file to write formatted rigid ligand
             return 'ERROR'
         if not outFile:
             return 'ERROR'
-        apply(self.doitWrapper, (molFile, outFile,),kw)
+        self.doitWrapper(*(molFile, outFile,), **kw)
 
 
 
@@ -1248,7 +1248,7 @@ outFile: file to write formatted rigid ligand
             return 'ERROR'
         if not outFile:
             return 'ERROR'
-        apply(self.doitWrapper, (molFile, outFile,),kw)
+        self.doitWrapper(*(molFile, outFile,), **kw)
 
 
 
@@ -1285,7 +1285,7 @@ class AUTOTORSWriter(MVCommand):
     def onAddCmdToViewer(self):
         if not hasattr(self.vf, 'atorsDict'):
             self.vf.atorsDict={}
-        if 'write CONECT records' not in self.vf.userpref.settings.keys():
+        if 'write CONECT records' not in list(self.vf.userpref.settings.keys()):
             doc = """Write a CONECT record for each bond in molecule. Valid values are 0 or 1"""
             self.vf.userpref.add('write CONECT records', 0, [0,1], 
                              doc=doc, category='AutoDockTools')
@@ -1294,7 +1294,7 @@ class AUTOTORSWriter(MVCommand):
     def doit(self, filename):
         #need to be sure filename is a string
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return 'ERROR'
         mol = dict['molecule']
@@ -1305,7 +1305,7 @@ class AUTOTORSWriter(MVCommand):
             self.vf.warningMsg(msg)
             return "ERROR"
         value = False
-        if "write CONECT records" in self.vf.userpref.keys(): 
+        if "write CONECT records" in list(self.vf.userpref.keys()): 
 	    value = self.vf.userpref['write CONECT records']
         mol.LPO.write(filename, write_CONECT=value)
         rootSph_list = self.vf.GUI.VIEWER.findGeomsByName('rootSph')
@@ -1322,13 +1322,13 @@ class AUTOTORSWriter(MVCommand):
         """None<-ADtors_writeFormattedPDBQ(filename)
             filename: file to write formatted ligand
         """
-        apply(self.doitWrapper, (filename,), kw)
+        self.doitWrapper(*(filename,), **kw)
 
 
     def guiCallback(self):
         hasGui = self.vf.hasGui
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return
         mol = dict['molecule']
@@ -1368,7 +1368,7 @@ ADD PDBQTWriter switch here-->>>
             if self.vf.userpref['Automerge NPHS']['value']==0:
                 cleanup = "lps"  #userpref set to keep non-polar hydrogens, only removing lone-pairs
         #add userpref here:
-        if 'write CONECT records' not in self.vf.userpref.settings.keys():
+        if 'write CONECT records' not in list(self.vf.userpref.settings.keys()):
             doc = """Write CONECT records for each bond in molecule. Valid values are 0 or 1"""
             self.vf.userpref.add('write CONECT records', 0, [0,1], 
                              doc=doc, category='AutoDockTools')
@@ -1377,7 +1377,7 @@ ADD PDBQTWriter switch here-->>>
     def doit(self, filename):
         #need to be sure filename is a string
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return 'ERROR'
         mol = dict['molecule']
@@ -1408,13 +1408,13 @@ ADD PDBQTWriter switch here-->>>
         """None<-ADtors4_writeFormattedPDBQT(filename)
             filename: file to write formatted ligand
         """
-        apply(self.doitWrapper, (filename,), kw)
+        self.doitWrapper(*(filename,), **kw)
 
 
     def guiCallback(self):
         hasGui = self.vf.hasGui
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return
         mol = dict['molecule']
@@ -1450,21 +1450,21 @@ class AUTOTORS4RandomWriter(MVCommand):
             self.vf.atorsDict={}
         if self.vf.hasGui:
             #string
-            self.outputfilename = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.outputfilename = tkinter.StringVar(master=self.vf.GUI.ROOT)
             #floats
             # TRANSLATION within autogrid box: info->lo[X,Y,Z]<->hi[X,Y,Z]
             # +/- xrange, +/- yrange, +/- zrange
-            self.info_loX = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.info_loX = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.info_loX.set("-1") #info->lo[X,Y,Z]
-            self.info_loY = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.info_loY = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.info_loY.set("-1") #info->lo[X,Y,Z]
-            self.info_loZ = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.info_loZ = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.info_loZ.set("-1") #info->lo[X,Y,Z]
-            self.info_hiX = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.info_hiX = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.info_hiX.set("1") #info->lo[X,Y,Z]
-            self.info_hiY = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.info_hiY = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.info_hiY.set("1") #info->lo[X,Y,Z]
-            self.info_hiZ = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.info_hiZ = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.info_hiZ.set("1") #info->lo[X,Y,Z]
             # QUATERNION NOT ADJUSTABLE:
             # instead QUATERNION based on Shoemake, Graphics Gems III.6, pp.124-132
@@ -1483,40 +1483,40 @@ class AUTOTORS4RandomWriter(MVCommand):
             # now.Q.w = cos(t2) * r2
             #------------------------------------------------------------------
             #number of attempts:
-            self.ntries = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.ntries = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.ntries.set(100)
             # label:
-            self.ntriesLab=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.ntriesLab=tkinter.StringVar(master=self.vf.GUI.ROOT)
             totalStr = "Number of tries: "
             self.ntriesLab.set(totalStr)
             #translation boundaries (3D):
             # lower bound label:
-            self.transLoLab=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.transLoLab=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.transLoLab.set("Min translation range:")
             info_lo_str = "%6.4f, %6.4f, %6.4f" %(float(self.info_loX.get()), float(self.info_loY.get()), float(self.info_loZ.get())) 
             # upper bound label:
-            self.transHiLab=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.transHiLab=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.transHiLab.set("Max translation range:")
             info_hi_str = "%6.4f, %6.4f, %6.4f" %(float(self.info_hiX.get()), float(self.info_hiY.get()), float(self.info_hiZ.get())) 
             # random torsions:
             #label:
-            self.torsRangeLab=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.torsRangeLab=tkinter.StringVar(master=self.vf.GUI.ROOT)
             totalStr = "Torsion range  +/- 180"
             self.torsRangeLab.set(totalStr)
             # random torsions in range (-PI, PI)
             #self.drange.set("180.0") # to match mkRandomState?
             # load Molecule
-            self.loadMol=Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.loadMol=tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.loadMol.set(0)
-            self.torsOnly=Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.torsOnly=tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.torsOnly.set(0)
-            self.relTrans=Tkinter.IntVar(master=self.vf.GUI.ROOT) #translation relative to original center of molecule
+            self.relTrans=tkinter.IntVar(master=self.vf.GUI.ROOT) #translation relative to original center of molecule
             self.relTrans.set(0)
 
 
     def doit(self, outputfilename="",info_lo="-1,-1,-1",info_hi="1,1,1",ntries=100,loadMol=0,torsOnly=0,relTrans=0,verbose=0):
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return 'ERROR'
         mol = dict['molecule']
@@ -1539,9 +1539,9 @@ class AUTOTORS4RandomWriter(MVCommand):
         if loadMol:
             self.vf.readMolecule(outputfilename)
         if verbose: 
-            print "outputfilename=", outputfilename
-            print "LR.quat=", LR.quat
-            print "LR.dihe=", LR.quat
+            print("outputfilename=", outputfilename)
+            print("LR.quat=", LR.quat)
+            print("LR.dihe=", LR.quat)
         #by default, do not load new random molecule
         self.loadMol.set(0)
         self.torsOnly.set(0)
@@ -1563,9 +1563,9 @@ class AUTOTORS4RandomWriter(MVCommand):
             if ll.find("#SPACING")==0: 
                 spacing = float(ll.strip().split()[1])
             if ll.find("#NELEMENTS")==0: 
-                npts = map(float, ll[11:].strip().split())
+                npts = list(map(float, ll[11:].strip().split()))
             if ll.find("#CENTER")==0: 
-                center = map(float, ll[8:].strip().split())
+                center = list(map(float, ll[8:].strip().split()))
         if center and npts and spacing:
             #compute and set infoLO and infoHi
             #from autogrid/main.cpp:
@@ -1588,7 +1588,7 @@ class AUTOTORS4RandomWriter(MVCommand):
         ifd = self.ifd = InputFormDescr(title = "Set Randomization Options")
         specfont = (ensureFontCase('helvetica'), 11, 'bold')
         ifd.append( {'name': 'nTries',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'textvariable': self.ntriesLab,
             'wcfg':{'font':(ensureFontCase('helvetica'),11,'bold')},
             'gridcfg':{'column':0, 'sticky':'w', 'columnspan':2 }})
@@ -1611,13 +1611,13 @@ class AUTOTORS4RandomWriter(MVCommand):
                 'continuous':1, 'wheelPad':1, 'height':20},
             'gridcfg':{'row':-1, 'column':1,'sticky':'we','columnspan':1}})
         ifd.append( {'name': 'useFLDLabelB', #@@ get search space dims from an autogrid fld file 
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Use fld range',
             'wcfg':{'bd':2, 'font':(ensureFontCase('helvetica'),11,'bold')},
             'gridcfg':{'row': -1, 'column':2, 'sticky':'we', 'columnspan':2},
             'command':self.useFldRange})
         ifd.append( {'name': 'transLoLabel', #@@ enter x_lo,y_lo,z_lo and x_hi, y_hi, z_hi separately
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'textvariable': self.transLoLab,
             'wcfg':{'font':(ensureFontCase('helvetica'),11,'bold')},
             'gridcfg':{'column':0,'sticky':'w','columnspan':1}})
@@ -1679,7 +1679,7 @@ class AUTOTORS4RandomWriter(MVCommand):
                 'continuous':1, 'wheelPad':1, 'height':20},
             'gridcfg':{'row':-1, 'column':3,'sticky':'we','columnspan':1}})
         ifd.append( {'name': 'transHiLabel', #@@ enter x_lo,y_lo,z_lo and x_hi, y_hi, z_hi separately
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'textvariable': self.transHiLab,
             'wcfg':{'font':(ensureFontCase('helvetica'),11,'bold')},
             'gridcfg':{'column':0,'sticky':'w','columnspan':1}})
@@ -1741,34 +1741,34 @@ class AUTOTORS4RandomWriter(MVCommand):
                 'continuous':1, 'wheelPad':1, 'height':20},
             'gridcfg':{'row':-1, 'column':3,'sticky':'we','columnspan':1}})
         ifd.append( {'name': 'torsRangeLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'textvariable': self.torsRangeLab,
             ##'wcfg':{'font':(ensureFontCase('helvetica'),11,'bold')},
             'wcfg':{'font':(ensureFontCase('helvetica'),10,'bold')},
             'gridcfg':{'sticky':'w','columnspan':1}})
         ifd.append({'name':'torsionsOnly',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'wcfg':{'text': 'torsions only', 'variable': self.torsOnly},
             'gridcfg':{'sticky':'w', 'columnspan':1,'row':-1, 'column':1}})
     #def doit(self, outputfilename="",info_lo=(-1,-1,-1),info_hi=(1,1,1),ntries=100,loadMol=0,torsOnly=0,relTrans=0,verbose=0):
         ifd.append({'name':'relativeTrans',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'wcfg':{'text': 'rel trans', 'variable': self.relTrans},
             'gridcfg':{'sticky':'w', 'columnspan':1,'row':-1, 'column':2}})
         ifd.append({'name':'addMolecule',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'wcfg':{'text': 'load new molecule', 'variable': self.loadMol},
             'gridcfg':{'sticky':'w', 'columnspan':1,'row':-1, 'column':3}})
         ifd.append({'name': 'acceptB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Accept',
             'wcfg':{'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'columnspan':2},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'columnspan':2},
             'command':self.Accept_cb})
-        ifd.append({'widgetType': Tkinter.Button,
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Cancel',
             'wcfg':{'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'row':-1, 'column':2, 'columnspan':2},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'row':-1, 'column':2, 'columnspan':2},
             'command':self.Close_cb})
         self.form = self.vf.getUserInput(self.ifd, scrolledFrame=1, modal=0, blocking=0)
                 #width=330, height=400, modal=0, blocking=0)
@@ -1805,7 +1805,7 @@ class AUTOTORS4RandomWriter(MVCommand):
             types=[('PDBQT files:', '*.pdbqt',)],
             title = 'Randomized Autotors Molecule File:')
         #kw['verbose'] = int(self.verbose.get())
-        if filename: apply(self.doitWrapper, (filename,), kw )
+        if filename: self.doitWrapper(*(filename,), **kw)
         self.form.withdraw()
     
     
@@ -1819,13 +1819,13 @@ class AUTOTORS4RandomWriter(MVCommand):
         """None<-ADtors4_writeRandomPDBQT(filename)
             filename: file for randomized formatted ligand
         """
-        apply(self.doitWrapper, (filename,), kw)
+        self.doitWrapper(*(filename,), **kw)
 
 
     def guiCallback(self):
         hasGui = self.vf.hasGui
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return
         mol = dict['molecule']
@@ -1859,7 +1859,7 @@ class MarkRoot(MVCommand):
             self.vf.atorsDict={}
         self.markonoff = 0
         if self.vf.hasGui:
-            self.markOn_Off = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.markOn_Off = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.markOn_Off.set(0)
             #initialize the geometries here:
             
@@ -1892,13 +1892,13 @@ class MarkRoot(MVCommand):
         """None<-ADtors_markRoot()
 starts or stops marking root expansion display:
 all atoms in root portion of ligand are marked with small sphere"""
-        apply(self.doitWrapper,(), kw)
+        self.doitWrapper(*(), **kw)
 
 
     def doit(self):
         if self.markonoff==0:
             return
-        if not self.vf.atorsDict.has_key('molecule'):
+        if 'molecule' not in self.vf.atorsDict:
             self.vf.warningMsg("you must select a ligand molecule first!")
             return "ERROR"
         mol = self.vf.atorsDict['molecule']
@@ -1931,8 +1931,8 @@ all atoms in root portion of ligand are marked with small sphere"""
 
     def getNeighbors(self, at):
         numBonds = len(at.bonds)
-        notActBonds = filter(lambda x: x.activeTors!=1, at.bonds)
-        numMarkedBonds = filter(lambda x: x.marked==1, at.bonds)
+        notActBonds = [x for x in at.bonds if x.activeTors!=1]
+        numMarkedBonds = [x for x in at.bonds if x.marked==1]
         numNotActive = len(notActBonds)
         for b in notActBonds:
             if b.marked: 
@@ -1953,7 +1953,7 @@ all atoms in root portion of ligand are marked with small sphere"""
         markSph_list = self.vf.GUI.VIEWER.findGeomsByName('markSph')
         markSph = markSph_list[0]
         if not hasattr(self.vf.GUI, 'currentADTBar'):
-            for k in self.vf.GUI.menuBars.keys():
+            for k in list(self.vf.GUI.menuBars.keys()):
                 if k.find("AutoTools")>-1:
                     self.vf.GUI.currentADTBar = k
         menuBarKey = self.vf.GUI.currentADTBar
@@ -1972,7 +1972,7 @@ all atoms in root portion of ligand are marked with small sphere"""
         else:
             self.markOn_Off.set(1)
             self.markonoff = 1
-            if not self.vf.atorsDict.has_key('molecule'):
+            if 'molecule' not in self.vf.atorsDict:
                 self.vf.warningMsg(warningText['noAtorsMol'])
                 return
             molecule = self.vf.atorsDict['molecule']
@@ -2053,7 +2053,7 @@ of ligand which has rotatable BRANCHES """
             
 
     def guiCallback(self):
-        if not self.vf.atorsDict.has_key("molecule"):
+        if "molecule" not in self.vf.atorsDict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return
         self.save = self.vf.ICmdCaller.commands.value["Shift_L"]
@@ -2064,7 +2064,7 @@ of ligand which has rotatable BRANCHES """
     def __call__(self, atom, **kw):
         """None <- selectRoot(atom, **kw) 
 set the root atom by setting mv.atorsDict['rootlist'] to [atom]"""
-        if not self.vf.atorsDict.has_key("molecule"):
+        if "molecule" not in self.vf.atorsDict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return 'ERROR'
         if not atom:
@@ -2075,7 +2075,7 @@ set the root atom by setting mv.atorsDict['rootlist'] to [atom]"""
         atoms = atoms.findType(Atom)
         if not atoms:
             return 'ERROR'
-        apply( self.doitWrapper, (atoms,), kw)
+        self.doitWrapper(*(atoms,), **kw)
         
 
 SelectRootGUI=CommandGUI()
@@ -2092,7 +2092,7 @@ to inactive those which move the fewest atoms or those which move the most
 
     def onRemoveObjectFromViewer(self, obj):
         dict = self.vf.atorsDict
-        if dict.has_key('molecule') and obj==dict['molecule'] and hasattr(self, 'ifd'):
+        if 'molecule' in dict and obj==dict['molecule'] and hasattr(self, 'ifd'):
             #print 'deleting settorsion ifd'
             delattr(self, 'ifd')
         
@@ -2101,9 +2101,9 @@ to inactive those which move the fewest atoms or those which move the most
         if not hasattr(self.vf, 'atorsDict'):
             self.vf.atorsDict={}
         if self.vf.hasGui:
-            self.typeVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.typeVar = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.typeVar.set('fewest')
-            self.numTorsions = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.numTorsions = tkinter.IntVar(master=self.vf.GUI.ROOT)
 
 
     def __call__(self, numTors, type='fewest',**kw):
@@ -2111,7 +2111,7 @@ to inactive those which move the fewest atoms or those which move the most
         numTors number of activeTorsions at end
         type whether to inactive most or fewest movers
         """
-        apply(self.doitWrapper,(numTors, type), kw)
+        self.doitWrapper(*(numTors, type), **kw)
 
 
     def doit(self, numTors, type):
@@ -2122,7 +2122,7 @@ to inactive those which move the fewest atoms or those which move the most
     def guiCallback(self):
         #check that there's an ators molecule, root etc
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg("No ligand molecule selected")
             return 'ERROR'
 
@@ -2160,23 +2160,23 @@ to inactive those which move the fewest atoms or those which move the most
     def buildForm(self):
         ifd = self.ifd = InputFormDescr(title = 'Set Number of Active Torsions')
         ifd.append({'name': 'typeLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text':'set number of active torsions moving:',
             'gridcfg':{'sticky':'we', 'columnspan':2}})
         ifd.append({'name':    'fewestRB',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg':{'text':'fewest atoms',
                     'variable':self.typeVar,
                     'value':'fewest'},
             'gridcfg':{'sticky':'w'}})
         ifd.append({'name':    'mostRB',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg':{'text':'most atoms',
                     'variable':self.typeVar,
                     'value':'most'}, 
             'gridcfg':{'sticky':'w','row':-1,'column':1}})
         ifd.append({'name':    'dividerLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'wcfg':{'text':'________________________________' }, 
             'gridcfg':{'sticky':'we','columnspan':2}})
         ifd.append({'widgetType':Pmw.Counter,
@@ -2193,7 +2193,7 @@ to inactive those which move the fewest atoms or those which move the most
                     'increment':1},
                 'gridcfg':{'sticky':'nesw', 'columnspan':2}})
         ifd.append({'name':    'closeBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg':{'text':'Dismiss',
                     'command':self.Dismiss_cb}, 
             'gridcfg':{'sticky':'we','columnspan':4}})
@@ -2243,7 +2243,7 @@ is equal to numTors. Method decides whether to inactive those which move the few
 atoms or those which move the most.
         """
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             msg = 'no current autotors ligand molecule selected'
             return 'ERROR'
         mol = dict['molecule']
@@ -2254,7 +2254,7 @@ atoms or those which move the most.
         if not hasattr(mol, 'ROOT'):
             msg = 'must set root before limiting torsions'
             return 'ERROR'
-        apply(self.doitWrapper,(numTors, type, simpleModel,), kw)
+        self.doitWrapper(*(numTors, type, simpleModel,), **kw)
 
 
     def doit(self, numTors, type, simpleModel):
@@ -2300,7 +2300,7 @@ atoms or those which move the most.
             self.vf.warningMsg(msg)
             numTors = tNum
         if type=='fewest':
-            rangeList = range(numTors)
+            rangeList = list(range(numTors))
         else:
             rangeList = []
             for k in range(1, numTors+1):
@@ -2327,7 +2327,7 @@ atoms or those which move the most.
         torscount = mol.torscount
         #turn on delta torsions + adjust torscount in dict 
         if type=='fewest':
-            rangeList = range(delta)
+            rangeList = list(range(delta))
         else:
             rangeList = []
             for k in range(1, delta+1):
@@ -2355,7 +2355,7 @@ atoms or those which move the most.
         torscount = mol.torscount
         #turn on delta torsions + adjust torscount in dict 
         if type=='fewest':
-            rangeList = range(delta)
+            rangeList = list(range(delta))
         else:
             rangeList = []
             for k in range(1, delta+1):
@@ -2363,7 +2363,7 @@ atoms or those which move the most.
         for i in rangeList:
             node = torsionMap[i]
             if node.bond==(None,None):
-                print 'error in turnOff torsions with ', rangeList
+                print('error in turnOff torsions with ', rangeList)
                 break
             b = allAts.get(lambda x, node=node: x.tt_ind in node.bond).bonds[0][0]
             if b.activeTors:
@@ -2388,10 +2388,10 @@ the smallest 'largest sub-tree'"""
 sets mv.atorsDict['rootlist'] to a list containing the atom with the smallest
 largest subtree.
         """
-        if not self.vf.atorsDict.has_key("molecule"):
+        if "molecule" not in self.vf.atorsDict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return 'ERROR'
-        apply(self.doitWrapper,(), kw)
+        self.doitWrapper(*(), **kw)
 
 
 
@@ -2410,7 +2410,7 @@ largest subtree.
         #if non-polar hydrogens have been merged, a correction in maxbranch is made..
         ###self.log()
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return
         mol= dict['molecule']
@@ -2472,7 +2472,7 @@ class SetRotatableBonds(MVCommand):
             if not hasattr(self.vf, 'setICOM'):
                 self.vf.loadCommand('interactiveCommands', 'setICOM', 'Pmv') 
             if not self.torsStr:
-                SetRotatableBonds.torsStr = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+                SetRotatableBonds.torsStr = tkinter.StringVar(master=self.vf.GUI.ROOT)
             if not hasattr(self.vf,'labelByProperty'):
                 self.vf.loadCommand('labelCommands', 'labelByProperty', 'Pmv',
                                     topCommand=0)
@@ -2511,7 +2511,7 @@ class SetRotatableBonds(MVCommand):
 
     def setNoActiveTors_cb(self, event=None, log=1, redraw=0):
         mol = self.vf.atorsDict['molecule']
-        possiblebonds = filter(lambda x: x.possibleTors==1, mol.allAtoms.bonds[0])
+        possiblebonds = [x for x in mol.allAtoms.bonds[0] if x.possibleTors==1]
         #if not len(pTatomset): return
         #activebonds = pTatomset.bonds[0]
         if not len(possiblebonds): return 
@@ -2622,7 +2622,7 @@ class SetRotatableBonds(MVCommand):
                 msg='self.ADtors_defineRotBonds.setNoSelected(log=0)'
             self.vf.log(msg)
         if hasattr(self, 'noSELBut'):
-            print 'self.hasSelected=',self.hasSelected
+            print('self.hasSelected=',self.hasSelected)
             if not self.hasSelected:
                 menuText['MSelected'] = menuText['MSelected1']
             else:
@@ -2734,7 +2734,7 @@ class DefiningRotatableBonds(SetRotatableBonds, MVBondICOM):
         #possibly window was open but 'molecule' removed from d before this
         #is called
         if self.form and hasattr(self.form,'root') and \
-                self.form.root.winfo_ismapped() and not dict.has_key('molecule'):
+                self.form.root.winfo_ismapped() and 'molecule' not in dict:
             self.form.withdraw()
         
 
@@ -2748,7 +2748,7 @@ switched:1->0 and 0->1
         kw['busyIdle'] = 1
         kw['log'] = 0
         self.setUpDisplay()
-        apply(self.doitWrapper, (bonds,), kw)
+        self.doitWrapper(*(bonds,), **kw)
 
 
     def doit(self, bonds):
@@ -2756,7 +2756,7 @@ switched:1->0 and 0->1
             if not bond.possibleTors: continue
             mol = bond.atom1.top
             if not hasattr(mol, 'LPO'):
-                print "bond in a non-formatted molecule"
+                print("bond in a non-formatted molecule")
                 return "ERROR"
             ind1 = mol.allAtoms.index(bond.atom1)
             ind2 = mol.allAtoms.index(bond.atom2)
@@ -2766,7 +2766,7 @@ switched:1->0 and 0->1
 
     def setUpDisplay(self):
         dict = self.vf.atorsDict
-        if not dict.has_key('molecule'):
+        if 'molecule' not in dict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return 
         mol = dict['molecule']
@@ -2808,11 +2808,11 @@ switched:1->0 and 0->1
         atorsMolGeom = atorsMolSet[0].geomContainer.geoms['bonded']
 ##         atorsMolGeom = atorsMolSet[0].geomContainer.geoms['lines']
 
-        for o, val in pick.hits.items(): #loop over geometries
-            primInd = map(lambda x: x[0], val)
+        for o, val in list(pick.hits.items()): #loop over geometries
+            primInd = [x[0] for x in val]
             if o != atorsMolGeom: continue
             else: g = o.mol.geomContainer
-            if g.geomPickToBonds.has_key(o.name):
+            if o.name in g.geomPickToBonds:
                 func = g.geomPickToBonds[o.name]
                 if func: return func(o, primInd)
             else:
@@ -2837,12 +2837,12 @@ switched:1->0 and 0->1
         dict = self.vf.atorsDict
         mol = dict['molecule']
         if not hasattr(mol, 'LPO'):
-            print ' formatting ', mol.name, ' for autotors'
+            print(' formatting ', mol.name, ' for autotors')
             cleanup = "nphs_lps"
             if self.vf.userpref['Automerge NPHS']['value']==0:
                 cleanup = "lps"
             initLPO(mol, cleanup=cleanup)
-            print "initLPO #4"
+            print("initLPO #4")
             self.vf.warningMsg(mol.LPO.summarize(),title=title)
             self.vf.allAtoms = self.vf.Mols.chains.residues.atoms
         if self.form:
@@ -2867,7 +2867,7 @@ switched:1->0 and 0->1
             return
         mol = self.vf.atorsDict['molecule']  
         if not mol:
-            print "Please select ligand molecule first"
+            print("Please select ligand molecule first")
             return
         self.hasAmide = mol.has_amide
         self.hasPeptide = mol.has_backbone
@@ -2882,36 +2882,36 @@ switched:1->0 and 0->1
         self.torsStr.set(menuText['torStr1'] + str(torscount) + menuText['torStr2'])
         ifd = self.ifd= InputFormDescr(title = 'Torsion Count')
         ifd.append({'name':'instrText',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'wcfg': {'text':'Shift Pick or Shift drag-&-pick bonds.  \nGreen = rotatable, \nMagenta = non-rotatable, \nRed = unrotatable.\n\n'},
                 'gridcfg':{'sticky':'we'}}),
         ifd.append({'name':'torsEntryLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'wcfg':{'textvariable':self.torsStr},
                 'gridcfg':{'sticky':'we'}}),
         ifd.append({'name':'noPepBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
               'wcfg':{'text':'Make peptide backbone bonds non-rotatable',
                   'command':self.setNoPeptideTors_cb},
                 'gridcfg':{'sticky':'we',
                        'columnspan':2}}),
         ifd.append({'name':'noAmideBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                'wcfg':{'text':'Make amide bonds non-rotatable',
                    'command':self.setNoAmideTors_cb},
                 'gridcfg':{'sticky':'we', 'columnspan':2}}),
         ifd.append({'name':'noGuanBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                'wcfg':{'text':'Make guanidinium bonds non-rotatable',
                    'command':self.setNoGuanidiniumTors_cb},
                 'gridcfg':{'sticky':'we', 'columnspan':2}}),
         ifd.append({'name':'noSelectedBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                'wcfg':{'text':'Make bonds between selected atoms non-rotatable',
                    'command':self.setNoSelected_cb},
                 'gridcfg':{'sticky':'we', 'columnspan':2}}),
         ifd.append({'name':'noActiveBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                'wcfg':{'text':'Make all active bonds non-rotatable',
                    'command':self.setNoActiveTors_cb},
                 'gridcfg':{'sticky':'we', 'columnspan':2}}),
@@ -2920,7 +2920,7 @@ switched:1->0 and 0->1
             ##'wcfg':{'text':"(to force possible activity:\npress 'Shift' while picking a red bond\nNB:must not be in a ring)"},
             ##'gridcfg':{'sticky':'w' + 'e'}}),
         ifd.append({'name':'done',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                 'wcfg':{'text':'Done','command':self.dismiss},
                 'gridcfg':{'sticky':'we',
                        'columnspan':2}})
@@ -2977,7 +2977,7 @@ rotatable can be either 1 or 0
         atoms = self.vf.expandNodes(atoms)
         if len(atoms)<2: return
         assert isinstance( atoms[0], Atom )
-        apply( self.doitWrapper, (atoms, rotatable), kw )
+        self.doitWrapper(*(atoms, rotatable), **kw)
 
         
     def doit(self, atoms, rotatable):
@@ -2990,7 +2990,7 @@ rotatable can be either 1 or 0
         
         bonds = atoms[:2].bonds
         if len(bonds[0])==0:
-            print 'ERROR: no bond between ...'
+            print('ERROR: no bond between ...')
             return 'ERROR'
 
         bond = bonds[0][0]
@@ -3052,7 +3052,7 @@ element type and name: 'A'"""
 
 
     def peptideA_init(self, mol):
-        dkeys = self.aromDict.keys()
+        dkeys = list(self.aromDict.keys())
         resSet = mol.chains.residues.get(lambda x, dkeys=dkeys: x.type in dkeys)
         bondDict = {}
         if not resSet or len(resSet)==0:
@@ -3089,7 +3089,7 @@ element type and name: 'A'"""
 
 
     def doit(self):
-        if not self.vf.atorsDict.has_key('molecule'):
+        if 'molecule' not in self.vf.atorsDict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return
         dict = self.vf.atorsDict
@@ -3108,7 +3108,7 @@ element type and name: 'A'"""
     def __call__(self, **kw):
         """None<- ADtors_changePlanarCarbonsToA
 changes names of carbon atoms in planar rings from C* to A*"""
-        apply(self.doitWrapper, (), kw)
+        self.doitWrapper(*(), **kw)
 
 
 CheckAromaticGUI = CommandGUI()
@@ -3137,7 +3137,7 @@ class StopCheckAromatic(MVCommand):
     def __call__(self, **kw):
         """None<- ADtors_changeAromaticCarbonsToC
 changes names of carbon atoms in planar rings from A* to C*"""
-        apply(self.doitWrapper, (), kw)
+        self.doitWrapper(*(), **kw)
 
 
 StopCheckAromaticGUI = CommandGUI()
@@ -3185,7 +3185,7 @@ class SetCarbonNames(MVCommand, MVAtomICOM):
         
 allows user to interactively toggle names of carbons from A* to C* and vice
 versa"""
-        if not self.vf.atorsDict.has_key('molecule'):
+        if 'molecule' not in self.vf.atorsDict:
             self.vf.warningMsg(warningText['noAtorsMol'])
             return "ERROR"
         if not len(nodes):
@@ -3198,13 +3198,13 @@ versa"""
             return 'ERROR'
         atorsAtoms = None
         molecules, ats = self.vf.getNodesByMolecule(aSet)
-        for mol, atomSets in map(None, molecules, ats):
+        for mol, atomSets in zip(molecules, ats):
             if mol == self.vf.atorsDict['molecule']:
                 atorsAtoms = atomSets
                 break
         if not atorsAtoms:
             return "ERROR"
-        apply(self.doitWrapper,(atorsAtoms,), kw)
+        self.doitWrapper(*(atorsAtoms,), **kw)
 
 
     def doit(self, atoms):
@@ -3214,8 +3214,8 @@ versa"""
         mol = dict['molecule']
         aromCs = mol.LPO.aromCs
         # WARNING: this forces all carbons in atoms to 'A' type
-        As = AtomSet(filter(lambda x: (x.element=='C' and x.autodock_element=='A'), atoms))
-        Cs = AtomSet(filter(lambda x: (x.element=='C' and x.autodock_element=='C'), atoms))
+        As = AtomSet([x for x in atoms if (x.element=='C' and x.autodock_element=='A')])
+        Cs = AtomSet([x for x in atoms if (x.element=='C' and x.autodock_element=='C')])
         mol.LPO.set_carbon_names(As, 'C')
         mol.LPO.set_carbon_names(Cs, 'A')
         if self.vf.hasGui:
@@ -3226,14 +3226,14 @@ versa"""
 
 
     def guiCallback(self):
-        if not self.vf.atorsDict.has_key('molecule'):
+        if 'molecule' not in self.vf.atorsDict:
             self.vf.warningMsg(warningText['noAtorsMol'])
         self.save = self.vf.ICmdCaller.commands.value["Shift_L"]
         self.vf.setICOM(self, modifier="Shift_L", topCommand=0)
         self.vf.setIcomLevel( Atom )
         ifd = self.ifd = InputFormDescr(title = 'STOP')
         ifd.append({'name':'stopBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg':{'text':'Stop Setting Carbon Names', 
                 'command':self.dismiss_cb},
             'gridcfg':{'sticky':'we'}})
@@ -3268,7 +3268,7 @@ default is < 5 degrees between normals to adjacent atoms.  User enters a new ang
         if not hasattr(self.vf, 'atorsDict'):
             self.vf.atorsDict={}
         if self.vf.hasGui: 
-            self.cutVal = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.cutVal = tkinter.StringVar(master=self.vf.GUI.ROOT)
 
 
     def __call__(self, val,  **kw):
@@ -3276,7 +3276,7 @@ default is < 5 degrees between normals to adjacent atoms.  User enters a new ang
         val: new angle to use as criteria for planarity detection
 if angle between normals to adjacent carbons in cycle is less than val, 
 cycle is declared to be planar"""
-        apply(self.doitWrapper, (val,), kw)
+        self.doitWrapper(*(val,), **kw)
 
 
     def doit(self,val):
@@ -3286,8 +3286,8 @@ cycle is declared to be planar"""
         #LigandPreparationObject uses AromaticCarbonManager,ACM
         mol.LPO.changePlanarityCriteria(val)
         if self.vf.hasGui:
-            Cs = AtomSet(filter(lambda x: x.autodock_element=='C',mol.allAtoms))
-            As = AtomSet(filter(lambda x: x.autodock_element=='A',mol.allAtoms))
+            Cs = AtomSet([x for x in mol.allAtoms if x.autodock_element=='C'])
+            As = AtomSet([x for x in mol.allAtoms if x.autodock_element=='A'])
             if self.vf.hasGui:
                 self.vf.color(As,((0.,1.,0.,),),['lines'],topCommand=0, redraw=1)
                 self.vf.color(Cs,((1.,1.,1.,),),['lines'],topCommand=0, redraw=1)
@@ -3300,7 +3300,7 @@ cycle is declared to be planar"""
         self.cutVal.set(str(val))
         ifd = self.ifd = InputFormDescr(title='CutOff Angle')
         ifd.append({'name':'aromVal',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg':{
                 'label': 'Enter angle in Degrees:',
                 'textvariable':self.cutVal},
@@ -3326,7 +3326,7 @@ class TogglerootSphere(MVCommand):
         rootSph = rootSph_list[0]
         markSph_list = self.vf.GUI.VIEWER.findGeomsByName('markSph')
         markSph = rootSph_list[0]
-        if dict.has_key('molecule') and obj==dict['molecule'] and rootSph.visible:
+        if 'molecule' in dict and obj==dict['molecule'] and rootSph.visible:
             #print 'hiding root sphere'
             #self.vf.ADtors_addChainToRootGC.chainSph.Set(visible=0)
             markSph.Set(visible=0)
@@ -3338,7 +3338,7 @@ class TogglerootSphere(MVCommand):
 Allows the user to toggle the visibility of the sphere marking the atom
 designated as the root atom in the ligand molecule"""
         kw['event'] = event
-        apply(self.doitWrapper, (), kw)
+        self.doitWrapper(*(), **kw)
 
 
     def doit(self, event=None):
@@ -3374,8 +3374,8 @@ class AutoAutoTors(MVCommand):
             self.vf.atorsDict={}
         self.ligand = None
         if self.vf.hasGui:
-            self.inviewer = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.outfileVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.inviewer = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.outfileVar = tkinter.StringVar(master=self.vf.GUI.ROOT)
 
 
     def onRemoveObjectFromViewer(self, obj):
@@ -3396,37 +3396,37 @@ class AutoAutoTors(MVCommand):
     def buildForm(self):
         ifd = self.ifd = InputFormDescr(title = 'AutoAutotors Parameters')
         ifd.append({'name': 'typeMolLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text':'molecule location:',
             'gridcfg':{'sticky':'w'}})
         ifd.append({'name':    'pickMol',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg':{'text':'in viewer',
                     'variable':self.inviewer,
                     'value':0, 
                     'command':self.chooseMol},
             'gridcfg':{'sticky':'w','row':-1,'column':1}})
         ifd.append({'name':    'readMol',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg':{'text':'from file',
                     'variable':self.inviewer,
                     'value':1, 
                     'command':self.readMol},
             'gridcfg':{'sticky':'w','row':-1,'column':2}})
         ifd.append({'name':'outputFile',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg':{
                 'label': 'Output filename:',
                 'width': 50,
                 'textvariable':self.outfileVar},
             'gridcfg':{'sticky':'w','columnspan':4}})
         ifd.append({'name':    'goBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg':{'text':'Accept',
                     'command':self.go_cb}, 
             'gridcfg':{'sticky':'we', 'columnspan':2}})
         ifd.append({'name':    'closeBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg':{'text':'Cancel',
                     'command':self.cancel_cb}, 
             'gridcfg':{'sticky':'we','row':-1,'column':2}})
@@ -3453,7 +3453,7 @@ class AutoAutoTors(MVCommand):
     def chooseMol(self, event=None):
         self.chooser = MoleculeChooser(self.vf, 'single', 'Choose Ligand')
         self.chooser.ipf.append({'name':'Select Button',
-             'widgetType':Tkinter.Button,
+             'widgetType':tkinter.Button,
              'text':'Select Molecule',
              'wcfg':{'bd':6},
              'gridcfg':{'sticky':'e'+'w'},
@@ -3535,7 +3535,7 @@ if ask_outfile=0, outputfile name is name of molecule + '.out.pdbqt'
 """
         kw['outfile'] = outfile
         kw['ask_outfile'] = ask_outfile
-        apply(self.doitWrapper, (mol,), kw)
+        self.doitWrapper(*(mol,), **kw)
 
 
     def doit(self, mol, **kw):
@@ -3545,7 +3545,7 @@ if ask_outfile=0, outputfile name is name of molecule + '.out.pdbqt'
         if hasattr(self, 'form'):
             self.form.withdraw()
         dict = self.vf.atorsDict
-        if type(mol)==types.StringType:
+        if type(mol)==bytes:
             #if there are any Mols, try to get this one
             if len(self.vf.Mols) and mol in self.vf.Mols.name:
                 mol = self.vf.Mols.NodesFromName(mol)
@@ -3576,7 +3576,7 @@ class StopAutoTors(MVCommand):
     def __call__(self, **kw):
         """None<-ADtors_stop
 general cleanup of atorsDict and geometries used by autotorsCommands"""
-        apply(self.doitWrapper,(), kw)
+        self.doitWrapper(*(), **kw)
 
         
     def doit(self):
@@ -3615,7 +3615,7 @@ class AtorsInit(MVCommand):
 
     def __call__(self, **kw):
         """ADtors_init is DEPRECATED. Remove from script"""
-        apply(self.doitWrapper,(),kw)
+        self.doitWrapper(*(), **kw)
 
 
     def doit(self):
@@ -3630,7 +3630,7 @@ class AtorsInitMol(MVCommand):
 
     def __call__(self, **kw):
         """ADtors_initLigand is DEPRECATED. Remove from script"""
-        apply(self.doitWrapper,(),kw)
+        self.doitWrapper(*(), **kw)
 
 
     def doit(self):
@@ -3645,7 +3645,7 @@ class ProcessCharges(MVCommand):
 
     def __call__(self, **kw):
         """ADtors_processCharges is DEPRECATED. Remove from script"""
-        apply(self.doitWrapper,(),kw)
+        self.doitWrapper(*(), **kw)
 
 
     def doit(self):
@@ -3660,7 +3660,7 @@ class ProcessBonds(MVCommand):
 
     def __call__(self, **kw):
         """ADtors_processBonds is DEPRECATED. Remove from script"""
-        apply(self.doitWrapper,(),kw)
+        self.doitWrapper(*(), **kw)
 
 
     def doit(self):
@@ -3739,13 +3739,13 @@ def initModule(vf):
 
     if vf.hasGui:
         vf.GUI.menuBars['AutoToolsBar']._frame.config( {'background':'tan'})
-        for item in vf.GUI.menuBars['AutoToolsBar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoToolsBar'].menubuttons.values()):
             item.configure(background = 'tan')
         if not hasattr(vf.GUI, 'adtBar'):
             vf.GUI.adtBar = vf.GUI.menuBars['AutoToolsBar']
-            vf.GUI.adtFrame = vf.GUI.adtBar.menubuttons.values()[0].master
-        if 'AutoTools41Bar' in vf.GUI.menuBars.keys():
-            for item in vf.GUI.menuBars['AutoTools41Bar'].menubuttons.values():
+            vf.GUI.adtFrame = list(vf.GUI.adtBar.menubuttons.values())[0].master
+        if 'AutoTools41Bar' in list(vf.GUI.menuBars.keys()):
+            for item in list(vf.GUI.menuBars['AutoTools41Bar'].menubuttons.values()):
                 item.configure(background = 'tan')
 #        if not hasattr(vf.GUI, 'ligandLabel'):
 #            vf.GUI.ligandLabelLabel = Tkinter.Label(vf.GUI.adtFrame, \

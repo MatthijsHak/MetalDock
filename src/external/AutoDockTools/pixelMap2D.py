@@ -34,7 +34,7 @@ class PixelMap2D:
 
     def __init__(self, results, master=None, mini=None, maxi=None, 
                     cmap=None, cmap_name='cmap', ramp=None, npixels=10):
-        assert isinstance(results, type(numpy.array(range(4))))
+        assert isinstance(results, type(numpy.array(list(range(4)))))
         assert len(results.shape)==2
         # a copy of the input array is used
         self.results = numpy.array(results[:])
@@ -48,16 +48,16 @@ class PixelMap2D:
         if mini is None:
             mini=min(results.ravel())
         else:
-            for x in xrange(self.x_number):
-                for y in xrange(self.y_number):
+            for x in range(self.x_number):
+                for y in range(self.y_number):
                     if self.results[x][y]<mini:
                         self.results[x][y]=mini
         self.mini = mini
         if maxi is None:
             maxi=max(results.ravel())
         else:
-            for x in xrange(self.x_number):
-                for y in xrange(self.y_number):
+            for x in range(self.x_number):
+                for y in range(self.y_number):
                     if self.results[x][y]>maxi:
                         self.results[x][y]=maxi
         self.maxi = maxi
@@ -94,37 +94,37 @@ class PixelMap2D:
 if __name__=='__main__':
     import numpy
     from time import sleep
-    r = numpy.array(range(10000))
+    r = numpy.array(list(range(10000)))
     r.shape = (100,100)
 
     rw_w = PixelMap2D(r[:])
     rw_w.show_image()
-    print "rw_w shown"
+    print("rw_w shown")
     sleep(3)
 
 
     rw_half_w = PixelMap2D(numpy.array(r[:])[:], maxi=5000.)
     rw_half_w.show_image()
-    print "rw_half_w shown"
+    print("rw_half_w shown")
     sleep(3)
 
     from DejaVu.colorTool import RedWhiteBlueRamp
     rwb_w = PixelMap2D(r[:], ramp=RedWhiteBlueRamp())
     rwb_w.show_image()
-    print "rwb_w shown"
+    print("rwb_w shown")
     sleep(3)
 
     s_r = numpy.array(numpy.swapaxes(r[:],0,1))
     s_r.shape = (100,100)
     s_r_w = PixelMap2D(s_r, ramp=RedWhiteBlueRamp())
     s_r_w.show_image()
-    print "s_r_w shown"
+    print("s_r_w shown")
     sleep(3)
 
     
     rwb_half_w = PixelMap2D(numpy.array(r[:])[:], maxi=5000., ramp=RedWhiteBlueRamp())
     rwb_half_w.show_image()
-    print "rwb_half_w shown"
+    print("rwb_half_w shown")
     sleep(3)
 
 

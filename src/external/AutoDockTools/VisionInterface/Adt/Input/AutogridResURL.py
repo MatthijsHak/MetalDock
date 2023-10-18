@@ -12,11 +12,11 @@ class AutogridResURL(NetworkNode):
     
     def __init__(self, name='AutogridResURL', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
 
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='string', name='url')
 

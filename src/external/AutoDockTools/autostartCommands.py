@@ -27,16 +27,16 @@ from mglutil.gui.InputForm.Tk.gui import InputFormDescr
 from mglutil.popen2Threads import SysCmdInThread
 from mglutil.util.callback import CallBackFunction
 from mglutil.util.packageFilePath import findResourceFile
-import tkMessageBox, tkFileDialog
+import tkinter.messagebox, tkinter.filedialog
 from Pmv.mvCommand import MVCommand
 from Pmv.guiTools import MoleculeChooser, BarButton, Kill
 
 from MolKit.tree import TreeNode, TreeNodeSet
 from MolKit.molecule import Atom
 
-from SimpleDialog import SimpleDialog
-import types, string, Tkinter, re
-import commands, os, sys, socket, time, subprocess
+from tkinter.simpledialog import SimpleDialog
+import types, string, tkinter, re
+import subprocess, os, sys, socket, time, subprocess
 from string import splitfields
 
 
@@ -53,7 +53,7 @@ except:
 
 
 def removePCs():
-    print 'removing PCs from hostTable'
+    print('removing PCs from hostTable')
      
 
 if entropiaPresent:
@@ -86,9 +86,9 @@ class ADKill(Kill):
         self.view.set(4)
         self.bar.file.forget()
         self.bar.view.forget()
-        self.frame2=Tkinter.Frame(self.master)
+        self.frame2=tkinter.Frame(self.master)
         self.frame2.pack()
-        self.dismiss = Tkinter.Button(self.frame2, text='Dismiss', command=self.quit)
+        self.dismiss = tkinter.Button(self.frame2, text='Dismiss', command=self.quit)
         self.update.forget()
         self.dismiss.pack(side = 'right', fill = 'x')
         self.winfo_toplevel().title('Autodock Process Manager')
@@ -123,14 +123,14 @@ class ADKill(Kill):
                     try:
                         process.terminate()
                     except AttributeError:
-                        print " no terminate method to Popen..."
+                        print(" no terminate method to Popen...")
                         try:
                             import signal
                             os.kill(process.pid, signal.SIGTERM)
                         except:
                             #print  "ERROR: could not terminate process"
                             #except OSError as e:
-                            print "Unable to kill process %d\n", process.pid
+                            print("Unable to kill process %d\n", process.pid)
                 elif self.platform=='Windows':
                     import ctypes                
                     ctypes.windll.kernel32.TerminateProcess(int(process._handle), -1)
@@ -159,7 +159,7 @@ class ADKill(Kill):
         for path in os.environ["PATH"].split(os.pathsep):
             exe_file = os.path.join(path, filename)
             if os.path.exists(exe_file) and os.access(exe_file, os.X_OK):
-                print "path=", path, " so exe_file=", exe_file
+                print("path=", path, " so exe_file=", exe_file)
                 #if os.path.exists(exe_file)
                 return exe_file
             return ''
@@ -171,7 +171,7 @@ class ADKill(Kill):
         self.pList = pList
         format = self.format_list[self.format.get()][1]
         view = self.view_list[self.view.get()][1]
-        self.frame.list.delete(0,Tkinter.AtEnd())
+        self.frame.list.delete(0,tkinter.AtEnd())
         for item in self.psList: 
             if hasattr(item, 'poll'):
                 if item.poll()==None:
@@ -213,14 +213,14 @@ class ADProcessManager(MVCommand):
 
     def onAddCmdToViewer(self):
         if not self.vf.hasGui:
-            self.root = Tkinter.Tk()
+            self.root = tkinter.Tk()
             self.root.withdraw()
             root = self.root
         else:
             root = self.vf.GUI.ROOT
-        self.hostVal=Tkinter.IntVar(master=root)
-        self.macroVal=Tkinter.IntVar(master=root)
-        self.top = Tkinter.Toplevel(master=root)
+        self.hostVal=tkinter.IntVar(master=root)
+        self.macroVal=tkinter.IntVar(master=root)
+        self.top = tkinter.Toplevel(master=root)
         self.top.withdraw()
         self.kill = ADKill(self.top)
         self.kill.vf = self.vf
@@ -261,11 +261,11 @@ class ADProcessManager(MVCommand):
             if p not in self.kill.psList:
                 self.kill.psList.append(p)
             self.kill.done = 0  # new process!
-        elif type(p)==types.StringType: #autogrid4, autodock4, vina..
+        elif type(p)==bytes: #autogrid4, autodock4, vina..
             if not p in self.kill.pList:
                 self.kill.pList.append(p) 
         else: 
-            raise 'unknown process type: ', p
+            raise ValueError('unknown process type: '+str(p))
         if not self.kill.master.winfo_ismapped() and not self.kill.done:
             self.kill.master.deiconify()
 
@@ -291,7 +291,7 @@ class ADProcessManager(MVCommand):
     def __call__(self, **kw):
         if not self.top.winfo_ismapped():
             self.top.deiconify()
-        apply(self.doitWrapper, (), kw)
+        self.doitWrapper(*(), **kw)
 
     def doit(self):
         #kill
@@ -310,9 +310,9 @@ very similar with a few differences such as programType, title for file browser,
 
     def onAddCmdToViewer(self):
         if self.vf.hasGui:
-            self.hostVal=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.macroVal=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.projectVal=Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.hostVal=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.macroVal=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.projectVal=tkinter.IntVar(master=self.vf.GUI.ROOT)
 
 
     def __init__(self, program=None, dictObj=None,
@@ -451,7 +451,7 @@ very similar with a few differences such as programType, title for file browser,
         if newfile:
             try:
                 self.EntropiaUI.upload(newfile)
-            except EntropiaError, msg:
+            except EntropiaError as msg:
                 self.vf.warningMsg(msg)
                 return
             self.updateLCS(key[1:])
@@ -473,361 +473,361 @@ very similar with a few differences such as programType, title for file browser,
             #self.pdbqFileList=['h2.out.pdbq','hpi1s.out.pdbq']
             #self.pdbqsFileList=['1crn.pdbqs','1hvr.pdbqs']
             ifd=self.ifd=InputFormDescr(title=self.ifdTitle)
-            self.execPath = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.workingDirPath = Tkinter.StringVar(master=self.vf.GUI.ROOT, value = os.getcwd() ) # N3P
-            self.queueType = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.execPath = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.workingDirPath = tkinter.StringVar(master=self.vf.GUI.ROOT, value = os.getcwd() ) # N3P
+            self.queueType = tkinter.StringVar(master=self.vf.GUI.ROOT)
             try:
                 self.queueType.set('int')
             except:
                 pass
-            self.jobFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.jobFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.jobFile.set('')
-            self.paramFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.paramFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.paramFile.set('')
-            self.niceLevel=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.niceLevel=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.niceLevel.set('20')
-            self.nqeTime=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.nqeTime=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.nqeTime.set('144000')
-            self.nqeCpu=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.nqeCpu=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.nqeCpu.set('1')
-            self.pbsCpu=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pbsCpu=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.pbsCpu.set('1')
-            self.pbsCpuTime=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pbsCpuTime=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.pbsCpuTime.set('24:00:00')
-            self.pbsWallTime=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pbsWallTime=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.pbsWallTime.set('24:30:00')
-            self.pbsRerun=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pbsRerun=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.pbsRerun.set('y')
-            self.logFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.cmd = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.logFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.cmd = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.setUpFlagVars()
-            self.pidStr = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.macroName = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.hostName = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.remoteDir = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pidStr = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.macroName = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.hostName = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.remoteDir = tkinter.StringVar(master=self.vf.GUI.ROOT)
             try:
                 usr = os.environ['USER']
                 self.remoteDir.set('/usr/people/'+usr)
             except:
                 self.remoteDir.set('./')
-            self.showMacroMenu = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.showHostMenu = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showMacroMenu = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showHostMenu = tkinter.IntVar(master=self.vf.GUI.ROOT)
             #the tkinter variables for the entropia stuff
-            self.projectName=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.gpf=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.dpf=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.pdbq=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.pdbqs=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.jobDir=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.projectName=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.gpf=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.dpf=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pdbq=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pdbqs=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.jobDir=tkinter.StringVar(master=self.vf.GUI.ROOT)
             if entropiaPresent:
                 self.jobDir.set(entropia_job_dir + 'job_id')
-            self.nodes=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.nodes=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.nodes.set('1')
-            self.gpfFilter=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.pdbqsFilter=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.dpfFilter=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.pdbqFilter=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.monitorVar=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.ftpBackVar=Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.gpfFilter=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pdbqsFilter=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.dpfFilter=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pdbqFilter=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.monitorVar=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.ftpBackVar=tkinter.IntVar(master=self.vf.GUI.ROOT)
             ifd.append( {'name': 'mNLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'Macro Name:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'mNentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.macroName,},
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append( {'name': 'mNMenu',
-                'widgetType':Tkinter.Menubutton,
+                'widgetType':tkinter.Menubutton,
                 'text': 'macros',
-                'gridcfg':{'sticky':Tkinter.W,'row':-1, 'column':2}})
+                'gridcfg':{'sticky':tkinter.W,'row':-1, 'column':2}})
             ifd.append( {'name': 'hNLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'Host Name:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'hNentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.hostName,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
 
 
             # here you define the working directory
             # N3P trace
             ifd.append( {'name': 'wDLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'Working Directory:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'wDentry',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'wcfg':{
                     'width':65,
-                    'justify':Tkinter.LEFT,
+                    'justify':tkinter.LEFT,
                     'textvariable': self.workingDirPath,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1, 'columnspan':12}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1, 'columnspan':12}})
             ifd.append({'name': 'wDbutton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'text':'Browse',
                 'wcfg':{'bd':2},
                 'command':self.browseWD,
-                'gridcfg':{'sticky':Tkinter.W,'row':-1, 'column':13}})
+                'gridcfg':{'sticky':tkinter.W,'row':-1, 'column':13}})
 
             # # # # #  N3P trace
 
 
             ifd.append( {'name': 'eXLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'Program Pathname:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'eXentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':65,
                     'textvariable': self.execPath,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1, 'columnspan':12}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1, 'columnspan':12}})
             ifd.append({'name': 'eXbutton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'text':'Browse',
                 'wcfg':{'bd':2},
                 'command':self.browseEX,
-                'gridcfg':{'sticky':Tkinter.W,'row':-1, 'column':13}})
+                'gridcfg':{'sticky':tkinter.W,'row':-1, 'column':13}})
 
             ifd.append( {'name': 'pFLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'Parameter Filename:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'pFentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':65,
                     'textvariable': self.paramFile,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1, 'columnspan':12}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1, 'columnspan':12}})
             ifd.append({'name': 'pFbutton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'text':'Browse',
                 'wcfg':{'bd':2},
                 'command':self.browsePF,
-                'gridcfg':{'sticky':Tkinter.W,'row':-1, 'column':13}})
+                'gridcfg':{'sticky':tkinter.W,'row':-1, 'column':13}})
             ifd.append( {'name': 'lFLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'Log Filename:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'lFentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':65,
                     'textvariable': self.logFile,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1, 'columnspan':12}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1, 'columnspan':12}})
             ifd.append({'name': 'lFbutton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'text':'Browse',
                 'wcfg':{'bd':2},
                 'command':self.browseLF,
-                'gridcfg':{'sticky':Tkinter.W,'row':-1, 'column':13}})
+                'gridcfg':{'sticky':tkinter.W,'row':-1, 'column':13}})
             self.getFlags()
             ifd.append({'name':'niceLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'Nice Level:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'niceEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.niceLevel,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'pbsDirLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'PBS: Remote Directory:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'pbsDirEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':65,
                     'textvariable': self.remoteDir,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1, 'columnspan':12}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1, 'columnspan':12}})
             ifd.append({'name':'nqeTimeLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'NQE: Time Limit:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'nqeTimeEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.nqeTime,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'pbsTimeLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'PBS: CpuTime Limit:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'pbsTimeEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.pbsCpuTime,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'pbsWallTimeLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'PBS: WallTime Limit:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'pbsWallTimeEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.pbsWallTime,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'pbsRerunCB',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'text': 'PBS: Rerun on System Crash',
                 'onvalue':'y',
                 'offvalue':'n',
                 'variable':self.pbsRerun,
                 'command': self.getCmd,
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'columnspan':2}})
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'columnspan':2}})
             ifd.append({'name':'pbsCpuLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'PBS: Number of Processors:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'pbsCpuEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.pbsCpu,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'nqeCpuLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'NQE: Number of Processors:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'nqeCpuEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.nqeCpu,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             #next the widgets for entropia widgets:
-            self.showProjectMenu = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showProjectMenu = tkinter.IntVar(master=self.vf.GUI.ROOT)
             ifd.append( {'name': 'pjLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'project:',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'pjentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.projectName,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append( {'name': 'pjMenu',
-                'widgetType':Tkinter.Menubutton,
+                'widgetType':tkinter.Menubutton,
                 'text': 'projects',
-                'gridcfg':{'sticky':Tkinter.W,'row':-1, 'column':2}})
+                'gridcfg':{'sticky':tkinter.W,'row':-1, 'column':2}})
             ifd.append({'name':'nodesEntLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'number of nodes',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'nodesEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.nodes,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'gpfEntLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'gpf file',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'gpfEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.gpf,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'pdbqsEntLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'pdbqs file',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'pdbqsEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.pdbqs,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'dpfEntLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'dpf file',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'dpfEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.dpf,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append({'name':'pdbqEntLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'pdbq file',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'pdbqEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.pdbq,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append( {'name': 'monitorCB',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'text': 'Monitor job',
                 'variable': self.monitorVar,
-                'gridcfg':{'sticky':Tkinter.W,'row':-1, 'column':2}})
+                'gridcfg':{'sticky':tkinter.W,'row':-1, 'column':2}})
             ifd.append({'name':'jobDirEntLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text': 'job directory',
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             ifd.append( {'name': 'jobDirEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.jobDir,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             ifd.append( {'name': 'ftpBackCB',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'text': 'FTP back',
                 'variable': self.ftpBackVar,
-                'gridcfg':{'sticky':Tkinter.W,'row':-1, 'column':2}})
+                'gridcfg':{'sticky':tkinter.W,'row':-1, 'column':2}})
             ifd.append( {'name': 'cmdentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':90,
                     'label': 'Cmd :',
                     'textvariable': self.cmd,
                 },
-                'gridcfg':{'sticky':Tkinter.W+Tkinter.E ,'columnspan':15}})
-            ifd.append({'widgetType': Tkinter.Button,
+                'gridcfg':{'sticky':tkinter.W+tkinter.E ,'columnspan':15}})
+            ifd.append({'widgetType': tkinter.Button,
                 'text':'Launch',
                 'wcfg':{'bd':2},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'columnspan':3},
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'columnspan':3},
                 'command':self.callDoit_cb})
-            ifd.append({'widgetType': Tkinter.Button,
+            ifd.append({'widgetType': tkinter.Button,
                 'text':'Cancel',
                 'wcfg':{'bd':2},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'row':-1,'column':3,'columnspan':2},
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'row':-1,'column':3,'columnspan':2},
                 'command':self.Close_cb})
             #last the widgets for the Entropia lists:
             #ifd.append({'name':'gpfFilterLab',
@@ -835,45 +835,45 @@ very similar with a few differences such as programType, title for file browser,
                 #'text': 'gpf file filter',
                 #'gridcfg':{'sticky':Tkinter.E}})
             ifd.append({'name': 'gpfFilterEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.gpfFilter,
                 },
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
             #ifd.append({'name':'pdbqsFilterLab',
                 #'widgetType':Tkinter.Label,
                 #'text': 'pdbqs file filter',
                 #'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':4}})
             ifd.append( {'name': 'pdbqsFilterEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.pdbqsFilter,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
             #ifd.append({'name':'dpfFilterLab',
                 #'widgetType':Tkinter.Label,
                 #'text': 'dpf file filter',
                 #'gridcfg':{'sticky':Tkinter.E}})
             ifd.append( {'name': 'dpfFilterEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.dpfFilter,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':2}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':2}})
             #ifd.append({'name':'pdbqFilterLab',
                 #'widgetType':Tkinter.Label,
                 #'text': 'pdbq file filter',
                 #'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':6}})
             ifd.append( {'name': 'pdbqFilterEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable': self.pdbqFilter,
                 },
-                'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':3}})
+                'gridcfg':{'sticky':tkinter.E,'row':-1,'column':3}})
             ifd.append({'widgetType':'ListChooser',
                 'name':'gpfFiles',
                 'entries':self.gpf_list,
@@ -910,25 +910,25 @@ very similar with a few differences such as programType, title for file browser,
                 'gridcfg':{'sticky':'w','column':3,'row':-13,
                 'rowspan':5}})
             ifd.append({'name':'uploadGpfFileBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                 'text': 'Upload gpf File',
                 'command': CallBackFunction(self.uploadFiles,'.gpf'),
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W}})
+                'gridcfg':{'sticky':tkinter.E+tkinter.W}})
             ifd.append({'name':'uploadPdbqsFileBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                 'text': 'Upload pdbqs File',
                 'command': CallBackFunction(self.uploadFiles,'.pdbqs'),
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'column':1, 'row':-1}})
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'column':1, 'row':-1}})
             ifd.append({'name':'uploadDpfFileBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                 'text': 'Upload dpf File',
                 'command': CallBackFunction(self.uploadFiles,'.dpf'),
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'column':2, 'row':-1}})
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'column':2, 'row':-1}})
             ifd.append({'name':'uploadPdbqFileBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                 'text': 'Upload pdbq File',
                 'command': CallBackFunction(self.uploadFiles,'.pdbq'),
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'column':3, 'row':-1}})
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'column':3, 'row':-1}})
         else:
             if hasattr(self, 'form') and self.form!=None:
                 self.form.deiconify()
@@ -943,7 +943,7 @@ very similar with a few differences such as programType, title for file browser,
         self.doitWrapper(self.cmd.get(),log=1,redraw=0)
 
     def setUpFlagVars(self):
-        self.flagVar = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.flagVar = tkinter.IntVar(master=self.vf.GUI.ROOT)
         self.flagVar.set(0)
 
     def getFlags(self):
@@ -952,7 +952,7 @@ very similar with a few differences such as programType, title for file browser,
 
     def __call__(self, cmd, ask=1, **kw):
         kw['ask']=ask
-        apply(self.doitWrapper, (cmd,), kw)
+        self.doitWrapper(*(cmd,), **kw)
 
 
     def doit(self, cmd, ask=1):
@@ -1028,7 +1028,7 @@ very similar with a few differences such as programType, title for file browser,
             outstring = "exit"
             fptr.write(outstring)
         fptr.close()
-        os.chmod(jobFile, 0755)
+        os.chmod(jobFile, 0o755)
         return jobFile
         
     def getMacro(self, event=None):
@@ -1067,7 +1067,7 @@ very similar with a few differences such as programType, title for file browser,
     def getEntropiaUIObject(self):
         if not entropiaPresent: return
         idf = InputFormDescr("Entropia Password")
-        idf.append({'widgetType':Tkinter.Entry,
+        idf.append({'widgetType':tkinter.Entry,
                 'name': 'password',
                 'label': 'Password',
                 'wcfg':{ 
@@ -1075,7 +1075,7 @@ very similar with a few differences such as programType, title for file browser,
                     'show': '*'
                 },
                 'defaultValue': '',
-                'gridcfg':{'sticky':Tkinter.E}
+                'gridcfg':{'sticky':tkinter.E}
               })
         idf_dict = self.vf.getUserInput(idf)
         if idf_dict:
@@ -1084,7 +1084,7 @@ very similar with a few differences such as programType, title for file browser,
             try:
                 self.EntropiaUI=EntropiaUI(password)
                 return 1 # true
-            except ftplib.error_perm,msg:
+            except ftplib.error_perm as msg:
                 self.vf.warningMsg(msg)
                 return None
         else: return None
@@ -1095,59 +1095,59 @@ very similar with a few differences such as programType, title for file browser,
         newAdtFile = 0
         ifd=InputFormDescr(title='Process current adt files?')
         ifd.append( {'name': 'thisLab',
-            'widgetType': Tkinter.Label,
+            'widgetType': tkinter.Label,
             'text': 'Upload newly created adt files:',
-            'gridcfg':{'sticky':Tkinter.E}})
+            'gridcfg':{'sticky':tkinter.E}})
         if hasattr(self.vf, 'gpo') and len(self.vf.gpo.gpf_filename):
             newAdtFile = 1
             files['gpf']= self.vf.gpo.gpf_filename
             ifd.append( {'name': 'gpfCBut',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'text':files['gpf'],
-                'gridcfg':{'sticky':Tkinter.W}})
-        if self.vf.atorsDict.has_key('outfile'):
+                'gridcfg':{'sticky':tkinter.W}})
+        if 'outfile' in self.vf.atorsDict:
             newAdtFile = 1
             files['pdbq']=os.path.split(self.vf.atorsDict['outfile'])[-1]
             ifd.append( {'name': 'pdbqCBut',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'text':files['pdbq'],
-                'gridcfg':{'sticky':Tkinter.W}})
+                'gridcfg':{'sticky':tkinter.W}})
         if hasattr(self.vf,'dpo') and len(self.vf.dpo.dpf_filename):
             newAdtFile = 1
             files['dpf'] = self.vf.dpo.dpf_filename
             ifd.append( {'name': 'dpfCBut',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'text':files['dpf'],
-                'gridcfg':{'sticky':Tkinter.W}})
+                'gridcfg':{'sticky':tkinter.W}})
         if hasattr(self.vf, 'gpo') and len(self.vf.gpo.receptor_filename):
             newAdtFile = 1
             files['pdbqs'] = self.vf.gpo.receptor_filename
             ifd.append( {'name': 'pdbqsCBut',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'text':files['pdbqs'],
-                'gridcfg':{'sticky':Tkinter.W}})
+                'gridcfg':{'sticky':tkinter.W}})
         elif hasattr(self.vf,'dpo') and len(self.vf.dpo.receptor_filename):
             newAdtFile = 1
             files['pdbqs'] = self.vf.dpo.receptor_filename
             ifd.append( {'name': 'pdbqsCBut',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'text':files['pdbqs'],
-                'gridcfg':{'sticky':Tkinter.W}})
+                'gridcfg':{'sticky':tkinter.W}})
         if not newAdtFile: return
         val_dict = self.vf.getUserInput(ifd)
         if val_dict:
-            for item in val_dict.keys():
+            for item in list(val_dict.keys()):
                 if val_dict[item]:
                     #upload this file
                     itemName=item[:-4]
                     try:
-                        print 'uploading ', files[itemName]
+                        print('uploading ', files[itemName])
                         self.EntropiaUI.upload(files[itemName])
-                    except EntropiaError, msg:
+                    except EntropiaError as msg:
                         self.vf.warningMsg(msg)
                         return
                     #this gets called with 'gpf' or 'pdbqs' etc
-                    print 'uploaded ', files[itemName]
+                    print('uploaded ', files[itemName])
                     #select it in the listchooser
                     self.updateLCS(itemName)
                     #put it in the entry
@@ -1170,7 +1170,7 @@ very similar with a few differences such as programType, title for file browser,
 
     def getMacroVal(self, val, event=None):
         #autostarter
-        macroList=self.hostDict.keys()
+        macroList=list(self.hostDict.keys())
         macro=macroList[val]
         self.qT=self.hostDict[macro]['queuetype']
         self.macroName.set(macro)
@@ -1288,7 +1288,7 @@ very similar with a few differences such as programType, title for file browser,
 
     def getHostVal(self, val, event=None):
         #autostarter
-        hostList=self.hostDict.keys()
+        hostList=list(self.hostDict.keys())
         host=hostList[val]
         self.Host=host
         self.hostName.set(host)
@@ -1349,7 +1349,7 @@ very similar with a few differences such as programType, title for file browser,
         macroMb.config(text='macros')
         if not self.showMacroMenu.get():
             #hostList is ['noah','saul','job']
-            macroList = self.hostDict.keys()
+            macroList = list(self.hostDict.keys())
             self.buildMenu(macroList,macroMb,self.macroVal, self.getMacroVal)
             self.showHostMenu.set(1)
         else:
@@ -1362,7 +1362,7 @@ very similar with a few differences such as programType, title for file browser,
         hostMb.config(text='hosts')
         if not self.showHostMenu.get():
             #hostList is ['noah','saul','job']
-            hostList = self.hostDict.keys()
+            hostList = list(self.hostDict.keys())
             self.buildMenu(hostList,hostMb,self.hostVal, self.getHostVal)
             self.showHostMenu.set(1)
         else:
@@ -1386,7 +1386,7 @@ very similar with a few differences such as programType, title for file browser,
         if not self.showProjectMenu.get():
             try:
                 projectList = self.EntropiaUI.project_list
-                print "projectList=", projectList
+                print("projectList=", projectList)
             except AttributeError: 
                 projectList=[]
             self.buildMenu(projectList,projectMb,self.projectVal, self.getProjectVal)
@@ -1399,7 +1399,7 @@ very similar with a few differences such as programType, title for file browser,
         #start from scratch and build menu
         mB.config(bg='white')
         if not hasattr(mB, 'menu'):
-            mB.menu=Tkinter.Menu(mB)
+            mB.menu=tkinter.Menu(mB)
             mB['menu']=mB.menu
         else:
             mB.menu.delete(1, 'end')
@@ -1453,7 +1453,7 @@ very similar with a few differences such as programType, title for file browser,
             cmdStr = "rsh "+host+" -n \'cd "+curdir+";/nqe/bin/cqsub -lT "+self.nqeTime.get()+ " -la ncpu="+ self.nqeCpu.get()+" "+jobFile+"\'"
             cmd.set(cmdStr)
         elif qT=='win':
-            print 'in case queueType==win'
+            print('in case queueType==win')
             cmdStr = "rsh "+host+" -n \'cd "+curdir+";/nqe/bin/cqsub -lT "+self.nqeTime.get()+ " -la ncpu="+ self.nqeCpu.get()+" "+jobFile+"\'"
             cmd.set(cmdStr)
         elif qT=='pbs':
@@ -1483,7 +1483,7 @@ very similar with a few differences such as programType, title for file browser,
         if cmd0=='': return
         if 'vina' in cmd0:
             self.cmd.set(self.execPath.get() + " --config " + pF + " &")
-            if not len(pF) and  hasattr(self.vf, 'vinaDict')and  self.vf.vinaDict.has_key('configFile'):
+            if not len(pF) and  hasattr(self.vf, 'vinaDict')and  'configFile' in self.vf.vinaDict:
                 self.paramFile.set(self.vf.vinaDict['configFile'])
                 self.cmd.set(self.execPath.get() + " --config " + self.paramFile.get() + " &")
         else:
@@ -1546,7 +1546,7 @@ very similar with a few differences such as programType, title for file browser,
         if hasattr(self, 'topLevel'):self.topLevel.lift()
 
     def browseWD(self, event=None):
-        wd = tkFileDialog.askdirectory(parent = self.topLevel, title= self.program) # N3P
+        wd = tkinter.filedialog.askdirectory(parent = self.topLevel, title= self.program) # N3P
         if wd: 
             self.workingDirPath.set(wd)
             """
@@ -1643,7 +1643,7 @@ very similar with a few differences such as programType, title for file browser,
         fptr= open(jobFile, 'w')
         fptr.write(jobStr)
         fptr.close()
-        os.chmod(jobFile, 0755)
+        os.chmod(jobFile, 0o755)
         self.nqeJobFile=jobFile
         
     def setNqeRemoteCommand(self,host,nice,exe,flagStr,pFile,log,nqeTime,ncpu):
@@ -1802,7 +1802,7 @@ class AutoDockStarter(AutoStarter):
                     self.ifd.entryByName[n]['widget'].bind('<Return>', CallBackFunction(self.updateLCS,item), '+')
 
     def getCmdParams(self, event=None):
-        print "in getCmdParms"
+        print("in getCmdParms")
         if not entropiaPresent: return
         if self.queueType.get()=='ent':
             cmdList=string.split(self.cmd.get(), ';')
@@ -1830,87 +1830,87 @@ class AutoDockStarter(AutoStarter):
             self.LogFile=cmdList[4]
 
     def setUpFlagVars(self):
-        self.flagVar = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.flagVar = tkinter.IntVar(master=self.vf.GUI.ROOT)
         self.flagVar.set(0)
-        self.kflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.iflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.uflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.tflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.cflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.inputFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-        self.outputFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.kflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.iflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.uflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.tflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.cflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.inputFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.outputFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
 
     def getFlags(self):
         self.ifd.append({'name': 'flagChoiceLab',
-            'widgetType': Tkinter.Label,
+            'widgetType': tkinter.Label,
             'text':'Add Optional Flags?',
-            'gridcfg':{'sticky':Tkinter.E }})
+            'gridcfg':{'sticky':tkinter.E }})
         self.ifd.append({'name': 'flagYes',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg': {'value':'1'},
             'variable': self.flagVar,
             'command': self.getCmd,
             'text':'Yes',
-            'gridcfg':{'sticky':Tkinter.E, 'row':-1,'column':1},
+            'gridcfg':{'sticky':tkinter.E, 'row':-1,'column':1},
             'command': self.updateFlags })
         self.ifd.append({'name': 'flagNo',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg': {'value':'0'},
             'variable': self.flagVar,
             'command': self.getCmd,
             'text':'No',
-            'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':2},
+            'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':2},
             'command': self.updateFlags })
         self.ifd.append({'name': 'kflag',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text':'Don\'t keep original residue numbers (-k)',
             'command': self.getCmd,
             'variable':self.kflag,
-            'gridcfg':{'sticky':Tkinter.W, 'column':1, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W, 'column':1, 'columnspan':2}})
         self.ifd.append({'name': 'iflag',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text':'Ignore grid map header errors (-i)',
             'variable':self.iflag,
             'command': self.getCmd,
-            'gridcfg':{'sticky':Tkinter.W, 'column':1, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W, 'column':1, 'columnspan':2}})
         self.ifd.append({'name': 'uflag',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text':'Return message describing cmd line usage (-u)',
             'variable':self.uflag,
             'command': self.getCmd,
-            'gridcfg':{'sticky':Tkinter.W, 'column':1, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W, 'column':1, 'columnspan':2}})
         self.ifd.append({'name': 'tflag',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text':'Parse PDBQ to check torsion dfns + stop (-t)',
             'variable':self.tflag,
             'command': self.getCmd,
-            'gridcfg':{'sticky':Tkinter.W, 'column':1, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W, 'column':1, 'columnspan':2}})
         self.ifd.append({'name': 'cflag',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text':'Run autodock in command mode (-c)',
             'variable':self.cflag,
             'command': self.getInputs,
-            'gridcfg':{'sticky':Tkinter.W, 'column':1, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W, 'column':1, 'columnspan':2}})
         self.ifd.append( {'name': 'inentLab',
-            'widgetType': Tkinter.Label,
+            'widgetType': tkinter.Label,
             'text':'Take input from:',
-            'gridcfg':{'sticky':Tkinter.E}})
+            'gridcfg':{'sticky':tkinter.E}})
         self.ifd.append( {'name': 'inentry',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg':{
                 'textvariable': self.inputFile,
             },
-            'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+            'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
         self.ifd.append( {'name': 'outentLab',
-            'widgetType': Tkinter.Label,
+            'widgetType': tkinter.Label,
             'text':'Redirect output to:',
-            'gridcfg':{'sticky':Tkinter.E}})
+            'gridcfg':{'sticky':tkinter.E}})
         self.ifd.append( {'name': 'outentry',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg':{
                 'textvariable': self.outputFile,
             },
-            'gridcfg':{'sticky':Tkinter.E,'row':-1,'column':1}})
+            'gridcfg':{'sticky':tkinter.E,'row':-1,'column':1}})
         self.flagWids=['flagChoiceLab','flagYes','flagNo',
                         'kflag','iflag','uflag',
                         'tflag','cflag','inentLab',
@@ -2074,7 +2074,7 @@ class AutoDockStarter(AutoStarter):
         jobStr='cd '+dName+";"+exe+" "+ flagStr +" -p "+pName+" -l "+logName+"\n"
         fptr.write(jobStr)
         fptr.close()
-        os.chmod(jobFile, 0755)
+        os.chmod(jobFile, 0o755)
         return jobFile
 
 AutoDockStarterGUI=CommandGUI()
@@ -2092,103 +2092,103 @@ class VinaStarter(AutoStarter):
         if not hasattr(self, 'ifd'):
             #for the moment:
             ifd=self.ifd=InputFormDescr(title="Start Vina")
-            self.execPath = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.workingDirPath = Tkinter.StringVar(master=self.vf.GUI.ROOT, value = os.getcwd() ) # N3P
-            self.paramFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.execPath = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.workingDirPath = tkinter.StringVar(master=self.vf.GUI.ROOT, value = os.getcwd() ) # N3P
+            self.paramFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.paramFile.set('')
-            self.cmd = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.cmd = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.setUpFlagVars()
-            self.queueType = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.queueType = tkinter.StringVar(master=self.vf.GUI.ROOT)
             try:
                 self.queueType.set('int')
             except:
                 pass
-            self.pidStr = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pidStr = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.pidStr.set("")
-            self.macroName = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.macroName = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.macroName.set("")
-            self.hostName = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.hostName = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.hostName.set("")
-            self.remoteDir = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.remoteDir = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.remoteDir.set("")
-            self.showMacroMenu = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showMacroMenu = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showMacroMenu.set("")
-            self.showHostMenu = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showHostMenu = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showHostMenu.set("")
             #the tkinter variables for the entropia stuff
-            self.projectName=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.projectName=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.projectName.set("")
-            self.gpf=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.gpf=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.gpf.set("")
-            self.dpf=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.dpf=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.dpf.set("")
-            self.pdbq=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pdbq=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.pdbq.set("")
-            self.pdbqs=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pdbqs=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.pdbqs.set("")
-            self.jobDir=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.jobDir=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.jobDir.set("")
-            self.nodes=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.nodes=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.nodes.set('1')
-            self.gpfFilter=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.pdbqsFilter=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.dpfFilter=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.pdbqFilter=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.monitorVar=Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.gpfFilter=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pdbqsFilter=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.dpfFilter=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.pdbqFilter=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.monitorVar=tkinter.IntVar(master=self.vf.GUI.ROOT)
             ifd.append( {'name': 'eXLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': '   Vina Program Pathname:',
-                'gridcfg':{'sticky':Tkinter.E, 'columnspan':4}})
+                'gridcfg':{'sticky':tkinter.E, 'columnspan':4}})
             ifd.append( {'name': 'eXentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':20,
                     'textvariable': self.execPath,
                 },
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'row':-1,'column':4, 'columnspan':2}})
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'row':-1,'column':4, 'columnspan':2}})
             ifd.append({'name': 'eXbutton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'text':'Browse',
                 'wcfg':{'bd':2},
                 'command':self.browseEX,
-                'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1, 'column':6}})
+                'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1, 'column':6}})
             ifd.append( {'name': 'pFLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'Config Filename:',
-                'gridcfg':{'sticky':Tkinter.E, 'column':1, 'columnspan': 3}})
+                'gridcfg':{'sticky':tkinter.E, 'column':1, 'columnspan': 3}})
             ifd.append( {'name': 'pFentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':20,
                     'textvariable': self.paramFile,
                 },
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'row':-1,'column':4, 'columnspan':2}})
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'row':-1,'column':4, 'columnspan':2}})
             ifd.append({'name': 'pFbutton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'text':'Browse',
                 'wcfg':{'bd':2},
                 'command':self.browsePF,
-                'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1, 'column':6}})
+                'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1, 'column':6}})
             ifd.append( {'name': 'cmdLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'text': 'Cmd:',
-                'gridcfg':{'sticky':Tkinter.E, 'column':1, 'columnspan':3}})
+                'gridcfg':{'sticky':tkinter.E, 'column':1, 'columnspan':3}})
             ifd.append( {'name': 'cmdentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':40,
                     'textvariable': self.cmd,
                 },
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W ,'row':-1, 'column':4, 'columnspan':3}})
-            ifd.append({'widgetType': Tkinter.Button,
+                'gridcfg':{'sticky':tkinter.E+tkinter.W ,'row':-1, 'column':4, 'columnspan':3}})
+            ifd.append({'widgetType': tkinter.Button,
                 'text':'Launch',
                 'wcfg':{'bd':2},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'columnspan':5},
+                'gridcfg':{'sticky':tkinter.E+tkinter.W, 'columnspan':5},
                 'command':self.callDoit_cb})  #vina
-            ifd.append({'widgetType': Tkinter.Button,
+            ifd.append({'widgetType': tkinter.Button,
                 'text':'Cancel',
                 'wcfg':{'bd':2},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'row':-1, 'column':5, 'columnspan':2},
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'row':-1, 'column':5, 'columnspan':2},
                 'command':self.Close_cb})
         else:
             if hasattr(self, 'form') and self.form!=None:
@@ -2225,7 +2225,7 @@ class VinaStarter(AutoStarter):
                     if len(self.vf.dpo.dpf_filename):
                         self.paramFile.set(self.vf.dpo.dpf_filename)
                         self.updateLF()
-            if hasattr(self.vf, 'vinaDict') and self.vf.vinaDict.has_key('configFile'):
+            if hasattr(self.vf, 'vinaDict') and 'configFile' in self.vf.vinaDict:
                 self.paramFile.set(self.vf.vinaDict['configFile'])
                 
             #self.bindEntries()
@@ -2290,9 +2290,9 @@ class VinaStarter(AutoStarter):
     def bindEntries(self):
         if hasattr(self,'form'):
             self.ifd.entryByName['cmdentry']['widget'].bind('<Return>', self.getCmdParams)
-            if self.ifd.entryByName.has_key('pjMenu'):
+            if 'pjMenu' in self.ifd.entryByName:
                 self.ifd.entryByName['pjMenu']['widget'].bind('<ButtonPress>', self.buildProjectMenu, add='+')
-            if self.ifd.entryByName.has_key('pFentry'):
+            if 'pFentry' in self.ifd.entryByName:
                 self.ifd.entryByName['pFentry']['widget'].bind('<Return>', self.updateLF)
                 self.ifd.entryByName['pFentry']['widget'].bind('<Return>', self.getCmdParams)
             if entropiaPresent:
@@ -2300,7 +2300,7 @@ class VinaStarter(AutoStarter):
             else:
                 entList=['lFentry','eXentry','inentry','outentry']
             for item in entList:
-                if self.ifd.entryByName.has_key(item):
+                if item in self.ifd.entryByName:
                     self.ifd.entryByName[item]['widget'].bind('<Return>', self.getCmd)
 
 
@@ -2333,15 +2333,15 @@ class VinaStarter(AutoStarter):
 
 
     def setUpFlagVars(self):
-        self.flagVar = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.flagVar = tkinter.IntVar(master=self.vf.GUI.ROOT)
         self.flagVar.set(0)
-        self.kflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.iflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.uflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.tflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.cflag = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.inputFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-        self.outputFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.kflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.iflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.uflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.tflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.cflag = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.inputFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.outputFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
 
 
     def callDoit_cb(self, event = None):  #vina
@@ -2394,9 +2394,9 @@ class VinaStarter(AutoStarter):
     def bindEntries(self):
         if hasattr(self,'form'):
             self.ifd.entryByName['cmdentry']['widget'].bind('<Return>', self.getCmdParams)
-            if self.ifd.entryByName.has_key('pjMenu'):
+            if 'pjMenu' in self.ifd.entryByName:
                 self.ifd.entryByName['pjMenu']['widget'].bind('<ButtonPress>', self.buildProjectMenu, add='+')
-            if self.ifd.entryByName.has_key('pFentry'):
+            if 'pFentry' in self.ifd.entryByName:
                 self.ifd.entryByName['pFentry']['widget'].bind('<Return>', self.updateLF)
                 self.ifd.entryByName['pFentry']['widget'].bind('<Return>', self.getCmdParams)
             if entropiaPresent:
@@ -2404,7 +2404,7 @@ class VinaStarter(AutoStarter):
             else:
                 entList=['lFentry','eXentry','inentry','outentry']
             for item in entList:
-                if self.ifd.entryByName.has_key(item):
+                if item in self.ifd.entryByName:
                     self.ifd.entryByName[item]['widget'].bind('<Return>', self.getCmd)
 
 
@@ -2528,7 +2528,7 @@ class VinaStarter(AutoStarter):
         jobStr='cd '+dName+";"+exe+" "+ flagStr +" -p "+pName+" -l "+logName+"\n"
         fptr.write(jobStr)
         fptr.close()
-        os.chmod(jobFile, 0755)
+        os.chmod(jobFile, 0o755)
         return jobFile
 
 
@@ -2573,121 +2573,121 @@ class AddAutoDockHost(MVCommand):
             import AutoDockTools
             self.hostDict = AutoDockTools.hostDict
             #print "AADH:hostDict.keys()=", self.hostDict.keys()
-            self.macroName=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.hostName=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.agPath=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.adPath=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.adVPath=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.qType=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.userSpecific=Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.macroName=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.hostName=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.agPath=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.adPath=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.adVPath=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.qType=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.userSpecific=tkinter.IntVar(master=self.vf.GUI.ROOT)
             ifd=self.ifd=InputFormDescr(title='Add Host')
             ifd.append( {'name': 'hList',
-                'widgetType': Tkinter.Listbox,
-                'gridcfg':{'sticky':Tkinter.E,'column':0, 'row': 0,'rowspan':6}})
+                'widgetType': tkinter.Listbox,
+                'gridcfg':{'sticky':tkinter.E,'column':0, 'row': 0,'rowspan':6}})
             ifd.append( {'name': 'mNLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'wcfg':{ 'text': 'Macro Name:'},
-                'gridcfg':{'sticky':Tkinter.E, 'row':0, 'column':1}})
+                'gridcfg':{'sticky':tkinter.E, 'row':0, 'column':1}})
             ifd.append( {'name': 'mNentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable':self.macroName},
-                'gridcfg':{'sticky':Tkinter.E,'row':0,'column':2}})
+                'gridcfg':{'sticky':tkinter.E,'row':0,'column':2}})
             ifd.append( {'name': 'hNLab',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'wcfg':{ 'text': 'Host Name:'},
-                'gridcfg':{'sticky':Tkinter.E, 'row':1, 'column':1}})
+                'gridcfg':{'sticky':tkinter.E, 'row':1, 'column':1}})
             ifd.append( {'name': 'hNentry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable':self.hostName},
-                'gridcfg':{'sticky':Tkinter.E,'row':1,'column':2}})
+                'gridcfg':{'sticky':tkinter.E,'row':1,'column':2}})
             ifd.append( {'name': 'agPath',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'wcfg':{ 
                     'text': 'Autogrid Program\nPathname:'},
-                'gridcfg':{'sticky':Tkinter.E,'row':2,'column':1}})
+                'gridcfg':{'sticky':tkinter.E,'row':2,'column':1}})
             ifd.append( {'name': 'agEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable':self.agPath},
-                'gridcfg':{'sticky':Tkinter.E,'row':2,'column':2}})
+                'gridcfg':{'sticky':tkinter.E,'row':2,'column':2}})
             ifd.append({'name': 'agButton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'wcfg':{'text':'Browse','command':self.browseAG,'bd':2},
-                'gridcfg':{'sticky':Tkinter.W,'row':2, 'column':3}})
+                'gridcfg':{'sticky':tkinter.W,'row':2, 'column':3}})
             ifd.append( {'name': 'adPath',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'wcfg':{ 'text': 'Autodock Program\nPathname:'},
-                'gridcfg':{'sticky':Tkinter.E, 'row':3, 'column':1}})
+                'gridcfg':{'sticky':tkinter.E, 'row':3, 'column':1}})
             ifd.append( {'name': 'adEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable':self.adPath},
-                'gridcfg':{'sticky':Tkinter.E,'row':3,'column':2}})
+                'gridcfg':{'sticky':tkinter.E,'row':3,'column':2}})
             ifd.append({'name': 'adButton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'wcfg':{'text':'Browse','command':self.browseAD,'bd':2},
-                'gridcfg':{'sticky':Tkinter.W,'row':3, 'column':3}})
+                'gridcfg':{'sticky':tkinter.W,'row':3, 'column':3}})
             ifd.append( {'name': 'adVPath',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'wcfg':{ 'text': 'Autodock Vina Program\nPathname:'},
-                'gridcfg':{'sticky':Tkinter.E, 'row':4, 'column':1}})
+                'gridcfg':{'sticky':tkinter.E, 'row':4, 'column':1}})
             ifd.append( {'name': 'adVEntry',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg':{
                     'width':25,
                     'textvariable':self.adVPath},
-                'gridcfg':{'sticky':Tkinter.E,'row':4,'column':2}})
+                'gridcfg':{'sticky':tkinter.E,'row':4,'column':2}})
             ifd.append({'name': 'adVButton',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'wcfg':{'text':'Browse','command':self.browseADV,'bd':2},
-                'gridcfg':{'sticky':Tkinter.W,'row':4, 'column':3}})
+                'gridcfg':{'sticky':tkinter.W,'row':4, 'column':3}})
             ifd.append( {'name': 'qChoice',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'wcfg':{'text':'Queue Type'},
-                'gridcfg':{'sticky':Tkinter.E, 'row':5, 'column':1}})
+                'gridcfg':{'sticky':tkinter.E, 'row':5, 'column':1}})
             ifd.append({'name': 'intButton',
-                'widgetType': Tkinter.Radiobutton,
+                'widgetType': tkinter.Radiobutton,
                 'wcfg':{'value':'int', 'text':'int', 'variable':self.qType},
-                'gridcfg':{'sticky':Tkinter.E +Tkinter.W, 'row':5,'column':2}})
+                'gridcfg':{'sticky':tkinter.E +tkinter.W, 'row':5,'column':2}})
             ifd.append({'name': 'winButton',
-                'widgetType': Tkinter.Radiobutton,
+                'widgetType': tkinter.Radiobutton,
                 'wcfg':{'text':'nqe','value':'nqe', 'variable':self.qType},
-                'gridcfg':{'sticky':Tkinter.W,'row':5, 'column':3}})
+                'gridcfg':{'sticky':tkinter.W,'row':5, 'column':3}})
             ifd.append({'name': 'pdsButton',
-                'widgetType': Tkinter.Radiobutton,
+                'widgetType': tkinter.Radiobutton,
                 'wcfg':{'text':'pbs','value':'pbs', 'state':'disabled','variable':self.qType},
-                'gridcfg':{'sticky':Tkinter.W,'row':5, 'column':4}})
+                'gridcfg':{'sticky':tkinter.W,'row':5, 'column':4}})
             ifd.append( {'name': 'userOnlyChoice',
-                'widgetType': Tkinter.Label,
+                'widgetType': tkinter.Label,
                 'wcfg':{'text':'From User Dict:'},
-                'gridcfg':{'sticky':Tkinter.E, 'row':6, 'column':1}})
+                'gridcfg':{'sticky':tkinter.E, 'row':6, 'column':1}})
             ifd.append({'name': 'userButton',
-                'widgetType': Tkinter.Radiobutton,
+                'widgetType': tkinter.Radiobutton,
                 'wcfg':{'text':'yes','value':1, 'variable':self.userSpecific},
-                'gridcfg':{'sticky':Tkinter.E +Tkinter.W,'row':6,'column':2}})
+                'gridcfg':{'sticky':tkinter.E +tkinter.W,'row':6,'column':2}})
             ifd.append({'name': 'notuserButton',
-                'widgetType': Tkinter.Radiobutton,
+                'widgetType': tkinter.Radiobutton,
                 'wcfg':{'text':'no','value':0, 'variable':self.userSpecific},
-                'gridcfg':{'sticky':Tkinter.W,'row':6, 'column':3}})
-            ifd.append({'widgetType': Tkinter.Button,
+                'gridcfg':{'sticky':tkinter.W,'row':6, 'column':3}})
+            ifd.append({'widgetType': tkinter.Button,
                 'wcfg':{'text':'Add','bd':2,'command':self.addItem_cb},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'row':8,'column':0}})
-            ifd.append({'widgetType': Tkinter.Button,
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'row':8,'column':0}})
+            ifd.append({'widgetType': tkinter.Button,
                 'wcfg':{'text':'Delete','command':self.delItem_cb,'bd':2},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'row':-1,'column':1}}),
-            ifd.append({'widgetType': Tkinter.Button,
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'row':-1,'column':1}}),
+            ifd.append({'widgetType': tkinter.Button,
                 'text':'Write',
                 'wcfg':{'text':'Write','command':self.write_cb,'bd':2},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'row':-1,'column':2}})
-            ifd.append({'widgetType': Tkinter.Button,
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'row':-1,'column':2}})
+            ifd.append({'widgetType': tkinter.Button,
                 'wcfg':{'text':'Cancel','bd':2,'command':self.Close_cb},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W,'row':-1,'column':3,'columnspan':5}})
+                'gridcfg':{'sticky':tkinter.E+tkinter.W,'row':-1,'column':3,'columnspan':5}})
         else:
             if hasattr(self, 'form') and self.form!=None:
                 self.form.deiconify()
@@ -2695,7 +2695,7 @@ class AddAutoDockHost(MVCommand):
     def fillForm(self):
         lb = self.ifd.entryByName['hList']['widget']
         dict= self.hostDict
-        for h in dict.keys():
+        for h in list(dict.keys()):
             lb.insert('end',h)
         lb.select_set(0)
         lb.bind('<Double-Button-1>', self.getItem)
@@ -2735,7 +2735,7 @@ class AddAutoDockHost(MVCommand):
 "',autodock='"+self.adPath.get()+"',queuetype='"+self.qType.get()+\
 "',vina='"+self.adVPath.get()+"',queuetype='"+self.qType.get()+\
 "',userSpecific="+str(self.userSpecific.get())+")\n"
-        print logstr
+        print(logstr)
         return logstr
 
     def write_cb(self, newfile = None, whichOnes='all', event=None):
@@ -2747,14 +2747,14 @@ class AddAutoDockHost(MVCommand):
             self.warningMsg(msg)
             adtrcDict = {}
         idir = './'
-        if 'HOME' in os.environ.keys():
+        if 'HOME' in list(os.environ.keys()):
             home=os.environ['HOME']
             idir=home
 
         #if there are NO _adtrc files any where, write to HOME if it exists
         #else write to current directory
         #check for >1 choice and ask user where to write it
-        hasValues=filter(lambda x: not x is None, adtrcDict.values())
+        hasValues=[x for x in list(adtrcDict.values()) if not x is None]
         #if filter(lambda x: not x is None, adtrcDict.values())==[]:
         if hasValues==[]:
             filename=self.vf.askFileSave(idir=idir,
@@ -2763,17 +2763,17 @@ class AddAutoDockHost(MVCommand):
                 title = 'Save new host macros in _adtrc:')
         elif len(hasValues)>1:
             #have to give a choice here:    
-            location=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            levels=adtrcDict.keys()
+            location=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            levels=list(adtrcDict.keys())
             ifd = InputFormDescr(title='which adtrc file to write?')
             for level in levels:
                 if adtrcDict[level]:
                     ifd.append({'name':    level,
-                        'widgetType':Tkinter.Radiobutton,
+                        'widgetType':tkinter.Radiobutton,
                         'wcfg': {'value': adtrcDict[level],
                         'variable':location,
                         'text':level},
-                        'gridcfg':{'sticky':Tkinter.W}})
+                        'gridcfg':{'sticky':tkinter.W}})
             vals = self.vf.getUserInput(ifd)
             if vals:
                 filename=location.get()
@@ -2813,7 +2813,7 @@ class AddAutoDockHost(MVCommand):
             f.close()
 
         else:
-            print "Careful: nothing has been written because no filename was give"
+            print("Careful: nothing has been written because no filename was give")
             return
 
     def checkit(self, host):
@@ -2823,7 +2823,7 @@ class AddAutoDockHost(MVCommand):
         return ans
         
     def checklb(self,host):
-        if not self.ifd.entryByName.has_key('hList'): return
+        if 'hList' not in self.ifd.entryByName: return
         lb = self.ifd.entryByName['hList']['widget']
         end =lb.index('end')
         for i in range(end):
@@ -2868,7 +2868,7 @@ class AddAutoDockHost(MVCommand):
             msg = "self.ADstart_editHostMacros.addItem_cb(macro='" + macro + "',host='"+host+ "', autogrid='"+ autogrid + "', autodock = '" + autodock + "', vina='"+ vina +"', queuetype='" + queuetype+"', userSpecific="+ str(userSpecific) + ")"
             self.vf.log(msg)
         ans = self.checklb(macro)
-        if not ans and self.ifd.entryByName.has_key('hList'):
+        if not ans and 'hList' in self.ifd.entryByName:
             lb = self.ifd.entryByName['hList']['widget']
             lb.insert('end', macro)
 
@@ -2924,7 +2924,7 @@ if os.name != 'nt': #not sys.platform == 'win32':
     {'name':'ADstart_manage','cmd':ADProcessManager(),'gui':ADProcessManagerGUI})
 else:
     import binaries
-    if os.environ.has_key('PATH'):
+    if 'PATH' in os.environ:
         os.environ['PATH'] = binaries.__path__[0]+";"+os.environ['PATH']
     else:
         os.environ['PATH'] = binaries.__path__[0]
@@ -2936,7 +2936,7 @@ def initModule(vf):
         vf.addCommand(dict['cmd'],dict['name'],dict['gui'])
 
     if hasattr(vf,'GUI'):
-        for item in vf.GUI.menuBars['AutoToolsBar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoToolsBar'].menubuttons.values()):
             item.configure(background = 'tan')
             item.configure(underline = '-1')
  

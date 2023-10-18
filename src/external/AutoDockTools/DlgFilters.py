@@ -279,14 +279,14 @@ class LigandEfficiencyFilter(Filter):
             cur_line = lines[i]
             if not found_index and cur_line.find(self.h_map_line)>-1:
                 hmap = int(strip(cur_line.split()[-1]))
-                if self.verbose: print "hmap=", hmap
+                if self.verbose: print("hmap=", hmap)
                 found_index = 1
             if lines[i].find(self.keyline)>-1:
                 break
         for j in range(len(lines[i:])):
             if lines[j].find("Number of atoms with atom type %d ="%(hmap))>-1:
                 self.number_of_hydrogens = int(strip(lines[j].split()[-1]))
-                if self.verbose: print "found %d hydrogens" %(self.number_of_hydrogens)
+                if self.verbose: print("found %d hydrogens" %(self.number_of_hydrogens))
         return lines[i:]
 
 
@@ -300,7 +300,7 @@ class LigandEfficiencyFilter(Filter):
         ll = lines[i+9].split()
         best_energy = float(ll[6])
         lig_eff = float(round(best_energy/num_lig_atoms, 4))
-        if self.verbose: print " ligand efficiency = ", lig_eff
+        if self.verbose: print(" ligand efficiency = ", lig_eff)
         return lig_eff<=self.ligand_efficiency
 
 

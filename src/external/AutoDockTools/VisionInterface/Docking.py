@@ -27,7 +27,7 @@ class Docking(NetworkNode):
     def __init__(self, constrkw = {},  name='Docking', **kw):
         kw['constrkw'] = constrkw
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw)
+        NetworkNode.__init__(*(self,), **kw)
         code = """def doit(self, docking_logs, rmsTool):
         from AutoDockTools.Docking import Docking
         d = Docking()
@@ -56,5 +56,5 @@ class Docking(NetworkNode):
             ed = net.getEditor()
         except:
             import traceback; traceback.print_exc()
-            print 'Warning! Could not import widgets'
+            print('Warning! Could not import widgets')
 

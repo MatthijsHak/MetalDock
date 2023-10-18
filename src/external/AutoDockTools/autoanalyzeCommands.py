@@ -70,7 +70,7 @@ After the selected docking log file is parsed, the user can:
     * Dockings can be deleted via 'Delete Docking Log'
 
 """
-import types, Tkinter, commands, os, copy, glob, popen2, time
+import types, tkinter, subprocess, os, copy, glob, popen2, time
 from string import find, join, replace, split, rfind, strip
 import numpy, math
 import re
@@ -124,7 +124,7 @@ from Pmv.mvCommand import MVCommand
 from Pmv.guiTools import MoleculeChooser, BarButton, Kill
 #from Pmv.Grid import AutoGrid, AutoGridSurfaceGui
 
-from SimpleDialog import SimpleDialog
+from tkinter.simpledialog import SimpleDialog
 
 #these are the texts on menubuttons, menu entries etc:
 menuText = {}
@@ -251,7 +251,7 @@ class ADChooseMacro(MVCommand):
             return 'ERROR'
         #need to construct a list of the current molecules connected to dockings
         self.buildMolList()
-        apply(self.doit, (mols[0],), kw)
+        self.doit(*(mols[0],), **kw)
 
 
     def __call__(self, macroMol=None, **kw):
@@ -263,17 +263,17 @@ class ADChooseMacro(MVCommand):
             return 'ERROR'
         macroMol = mols[0]
         if not self.vf.docked:
-            print "no current docking"
+            print("no current docking")
             return 'ERROR'
         #if hasattr(self.vf.docked, 'macroMol'):
         #    self.vf.warningMsg('current docking already has a macromolecule')
         #    return 'ERROR'
-        apply(self.doitWrapper,(macroMol,), kw)
+        self.doitWrapper(*(macroMol,), **kw)
 
 
     def doit(self, macroMol):
         if not self.vf.docked:
-            print "no current docking"
+            print("no current docking")
             return 'ERROR'
         self.vf.docked.macroMol = macroMol
 
@@ -299,10 +299,10 @@ class ADChooseMacro(MVCommand):
         self.chooser = MoleculeChooser(self.vf, mode='single', 
                         title='Choose Macromolecule for Current Docking')
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Macromolecule',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseMolecule_cb})
         self.form = self.chooser.go(modal=0, blocking=0)
         lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -339,28 +339,28 @@ class ADReadVSResult(MVCommand):
             for item in ['displayLines','showMolecules']:
                 if not hasattr(self.vf, item):
                     self.vf.loadCommand('displayCommands', item, 'Pmv')
-        if 'VSCloseContacts_displayMode' not in self.vf.userpref.keys():
+        if 'VSCloseContacts_displayMode' not in list(self.vf.userpref.keys()):
             doc = """Choose display mode for atoms in close contact in a VirtualScreening result:\nasSelection, asCPK,  asSticks or None\n. Default value is 'asSelection'"""
             self.vf.userpref.add('VSCloseContacts_displayMode', 'asSelection', 
                     ['asSelection', 'asCPK', 'asSticks','None'],
                     callbackFunc = [self.set_VSCloseContacts_displayMode], doc=doc ,
                     category='AutoDockTools')
             self.vf.userpref['VSCloseContacts_displayMode']['value'] = 'None'
-        if 'VSHydrogenBond_displayMode' not in self.vf.userpref.keys():
+        if 'VSHydrogenBond_displayMode' not in list(self.vf.userpref.keys()):
             doc = """Choose display mode for hydrogen bonds in a VirtualScreening result:\nasSpheres, asCylinders  or None\n. Default value is 'asSpheres'"""
             self.vf.userpref.add('VSHydrogenBond_displayMode', 'asSpheres', 
                     ['asSpheres', 'asCylinders', 'asLines', 'None'],
                     callbackFunc = [self.set_VSHydrogenBond_displayMode], doc=doc ,
                     category='AutoDockTools')
             self.vf.userpref['VSHydrogenBond_displayMode']['value'] = 'None'
-        if 'VSPiInteractions_displayMode' not in self.vf.userpref.keys():
+        if 'VSPiInteractions_displayMode' not in list(self.vf.userpref.keys()):
             doc = """Choose display mode for atoms with PiInteractions in a VirtualScreening result:\nasCylindersAndCones, asSelection or None\n. Default value is 'asCylindersAndCones'"""
             self.vf.userpref.add('VSPiInteractions_displayMode', 'asCylindersAndCones', 
                     ['asCylindersAndCones', 'asSelection', 'None'],
                     callbackFunc = [self.set_VSPiInteractions_displayMode], doc=doc ,
                     category='AutoDockTools')
             self.vf.userpref['VSPiInteractions_displayMode']['value'] = 'None'
-        if 'VS_ShowClusteringHistogram' not in self.vf.userpref.keys():
+        if 'VS_ShowClusteringHistogram' not in list(self.vf.userpref.keys()):
             doc = """Choose to show or not show Clustering Histogram for a VirtualScreening result:\n'Yes' or 'No'\n. Default value is 'No'"""
             self.vf.userpref.add('VS_ShowClusteringHistogram', 'Yes', 
                     ['Yes', 'No', 'None'],
@@ -393,7 +393,7 @@ class ADReadVSResult(MVCommand):
         other = None
         has_hbonds = 0
         displayMode = self.vf.userpref['VSCloseContacts_displayMode']['value']
-        if obj.__dict__.has_key('LE_close_ats'): #isV2
+        if 'LE_close_ats' in obj.__dict__: #isV2
             if len(self.vf.Mols): other = self.vf.Mols[-1]
             #print "V2: other.name=", other.name
             kkeys = ['LE_close_ats', 'LC_close_ats']
@@ -521,7 +521,7 @@ class ADReadVSResult(MVCommand):
         if resultFile:
             kw = {}
             #ask = 1
-            apply( self.doitWrapper, (resultFile,),  kw)
+            self.doitWrapper(*(resultFile,), **kw)
 
 
     def processArrowEvent(self, event):
@@ -587,7 +587,7 @@ class ADReadVSResult(MVCommand):
                             m.clustNB.draw.itemconfig((m.le_index,), fill='blue')
                 else: #hbonds
                     #print "OFF THE END!!"
-                    print 'end: last virtual screening result for ', m.name
+                    print('end: last virtual screening result for ', m.name)
                     #event = EditAtomsEvent('coords', m.allAtoms)
                     #self.vf.dispatchEvent(event)
                     #print " end "#, ind, "  vina_energy =", m.vina_results[-1][0]
@@ -614,7 +614,7 @@ class ADReadVSResult(MVCommand):
                         c.build()
                 else:
                     #print "LESS THAN ZERO!!"
-                    print 'back to first: best VSresult for ', m.name
+                    print('back to first: best VSresult for ', m.name)
                     #print " at first"
                     #print " over-all best vina_energy=", m.vina_results[0][0]
                 event2 = EditAtomsEvent('coords', m.allAtoms)
@@ -669,7 +669,7 @@ class ADReadVSResult(MVCommand):
         """
         if resultFile is None:
             return 'ERROR'
-        apply(self.doitWrapper,(resultFile,), kw)
+        self.doitWrapper(*(resultFile,), **kw)
 
 
     def doit(self, resultFile, **kw):
@@ -738,7 +738,7 @@ class ADReadVSResult(MVCommand):
         top = None
         if  self.vf.userpref['VS_ShowClusteringHistogram']['value']=='Yes':
             #provide toplevel for showing the histogram
-            top = Tkinter.Toplevel(master=self.vf.GUI.ROOT)
+            top = tkinter.Toplevel(master=self.vf.GUI.ROOT)
             try:
                 tstr = ligand.name + ': rms=' + rms + ' ' + num_runs + ' runs'
             except:
@@ -763,7 +763,7 @@ class ADReadVSResult(MVCommand):
                 cl_ctr = 0
                 for item in hist_list:
                     item_list = item.split(':')
-                    dataList.append(map(float,item_list[:2]))
+                    dataList.append(list(map(float,item_list[:2])))
                     if len(item_list)>2:
                         if item_list[-1]=='**':
                             LE = item_list
@@ -771,7 +771,7 @@ class ADReadVSResult(MVCommand):
                             LC = item_list
                     num_confs = int(item_list[1])
                     if num_confs>1: 
-                        reverseList.append(range(ctr, ctr+num_confs+1))
+                        reverseList.append(list(range(ctr, ctr+num_confs+1)))
                     ctr += 1
                     cl_ctr += 1
                 top.title(tstr)
@@ -783,7 +783,7 @@ class ADReadVSResult(MVCommand):
                 le = 10000
                 max_height = -1
                 max_index = None
-                for i,j in ligand.clustNB.geoms.items():
+                for i,j in list(ligand.clustNB.geoms.items()):
                     if j.point[0]<le:
                         le = j.point[0]
                         le_index = i
@@ -844,7 +844,7 @@ class ADReadVSResult(MVCommand):
                     #d:<0>:N1~~B:ASN83:N,d:<0>:O3~~B:LYS20:NZ
                     str_1, str_2 = hb_str.split(ssStr)
                     if not len(str_1) or not len(str_2):
-                        print "skipping improper hb_str ", hb_str
+                        print("skipping improper hb_str ", hb_str)
                         continue
                     ligStr = ligand.chains[0].id #@@FIX THIS
                     ok = True
@@ -855,10 +855,10 @@ class ADReadVSResult(MVCommand):
                         lig_str = str_2
                         rec_str = str_1
                     else:
-                        print "ligand name: ", ligand.name, " not found in hb_str ", hb_str
+                        print("ligand name: ", ligand.name, " not found in hb_str ", hb_str)
                         ok = False                    
-                        print "not ok!: lig_str=", lig_str, ' rec_str=', rec_str
-                        raise 'ligand name!'
+                        print("not ok!: lig_str=", lig_str, ' rec_str=', rec_str)
+                        raise ValueError('ligand name!')
                     if ok:
                         #print "ok!: lig_str=", lig_str, ' rec_str=', rec_str
                         #rec_str xJ1_xtal:B:GLY16:N,HN
@@ -866,7 +866,7 @@ class ADReadVSResult(MVCommand):
                         rec_ats = css.select(self.vf.Mols, strip(rec_str))
                         #rec_ats = self.vf.expandNodes(strip(rec_str))
                         if not len(rec_ats):
-                            print "skipping hb_str because ",  rec_str, " did not match atoms in the receptor"
+                            print("skipping hb_str because ",  rec_str, " did not match atoms in the receptor")
                         #(<AtomSet instance> holding 2 Atom, "xJ1_xtal:B:ARG57:NE,HE", '')
                         rec_ats = rec_ats[0]
                         #add ligand name to lig_str
@@ -874,7 +874,7 @@ class ADReadVSResult(MVCommand):
                         #(<AtomSet instance> holding 1 Atom, "ZINC02025973_vs_le:d:<0>:O3", '')
                         #lig_ats = self.vf.expandNodes(strip(lig_str))
                         if not len(lig_ats):
-                            print "skipping hb_str because ",  lig_str, " did not match atoms in the ligand"
+                            print("skipping hb_str because ",  lig_str, " did not match atoms in the ligand")
                         #(<AtomSet instance> holding 1 Atom, "ZINC02026663_vs:d:<0>:O3", '')
                         #lig_ats = lig_ats[0]
                         donor_ats = rec_ats
@@ -975,7 +975,7 @@ class ADReadVSResult(MVCommand):
                     pi_ats1 = self.vf.expandNodes(pi_str1)
                     pi_ats2 = self.vf.expandNodes(pi_str2)
                     pi_pi_list.append([pi_ats1, pi_ats2])
-                    print 'do something here'
+                    print('do something here')
             if not len(pi_cation_list) and not len(pi_pi_list):
                 return
             if self.vf.userpref['VSPiInteractions_displayMode']['value'] == 'asCylindersAndCones':
@@ -1046,7 +1046,7 @@ class ADReadVSResult(MVCommand):
 
 
     def describeClust(self, mol, event=None):
-        print "in VS describeClust"
+        print("in VS describeClust")
         ##raise 'describeClust'
         return
 
@@ -1118,7 +1118,7 @@ class ADWriteVSResult(MVCommand):
         resultFile = self.vf.askFileSave(types=[('docked result file','*_VS.pdbqt')], title = 'Docked Ligand File:')
         if resultFile:
             kw = {'detect_pi': detect_pi}
-            apply( self.doitWrapper, (resultFile,),  kw)
+            self.doitWrapper(*(resultFile,), **kw)
 
 
     def __call__(self, resultFile=None, **kw):
@@ -1127,7 +1127,7 @@ class ADWriteVSResult(MVCommand):
                       various information about clustering and interactions 
                       between docked ligand and receptor...
         """
-        apply(self.doitWrapper,(resultFile,), kw)
+        self.doitWrapper(*(resultFile,), **kw)
 
 
     def doit(self, resultFile, **kw):
@@ -1312,7 +1312,7 @@ class ADReadMacro(MVCommand):
             d = self.vf.docked
             if d.macroMol==obj:
                 delattr(d, 'macroMol')
-            for v in self.vf.dockings.values():
+            for v in list(self.vf.dockings.values()):
                 if hasattr(v,'macroMol') and v.macroMol==obj:
                     delattr(v,'macroMol')
 
@@ -1372,17 +1372,17 @@ class ADReadMacro(MVCommand):
         if macroFile is None:
             return 'ERROR'
         if not self.vf.docked:
-            print "no current docking"
+            print("no current docking")
             return 'ERROR'
         if hasattr(self.vf.docked, 'macroMol'):
             self.vf.warningMsg('current docking already has a macromolecule')
             return 'ERROR'
-        apply(self.doitWrapper,(macroFile,), kw)
+        self.doitWrapper(*(macroFile,), **kw)
 
 
     def doit(self, macroFile):
         if not self.vf.docked:
-            print "no current docking"
+            print("no current docking")
             return 'ERROR'
         macrolist = self.vf.readMolecule(macroFile,topCommand=0)
         if macrolist is None:
@@ -1421,7 +1421,7 @@ class ADEPDBMol(MVCommand):
         for item in ['colorByMolecules','colorByAtomType', 'colorByProperty']:
             if not hasattr(self.vf, item):
                 self.vf.loadCommand('colorCommands', item, 'Pmv')
-        if not self.vf.colorMaps.has_key('rgb256'):
+        if 'rgb256' not in self.vf.colorMaps:
             mod = __import__("ViewerFramework")
             VFPath = mod.__path__[0]
             self.vf.loadColorMap(os.path.join(VFPath, "ColorMaps","rgb256_map.py"), 
@@ -1442,7 +1442,7 @@ class ADEPDBMol(MVCommand):
                 kw = {}
                 kw['log'] = 1
                 kw['redraw'] = 1
-                apply(self.doitWrapper, (dpfFile, [molFile],),kw)
+                self.doitWrapper(*(dpfFile, [molFile],), **kw)
 
 
     def __call__(self, dpfFile=None, molList=None, **kw):
@@ -1453,7 +1453,7 @@ class ADEPDBMol(MVCommand):
         \nmolFile: pdbq file to be evaluated
         """
         if dpfFile and molList:
-            return apply(self.doitWrapper, (dpfFile, molList,), kw)
+            return self.doitWrapper(*(dpfFile, molList,), **kw)
         else:
             return 'ERROR'
 
@@ -1473,7 +1473,7 @@ class ADEPDBMol(MVCommand):
             line = outptr.readline()
             ct = ct + 1
         if find(line,'sorry')>-1:
-            print 'command mode error: ', line
+            print('command mode error: ', line)
             return 'ERROR'
         #now build + enter epdb cmd
         for molFile in molList:
@@ -1514,11 +1514,11 @@ class ADEPDBMol(MVCommand):
             #also totals
             #Estimated Free Energy of Binding, FDE, FIE, FIEL, TFE
             #OUTPUT parser info to python shell:
-            print 'Estimated Free Energy:', parser.estFreeEnergy
-            print 'Final Docked Energy:', parser.finalDockedEnergy
-            print 'Final Intermolecular Energy:', parser.finalIntermolEnergy
-            print 'Final Internal Energy:', parser.finalInternalEnergy
-            print 'Torsional Free Energy:', parser.torsionalFreeEnergy
+            print('Estimated Free Energy:', parser.estFreeEnergy)
+            print('Final Docked Energy:', parser.finalDockedEnergy)
+            print('Final Intermolecular Energy:', parser.finalIntermolEnergy)
+            print('Final Internal Energy:', parser.finalInternalEnergy)
+            print('Torsional Free Energy:', parser.torsionalFreeEnergy)
             mols = self.vf.readMolecule(molFile)
             mol = mols[0]
             mol.estFreeEnergy = parser.estFreeEnergy
@@ -1594,7 +1594,7 @@ class ADSeeSpots(MVCommand):
 
     def guiCallback(self):
         """called each time the 'Visualize dockings as Spheres' button is pressed"""
-        docklist = self.vf.dockings.keys()
+        docklist = list(self.vf.dockings.keys())
         if len(docklist)==0:
             self.vf.warningMsg('Please Read a Docking Log First')
             return
@@ -1611,7 +1611,7 @@ class ADSeeSpots(MVCommand):
         \ndocklist: list of keys into self.vf.dockings
         """
         if docklist and len(docklist):
-            return apply(self.doitWrapper, (docklist,), kw)
+            return self.doitWrapper(*(docklist,), **kw)
         else:
             return 'ERROR'
 
@@ -1653,7 +1653,7 @@ class ADSeeSpots(MVCommand):
             dl2.append((n, None))
         ifd = self.ifd = InputFormDescr(title='Show Docked Conformations as Spheres')
         ifd.append({'name': 'dockingLabel',
-            'widgetType': Tkinter.Label,
+            'widgetType': tkinter.Label,
             'wcfg':{'text': str(len(docklist)) + ' Current Docking(s)\n(centers=average of coords)'},
             'gridcfg':{'sticky': 'wens', 'columnspan':2}})
         ifd.append({'name': 'dockedLC',
@@ -1683,7 +1683,7 @@ class ADSeeSpots(MVCommand):
             'gridcfg':{'sticky':'we', 'columnspan':2}})
             #'gridcfg':{'sticky':'wens', 'columnspan':2}})
         ifd.append( {'name':'quality',
-            'widgetType': Tkinter.Scale,
+            'widgetType': tkinter.Scale,
             'wcfg':{'label':'quality',
                 'troughcolor':'green',
                  'from_':2, 'to_':20,
@@ -1693,18 +1693,18 @@ class ADSeeSpots(MVCommand):
             'gridcfg':{'sticky':'we', 'columnspan':2}})
             #'gridcfg':{'sticky':'wens'}})
         ifd.append({'name':'updateColorBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg': { 'text':'Choose color',
                 'command': self.updateColor},
             'gridcfg':{'sticky':'we' }})
             #'gridcfg':{'sticky':'wes', 'row':-1, 'column':1}})
         ifd.append({'name':'colorByPropBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg': { 'text':'Color by Prop',
                 'command': self.colorByProp},
             'gridcfg':{'sticky':'we', 'row':-1, 'column':1}})
         ifd.append({'name':'closeBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg': { 'text':'Dismiss',
                 'command': self.dismiss_cb},
             'gridcfg':{'sticky':'wens','columnspan':2 }})
@@ -1746,7 +1746,7 @@ class ADSeeSpots(MVCommand):
             curSel.append(self.lb.get(item))
         for k in self.keys:
             gC = self.vf.dockings[k].ligMol.geomContainer
-            if gC.geoms.has_key('dockedSpheres'):
+            if 'dockedSpheres' in gC.geoms:
                 g = gC.geoms['dockedSpheres']
             else:
                 res = self.addSpheres(self.keys)
@@ -1809,7 +1809,7 @@ class ADSeeSpots(MVCommand):
         #print "in pickedVerticesToDockings: geom=", geom, ' + vertIndList=', vertIndList
         ind_list = self.ifd.entryByName['dockedLC']['widget'].lb.curselection()
         key_ind = int(ind_list[0])
-        print 'highlighted dockinglog filename is ', self.keys[key_ind]
+        print('highlighted dockinglog filename is ', self.keys[key_ind])
         docking = self.vf.dockings[self.keys[key_ind]]
         geomCont = docking.ligMol.geomContainer
         msg = "Picked sphere(s) corresponds to docking run(s) with energy :\n"
@@ -1822,7 +1822,7 @@ class ADSeeSpots(MVCommand):
             conf = docking.ch.conformations[ind]
             docking.ligMol.spw.nextFrame(ind+1)
             msg += "%4d  % 6.4f\n" %(ind+1, docking.sphere_energies[ind])
-        print msg
+        print(msg)
         if self.cmg.legend is None: self.cmg.createCML()
         self.cmg.showLegendVar.set(1)
         self.cmg.configure({},updateGui=True)
@@ -1839,7 +1839,7 @@ class ADSeeSpots(MVCommand):
                 self.warningMsg("'Show as Spheres' is not implemented for vina results")
                 return 'ERROR'
             geomCont = docking.ligMol.geomContainer
-            if geomCont.geoms.has_key('dockedSpheres'):
+            if 'dockedSpheres' in geomCont.geoms:
                 geomCont.geoms['dockedSpheres'].Set(visible=vis)
                 self.vf.GUI.VIEWER.Redraw()
                 continue
@@ -1924,20 +1924,20 @@ class ADShowBindingSite(MVCommand):
         self.vf.loadModule('displayCommands', 'Pmv')
         self.vf.loadModule('hbondCommands', 'Pmv')
         self.percentCutoff = 1.0
-        self.updateDisplay = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.setBKGColor = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.showHbatSpheres = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.showCloseContactSpheres = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.showSS = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.showMM = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.showMsms = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.showResLabels = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.showPiPi = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.showPiCation = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-        self.infoType = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.updateDisplay = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.setBKGColor = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.showHbatSpheres = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.showCloseContactSpheres = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.showSS = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.showMM = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.showMsms = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.showResLabels = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.showPiPi = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.showPiCation = tkinter.IntVar(master=self.vf.GUI.ROOT)
+        self.infoType = tkinter.StringVar(master=self.vf.GUI.ROOT)
         self.infoType.set("")
         self.infoTypeList = ["ligand contacts", "receptor contacts", "hydrogen bonds"]
-        self.sphereType = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.sphereType = tkinter.StringVar(master=self.vf.GUI.ROOT)
         self.sphereType.set("wireframe")
         self.sphereTypeList = ["wireframe", "solid"]
         self.backgroundcolor=[1.0,1.0,1.0]
@@ -2020,7 +2020,7 @@ class ADShowBindingSite(MVCommand):
                     ('lig_close_carbons', 'lcloseCs')]
         for k1,k2 in key_list:
             nodes = rDict[k1]
-            if k2 in self.vf.sets.keys():
+            if k2 in list(self.vf.sets.keys()):
                 self.vf.sets.pop(k2)
                 self.vf.saveSet(nodes, k2, addToDashboard=False)
             else:
@@ -2045,7 +2045,7 @@ class ADShowBindingSite(MVCommand):
     def getSSResidues(self, mol):
         from MolKit.protein import ResidueSet
         res = ResidueSet()
-        for k, v in mol.geomContainer.atoms.items():
+        for k, v in list(mol.geomContainer.atoms.items()):
 	        if k[:3] in ['Coi', 'Hel', 'Str', 'Tur']:
 		        res += v
         return res
@@ -2053,7 +2053,7 @@ class ADShowBindingSite(MVCommand):
 
     def setupUndoBefore(self, docking):
         #???color???
-        if type(docking)==types.StringType:
+        if type(docking)==bytes:
             docking = self.vf.dockings[docking]
         if not hasattr(docking, 'macroMol'):
             return 
@@ -2157,7 +2157,7 @@ class ADShowBindingSite(MVCommand):
                 'ProteinLabels', 'ResidueLabels', 'nobnds', 'balls', 'bondorder', 'lines', 'CAballs']
         displayed_res = ResidueSet()
         gc = macro.geomContainer
-        for k in gc.atoms.keys():
+        for k in list(gc.atoms.keys()):
             if not k in keys_to_exclude:
                 displayed_res += gc.atoms[k].findType(Residue)
         if len(displayed_res):
@@ -2277,7 +2277,7 @@ class ADShowBindingSite(MVCommand):
 
     def guiCallback(self):
         """called each time the 'Show Interactions' button is pressed"""
-        docklist = self.vf.dockings.keys()
+        docklist = list(self.vf.dockings.keys())
         if len(docklist)==0:
             self.vf.warningMsg("Currently no dockings are available. Please use Analyze->Open to read in a '.dlg' file first...")
             return
@@ -2297,7 +2297,7 @@ class ADShowBindingSite(MVCommand):
             if len(val)>0 and len(val['dlgFiles'])>0:
                 docking = val['dlgFiles'][0]
                 kw = {}
-                apply(self.doitWrapper, val['dlgFiles'][0], kw)
+                self.doitWrapper(*val['dlgFiles'][0], **kw)
             else:
                 return "ERROR"
 
@@ -2307,7 +2307,7 @@ class ADShowBindingSite(MVCommand):
         \ndocking: 
         """
         if docking_filename:
-            return apply(self.doitWrapper, (docking_filename,), kw)
+            return self.doitWrapper(*(docking_filename,), **kw)
         else:
             return 'ERROR'
 
@@ -2361,27 +2361,27 @@ class ADShowBindingSite(MVCommand):
     def buildDisplayForm(self, event=None):
         ifd = self.ifd= InputFormDescr(title='Binding Site Interactions display options')
         ifd.append({'name': 'updateCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': 'Each time you change the conformation using the player,\nthe display will be rebuilt. To undo use\nRevert or Edit->Undo ADanalyze_showBindingSite.\nIf you have displayed multiple conformations,\npossibly you may need to Undo displayExtrudedSS multiple times..',
                     'wcfg':{'text':"update display for each new conformation",
                             'variable':self.updateDisplay},
                     'command': self.toggleUpdate,
-                    'gridcfg':{'sticky':Tkinter.W, 'columnspan':2}})
+                    'gridcfg':{'sticky':tkinter.W, 'columnspan':2}})
         ifd.append({'name':'setBGcolorCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': 'customize the Viewer background color...',
                     'wcfg':{'text':"set background color",
                             'variable':self.setBKGColor},
                     'command': self.setBackGroundColor,
-                    'gridcfg':{'sticky':Tkinter.W, 'row':-1, 'column':2}})
+                    'gridcfg':{'sticky':tkinter.W, 'row':-1, 'column':2}})
         ifd.append({'name': 'msmsCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': 'display solvent-excluded-surface geometry for ligand',
                     'wcfg':{'text':"display msms",
                             'variable':self.showMsms},
                     'command': self.updateMsms,
-                    'gridcfg':{'sticky':Tkinter.W, 'columnspan':3}})
-        ifd.append({'widgetType':Tkinter.Label,
+                    'gridcfg':{'sticky':tkinter.W, 'columnspan':3}})
+        ifd.append({'widgetType':tkinter.Label,
                     'tooltip': 'set which spheres to display and whether to use wireframe or solid',
                     'wcfg': {'text':"display spheres as"},
                     'gridcfg':{'sticky':'w'} })
@@ -2394,24 +2394,24 @@ class ADShowBindingSite(MVCommand):
                     'selectioncommand': self.updateSphereDisplay,
                     },
             'gridcfg':{'sticky':'w', 'row':-1, 'column':1}})
-        ifd.append({'widgetType':Tkinter.Label,
+        ifd.append({'widgetType':tkinter.Label,
                     'tooltip': 'set which spheres to display ',
                     'wcfg': {'text':"on atoms in:"},
                     'gridcfg':{'sticky':'e'} })
         ifd.append({'name': 'closeAtsCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': "display spheres on pairs of atoms closer than sum of vdw radii*Scaling Factor.\nWhen msms surface for 'ligand' is displayed, spheres are displayed only on the 'receptor'",
                     'wcfg':{'text':"close contact",
                             'variable':self.showCloseContactSpheres},
                     'command': self.updateCCCpk,
-                    'gridcfg':{'sticky':Tkinter.W, 'row':-1, 'column':1}})
+                    'gridcfg':{'sticky':tkinter.W, 'row':-1, 'column':1}})
         ifd.append({'name': 'hbondsCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': "display spheres on atoms involved in hydrogen bonds\nbetween ligand atoms and receptor atoms.\nWhen msms surface for ligand is displayed, spheres are displayed only on the receptor\n(Hbonds are displayed as small green spheres)",
                     'wcfg':{'text':"hydrogen bonds",
                             'variable':self.showHbatSpheres},
                     'command': self.updateHBonds,
-                    'gridcfg':{'sticky':Tkinter.W, 'row':-1, 'column':2}})
+                    'gridcfg':{'sticky':tkinter.W, 'row':-1, 'column':2}})
         ifd.append({'name':'vdwPercentCutoff',
                     'widgetType':ThumbWheel,
                     'tooltip': "used in finding 'close atoms' which are closer than:\ndistance = (atom1.vdw+atom2.vdw)*scaling_factor\n(smaller values find fewer contacts; larger values more)",
@@ -2423,38 +2423,38 @@ class ADShowBindingSite(MVCommand):
                              'value':1.0, 'continuous':0, 'oneTurn':2,
                              'wheelPad':2, 'height':20},
                     'gridcfg':{'sticky':'e', 'columnspan':3}})
-        ifd.append({'widgetType':Tkinter.Label,
+        ifd.append({'widgetType':tkinter.Label,
                     'tooltip': 'set residues for which to display extruded secondary structure',
                     'wcfg': {'text':"display ribbon for:"},
                     'gridcfg':{'sticky':'w'} })
         ifd.append({'name': 'ssCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': 'display ribbon secondary structure for sequences of >3\nresidues in receptor with atoms close to ligand atoms.\ngaps of 1 residue are allowed',
                     'wcfg':{'text':"near residues",
                             'variable':self.showSS},
                     'command': self.showHideSecondaryStructure, 
                     'gridcfg':{'sticky':'e'}})
         ifd.append({'name': 'ssALLCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': 'display ribbon secondary structure/nfor all residues in receptor',
                     'wcfg':{'text':"for all residues",
                             'variable':self.showMM},
                     'command': self.updateMM, 
                     'gridcfg':{'sticky':'e', 'row':-1, 'column':1}})
         ifd.append({'name': 'ssOtherCB',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'tooltip': "read in a different molecule for receptor secondary structure\n(useful for AD4 dockings 'missing' flexible residues in receptor)",
                     'wcfg':{'text':"open other file", 'relief':'flat'},
                     'command': self.openOtherMM, 
-                    'gridcfg':{'sticky':Tkinter.EW, 'row':-1, 'column':2}})
+                    'gridcfg':{'sticky':tkinter.EW, 'row':-1, 'column':2}})
         ifd.append({'name': 'resLabCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': "display labels on all residues in 'receptor' which have\none or more atoms close to an atom in the 'ligand'",
                     'wcfg':{'text':"display labels on residues",
                             'variable':self.showResLabels},
                     'command': self.updateResLabels,
-                    'gridcfg':{'sticky':Tkinter.W, 'columnspan':3}})
-        ifd.append({'widgetType':Tkinter.Label,
+                    'gridcfg':{'sticky':tkinter.W, 'columnspan':3}})
+        ifd.append({'widgetType':tkinter.Label,
                     'tooltip': 'print list of residue contacts in python shell',
                     'wcfg': {'text':"output list of:"},
                     'gridcfg':{'sticky':'w'} })
@@ -2468,38 +2468,38 @@ class ADShowBindingSite(MVCommand):
                     },
             'gridcfg':{'sticky':'w', 'row':-1, 'column':1, 'columnspan':2}})
         ifd.append({'name': 'piLabCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': "display pi-pi interactions between 'ligand' and 'receptor'. Note: initial calculation is slow...",
                     'wcfg':{'text':"display pi-pi interactions",
                             'variable':self.showPiPi},
                     'command': self.updatePiPi,
-                    'gridcfg':{'sticky':Tkinter.W}})
+                    'gridcfg':{'sticky':tkinter.W}})
         ifd.append({'name': 'piCationLabCB',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'tooltip': "display cation-pi and pi-cation interactions between 'ligand' and 'receptor'. Note: initial calculation is slow...",
                     'wcfg':{'text':"display pi-cation interactions",
                             'variable':self.showPiCation},
                     'command': self.updatePiCation,
-                    'gridcfg':{'sticky':Tkinter.W, 'row':-1, 'column':2}})
+                    'gridcfg':{'sticky':tkinter.W, 'row':-1, 'column':2}})
         ifd.append({'name': 'revertB',
-                    'widgetType': Tkinter.Button,
+                    'widgetType': tkinter.Button,
                     'text':'Revert',
                     'tooltip': "Revert to previous display and destroy this form....",
                     'wcfg':{'bd':4,'state':'disabled'},
                     'gridcfg':{'sticky':'nesw'},
                     'command':self.revert})
         ifd.append({'name': 'closeB',
-                    'widgetType': Tkinter.Button,
+                    'widgetType': tkinter.Button,
                     'text':'Close',
                     'tooltip': "Destroy this form.\nIt will be rebuilt if you change the conformation\nUse 'Edit->Undo ADanalyze_showBindingSiteInteractions' to restore...",
                     'wcfg':{'bd':4},
                     'gridcfg':{'sticky':'nesw', 'row':-1, 'column':1},
                     'command':self.close})
         ifd.append({'name': 'saveButton',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Save Image'},
                     'command': self.save,
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1,'column':2}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1,'column':2}})
         self.displayform = self.vf.getUserInput(self.ifd, modal=0, blocking=0)
         self.displayform.root.protocol('WM_DELETE_WINDOW',self.close)
         e = self.ifd.entryByName['sphere_type']['widget']._entryfield
@@ -2558,22 +2558,22 @@ class ADShowBindingSite(MVCommand):
 
 
     def print_macro_residue_contacts(self, event=None):
-        print "\n\nresidues in 'receptor'-> 'ligand' residues in close contact"
+        print("\n\nresidues in 'receptor'-> 'ligand' residues in close contact")
         self.intDescr.print_macro_residue_contacts()
-        print "\n"
+        print("\n")
 
 
     def print_ligand_residue_contacts(self, event=None):
-        print "\n\nresidues in 'ligand'-> 'receptor' residues in close contact"
+        print("\n\nresidues in 'ligand'-> 'receptor' residues in close contact")
         self.intDescr.print_ligand_residue_contacts()
-        print "\n"
+        print("\n")
 
 
     def print_hydrogen_bonds(self, event=None):
         if not hasattr(self.docking.ligMol, 'vina_result') or self.docking.ligMol.vina_result==False:
-            print "\n\nhydrogen bonds (donor residue->acceptor residue(s))"
+            print("\n\nhydrogen bonds (donor residue->acceptor residue(s))")
             self.intDescr.print_hb_residue()
-            print "\n"
+            print("\n")
 
 
     def updateMsms(self):
@@ -2721,7 +2721,7 @@ class ADShowBindingSite(MVCommand):
                     'ProteinLabels', 'ResidueLabels', 'nobnds', 'balls', 'bondorder', 'lines', 'CAballs']
             displayed_atoms = AtomSet()
             gc = ss_macro.geomContainer
-            for k in gc.atoms.keys():
+            for k in list(gc.atoms.keys()):
                 if not k in keys_to_exclude:
                     displayed_atoms += gc.atoms[k].findType(Atom)
             if len(displayed_atoms)!= len(ss_macro.allAtoms):
@@ -2973,13 +2973,13 @@ class ADShowBindingSite(MVCommand):
             if len(cation_pi):
                 for first,second in cation_pi: 
                     #either (atom, list of atoms) OR (list, atom)
-                    if type(first)==types.ListType:
+                    if type(first)==list:
                         center1 = (numpy.add.reduce(AtomSet(first).coords)/len(first)).tolist()
                         radii.append(0.7)
                     else:
                         center1 = (first.coords)
                         radii.append(0.1)
-                    if type(second)==types.ListType:
+                    if type(second)==list:
                         center2 = (numpy.add.reduce(AtomSet(second).coords)/len(second)).tolist()
                         radii.append(0.7)
                     else:
@@ -2997,13 +2997,13 @@ class ADShowBindingSite(MVCommand):
             ctr = 0
             if len(pi_cation):
                 for first,second in pi_cation: #either (atom, list of atoms)
-                    if type(first)==types.ListType:
+                    if type(first)==list:
                         center1 = (numpy.add.reduce(AtomSet(first).coords)/len(first)).tolist()
                         radii.append(0.7)
                     else:
                         center1 = (first.coords)
                         radii.append(0.1)
-                    if type(second)==types.ListType:
+                    if type(second)==list:
                         center2 = (numpy.add.reduce(AtomSet(second).coords)/len(second)).tolist()
                         radii.append(0.7)
                     else:
@@ -3157,49 +3157,49 @@ class ADMakeAllGrids(MVCommand):
             dlgstr = ': ' + d.dlo_list[-1].filename
             ifd = self.ifd= InputFormDescr(title='Visualize AutoGrids'+dlgstr)
             ifd.append({'name': 'macroLab',
-                        'widgetType':Tkinter.Label,
+                        'widgetType':tkinter.Label,
                         'text':macroLab,
-                        'gridcfg':{'sticky':Tkinter.W, 'columnspan':3}})
+                        'gridcfg':{'sticky':tkinter.W, 'columnspan':3}})
             ifd.append({'name': 'centerLab',
-                        'widgetType':Tkinter.Label,
+                        'widgetType':tkinter.Label,
                         'text':'center: ',
-                        'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':3,
+                        'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':3,
                             'columnspan':2}})
             ifd.append({'name': 'nptsLab',
-                        'widgetType':Tkinter.Label,
+                        'widgetType':tkinter.Label,
                         'text':'number of points: ',
-                        'gridcfg':{'sticky':Tkinter.W, 'columnspan':3}})
+                        'gridcfg':{'sticky':tkinter.W, 'columnspan':3}})
             ifd.append({'name': 'spaceLab',
-                        'widgetType':Tkinter.Label,
+                        'widgetType':tkinter.Label,
                         'text':'spacing: ',
                         #'gridcfg':{'sticky':Tkinter.W, 'columnspan':5}})
-                        'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':3,
+                        'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':3,
                             'columnspan':2}})
-            ifd.append({'widgetType': Tkinter.Label,
+            ifd.append({'widgetType': tkinter.Label,
                         'text':'___________________________________________________',
                         'wcfg':{'bd':6},
-                        'gridcfg':{'sticky':Tkinter.W, 'columnspan':4}})
-            ifd.append({'widgetType': Tkinter.Label,
+                        'gridcfg':{'sticky':tkinter.W, 'columnspan':4}})
+            ifd.append({'widgetType': tkinter.Label,
                         'text':'Display\nMap',
                         'wcfg':{'bd':6},
-                        'gridcfg':{'sticky':Tkinter.W}})
-            ifd.append({'widgetType': Tkinter.Label,
+                        'gridcfg':{'sticky':tkinter.W}})
+            ifd.append({'widgetType': tkinter.Label,
                         'text':'Sampling',
-                        'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':1}})
-            ifd.append({'widgetType': Tkinter.Label,
+                        'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':1}})
+            ifd.append({'widgetType': tkinter.Label,
                         'text':'IsoValue',
                         'wcfg':{'bd':6},
-                        'gridcfg':{'sticky':Tkinter.W+Tkinter.E,
+                        'gridcfg':{'sticky':tkinter.W+tkinter.E,
                              'row':-1,'column':2,'columnspan':2}})
-            ifd.append({'widgetType': Tkinter.Label,
+            ifd.append({'widgetType': tkinter.Label,
                         'text':'RenderMode',
                         'wcfg':{'bd':6},
-                        'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':4}})
+                        'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':4}})
             ifd.append({'name': 'closeB',
-                'widgetType': Tkinter.Button,
+                'widgetType': tkinter.Button,
                 'text':'Close',
                 'wcfg':{'bd':4},
-                'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'columnspan':6},
+                'gridcfg':{'sticky':tkinter.E+tkinter.W, 'columnspan':6},
                 'command':self.Close_cb})
             self.form = self.vf.getUserInput(self.ifd, modal=0,blocking=0)
             self.form.root.protocol('WM_DELETE_WINDOW',self.Close_cb)
@@ -3272,7 +3272,7 @@ class ADMakeAllGrids(MVCommand):
             raise IOError
         else:
             kw['ask'] = ask
-            return apply(self.doitWrapper, (gridFile,), kw)
+            return self.doitWrapper(*(gridFile,), **kw)
 
 
     def doit(self, gridFile, **kw):
@@ -3281,7 +3281,7 @@ class ADMakeAllGrids(MVCommand):
         if hasattr(d,'ligMol') and hasattr(d.ligMol, 'vina_energy'):
             self.vf.warningMsg('Current docking is a vina result. Visualizing grids is not possible.')
             return "ERROR"
-        if self.vf.grids.has_key(gridFile): 
+        if gridFile in self.vf.grids: 
             newGrid = self.vf.grids[gridFile]
         else:
             if os.path.exists(gridFile):
@@ -3362,7 +3362,7 @@ class ADGetOutput(MVCommand):
     def guiCallback(self):
         """called each time the 'get output' button is pressed"""
         #THIS SHOULD BE A LIST BOX OF CURRENT DOCKING DICTIONARIES
-        entries = self.vf.dockings.keys()
+        entries = list(self.vf.dockings.keys())
         if len(entries)==0:
             self.vf.warningMsg('Please Read a Docking Log First')
             return
@@ -3497,7 +3497,7 @@ class ADSelectDLG(MVCommand):
             for item in ['displayLines','showMolecules']:
                 if not hasattr(self.vf, item):
                     self.vf.loadCommand('displayCommands', item, 'Pmv')
-        if 'Player GUI' not in self.vf.userpref.keys():
+        if 'Player GUI' not in list(self.vf.userpref.keys()):
             doc = """Use StatesPlayerWidget or ConformationPlayer to
             visualized docked structures. Default value is 'StatesPlayerWidget'"""
             self.vf.userpref.add('Player GUI', 'ConformationPlayer', 
@@ -3516,7 +3516,7 @@ class ADSelectDLG(MVCommand):
 
     def guiCallback(self):
         """called each time the 'select docking logfile ' button is pressed"""
-        entries = self.vf.dockings.keys()
+        entries = list(self.vf.dockings.keys())
         if not len(entries):
             self.vf.warningMsg('No docking logs have been read')
             return
@@ -3577,7 +3577,7 @@ class ADDeleteDLG(MVCommand):
 
     def guiCallback(self):
         """called each time the 'delete docking logfile ' button is pressed"""
-        entries = self.vf.dockings.keys()
+        entries = list(self.vf.dockings.keys())
         if not len(entries):
             self.vf.warningMsg('No docking logs have been read')
             return
@@ -3598,8 +3598,8 @@ class ADDeleteDLG(MVCommand):
 
     def doit(self, dockingKey):
         """selected key into self.vf.dockings"""
-        if not dockingKey in self.vf.dockings.keys():
-            raise KeyError, dockingKey + " is not a docking in viewer"
+        if not dockingKey in list(self.vf.dockings.keys()):
+            raise KeyError(dockingKey + " is not a docking in viewer")
         docking = self.vf.dockings[dockingKey]
         if hasattr(self.vf.ADanalyze_showDockingsAsSpheres, 'keys'):
             for k in self.vf.ADanalyze_showDockingsAsSpheres.keys:
@@ -3623,16 +3623,16 @@ class ADDeleteDLG(MVCommand):
         #        self.vf.ADanalyze_showHistogram.canvas.delete(item)
         #        self.vf.ADanalyze_showHistogram.close()
         #        self.vf.ADanalyze_showHistogram.canvas.config({'height':450,'width':660})
-        if self.vf.dockings.has_key(dockingKey):
+        if dockingKey in self.vf.dockings:
             del self.vf.dockings[dockingKey]
         if docking==self.vf.docked: 
-            if len(self.vf.dockings.keys()):
-                key = self.vf.dockings.keys()[0]
+            if len(list(self.vf.dockings.keys())):
+                key = list(self.vf.dockings.keys())[0]
                 self.vf.docked = self.vf.dockings[key]
             else:
                 self.vf.docked = None
-        elif self.vf.docked is None and len(self.vf.dockings.keys()):
-            self.vf.docked = self.vf.dockings.values()[0]
+        elif self.vf.docked is None and len(list(self.vf.dockings.keys())):
+            self.vf.docked = list(self.vf.dockings.values())[0]
             
 
 
@@ -3681,7 +3681,7 @@ class ADGetDirDLGs(MVCommand):
         \ndlgDir --- directory containing any number of docking log files
         makeOneDocking --- whether to compile all dlg results into one Docking object with 1 list of conformations and ability to do clustering if not, a separate Docking is created for each docking logfile.
         """
-        apply(self.doitWrapper, (dlgDir, makeOneDocking,), kw)
+        self.doitWrapper(*(dlgDir, makeOneDocking,), **kw)
 
 
     def doit(self, dlgDir, makeOneDocking, **kw):
@@ -3692,7 +3692,7 @@ class ADGetDirDLGs(MVCommand):
             dlgList.sort()
             kw = {'log':0}
             for dlgName in dlgList:
-                apply(self.vf.ADanalyze_readDLG,(dlgName, makeOneDocking,), kw)
+                self.vf.ADanalyze_readDLG(*(dlgName, makeOneDocking,), **kw)
         self.vf.setUserPreference(('Warning Message Format', oldPref))
                     
 
@@ -3721,7 +3721,7 @@ class ADGetDLG(MVCommand):
         if hasattr(obj, 'docking') and hasattr(obj, 'torTree'):
             #clean-up self.vf.dockings:
             remove_keys = []
-            for k, v in self.vf.dockings.items():
+            for k, v in list(self.vf.dockings.items()):
                 if v==obj.docking:
                     remove_keys.append(k)
             for k in remove_keys:
@@ -3754,10 +3754,10 @@ class ADGetDLG(MVCommand):
             del obj.docking
 
             #try to clean-out torTree reference
-            for key in obj.torTree.rootNode.__dict__.keys():
+            for key in list(obj.torTree.rootNode.__dict__.keys()):
                 obj.torTree.rootNode.__dict__[key] = None
             for item in obj.torTree.torsionMap:
-                for key in item.__dict__.keys():
+                for key in list(item.__dict__.keys()):
                     item.__dict__[key] = None
             del obj.torTree
 
@@ -3779,7 +3779,7 @@ class ADGetDLG(MVCommand):
                 self.vf.colorByMolecules(mol,['lines'], topCommand=0, redraw=1)
             else:
                 self.vf.colorByAtomType(mol,['lines'], topCommand=0)
-                aromaticCs = AtomSet(filter(lambda x: x.autodock_element=='A',mol.allAtoms))
+                aromaticCs = AtomSet([x for x in mol.allAtoms if x.autodock_element=='A'])
                 if len(aromaticCs):
                     self.vf.color(aromaticCs,((0.,1.,0.),),['lines'],topCommand=0, redraw=1)
                 mol.colored=1
@@ -3824,7 +3824,7 @@ class ADGetDLG(MVCommand):
                     return 'ERROR'
             kw = {}
             ask = 1
-            apply( self.doitWrapper, (dlgFile, addToPrevious,ask),  kw)
+            self.doitWrapper(*(dlgFile, addToPrevious,ask), **kw)
 
 
     def __call__(self, dlgFile, addToPrevious=0, ask=1, **kw):
@@ -3832,7 +3832,7 @@ class ADGetDLG(MVCommand):
         \ndlgFile --- docking log file
         \naddToPrevious --- if 0, start a new Docking otherwise add docked conformations to a previous docking
         """
-        apply(self.doitWrapper, (dlgFile, addToPrevious, ask,), kw) 
+        self.doitWrapper(*(dlgFile, addToPrevious, ask,), **kw) 
 
 
     def doit(self, dlgFile, addToPrevious, ask):
@@ -3844,9 +3844,9 @@ class ADGetDLG(MVCommand):
             p = XMLParser()
             if not addToPrevious or not self.vf.docked:
                 d = self.vf.docked = Docking(parser=p)
-                print isinstance(d.parser, XMLParser)
+                print(isinstance(d.parser, XMLParser))
             if not isinstance(self.vf.docked.parser, XMLParser):
-                print "unable to add xml result to previous result"
+                print("unable to add xml result to previous result")
                 return "ERROR"
             d.readXMLResults(dlgFile)
         else:
@@ -3878,15 +3878,15 @@ class ADGetDLG(MVCommand):
 
         #FIX THIS:
         d2 = self.vf.dockings
-        if d not in d2.values():
+        if d not in list(d2.values()):
             filename = os.path.basename(dlgFile)
-            if filename in d2.keys():
+            if filename in list(d2.keys()):
                 #fix this: could be >1 duplicate
-                filename = filename + '_' + str(len(d2.keys()))
+                filename = filename + '_' + str(len(list(d2.keys())))
             d2[filename] = d
         else:
-            ind = d2.values().index(d)
-            filename = d2.keys()[ind]
+            ind = list(d2.values()).index(d)
+            filename = list(d2.keys())[ind]
 
         #if hasattr(self.vf.ADanalyze_showHistogram, 'canvas'):
         #    l = self.vf.ADanalyze_showHistogram.canvas.find_all()
@@ -3976,16 +3976,16 @@ class ADLoadVinaResult(MVCommand):
                     if g:
                         g.Set(labels = (str(m.vina_results[ind][0]),))
                     if ind==0:
-                        print "over-all best vina_energy=", m.vina_results[ind][0]
+                        print("over-all best vina_energy=", m.vina_results[ind][0])
                     else:
-                        print ind+1," vina_energy=", m.vina_results[ind][0]
+                        print(ind+1," vina_energy=", m.vina_results[ind][0])
                     if hasattr(m, 'bindingSite'):
                         delattr(m, 'bindingSite')
                         c = self.vf.ADanalyze_showBindingSite
                         c.build()
                 else:
                     #print "OFF THE END!!"
-                    print 'end: last vina result for ', m.name
+                    print('end: last vina result for ', m.name)
                 event = EditAtomsEvent('coords', m.allAtoms)
                 self.vf.dispatchEvent(event)
                     #print " end "#, ind, "  vina_energy =", m.vina_results[-1][0]
@@ -4007,16 +4007,16 @@ class ADLoadVinaResult(MVCommand):
                         g.Set(labels = (str(m.vina_results[ind][0]),))
                     #print "LEFT: vina_results[",ind,"][0]=", m.vina_results[ind][0]
                     if ind==0:
-                        print "over-all best vina_energy=", m.vina_results[ind][0]
+                        print("over-all best vina_energy=", m.vina_results[ind][0])
                     else:
-                        print ind+1," vina_energy=", m.vina_results[ind][0]
+                        print(ind+1," vina_energy=", m.vina_results[ind][0])
                     if hasattr(m, 'bindingSite'):
                         delattr(m, 'bindingSite')
                         c = self.vf.ADanalyze_showBindingSite
                         c.build()
                 else:
                     #print "LESS THAN ZERO!!"
-                    print 'first: best vina result for ', m.name
+                    print('first: best vina result for ', m.name)
                     #print " at first"
                     #print " over-all best vina_energy=", m.vina_results[0][0]
                 event = EditAtomsEvent('coords', m.allAtoms)
@@ -4026,7 +4026,7 @@ class ADLoadVinaResult(MVCommand):
     def guiCallback(self):
         """called each time the 'select docking logfile' button is pressed"""
         if not hasattr(self, 'modelsAs'):
-            self.modelsAs = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.modelsAs = tkinter.IntVar(master=self.vf.GUI.ROOT)
 
         pdbqtFile = self.vf.askFileOpen(types=[('select vina result filename:', '*.pdbqt'),
                             ('all files','*')],
@@ -4040,14 +4040,14 @@ class ADLoadVinaResult(MVCommand):
             ifd = InputFormDescr(title="Load MODELS as:")
             ifd.append({'name': 'ModelsAsMols',
                 'text': 'separate molecules',
-                'widgetType':Tkinter.Radiobutton,
+                'widgetType':tkinter.Radiobutton,
                 'tooltip':'Check this button to add a separate molecule for each model',
                 'variable': self.modelsAs,
                 'value': '1',
                 'text': 'Multiple molecules            ',
                 'gridcfg': {'sticky':'w'}})
             ifd.append({'name': 'ModelsAsConfs',
-                'widgetType':Tkinter.Radiobutton,
+                'widgetType':tkinter.Radiobutton,
                 'tooltip':'Check this button to add a single molecule\nwith a separate conformation for each model',
                 'variable': self.modelsAs,
                 'value': '0',
@@ -4058,7 +4058,7 @@ class ADLoadVinaResult(MVCommand):
             ans = d['ModelsAsMols']
             if ans>0: modelsAs = 'molecules'
             #self.vf.readMolecule(pdbqtFile)
-            apply( self.doitWrapper, (pdbqtFile, modelsAs), {})
+            self.doitWrapper(*(pdbqtFile, modelsAs), **{})
 
 
     def __call__(self, pdbqtFile, modelsAs='conformations', **kw):
@@ -4066,7 +4066,7 @@ class ADLoadVinaResult(MVCommand):
         \npdbqtFile --- vina result file
         \nmodelsAs --- if 'molecules', a new molecule is added for each result otherwise a single molecule with multiple conformations is built
         """
-        apply(self.doitWrapper, (pdbqtFile, modelsAs), kw) 
+        self.doitWrapper(*(pdbqtFile, modelsAs), **kw) 
 
 
     def doit(self, pdbqtFile, modelsAs='conformations', setupUpdates=1):
@@ -4100,7 +4100,7 @@ class ADLoadVinaResult(MVCommand):
             self.warningMsg(msg)
         #set up label by vina_energy etc
         self.vf.labelByProperty(mols, properties = ['vina_energy'], font={'fontScales':(.5,.5,.5)})
-        print "over-all best vina_energy=", m.vina_results[0][0]
+        print("over-all best vina_energy=", m.vina_results[0][0])
 
         
 
@@ -4143,7 +4143,7 @@ class ClusterDockingChooser(MoleculeChooser):
         if not hasattr(d, 'clusterer'):
             self.vf.warningMsg('current docking has no clusterer')
             return
-        if not len(d.clusterer.clustering_dict.keys()):
+        if not len(list(d.clusterer.clustering_dict.keys())):
             self.vf.warningMsg('current clusterer has no clusterings')
             return
         #FIX THIS: add choice of possible keys
@@ -4151,7 +4151,7 @@ class ClusterDockingChooser(MoleculeChooser):
         #rmstol = self.vf.dpo['rmstol']['value']
         #rmstol = thisDLO.dpo['rmstol']['value']
         #FIX THIS:???
-        rmstol = d.clusterer.clustering_dict.keys()[0]
+        rmstol = list(d.clusterer.clustering_dict.keys())[0]
         cluList = d.clusterer.clustering_dict[rmstol]
         #cluList = d.ch.clusterer.clustering_dict[rmstol]
         #cluList = d.ch.conformations
@@ -4237,13 +4237,13 @@ class ClusterDockingChooser(MoleculeChooser):
                             #'text':'Show Conformation',
                             #'gridcfg':{'sticky': Tkinter.E+Tkinter.W,'columnspan':2},
                             #'command':self.show_cb})
-            self.ifd.append({'widgetType':Tkinter.Button,
+            self.ifd.append({'widgetType':tkinter.Button,
                             'text':'Write Current Coords',
-                            'gridcfg':{'sticky': Tkinter.E+Tkinter.W,'columnspan':2},
+                            'gridcfg':{'sticky': tkinter.E+tkinter.W,'columnspan':2},
                             'command':self.save_cb})
-            self.ifd.append({'widgetType':Tkinter.Button,
+            self.ifd.append({'widgetType':tkinter.Button,
                             'text':'Dismiss',
-                            'gridcfg':{'sticky': Tkinter.E+Tkinter.W,'columnspan':2},
+                            'gridcfg':{'sticky': tkinter.E+tkinter.W,'columnspan':2},
                             'command':self.done_cb})
         #self.bindPickingCallback(event)
         from Pmv.picker import AtomPicker
@@ -4296,15 +4296,15 @@ class ClusterDockingChooser(MoleculeChooser):
         else:
             confName = split(lc.entries[ind][0])[1]
             #names are '1_1' etc
-            clu, rank = map(int, split(confName,'_'))
+            clu, rank = list(map(int, split(confName,'_')))
             clusterer = self.vf.docked.clusterer
             #FIX THIS: it lets you only look at first rms clustering
-            clu_keys = clusterer.clustering_dict.keys()
+            clu_keys = list(clusterer.clustering_dict.keys())
             if not len(clu_keys):
                 t = 'No Clusterings available:Make a clustering first!'
                 self.vf.warningMsg(t)
                 return
-            rmstol = clusterer.clustering_dict.keys()[0]
+            rmstol = list(clusterer.clustering_dict.keys())[0]
             clustering = clusterer.clustering_dict[rmstol]
             conf = clustering[clu-1][rank-1]
             dockedMol.docking.ch.set_conformation(conf)
@@ -4357,7 +4357,7 @@ class ClusterDockingChooser(MoleculeChooser):
             ctr=0
             for i in range(len(ligandlines)):
                 item = ligandlines[i]
-                print item
+                print(item)
                 if find(item,'ATOM')!=0 and find(item, 'HETATM') !=0:
                     outstring = item + '\n'
                 else:
@@ -4439,7 +4439,7 @@ class ModelDockingChooser(MoleculeChooser):
                             'mode':self.mode,
                             'entries':entries})
         if not (modal or blocking):
-            self.ifd.append({'widgetType':Tkinter.Button,
+            self.ifd.append({'widgetType':tkinter.Button,
                             'text':'Dismiss',
                             'command':self.done_cb})
         self.bindPickingCallback(event)
@@ -4520,45 +4520,45 @@ class ADDrawHistogram(MVCommand):
             self.buttons = {}
             ifd = self.ifd= InputFormDescr(title='Visualize Results Histogram')
             ifd.append({'name': 'histCanvas',
-                        'widgetType':Tkinter.Canvas,
+                        'widgetType':tkinter.Canvas,
                         'wcfg':{'width':450,
                             'height':450,
                             'bg':'white'},
-                        'gridcfg':{'sticky':Tkinter.W, 'columnspan':4}})
+                        'gridcfg':{'sticky':tkinter.W, 'columnspan':4}})
             ifd.append({'name': 'quitButton',
-                        'widgetType':Tkinter.Button,
+                        'widgetType':tkinter.Button,
                         'text':'Close',
                         'command': self.close,
-                        'gridcfg':{'sticky':Tkinter.W+Tkinter.E}})
+                        'gridcfg':{'sticky':tkinter.W+tkinter.E}})
             ifd.append({'name': 'resetButton',
-                        'widgetType':Tkinter.Button,
+                        'widgetType':tkinter.Button,
                         'text':'Reset Ligand',
                         'command': self.reset,
-                        'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1,'column':1}})
+                        'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1,'column':1}})
             ifd.append({'name': 'infoButton',
-                        'widgetType':Tkinter.Button,
+                        'widgetType':tkinter.Button,
                         'text':'Info...',
                         'command': self.info,
-                        'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1,'column':2}})
+                        'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1,'column':2}})
             ifd.append({'name': 'saveButton',
-                        'widgetType':Tkinter.Button,
+                        'widgetType':tkinter.Button,
                         'text':'Write as postscript ',
                         'command': self.savePS,
-                        'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1,'column':3}})
+                        'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1,'column':3}})
             self.form = self.vf.getUserInput(self.ifd, modal=0,blocking=0)
             self.form.root.protocol('WM_DELETE_WINDOW',self.close)
             self.canvas=self.ifd.entryByName['histCanvas']['widget']
-            Tkinter.Widget.bind(self.canvas,"<Button-1>", self.MouseDown)
-            Tkinter.Widget.bind(self.canvas,"<Button1-ButtonRelease>", self.MouseUp)
-            Tkinter.Widget.bind(self.canvas,"<ButtonPress-2>", self.showInfo)
-            Tkinter.Widget.bind(self.canvas,"<ButtonRelease-2>", self.hideInfo)
+            tkinter.Widget.bind(self.canvas,"<Button-1>", self.MouseDown)
+            tkinter.Widget.bind(self.canvas,"<Button1-ButtonRelease>", self.MouseUp)
+            tkinter.Widget.bind(self.canvas,"<ButtonPress-2>", self.showInfo)
+            tkinter.Widget.bind(self.canvas,"<ButtonRelease-2>", self.hideInfo)
             ifd2=self.ifd2=InputFormDescr(title='Docked Conformation Info')
             ifd2.append({'name': 'histText',
-                        'widgetType':Tkinter.Text,
+                        'widgetType':tkinter.Text,
                         'wcfg':{'width':60,
                             'height':10, 
                             'bg':'white'},
-                        'gridcfg':{'sticky':Tkinter.W, 'columnspan':3}})
+                        'gridcfg':{'sticky':tkinter.W, 'columnspan':3}})
             self.form2 = self.vf.getUserInput(self.ifd2, modal=0,blocking=0)
             self.histText=self.ifd2.entryByName['histText']['widget']
             self.form2.root.withdraw()
@@ -4591,7 +4591,7 @@ class ADDrawHistogram(MVCommand):
         j = int(l[1])
         #FIX THIS
         #thisDLO = self.vf.docked.dlo_list[-1]
-        cluster_list = self.vf.docked.clusterer.clustering_dict.values()[0]
+        cluster_list = list(self.vf.docked.clusterer.clustering_dict.values())[0]
         return cluster_list[i][j]
         #return self.vf.docked.cluster_list[i][j]
         #for item in self.vf.docked.ch.conformations:
@@ -4612,7 +4612,7 @@ class ADDrawHistogram(MVCommand):
         self.lastx = self.startx = self.canvas.canvasx(event.x)
         self.lasty = self.starty = self.canvas.canvasy(event.y)
         self.currentObject= self.canvas.find_closest(self.startx,self.starty)[0]
-        if self.currentObject in self.buttons.keys():
+        if self.currentObject in list(self.buttons.keys()):
             nstr=self.buttons[self.currentObject]
             docked = self.getDocking(nstr)
             if docked:
@@ -4641,12 +4641,12 @@ class ADDrawHistogram(MVCommand):
         docked = self.vf.docked
         ch = docked.ch
         ligMol = docked.ligMol
-        if self.selObj in self.buttons.keys():
+        if self.selObj in list(self.buttons.keys()):
             self.canvas.itemconfig(self.selObj, width=2)
             nstr=self.buttons[self.selObj]
-            nl=map(lambda x:x.name, self.vf.Mols)
-            cluNum, rank = map(int,split(nstr, '_'))
-            cluster = docked.clusterer.clustering_dict.values()[0][cluNum]
+            nl=[x.name for x in self.vf.Mols]
+            cluNum, rank = list(map(int,split(nstr, '_')))
+            cluster = list(docked.clusterer.clustering_dict.values())[0][cluNum]
             #cluster = docked.cluster_list.data[cluNum]
             conf = cluster[rank]
             allAtoms = ligMol.allAtoms
@@ -4674,13 +4674,13 @@ class ADDrawHistogram(MVCommand):
     def MouseUp(self, event):
         self.lastx = self.canvas.canvasx(event.x)
         self.lasty = self.canvas.canvasy(event.y)
-        if self.selObj and self.selObj in self.buttons.keys():
+        if self.selObj and self.selObj in list(self.buttons.keys()):
             self.canvas.itemconfig(self.selObj, width=1)
 
 
     def getEnergyText(self,i):
         #FIX THIS
-        cluster = self.vf.docked.clusterer.clustering_dict.values()[0][i]
+        cluster = list(self.vf.docked.clusterer.clustering_dict.values())[0][i]
         #cluster = self.vf.docked.cluster_list[i]
         #cluster = self.vf.docked.ch.conformations[i]
         if i==0:
@@ -4708,7 +4708,7 @@ class ADDrawHistogram(MVCommand):
     def getButton(self,docked,i,j):
         #docked is cluster[i].member[j]
         #FIX THIS
-        cluster = self.vf.docked.clusterer.clustering_dict.values()[0][i]
+        cluster = list(self.vf.docked.clusterer.clustering_dict.values())[0][i]
         colorText = cluster.colorText
         #colorText = self.vf.docked.ch.conformations[docked.rank-1].colorText
         y0=self.yoffset-j*self.indHeight
@@ -4732,7 +4732,7 @@ class ADDrawHistogram(MVCommand):
             self.vf.warningMsg('Please cluster Docking First')
             return
         if hasattr(self.vf.docked, 'clusterer') and \
-                len(self.vf.docked.clusterer.clustering_dict.keys())==0:
+                len(list(self.vf.docked.clusterer.clustering_dict.keys()))==0:
             return
         #delete oldstuff first??
         l= self.canvas.find_all()
@@ -4740,7 +4740,7 @@ class ADDrawHistogram(MVCommand):
             self.canvas.delete(item)
         colorCtr=0
         #FIX THIS
-        cList=self.vf.docked.clusterer.clustering_dict.values()[0]
+        cList=list(self.vf.docked.clusterer.clustering_dict.values())[0]
         #cList=self.vf.docked.cluster_list
         if len(cList):
             #determine how long canvas has to be...
@@ -4751,7 +4751,7 @@ class ADDrawHistogram(MVCommand):
             #determine how wide canvas has to be...
             #num_members = self.getArray(cList)
             #maxNumMembers = numpy.maximum.reduce(num_members)
-            num_members = map(lambda x: len(x), cList)
+            num_members = [len(x) for x in cList]
             maxNumMembers = max(num_members)
             num_membersSum = numpy.add.reduce(numpy.array(num_members))
             nWidth = 100 + maxNumMembers*40
@@ -4841,24 +4841,24 @@ class ADMacroLigandChart(MVCommand):
         #for sort: use rows' 1st entry
         #print "calling sortByRow w/column1"
         if not hasattr(self, 'sortChoice'):
-            self.sortChoice=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.sortChoice=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.sortChoice.set('row')
         if not hasattr(self, 'rowChoice'):
-            self.rowChoice=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.rowChoice=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.rowChoice.set('1')
-            self.columnChoice=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.columnChoice=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.columnChoice.set('1')
         ifd = InputFormDescr(title='Sort Options')
-        ifd.append({ 'widgetType':Tkinter.Label,
+        ifd.append({ 'widgetType':tkinter.Label,
                 'wcfg':{'text':'   '},
                 #'wcfg':{'text':'On Row or Column'},
-                'gridcfg':{'sticky':Tkinter.W+Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.W+tkinter.E}})
         ifd.append({'name': 'rowBut',
-                'widgetType':Tkinter.Radiobutton,
+                'widgetType':tkinter.Radiobutton,
                 'wcfg':{'text':'row', 
                     'value':'row',
                     'variable':self.sortChoice},
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
         #ifd.append({'name': 'colBut',
                 #'widgetType':Tkinter.Radiobutton,
                 #'wcfg':{'text':'column', 
@@ -4866,18 +4866,17 @@ class ADMacroLigandChart(MVCommand):
                     #'value':'column',
                     #'variable':self.sortChoice},
                 #'gridcfg':{'sticky':Tkinter.W, 'row': -1, 'column':1}})
-        ifd.append({ 'widgetType':Tkinter.Label,
+        ifd.append({ 'widgetType':tkinter.Label,
                 'wcfg':{'text':'Using as Keys:'},
-                'gridcfg':{'sticky':Tkinter.W+Tkinter.E}})
-        columnList=map(lambda x: 'column' + str(x),
-                    range(1,len(self.ifd.entryByColumn)))
+                'gridcfg':{'sticky':tkinter.W+tkinter.E}})
+        columnList=['column' + str(x) for x in range(1,len(self.ifd.entryByColumn))]
         ifd.append({'name': 'columnChoices',
-                'widgetType':Tkinter.Radiobutton,
+                'widgetType':tkinter.Radiobutton,
                 'listtext':columnList,
                 'defaultValue':self.columnChoice.get(),
                 'groupedBy':10,
                 'wcfg':{'variable':self.columnChoice},
-                'gridcfg':{'sticky':Tkinter.E}})
+                'gridcfg':{'sticky':tkinter.E}})
         #rowList=map(lambda x: 'row'+str(x),range(1,len(self.ifd.entryByRow)))
         #ifd.append({'name': 'rowChoices',
                 #'widgetType':Tkinter.Radiobutton,
@@ -4906,12 +4905,12 @@ class ADMacroLigandChart(MVCommand):
         else:
             dict1=self.ifd.entryByColumn
             dict2=self.ifd.entryByRow
-        d1len=len(dict1.keys())
-        d2len=len(dict2.keys())
-        d=len(dict1.keys())-len(dict2[keyNum])
+        d1len=len(list(dict1.keys()))
+        d2len=len(list(dict2.keys()))
+        d=len(list(dict1.keys()))-len(dict2[keyNum])
         for i in range(d): 
             dict2[keyNum].append([])
-        d2len=len(dict2.keys())
+        d2len=len(list(dict2.keys()))
         wList=dict2[keyNum]
         if len(wList)<d2len:wList.append([])
         keyList=[]
@@ -4943,7 +4942,7 @@ class ADMacroLigandChart(MVCommand):
         #for i in range(len(dict1.keys())):
             #self.newDict1[i]=[]
         #self.newDict1[0]=dict1[0]
-        for i in range(len(dict1.keys())):
+        for i in range(len(list(dict1.keys()))):
             newRow=sList.index(keyList[i])
             for item in dict1[i]:
                 if item!=[]:
@@ -4959,7 +4958,7 @@ class ADMacroLigandChart(MVCommand):
 
     def updateDict1(self, dict1, mapList):
         newDict={}
-        for i in range(len(dict1.keys())):
+        for i in range(len(list(dict1.keys()))):
             newindex=mapList[i]
             newDict[i]=dict1[newindex]
         return newDict
@@ -4967,7 +4966,7 @@ class ADMacroLigandChart(MVCommand):
 
     def updateDict2(self, dict2, mapList):
         newDict={}
-        for i in range(len(dict2.keys())):
+        for i in range(len(list(dict2.keys()))):
             itemList=dict2[i]
             cutoff=len(itemList)-1
             newitemList=[]
@@ -4990,7 +4989,7 @@ class ADMacroLigandChart(MVCommand):
         newLabel = llist[ok]
         for docking in self.dockingsShown:
             if hasattr(docking, 'clusterer') and hasattr(docking.clusterer, 'clustering_dict'):
-                key = docking.clusterer.clustering_dict.keys()[0]
+                key = list(docking.clusterer.clustering_dict.keys())[0]
                 conf = len(docking.clusterer.clustering_dict[key][0][0])
                 clLen = len(docking.clusterer.clustering_dict[key][0])
             else:
@@ -5026,14 +5025,14 @@ class ADMacroLigandChart(MVCommand):
         if filename:
             outf=open(filename, 'w')
         else: return
-        maxrow=len(self.labels.keys())-1
+        maxrow=len(list(self.labels.keys()))-1
         #rowKeys=self.labels.keys()
         #rowKeys.sort()
         #maxrow=rowKeys[-1]
         maxcolumn=0
-        for item in self.labels.values():
+        for item in list(self.labels.values()):
             #each item is a dictionary w/ column keys
-            itemKeys=item.keys()
+            itemKeys=list(item.keys())
             itemKeys.sort()
             maxitem=itemKeys[-1]
             if maxitem>maxcolumn: 
@@ -5044,7 +5043,7 @@ class ADMacroLigandChart(MVCommand):
             columnLabels=self.labels[i]
             outstr=''
             for j in range(maxcolumn+1):
-                if columnLabels.has_key(j):
+                if j in columnLabels:
                     outstr="%s%18.18s"%(outstr,columnLabels[j])
                 else:
                     outstr="%s%18.18s"%(outstr,spaceStr)
@@ -5066,30 +5065,30 @@ class ADMacroLigandChart(MVCommand):
         ifd = self.ifd= InputFormDescr(title='Results Chart')
         self.bButtons=[['quitButton','infoButton','sortButton','saveButton']]
         ifd.append({'name': 'cornerLabel',
-                    'widgetType':Tkinter.Label,
+                    'widgetType':tkinter.Label,
                     'wcfg':{'text':'Ligands\Macros',
                             'width':16},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E}})
         ifd.append({'name': 'quitButton',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Close'},
                     'command': self.close,
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E}})
         ifd.append({'name': 'infoButton',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':"'Lowest Energy' labels"},
                     'command': self.changeInfo,
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1,'column':1}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1,'column':1}})
         ifd.append({'name': 'sortButton',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':"Sort"},
                     'command': self.sortInfo_cb,
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1,'column':2}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1,'column':2}})
         ifd.append({'name': 'saveButton',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Write as postscript '},
                     'command': self.savePS,
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1,'column':3}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1,'column':3}})
         #These will be dictionaries w/ keys 0,1,2,3...
         self.ifd.entryByRow={}
         self.ifd.entryByColumn={}
@@ -5124,7 +5123,7 @@ class ADMacroLigandChart(MVCommand):
         elif not self.form.root.winfo_ismapped():
             self.form.root.deiconify()
         ifd2=self.ifd2=InputFormDescr(title='Select Dockings')
-        entries = self.vf.dockings.keys()
+        entries = list(self.vf.dockings.keys())
         if len(entries)>1:
             ifd2.append({'name': 'dockings',
                 'title':'Docking Logs:',
@@ -5141,11 +5140,11 @@ class ADMacroLigandChart(MVCommand):
             self.doitWrapper(entries,log=1, redraw=0)
         ifd3=self.ifd3=InputFormDescr(title='Docked Conformation Info')
         ifd3.append({'name': 'infoText',
-                    'widgetType':Tkinter.Text,
+                    'widgetType':tkinter.Text,
                     'wcfg':{'width':60,
                         'height':10, 
                         'bg':'white'},
-                    'gridcfg':{'sticky':Tkinter.W, 'columnspan':3}})
+                    'gridcfg':{'sticky':tkinter.W, 'columnspan':3}})
         self.form2 = self.vf.getUserInput(self.ifd3, modal=0,blocking=0)
         self.infoText=self.ifd3.entryByName['infoText']['widget']
         self.form2.root.withdraw()
@@ -5175,7 +5174,7 @@ class ADMacroLigandChart(MVCommand):
         #9/18: convent: mol in viewer has corrected name, button will have filename
         label=str(docking.ch.conformations[0].binding_energy)
         #label=str(docking.ch.conformations[0].lowEnergy)
-        print "checking ", macro , " vs ", self.macros
+        print("checking ", macro , " vs ", self.macros)
         if macro in self.macros:
             if ligand in self.ligands:
                 rowNum=self.ligands.index(ligand)+1
@@ -5200,7 +5199,7 @@ class ADMacroLigandChart(MVCommand):
         dict=self.ifd.entryByRow
         rnum=int(newButton.row)
         cnum=int(newButton.column)
-        if not dict.has_key(rnum):
+        if rnum not in dict:
             dict[rnum]=[]
         while len(dict[rnum])<cnum+1:
             dict[rnum].append([])
@@ -5212,7 +5211,7 @@ class ADMacroLigandChart(MVCommand):
         #FIX THIS
         rnum=int(newButton.row)
         cnum=int(newButton.column)
-        if not dict.has_key(cnum):
+        if cnum not in dict:
             dict[cnum]=[]
         while len(dict[cnum])<rnum+1:
             dict[cnum].append([])
@@ -5277,7 +5276,7 @@ class ADMacroLigandChart(MVCommand):
         #NB bestConf is a name
         currentButton=self.ifd.entryByName[label]['widget']
         mol = self.vf.Mols.NodesFromName(bestConf)[0]
-        self.hasShowHide = self.vf.commands.has_key('showMolecules')
+        self.hasShowHide = 'showMolecules' in self.vf.commands
 ##         if len(mol.geomContainer.geoms['lines'].faceSet.faces.array)==0:
         if len(mol.geomContainer.geoms['bonded'].faceSet.faces.array)==0:
             mol.buildBondsByDistance()
@@ -5298,10 +5297,10 @@ class ADMacroLigandChart(MVCommand):
 
     def showMolecule(self, molFile, event=None):
         #should the user be asked about whether to load molecule?
-        self.hasShowHide=self.vf.commands.has_key('showMolecules')
+        self.hasShowHide='showMolecules' in self.vf.commands
         rnum=rfind(molFile, '.')
         if rnum<0:
-            print "illegal name", molFile
+            print("illegal name", molFile)
             return
         molName=molFile[:rnum]
         currentButton=self.ifd.entryByName[molFile]['widget']
@@ -5364,7 +5363,7 @@ class ADMacroLigandChart(MVCommand):
             
 
     def saveLabel(self,row,column,label):
-        if self.labels.has_key(row):
+        if row in self.labels:
             self.labels[row][column]=label
         else:
             self.labels[row]={}
@@ -5386,10 +5385,10 @@ class ADMacroLigandChart(MVCommand):
                     oldRow= int(ifd.entryByName[item]['widget'].grid_info()['row'])
                 ifd.entryByName[item]['widget'].grid_forget()
         entry= {'name': '%s'%label,
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg':{'width':16, 'relief':'ridge','text':shortLabel,
                 'command':CallBackFunction(self.showMolecule,label)}, 
-            'gridcfg':{'sticky':Tkinter.E,
+            'gridcfg':{'sticky':tkinter.E,
                 'row':rowNum,'column':columnNum}}
         ifd.entryByName[entry['name']]=entry
         form.addEntry(entry)
@@ -5428,11 +5427,11 @@ class ADMacroLigandChart(MVCommand):
         bestConf=docking.ligMol.name
         #bestConf=docking.ch.conformations[0].members[0].mol.name
         entry= {'name': '%s'%label,
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg':{'width':16,'relief':'ridge',
             'command': CallBackFunction(self.chooseConformation,bestConf,label),    
                 'text':label},
-            'gridcfg':{'sticky':Tkinter.W+Tkinter.E,
+            'gridcfg':{'sticky':tkinter.W+tkinter.E,
                 'row':rowNum,'column':columnNum}} 
         ifd.entryByName[entry['name']]=entry
         form.addEntry(entry)
@@ -5554,7 +5553,7 @@ class ADDockingChooser(MVCommand):
     def doit(self, nodes):
         ##self.lastCmdLog = self.logString(nodes)
 
-        if type(nodes)==types.StringType:
+        if type(nodes)==bytes:
             nodes = self.vf.Mols.NodesFromName(nodes)
 
         if issubclass(nodes.__class__, TreeNode):
@@ -5622,7 +5621,7 @@ class ReadAutoDockStates(MVCommand):
         """None<-ADanalyze_readStates(dpfFile, trjFile)"""
         if not (dpfFile and trjFile): return 'ERROR'
         #print "call: addToPrevious=", addToPrevious, "ask=", ask
-        apply(self.doitWrapper, (dpfFile, trjFile, addToPrevious, ask), kw)   
+        self.doitWrapper(*(dpfFile, trjFile, addToPrevious, ask), **kw)   
 
 
     def getMolecule(self, molFileName, ask=1):
@@ -5739,7 +5738,7 @@ class StatesPlayerWidget:
         for item in ['colorByMolecules','colorByAtomType', 'colorByProperty']:
             if not hasattr(self.vf, item):
                 self.vf.loadCommand('colorCommands', item, 'Pmv')
-        if not self.vf.colorMaps.has_key('rgb256'):
+        if 'rgb256' not in self.vf.colorMaps:
             mod = __import__("ViewerFramework")
             VFPath = mod.__path__[0]
             self.vf.loadColorMap(os.path.join(VFPath, "ColorMaps","rgb256_map.py"), 
@@ -5747,7 +5746,7 @@ class StatesPlayerWidget:
         self.update(sequenceList, idList)
 
         if self.vf.hasGui:
-            self.doTorsionsOnly = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.doTorsionsOnly = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.form = self.buildFORM(titleStr)
         else :
             self.doTorsionsOnly = False
@@ -5776,8 +5775,8 @@ class StatesPlayerWidget:
         ##indicies in idList are 1 more than indices in sequenceList
         if not idList:
             #insert 0 for original state
-            idL = range(0, len(self.sequenceList) + 1)
-            self.idList = map(str, idL)
+            idL = list(range(0, len(self.sequenceList) + 1))
+            self.idList = list(map(str, idL))
         else:
             #or it could be explicit
             #SHOULD always be incremented by 1 so 0 can be original coords
@@ -5807,7 +5806,7 @@ class StatesPlayerWidget:
         # increment is value of increment megawidget option
 
         if not text in self.idList:
-            raise ValueError, text + ' not in current idList'
+            raise ValueError(text + ' not in current idList')
         #check whether ind+factor is in range
         newval = self.idList.index(text) + factor
         if newval<0 or newval>(len(self.idList)-1):
@@ -5827,20 +5826,20 @@ class StatesPlayerWidget:
             self.form.deiconify()
             return
         maxval = len(self.sequenceList)
-        self.rmsVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.rmsVar = tkinter.StringVar(master=self.vf.GUI.ROOT)
         self.rmsVar.set('rms(ref=0) 0.0000')
-        self.energyVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-        self.colorType = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.energyVar = tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.colorType = tkinter.StringVar(master=self.vf.GUI.ROOT)
         self.colorType.set('atom')
         ifd = mol.ifd2 = InputFormDescr(title=titleStr)
         ifd.append({'name':'energyLab',
-            'widgetType': Tkinter.Label,
+            'widgetType': tkinter.Label,
             'textvariable': self.energyVar,
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw', 'columnspan':2}})
             #'gridcfg':{'sticky':'nesw','row':-1, 'column':1}}),
         ifd.append({'name':'rmsLab',
-            'widgetType': Tkinter.Label,
+            'widgetType': tkinter.Label,
             'textvariable': self.rmsVar,
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw'}}),
@@ -5871,14 +5870,14 @@ class StatesPlayerWidget:
 		 		    'entryfield_validate': self.custom_validate },
 		 	    'gridcfg':{'sticky':'nesw', 'columnspan':2}})
         ifd.append({'name':'selectCB',
-            'widgetType': Tkinter.Checkbutton,
+            'widgetType': tkinter.Checkbutton,
             'text':'Show IdList',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw', 'columnspan':1},
             #'gridcfg':{'sticky':'nesw', 'columnspan':2},
             'command': self.showStatesList})
         ifd.append({'name': 'doTransCB',
-            'widgetType': Tkinter.Checkbutton,
+            'widgetType': tkinter.Checkbutton,
             'text':'torsions only',
             #'text':'transform torsions only',
             'variable': self.doTorsionsOnly,
@@ -5886,43 +5885,43 @@ class StatesPlayerWidget:
             'gridcfg':{'sticky':'nesw', 'row':-1,'column':1}})
             #'gridcfg':{'sticky':'nesw', 'columnspan':2}})
         ifd.append({'name': 'playB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Play Sequence',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw','columnspan':1},
             'command':self.Play_cb})
         ifd.append({'name': 'playReverseB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Play it Reverse',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw','row':-1, 'column':1},
             'command':self.PlayRev_cb})
         ifd.append({'name': 'stopB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Stop',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw'},
             'command':self.Stop_cb})
         ifd.append({'name': 'pauseB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Pause',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw','row':-1, 'column':1},
             'command':self.Pause_cb})
         ifd.append({'name': 'closeB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Make rms refcoords',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw'},
             'command':self.MakeRef_cb})
         ifd.append({'name': 'buildB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Build',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw','row':-1, 'column':1},
             'command':self.Build_cb})
         ifd.append({'name': 'closeB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Close',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw', 'columnspan':2},
@@ -6319,7 +6318,7 @@ class ShowAutoDockStatesBaseCmd(MVCommand):
             if not hasattr(self.vf, item):
                 self.vf.loadCommand('colorCommands', item, 'Pmv')
         if self.vf.hasGui:
-            self.doTorsionsOnly = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.doTorsionsOnly = tkinter.IntVar(master=self.vf.GUI.ROOT)
             #self.vf.loadModule('measureCommands')
 
 
@@ -6343,10 +6342,10 @@ class ShowAutoDockStatesBaseCmd(MVCommand):
             d = self.dockings[ind]
             self.dockings.remove(d)
         if hasattr(obj, 'torTree'):
-            for key in obj.torTree.rootNode.__dict__.keys():
+            for key in list(obj.torTree.rootNode.__dict__.keys()):
                 obj.torTree.rootNode.__dict__[key] = None
             for item in obj.torTree.torsionMap:
-                for key in item.__dict__.keys():
+                for key in list(item.__dict__.keys()):
                     item.__dict__[key] = None
 
 
@@ -6378,7 +6377,7 @@ class ShowAutoDockStatesBaseCmd(MVCommand):
         self.buildMolList()
         kw['log'] = log
         #kw.setdefault('log', 1)
-        apply(self.doitWrapper, (mols[0],), kw)
+        self.doitWrapper(*(mols[0],), **kw)
 
 
     def doit(self, mol, **kw):
@@ -6386,7 +6385,7 @@ class ShowAutoDockStatesBaseCmd(MVCommand):
 
 
     def buildMolList(self):
-        for k, d in self.vf.dockings.items():
+        for k, d in list(self.vf.dockings.items()):
             self.molList.append(d.ligMol)
             self.dockings.append(d)
 
@@ -6413,10 +6412,10 @@ class ShowAutoDockStatesBaseCmd(MVCommand):
         else:
             self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
             self.chooser.ipf.append({'name':'Select Button',
-                                     'widgetType':Tkinter.Button,
+                                     'widgetType':tkinter.Button,
                                      'text':'Select Molecule',
                                      'wcfg':{'bd':6},
-                                     'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                     'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                      'command': self.chooseMolecule_cb})
             self.form = self.chooser.go(modal=0, blocking=0)
             lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -6550,7 +6549,7 @@ class ShowAutoDockPopulation(ShowAutoDockStatesBaseCmd):
                     mol.ppw.form.deiconify()
             else:
                 #TRACE whether ask is necessary!!!
-                idList = range(len(docking.ph.all_populations))
+                idList = list(range(len(docking.ph.all_populations)))
                 titleStr = mol.name + " population player"
                 mol.ppw = PopulationPlayer(mol, docking, self.vf, 
                                 titleStr, docking.ph.individuals, form2=1,
@@ -6602,10 +6601,10 @@ class ShowAutoDockStatesHISTOGRAM(ShowAutoDockStatesBaseCmd):
             if hasattr(obj.spw, 'mol'):
                 delattr(obj.spw, 'mol')
         if hasattr(obj, 'torTree'):
-            for key in obj.torTree.rootNode.__dict__.keys():
+            for key in list(obj.torTree.rootNode.__dict__.keys()):
                 obj.torTree.rootNode.__dict__[key] = None
             for item in obj.torTree.torsionMap:
-                for key in item.__dict__.keys():
+                for key in list(item.__dict__.keys()):
                     item.__dict__[key] = None
 
 
@@ -6617,7 +6616,7 @@ class ShowAutoDockStatesHISTOGRAM(ShowAutoDockStatesBaseCmd):
         mol.ehist.createReverseIndex()
         nodeList = mol.ehist.array
         tstr = mol.name + ' histogram'
-        top = Tkinter.Toplevel(master=self.vf.GUI.ROOT)
+        top = tkinter.Toplevel(master=self.vf.GUI.ROOT)
         top.title(tstr)
         mol.histNB = interactiveHistogramGraph.InteractiveHistogramGraph(mol.name, 
                 master=top, nodeList = nodeList,
@@ -6634,8 +6633,8 @@ class ShowAutoDockStatesHISTOGRAM(ShowAutoDockStatesBaseCmd):
         #this is a list [0,3,8,9]
         #currentInfo is a list of indices
         cI = mol.histNB.currentInfo
-        cI0 = map(lambda x:x+1, cI)
-        idList = map(str, cI0)
+        cI0 = [x+1 for x in cI]
+        idList = list(map(str, cI0))
         idList.insert(0,'0')
         clist = []
         confs = docking.ch.conformations
@@ -6694,50 +6693,50 @@ class ShowAutoDockStatesHISTOGRAM(ShowAutoDockStatesBaseCmd):
             mol.elist = numpy.array(elist)
             mol.r = [numpy.minimum.reduce(mol.elist), 
                         numpy.maximum.reduce(mol.elist)]
-            mol.nbins = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            mol.nbins = tkinter.IntVar(master=self.vf.GUI.ROOT)
             mol.nbins.set(10)
-            mol.min = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            mol.min = tkinter.StringVar(master=self.vf.GUI.ROOT)
             mol.min.set(str(mol.r[0]))
-            mol.max = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            mol.max = tkinter.StringVar(master=self.vf.GUI.ROOT)
             mol.max.set(str(mol.r[1]))
 
         titleStr = 'Show ' + mol.name + ' Conformations'
         ifd =  InputFormDescr(title=titleStr)
         ifd.append({'name': 'nbinEnt',
-            'widgetType': Tkinter.Entry,
+            'widgetType': tkinter.Entry,
             'wcfg':{'bd':4,
                 'label': 'Number of Bins:',
                 'textvariable': mol.nbins
                 },
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         ifd.append({'name': 'minEnt',
-            'widgetType': Tkinter.Entry,
+            'widgetType': tkinter.Entry,
             'wcfg':{'bd':4,
                 'label': 'Energy Minimum:',
                 'textvariable': mol.min
                 },
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         ifd.append({'name': 'maxEnt',
-            'widgetType': Tkinter.Entry,
+            'widgetType': tkinter.Entry,
             'wcfg':{'bd':4,
                 'label': 'Energy Maximum:',
                 'textvariable': mol.max
                 },
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         ifd.append({'name': 'buildBut',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Build Histogram:',
             'wcfg':{'bd':4},
             'command': CallBackFunction(self.buildInteractiveGraph, mol, docking),
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         ifd.append({'name': 'resetRangeBut',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Reset Range',
             'wcfg':{'bd':4},
             'command': CallBackFunction(self.resetRange, mol),
             'gridcfg':{'sticky':'nesw'} })
         ifd.append({'name': 'closeB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Close',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw','row':-1,'column':1},
@@ -6799,10 +6798,10 @@ class ShowAutoDockClusteringStates(ShowAutoDockStatesBaseCmd):
                     delattr(d.clusterer, 'subset')
             self.dockings.remove(d)
         if hasattr(obj, 'torTree'):
-            for key in obj.torTree.rootNode.__dict__.keys():
+            for key in list(obj.torTree.rootNode.__dict__.keys()):
                 obj.torTree.rootNode.__dict__[key] = None
             for item in obj.torTree.torsionMap:
-                for key in item.__dict__.keys():
+                for key in list(item.__dict__.keys()):
                     item.__dict__[key] = None
 
 
@@ -6868,7 +6867,7 @@ class ShowAutoDockClusteringStates(ShowAutoDockStatesBaseCmd):
         ifd= InputFormDescr(title='Select Clusterer')
         ifd.append({'widgetType':'ListChooser',
             'name':'clusterSel',
-            'entries':docking.clusterer_dict.keys(),
+            'entries':list(docking.clusterer_dict.keys()),
             'mode':'single',
             'title':'energy used for clustering\n(if subset, name_energy)',
             'lbwcfg':{'height':4},
@@ -6922,18 +6921,18 @@ class ShowAutoDockClusteringStates(ShowAutoDockStatesBaseCmd):
         docking = self.dockings[ind]
         mol.stop2 = 0
         docking_has_clusterer = hasattr(docking, 'clusterer')
-        if not docking_has_clusterer or len(docking.clusterer.clustering_dict.keys())==0:
+        if not docking_has_clusterer or len(list(docking.clusterer.clustering_dict.keys()))==0:
             #check whether a file of clusterings is to be read
             msg = 'Clusterer of current docking has no clusterings to show. Recluster or read in a previous clustering first...'
             self.warningMsg(msg)
             return "ERROR"
         #check how many clusterers the docking has
-        num_clusterers = len(docking.clusterer_dict.keys())
+        num_clusterers = len(list(docking.clusterer_dict.keys()))
         #if more than one, choose which one to use
         if num_clusterers >1:
             self.setClusterer(docking)
         #check how many clusterings the clusterer has
-        entries = docking.clusterer.clustering_dict.keys()
+        entries = list(docking.clusterer.clustering_dict.keys())
         num_entries = len(entries)
         if num_entries==0:
             msg = "no available clusterings to show"
@@ -6943,7 +6942,7 @@ class ShowAutoDockClusteringStates(ShowAutoDockStatesBaseCmd):
             #if there is only one available rms, just use it
             self.showClustering(entries[0], mol, docking)
             return 
-        entries = map(lambda x:'%6.3f'%x, entries)
+        entries = ['%6.3f'%x for x in entries]
         entries.sort()
         #sort and format keys here
         titleStr = 'Show ' + mol.name + ' Clusterings'
@@ -6956,7 +6955,7 @@ class ShowAutoDockClusteringStates(ShowAutoDockStatesBaseCmd):
             'wcfg': { 'mode':self.mode},
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         ifd.append({'name': 'closeB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'text':'Close',
             'wcfg':{'bd':4},
             'gridcfg':{'sticky':'nesw'},
@@ -7000,10 +6999,10 @@ class ShowAutoDockClusteringStates(ShowAutoDockStatesBaseCmd):
                 energy = l[0].docking_energy
             dataList.append([float(energy), len(l)])
             #this ends up being 0-6,7,8-9
-            reverseList.append(range(rLctr,rLctr+len(l)))
+            reverseList.append(list(range(rLctr,rLctr+len(l))))
             rLctr = rLctr + len(l)
         tstr = mol.name + ': rms =  ' + str(rms) + '  clustering'
-        top = Tkinter.Toplevel(master=self.vf.GUI.ROOT)
+        top = tkinter.Toplevel(master=self.vf.GUI.ROOT)
         top.title(tstr)
         #NOW build the histogram
         if e[0]=='d':
@@ -7083,7 +7082,7 @@ class ReadAutoDockClusteringStates(ShowAutoDockStatesBaseCmd):
                 except:
                     #if clustfile is on binding energy, need to have a
                     #clusterer, whose argsort is on binding_energy
-                    if sort=='docking' and not 'binding' in docking.clusterer_dict.keys():
+                    if sort=='docking' and not 'binding' in list(docking.clusterer_dict.keys()):
                         clusterer = Clusterer(docking.ch.conformations, 
                                             sort='binding')
                         docking.clusterer = clusterer
@@ -7119,7 +7118,7 @@ class WriteAutoDockStates(MVCommand):
         ifd= InputFormDescr(title='Select Clusterer')
         ifd.append({'widgetType':'ListChooser',
             'name':'clusterSel',
-            'entries':docking.clusterer_dict.keys(),
+            'entries':list(docking.clusterer_dict.keys()),
             'mode':'single',
             'title':'energy used for clustering',
             'lbwcfg':{'height':4},
@@ -7133,7 +7132,7 @@ class WriteAutoDockStates(MVCommand):
 
     def buildMolList(self):
         molList = self.molList = []
-        for k, d in self.vf.dockings.items():
+        for k, d in list(self.vf.dockings.items()):
             self.molList.append(d.ligMol)
             self.dockings.append(d)
 
@@ -7159,7 +7158,7 @@ class WriteAutoDockStates(MVCommand):
         elif len(molList)==1:
             mol = molList[0]
             #if there are more than one clusterers available, make user pick
-            if len(mol.docking.clusterer_dict.keys())>1:
+            if len(list(mol.docking.clusterer_dict.keys()))>1:
                 self.setClusterer(mol.docking)
             filename = self.vf.askFileSave(types=[('docked results file','*.res')], title = 'Docked Result File:')
             if filename:
@@ -7168,10 +7167,10 @@ class WriteAutoDockStates(MVCommand):
         else:
             self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
             self.chooser.ipf.append({'name':'Select Button',
-                                     'widgetType':Tkinter.Button,
+                                     'widgetType':tkinter.Button,
                                      'text':'Select Molecule',
                                      'wcfg':{'bd':6},
-                                     'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                     'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                      'command': self.chooseMolecule_cb})
             self.form = self.chooser.go(modal=0, blocking=0)
             lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -7183,7 +7182,7 @@ class WriteAutoDockStates(MVCommand):
         invoked from guiCallback"""
         mol = self.chooser.getMolSet()
         if mol in self.molList:
-            if len(mol.docking.clusterer_dict.keys())>1:
+            if len(list(mol.docking.clusterer_dict.keys()))>1:
                 self.setClusterer(mol.docking)
             self.chooser.form.withdraw()
             filename = self.vf.askFileSave(types=[('docked results file','*.res')], title = 'Docked Result File:')
@@ -7200,7 +7199,7 @@ class WriteAutoDockStates(MVCommand):
         if len(mols)==0:
             return 'ERROR'
         self.buildMolList()
-        apply(self.doit, (mols[0], filename), kw)
+        self.doit(*(mols[0], filename), **kw)
 
 
     def doit(self, mol, filename):
@@ -7266,7 +7265,7 @@ class WriteAutoDockClustering(MVCommand):
         self.dockings = []
         molList = self.molList = []
         #FIX THIS!!!
-        for k, d in self.vf.dockings.items():
+        for k, d in list(self.vf.dockings.items()):
             self.molList.append(d.ligMol)
             self.dockings.append(d)
         if not len(molList):
@@ -7275,7 +7274,7 @@ class WriteAutoDockClustering(MVCommand):
             return 'ERROR'
         elif len(molList)==1:
             mol = molList[0]
-            if len(mol.docking.clusterer_dict.keys())>1:
+            if len(list(mol.docking.clusterer_dict.keys()))>1:
                 self.setClusterer(mol.docking)
             filename = self.vf.askFileSave(types=[('clustering results file','*.clust')], title = 'Clustering Result File:')
             if filename:
@@ -7284,10 +7283,10 @@ class WriteAutoDockClustering(MVCommand):
         else:
             self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
             self.chooser.ipf.append({'name':'Select Button',
-                                     'widgetType':Tkinter.Button,
+                                     'widgetType':tkinter.Button,
                                      'text':'Select Molecule',
                                      'wcfg':{'bd':6},
-                                     'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                     'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                      'command': self.chooseMolecule_cb})
             self.form = self.chooser.go(modal=0, blocking=0)
             lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -7300,7 +7299,7 @@ class WriteAutoDockClustering(MVCommand):
         mol = self.chooser.getMolSet()
         if mol in self.molList:
             self.chooser.form.withdraw()
-            if len(mol.docking.clusterer_dict.keys())>1:
+            if len(list(mol.docking.clusterer_dict.keys()))>1:
                 self.setClusterer(mol.docking)
             filename = self.vf.askFileSave(types=[('clustering results file','*.clust')], title = 'Clustering Result File:')
             if filename:
@@ -7316,14 +7315,14 @@ class WriteAutoDockClustering(MVCommand):
         mols = self.vf.expandNodes(mol)
         if len(mols)==0:
             return 'ERROR'
-        apply(self.doit, (mols[0], filename), kw)
+        self.doit(*(mols[0], filename), **kw)
 
 
     def setClusterer(self, docking):
         ifd= InputFormDescr(title='Select Clusterer')
         ifd.append({'widgetType':'ListChooser',
             'name':'clusterSel',
-            'entries':docking.clusterer_dict.keys(),
+            'entries':list(docking.clusterer_dict.keys()),
             'mode':'single',
             'title':'energy used for clustering',
             'lbwcfg':{'height':4},
@@ -7345,7 +7344,7 @@ class WriteAutoDockClustering(MVCommand):
         ind = self.molList.index(mol)
         #mol = docking.ligMol
         docking = self.dockings[ind]
-        if not len(docking.clusterer.clustering_dict.keys()):
+        if not len(list(docking.clusterer.clustering_dict.keys())):
             return 'ERROR'
         docking.clusterer.write(filename)
 
@@ -7364,7 +7363,7 @@ class MakeAutoDockCLUSTERING(MVCommand):
     def guiCallback(self):
         """called each time the 'make clustering ' button is pressed"""
         #if there are more than one dockings, allow user to choose
-        if len(self.vf.dockings.keys())>1:
+        if len(list(self.vf.dockings.keys()))>1:
             self.vf.ADanalyze_selectDLG.guiCallback()
         #need to get at the clusterer, an outputfile name and a tolerance list:
         if not self.vf.docked:
@@ -7414,15 +7413,15 @@ class MakeAutoDockCLUSTERING(MVCommand):
         d = self.vf.docked
         version = d.version
         mol = d.ligMol
-        self.tolStr = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.tolStr = tkinter.StringVar(master=self.vf.GUI.ROOT)
         self.tolStr.set('0.5 2.0')
-        self.sort = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.sort = tkinter.StringVar(master=self.vf.GUI.ROOT)
         self.sort.set('docking')
-        self.outputFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.outputFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
         titleStr = 'Cluster ' + mol.name + ' Conformations'
         ifd =  self.ifd = InputFormDescr(title = titleStr)
         ifd.append({'name': 'tolEnt',
-            'widgetType': Tkinter.Entry,
+            'widgetType': tkinter.Entry,
             'wcfg':{'bd':4,
                 'label': 'Tolerances:',
                 'textvariable': self.tolStr,
@@ -7430,47 +7429,47 @@ class MakeAutoDockCLUSTERING(MVCommand):
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         if version>=4.0:
             ifd.append({'name':'dsortbut',
-                    'widgetType':Tkinter.Label,
+                    'widgetType':tkinter.Label,
                     'wcfg':{'text':'Clustering on AD4 Energy'}, 
-                    'gridcfg':{'sticky':Tkinter.E}})
+                    'gridcfg':{'sticky':tkinter.E}})
         else:
             ifd.append({'name':'dsortbut',
-                    'widgetType':Tkinter.Radiobutton,
+                    'widgetType':tkinter.Radiobutton,
                     'wcfg':{'text':'docking energy', 
                         'value':'docking',
                         'variable':self.sort},
-                    'gridcfg':{'sticky':Tkinter.E}})
+                    'gridcfg':{'sticky':tkinter.E}})
             ifd.append({'name':'bsortbut',
-                    'widgetType':Tkinter.Radiobutton,
+                    'widgetType':tkinter.Radiobutton,
                     'wcfg':{'text':'binding energy', 
                         'value':'binding',
                         'variable':self.sort},
-                    'gridcfg':{'sticky':Tkinter.E}})
+                    'gridcfg':{'sticky':tkinter.E}})
         ifd.append({'name': 'fileEnt',
-            'widgetType': Tkinter.Entry,
+            'widgetType': tkinter.Entry,
             'wcfg':{'bd':4,
                 'label': 'Outputfile Name:',
                 'textvariable': self.outputFile,
                 },
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         ifd.append({'name': 'closeB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'wcfg':{
                 'text':'OK',
                 'command':self.OK_cb,
                 'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W}}),
+            'gridcfg':{'sticky':tkinter.E+tkinter.W}}),
         ifd.append({'name': 'cancelB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'wcfg':{
                 'bd':4,
                 'text':'Cancel',
                 'command':self.Cancel_cb},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'row':-1, 'column':1}})
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'row':-1, 'column':1}})
 
 
     def OK_cb(self, event=None):
-        tolList = map(float, split(self.tolStr.get()))
+        tolList = list(map(float, split(self.tolStr.get())))
         filename = strip(self.outputFile.get())
         sort = self.sort.get()
         self.form.withdraw()
@@ -7498,7 +7497,7 @@ outputFile: file to get written clustering results, generally *.clust
             return 'ERROR'
         if not len(self.vf.docked.clusterer.data):
             return 'ERROR'
-        apply(self.doitWrapper, (toleranceList, sort, outputFile,), kw)
+        self.doitWrapper(*(toleranceList, sort, outputFile,), **kw)
 
 
 
@@ -7521,7 +7520,7 @@ outputFile: optional name of file for written output
             clusterer = docked.clusterer
             clusterer.usesSubset = 0
         elif sort[0]=='d':
-            if docked.clusterer_dict.has_key('docking'):
+            if 'docking' in docked.clusterer_dict:
                 clusterer = docked.clusterer_dict['docking']
             else:
                 clusterer = Clusterer(docked.ch.conformations,
@@ -7529,7 +7528,7 @@ outputFile: optional name of file for written output
                 docked.clusterer_dict['docking'] = clusterer
                 clusterer.usesSubset = 0
         else:
-            if docked.clusterer_dict.has_key('binding'):
+            if 'binding' in docked.clusterer_dict:
                 clusterer = docked.clusterer_dict['binding']
             else:
                 clusterer = Clusterer(docked.ch.conformations,
@@ -7537,10 +7536,10 @@ outputFile: optional name of file for written output
                 docked.clusterer_dict['binding'] = clusterer
                 clusterer.usesSubset = 0
         if not len(clusterer.data):
-            print 'returning lack of data error'
+            print('returning lack of data error')
             return 'ERROR'
         for tol in toleranceList:
-            print 'clustering at ', tol
+            print('clustering at ', tol)
             clusterer.make_clustering(tol)
         if outputFile:
             clusterer.write(outputFile)
@@ -7641,18 +7640,18 @@ class MakeAutoDockSubsetCLUSTERING(MakeAutoDockCLUSTERING):
         if not len(clusterer.data):
             self.vf.warningMsg('current clusterer has no conformations')
             return 'ERROR'
-        if not len(self.vf.sets.values()):
+        if not len(list(self.vf.sets.values())):
             self.vf.warningMsg('currently no saved sets')
             return 'ERROR'
-        lig_ids = map(id, self.vf.docked.ligMol.allAtoms)
+        lig_ids = list(map(id, self.vf.docked.ligMol.allAtoms))
         set_entries = []
-        for k, val in self.vf.sets.items():
+        for k, val in list(self.vf.sets.items()):
             #check that the sets are of atoms in docked.ligMol
             ok = 1
             vset = val
             #vset = val[0]
             atset = vset.findType(Atom)
-            ats_ids = map(id, atset)
+            ats_ids = list(map(id, atset))
             for vv in ats_ids:
                 if vv not in lig_ids:
                     ok = 0
@@ -7682,15 +7681,15 @@ class MakeAutoDockSubsetCLUSTERING(MakeAutoDockCLUSTERING):
         # button to go or cancel
         d = self.vf.docked
         mol = d.ligMol
-        self.tolStr = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.tolStr = tkinter.StringVar(master=self.vf.GUI.ROOT)
         self.tolStr.set('0.5 2.0')
-        self.sort = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.sort = tkinter.StringVar(master=self.vf.GUI.ROOT)
         version = d.version
         self.sort.set('docking')
         if version>=4.0:
             self.sort.set('energy')
-        self.outputFile = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-        self.keyName = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.outputFile = tkinter.StringVar(master=self.vf.GUI.ROOT)
+        self.keyName = tkinter.StringVar(master=self.vf.GUI.ROOT)
         self.keyName.set(self.set_entries[0])
         titleStr = 'Cluster ' + mol.name + ' Conformations'
         ifd =  self.ifd = InputFormDescr(title = titleStr)
@@ -7704,7 +7703,7 @@ class MakeAutoDockSubsetCLUSTERING(MakeAutoDockCLUSTERING):
                             #'selectioncommand':self.update, }
                     'gridcfg':{'sticky':'nesw','columnspan':2} })
         ifd.append({'name': 'tolEnt',
-            'widgetType': Tkinter.Entry,
+            'widgetType': tkinter.Entry,
             'wcfg':{'bd':4,
                 'label': 'Tolerances:',
                 'textvariable': self.tolStr,
@@ -7712,49 +7711,49 @@ class MakeAutoDockSubsetCLUSTERING(MakeAutoDockCLUSTERING):
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         if version>=4.0:
             ifd.append({'name':'dsortbut',
-                    'widgetType':Tkinter.Radiobutton,
+                    'widgetType':tkinter.Radiobutton,
                     'wcfg':{'text':'energy', 
                         'value':'energy',
                         'variable':self.sort},
-                    'gridcfg':{'sticky':Tkinter.E}})
+                    'gridcfg':{'sticky':tkinter.E}})
         else:
             ifd.append({'name':'dsortbut',
-                    'widgetType':Tkinter.Radiobutton,
+                    'widgetType':tkinter.Radiobutton,
                     'wcfg':{'text':'docking energy', 
                         'value':'docking',
                         'variable':self.sort},
-                    'gridcfg':{'sticky':Tkinter.E}})
+                    'gridcfg':{'sticky':tkinter.E}})
             ifd.append({'name':'bsortbut',
-                    'widgetType':Tkinter.Radiobutton,
+                    'widgetType':tkinter.Radiobutton,
                     'wcfg':{'text':'binding energy', 
                         'value':'binding',
                         'variable':self.sort},
-                    'gridcfg':{'sticky':Tkinter.E}})
+                    'gridcfg':{'sticky':tkinter.E}})
         ifd.append({'name': 'fileEnt',
-            'widgetType': Tkinter.Entry,
+            'widgetType': tkinter.Entry,
             'wcfg':{'bd':4,
                 'label': 'Outputfile Name:',
                 'textvariable': self.outputFile,
                 },
             'gridcfg':{'sticky':'nesw','columnspan':2} })
         ifd.append({'name': 'closeB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'wcfg':{
                 'text':'OK',
                 'command':self.OK_cb,
                 'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W}}),
+            'gridcfg':{'sticky':tkinter.E+tkinter.W}}),
         ifd.append({'name': 'cancelB',
-            'widgetType': Tkinter.Button,
+            'widgetType': tkinter.Button,
             'wcfg':{
                 'bd':4,
                 'text':'Cancel',
                 'command':self.Cancel_cb},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'row':-1, 'column':1}})
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'row':-1, 'column':1}})
 
 
     def OK_cb(self, event=None):
-        tolList = map(float, split(self.tolStr.get()))
+        tolList = list(map(float, split(self.tolStr.get())))
         filename = strip(self.outputFile.get())
         key = self.ifd.entryByName['set']['widget'].get()
         self.form.withdraw()
@@ -7772,7 +7771,7 @@ toleranceList: list of rms tolerances for clusterings
 sort: type of energy for clustering, either docking or binding.
 outputFile: file to get written clustering results, generally *.clust
         """
-        if key not in self.vf.sets.keys():
+        if key not in list(self.vf.sets.keys()):
             msg = 'invalid set name:'+ key 
             self.vf.warningMsg(msg)
             return 'ERROR'
@@ -7784,7 +7783,7 @@ outputFile: file to get written clustering results, generally *.clust
             msg = 'no rms tolerances specified'
             self.vf.warningMsg(msg)
             return 'ERROR'
-        apply(self.doitWrapper, (key, toleranceList, sort, outputFile,), kw)
+        self.doitWrapper(*(key, toleranceList, sort, outputFile,), **kw)
 
 
 
@@ -7800,16 +7799,16 @@ outputFile: optional name of file for written output
         #NB: atoms = subset used for this clustering
         atoms = nodes.findType(Atom)
         if not len(atoms):
-            print 'no atoms found in key specified as basis for custom clustering'
+            print('no atoms found in key specified as basis for custom clustering')
             return 'ERROR'
         else:
-            print 'making clustering with subset of ', len(atoms), ' atoms'
+            print('making clustering with subset of ', len(atoms), ' atoms')
         if not self.vf.docked:
-            print 'no current docking'
+            print('no current docking')
             return 'ERROR'
         #if no conformations, return
         if not len(self.vf.docked.ch.conformations):
-            print 'no current conformations'
+            print('no current conformations')
             return 'ERROR'
         docked = self.vf.docked
         if hasattr(docked, 'version') and docked.version>=4.0:
@@ -7835,7 +7834,7 @@ outputFile: optional name of file for written output
         #clusterer.set_get_distance(get_distance_subset)
         clusterer.set_get_distance(clusterer._get_distance_subset)
         for tol in toleranceList:
-            print 'clustering at ', tol
+            print('clustering at ', tol)
             clusterer.make_clustering(tol)
         if outputFile:
             clusterer.write(outputFile)
@@ -7887,7 +7886,7 @@ try:
     {'name':'ADanalyze_addExtraGridIsocontour','cmd':ADGetAGrid(),'gui':ADGetAGridGUI}, {'name':'ADanalyze_showGridIsocontours','cmd':ADMakeAllGrids(),'gui':ADMakeAllGridsGUI}]:
         commandList.insert(7,i)
 except:
-    print 'skipping the isocontour-dependent commands'
+    print('skipping the isocontour-dependent commands')
 
 
 def initModule(vf):
@@ -7895,11 +7894,11 @@ def initModule(vf):
         vf.addCommand(dict['cmd'],dict['name'],dict['gui'])
 
     if hasattr(vf, 'GUI'):
-        for item in vf.GUI.menuBars['AutoToolsBar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoToolsBar'].menubuttons.values()):
             item.configure(background = 'tan')
         if not hasattr(vf.GUI, 'adtBar'):
             vf.GUI.adtBar = vf.GUI.menuBars['AutoToolsBar']
-            vf.GUI.adtFrame = vf.GUI.adtBar.menubuttons.values()[0].master
+            vf.GUI.adtFrame = list(vf.GUI.adtBar.menubuttons.values())[0].master
             
 
 

@@ -31,7 +31,7 @@ class ADTFileNames(NetworkNode):
     def __init__(self, constrkw = {},  name='ADTFileNames', **kw):
         kw['constrkw'] = constrkw
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw)
+        NetworkNode.__init__(*(self,), **kw)
 
         ip = self.inputPortsDescr
         ip.append({'name': 'recpetor_obj', 'datatype': 'receptor'})
@@ -73,5 +73,5 @@ class ADTFileNames(NetworkNode):
             ed = net.getEditor()
         except:
             import traceback; traceback.print_exc()
-            print 'Warning! Could not import widgets'
+            print('Warning! Could not import widgets')
 

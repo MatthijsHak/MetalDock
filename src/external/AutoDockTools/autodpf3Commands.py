@@ -229,11 +229,11 @@ def initModule(vf):
         vf.addCommand(DpfSetDpo(), 'ADdpf_setDpo', None)
 
     if vf.hasGui:
-        for item in vf.GUI.menuBars['AutoTools3Bar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoTools3Bar'].menubuttons.values()):
             item.configure(background = 'tan')
         if not hasattr(vf.GUI, 'adtBar'):
             vf.GUI.adtBar = vf.GUI.menuBars['AutoTools3Bar']
-            vf.GUI.adtFrame = vf.GUI.adtBar.menubuttons.values()[0].master
+            vf.GUI.adtFrame = list(vf.GUI.adtBar.menubuttons.values())[0].master
 
 
 

@@ -80,7 +80,7 @@ class XMLParser(ResultParser):
 
     def getReDict(self):
         if hasattr(self, 'reDict'):
-            for k, d in self.reDict.items():
+            for k, d in list(self.reDict.items()):
                 d['lines'] = []
             return
         self.reDict = {}
@@ -125,7 +125,7 @@ class XMLParser(ResultParser):
         for k in self.reKeys:
             d = self.reDict[k]
             lines = d['lines']
-            apply(d['func'], (lines,), {})
+            d['func'](*(lines,), **{})
 
 
     def set_AD_version(self,lines):
@@ -137,13 +137,13 @@ class XMLParser(ResultParser):
                         lll = ll[1].split('<')
                         self.version = float(lll[0])
                     else:
-                        print "problem autodock version found!"
+                        print("problem autodock version found!")
                         self.version = 4.03
                         break
                     #print "ad version=", self.version
                     break
         else:
-            print "no autodock version found!"
+            print("no autodock version found!")
             self.version = 4.03
 
 
@@ -156,13 +156,13 @@ class XMLParser(ResultParser):
                         lll = ll[1].split('<')
                         self.autogrid_version = float(lll[0])
                     else:
-                        print "problem autogrid version found!"
+                        print("problem autogrid version found!")
                         self.autogrid_version = 4.03
                         break
                     #print "ag version=", self.autogrid_version
                     break
         else:
-            print "no autogrid version found!"
+            print("no autogrid version found!")
             self.autogrid_version = 4.03
 
 
@@ -175,13 +175,13 @@ class XMLParser(ResultParser):
                         lll = ll[1].split('<')
                         self.xml_version = float(lll[0])
                     else:
-                        print "problem xml version version found!"
+                        print("problem xml version version found!")
                         self.xml_version = 0.10
                         break
                     #print "xml version=", self.xml_version
                     break
         else:
-            print "no xml version found!"
+            print("no xml version found!")
             self.xml_version = 0.10
 
 
@@ -194,7 +194,7 @@ class XMLParser(ResultParser):
                         lll = ll[1].split('<')
                         self.run_requested = int(lll[0])
                     else:
-                        print "problem with run requested found!"
+                        print("problem with run requested found!")
                         self.run_requested = 1
                         break
                     #print "run requested =", self.run_requested
@@ -226,14 +226,14 @@ class XMLParser(ResultParser):
         #print "in get_floats with ", line
         ll = line.split('>')[1]
         lll = ll.split('<')
-        return map(float, lll[0].split())
+        return list(map(float, lll[0].split()))
 
 
     def get_ints(self, line):
         #print "in get_ints with ", line
         ll = line.split('>')[1]
         lll = ll.split('<')
-        return map(int, lll[0].split())
+        return list(map(int, lll[0].split()))
         
 
     def process_run(self, run_lines):
@@ -309,12 +309,12 @@ class XMLParser(ResultParser):
         try:
             d['Ki'] = Ki
         except:
-            print 'except on Ki, for run id=', id
+            print('except on Ki, for run id=', id)
             d['Ki'] = 0.0
         try:
             d['Temp'] = Temp
         except:
-            print 'except on Temp, for run id=', id
+            print('except on Temp, for run id=', id)
             d['Temp'] = 0.0
         #intermol+internal+torsional
         d['binding_energy'] = d['free_NRG_binding'] = free_NRG_binding 
@@ -332,8 +332,8 @@ class XMLParser(ResultParser):
         
         if hasattr(self, 'dpf'):
             if dpf!=self.dpf:
-                print "dpf mismatch"
-                print dpf, ' vs ', self.dpf
+                print("dpf mismatch")
+                print(dpf, ' vs ', self.dpf)
             ##assert dpf == self.dpf
         else:
             self.dpf = dpf

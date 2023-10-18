@@ -34,7 +34,7 @@ This module implements classes to support AutoDock atomtypes
 import os
 from MolKit.molecule import AtomSet, BondSet
 from MolKit.bondSelector import AromaticCycleBondSelector2
-from AutoDockTools.sol_par import solvs
+from sol_par import solvs
 from PyBabel.atomTypes import AtomHybridization
 
 
@@ -49,7 +49,7 @@ class NonpolarHydrogenMerger:
 
     def mergeNPHS(self, atoms, renumber=1):
         if len(atoms.bonds[0])==0:
-            print "WARNING atoms have no bonds....BUILDING THEM!!!"
+            print("WARNING atoms have no bonds....BUILDING THEM!!!")
             tops = atoms.top.uniq()
             for t in tops: t.buildBondsByDistance()
         #MAKE sure there are some hydrogens
@@ -59,13 +59,13 @@ class NonpolarHydrogenMerger:
         #Check whether there are any hydrogens with no bonds
         no_bnd_hs = hs.get(lambda x: len(x.bonds)==0)
         if len(no_bnd_hs):
-            print "Warning: hydrogens, ", no_bnd_hs.name, " , with no bonds!"
+            print("Warning: hydrogens, ", no_bnd_hs.name, " , with no bonds!")
         if len(no_bnd_hs)==len(hs):
             return 0
         bonded_hs = hs.get(lambda x: len(x.bonds)>0)
         #next check is superfluous
         if bonded_hs is None or len(bonded_hs)==0:
-            print "Warning: no hydrogens with bonds!"
+            print("Warning: no hydrogens with bonds!")
             return 0
         #Check whether there are any nphs hydrogens
         nphs = bonded_hs.get(lambda x: x.bonds[0].atom1.element=='C' \
@@ -82,19 +82,19 @@ class NonpolarHydrogenMerger:
             t.allAtoms = t.allAtoms - t_nphs
 
             #deal with the charges, if there are any
-            chList = t_nphs[0]._charges.keys()
+            chList = list(t_nphs[0]._charges.keys())
             for h in t_nphs:
-                chs = h._charges.keys() 
+                chs = list(h._charges.keys()) 
                 for c in chList:
                     if c not in chs:
                         chList.remove(c)
             if not len(chList):
-                print 'no charges on carbons to increment'
+                print('no charges on carbons to increment')
             else:
                 for chargeSet in chList:
                     for h in t_nphs:
                         if len(h.bonds)==0:
-                            print h.full_name(), ' has no bonds!'
+                            print(h.full_name(), ' has no bonds!')
                         else:
                             c_atom = h.bonds[0].atom1
                             if c_atom==h: 
@@ -117,7 +117,7 @@ class NonpolarHydrogenMerger:
             if renumber:
                 lenAts = len(t.chains.residues.atoms)
                 assert lenAts==len(t.allAtoms)
-                t.allAtoms.number = range(1, lenAts+1) 
+                t.allAtoms.number = list(range(1, lenAts+1)) 
         return len_nphs
 
 
@@ -133,7 +133,7 @@ atom to which each is bound.
 
     def mergeLPS(self, atoms, renumber=1):
         if len(atoms.bonds[0])==0:
-            print "WARNING atoms have no bonds....BUILDING THEM!!!"
+            print("WARNING atoms have no bonds....BUILDING THEM!!!")
             tops = atoms.top.uniq()
             for t in tops: t.buildBondsByDistance()
         #lps = atoms.get(lambda x: x.element=='Xx' and \
@@ -151,19 +151,19 @@ atom to which each is bound.
             mol.allAtoms = mol.allAtoms - mol_lps
 
             #deal with the charges, if there are any
-            chList = mol_lps[0]._charges.keys()
+            chList = list(mol_lps[0]._charges.keys())
             for lp in mol_lps:
-                chs = lp._charges.keys() 
+                chs = list(lp._charges.keys()) 
                 for c in chList:
                     if c not in chs:
                         chList.remove(c)
             if not len(chList):
-                print 'no charges on carbons to increment'
+                print('no charges on carbons to increment')
             else:
                 for chargeSet in chList:
                     for lp in mol_lps:
                         if len(lp.bonds)==0:
-                            print lp.full_name(), ' has no bonds!'
+                            print(lp.full_name(), ' has no bonds!')
                         else:
                             c_atom = lp.bonds[0].atom1
                             if c_atom==lp: 
@@ -186,7 +186,7 @@ atom to which each is bound.
             if renumber:
                 lenAts = len(mol.chains.residues.atoms)
                 assert lenAts==len(mol.allAtoms)
-                mol.allAtoms.number = range(1, lenAts+1) 
+                mol.allAtoms.number = list(range(1, lenAts+1)) 
         return len_lps
             
 
@@ -213,7 +213,7 @@ class AromaticCarbonManager:
                 old_aromCs = molecule.allAtoms.get(lambda x:\
                                 (x.element=='C' and x.autodock_element=='A'))
                 if old_aromCs is not None and len(old_aromCs)!=0:
-                    if debug: print "resetting ", len(old_aromCs), " prior aromCs"
+                    if debug: print("resetting ", len(old_aromCs), " prior aromCs")
                     self.set_carbon_names(old_aromCs, 'C')
             self.cutoff = cutoff
         typed_atoms = molecule.allAtoms.get(lambda x: hasattr(x, 'autodock_element'))
@@ -222,22 +222,21 @@ class AromaticCarbonManager:
             currentAromCs = molecule.allAtoms.get(lambda x: (x.element=='C' and x.autodock_element=='A'))
         if debug:
             if currentAromCs is not None and len(currentAromCs):
-                print "now: ", len(currentAromCs)
+                print("now: ", len(currentAromCs))
             else:
-                print "now: no aromCs"
+                print("now: no aromCs")
         aromBnds = self.aromBndSel.select(molecule.allAtoms.bonds[0],
                                                   self.cutoff)
         aromBndAts = self.aromBndSel.getAtoms(aromBnds)
         result = AtomSet()
         changed = AtomSet()
         if len(aromBndAts):
-            aromCs =  AtomSet(filter(lambda x: x.element=='C', \
-                                              aromBndAts))           
+            aromCs =  AtomSet([x for x in aromBndAts if x.element=='C'])           
             aromCs = aromCs.uniq()
             if len(aromCs)>len(result):
                 result = aromCs
             if debug: 
-                print "len(aromCs)=", len(aromCs)
+                print("len(aromCs)=", len(aromCs))
             changed = self.set_carbon_names(aromCs, 'A')
         #if len(changed)>len(result):
         #    result = changed
@@ -291,7 +290,7 @@ class SolvationParameterizer:
                        nuc_acid_list= ['  A','  C','  G']):
         self.bblist = bblist
         self.nuc_acid_list = nuc_acid_list
-        self.solvsKeys = solvs.keys()
+        self.solvsKeys = list(solvs.keys())
 
 
     def addParameters(self, atoms):
@@ -307,7 +306,7 @@ class SolvationParameterizer:
                 if 'O2*' in childnames or 'O2\'' in childnames:
                     #treat rna variant even more specially
                     atKey = at.name + ' R' + at.parent.type[2]
-                    print 'special rna key', atKey
+                    print('special rna key', atKey)
                 else:
                     atKey = at.name + at.parent.type
             else:
@@ -352,7 +351,7 @@ class AutoDock4_AtomTyper:
     def setAutoDockElements(self, mol, typeAtoms=0, reassign=False, splitAcceptors=False):
         if os.path.splitext(mol.parser.filename)[-1]=='.pdbqt' and reassign is False:
             if self.verbose:
-                print 'setAutoDockElements unnecessary:\n', mol.name, ' already has AD4 atomtypes: not reassigned!'
+                print('setAutoDockElements unnecessary:\n', mol.name, ' already has AD4 atomtypes: not reassigned!')
             return
         #check that the types have already been set, first
         if self.set_aromatic_carbons:
@@ -362,10 +361,10 @@ class AutoDock4_AtomTyper:
         ah = AtomHybridization()
         if not len(mol.allAtoms.bonds[0]):
             mol.buildBondsByDistance()
-        ats_with_babel_type = filter(lambda x: hasattr(x, 'babel_type'), mol.allAtoms)
+        ats_with_babel_type = [x for x in mol.allAtoms if hasattr(x, 'babel_type')]
         if typeAtoms or len(ats_with_babel_type)!=len(mol.allAtoms):
             if self.verbose:
-                print "assigning babel_types"
+                print("assigning babel_types")
             ah = AtomHybridization()
             ah.assignHybridization(mol.allAtoms)
         for item in mol.allAtoms:
@@ -412,7 +411,7 @@ class AutoDock4_AtomTyper:
                     #O->OB;N->NB;S->SB
                     item.autodock_element = item.element + 'B'
             d[item.autodock_element] = 1
-        type_list = d.keys()
+        type_list = list(d.keys())
         type_list.sort()
         mol.types = type_list
 
@@ -423,9 +422,9 @@ if __name__ == "__main__":
     solP = SolvationParameterizer()
     ll = solP.addParameters(m.allAtoms)
     #NB: hydrogens get 0.0 0.0
-    print "len(notfound) = ", len(ll)
+    print("len(notfound) = ", len(ll))
     for i in ll: 
-        print i.full_name(),
+        print(i.full_name(), end=' ')
     from MolKit.pdbWriter import PdbqsWriter
     writer = PdbqsWriter()
     writer.write("/mgl/work4/rhuey/dev23/test_hsg1.pdbqs", m.allAtoms)

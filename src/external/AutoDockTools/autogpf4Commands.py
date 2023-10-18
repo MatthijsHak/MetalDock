@@ -241,11 +241,11 @@ def initModule(vf):
         vf.addCommand(dict['cmd'],dict['name'],dict['gui'])
     
     if hasattr(vf, 'GUI'):
-        for item in vf.GUI.menuBars['AutoTools4Bar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoTools4Bar'].menubuttons.values()):
             item.configure(background = 'tan')
             item.configure(underline = '-1')
         if not hasattr(vf.GUI, 'adtBar'):
             vf.GUI.adtBar = vf.GUI.menuBars['AutoTools4Bar']
-            vf.GUI.adtFrame = vf.GUI.adtBar.menubuttons.values()[0].master
+            vf.GUI.adtFrame = list(vf.GUI.adtBar.menubuttons.values())[0].master
 
 

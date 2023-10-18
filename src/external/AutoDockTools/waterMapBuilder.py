@@ -66,30 +66,30 @@ class WaterMapBuilder:
         self.verbose = verbose
         output_stem = None
         if receptor_file is None and (OAmap_file is None or HDmap_file is None):
-            raise "receptor filename or both oxygen map file AND hydrogen map file must be specified"
+            raise ValueErorr("receptor filename or both oxygen map file AND hydrogen map file must be specified")
         #???
         self.O = 0
         self.H = 0
         if receptor_file is not None:
             output_stem = os.path.splitext(os.path.basename(receptor_file))[0]
-            if self.verbose: print "set output_stem from receptor_file to ", output_stem
+            if self.verbose: print("set output_stem from receptor_file to ", output_stem)
             self.OAmap_file = output_stem + ".OA.map"
             self.HDmap_file = output_stem + ".HD.map"
         elif OAmap_file is not None and HDmap_file is not None:
             output_stem = OAmap_file.split('.')[0] 
-            if self.verbose: print "set output_stem from OAmap to ", output_stem
+            if self.verbose: print("set output_stem from OAmap to ", output_stem)
         if output_stem is None:
-            raise "output_stem is None!"
+            raise ValueError("output_stem is None!")
         self.output_stem = output_stem
         if self.Wmap_file is None:
             self.Wmap_file = "protein.W.map.%s.w%1.2f.O%1.1f.H%1.1f.E%1.1f" % (mix_method, weight, O_weight, hd_boost, ENTROPY )
 
             #by default self.Wmap_file = output_stem + ".W.map"
-            if self.verbose: print "set self.Wmap_file to ", self.Wmap_file
+            if self.verbose: print("set self.Wmap_file to ", self.Wmap_file)
         if self.OAmap_file is None:
-            raise "oxygen map file not specified"
+            raise ValueError("oxygen map file not specified")
         if self.HDmap_file is None:
-            raise "hydrogen map file not specified"
+            raise ValueError("hydrogen map file not specified")
         if mix_method not in ['best','avg','coop','boost','best_w']: #mode
             msg = 'Unrecognized mix_method:' + mix_method 
             raise  msg
@@ -191,18 +191,18 @@ class WaterMapBuilder:
 
     def build(self):
         if self.verbose:
-            print "in build:",
-            print " self.OAmap_file=", self.OAmap_file
-            print " self.HDmap_file=", self.HDmap_file
-            print " self.Wmap_file=", self.Wmap_file
+            print("in build:", end=' ')
+            print(" self.OAmap_file=", self.OAmap_file)
+            print(" self.HDmap_file=", self.HDmap_file)
+            print(" self.Wmap_file=", self.Wmap_file)
         try:
             #MAP1 = open(firstMap, 'r')
             oa_ptr = open(self.OAmap_file)
             oa_lines = oa_ptr.readlines()
             oa_ptr.close()
-            if self.verbose: print "read %d lines from %s"%(len(oa_lines),self.OAmap_file)
+            if self.verbose: print("read %d lines from %s"%(len(oa_lines),self.OAmap_file))
         except:
-            print "ERROR: unable to open map file: %s" % self.OAmap_file
+            print("ERROR: unable to open map file: %s" % self.OAmap_file)
             exit(1)
 
         try:
@@ -210,22 +210,22 @@ class WaterMapBuilder:
             hd_ptr = open(self.HDmap_file)
             hd_lines = hd_ptr.readlines()
             hd_ptr.close()
-            if self.verbose: print "read %d lines from %s"%(len(hd_lines),self.HDmap_file)
+            if self.verbose: print("read %d lines from %s"%(len(hd_lines),self.HDmap_file))
         except:
             #print "ERROR: the map %s can't be open" % self.HDmap_file
-            print "ERROR: unable to open map file: %s" % self.HDmap_file
+            print("ERROR: unable to open map file: %s" % self.HDmap_file)
             exit(1)
 
         #sanity checks:
         assert len(oa_lines)==len(hd_lines)
 
         try:
-            if self.verbose: print "opening ", self.Wmap_file
+            if self.verbose: print("opening ", self.Wmap_file)
             optr = open(self.Wmap_file, 'w' )
-            if self.verbose: print "opened water mapfile: ", self.Wmap_file
+            if self.verbose: print("opened water mapfile: ", self.Wmap_file)
             #DIFFERENCE = open(self.Wmap_file, 'w' )
         except:
-            print "ERROR: impossible to open the output map", self.Wmap_file
+            print("ERROR: impossible to open the output map", self.Wmap_file)
             exit(1)
 
         #get the header lines from the oxygen map
@@ -235,15 +235,15 @@ class WaterMapBuilder:
             #if self.verbose: print "wrote ", ll
         # process the rest of the lines
         mode = self.mix_method
-        if self.verbose: print "using mode =", mode, 'to create W map_file=', self.Wmap_file
+        if self.verbose: print("using mode =", mode, 'to create W map_file=', self.Wmap_file)
         for i in range(6, len(hd_lines)):
             oxy_val=oa_lines[i].strip()
             oxy_val = float(oxy_val)
             hyd_val=hd_lines[i].strip()
             hyd_val = float(hyd_val)
-            optr.write("%1.4f\n"%apply(self.method, (oxy_val, hyd_val)))
+            optr.write("%1.4f\n"%self.method(*(oxy_val, hyd_val)))
         optr.close()     
-        if self.verbose: print "closed ", self.Wmap_file
+        if self.verbose: print("closed ", self.Wmap_file)
 
 #        # output the results
 #        for index in range(len(HEADER)):
@@ -260,12 +260,12 @@ class WaterMapBuilder:
             O = float(self.O)
             H = float(self.H)
             tot = H+O
-            if tot == 0: raise 'O+H == zero !'
+            if tot == 0: raise ValueError('O+H == zero !')
             o_pc = (O/tot)*100
             h_pc = (H/tot)*100
 
-            print "\n     output results   "
-            print "  --------------------"
-            print "  OA points : %3.2f%s" % ( o_pc , "%")
-            print "  HD points : %3.2f%s\n" % ( h_pc, "%")
+            print("\n     output results   ")
+            print("  --------------------")
+            print("  OA points : %3.2f%s" % ( o_pc , "%"))
+            print("  HD points : %3.2f%s\n" % ( h_pc, "%"))
 

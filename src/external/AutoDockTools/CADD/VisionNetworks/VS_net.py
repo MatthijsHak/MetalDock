@@ -72,9 +72,9 @@ try:
     iterate_0 = Iterate(constrkw={}, name='iterate', library=stdlib)
     masterNet.addNode(iterate_0,16,228)
     iterate_0.inputPortByName['stopOnFailure'].widget.set(0, run=False)
-    apply(iterate_0.configure, (), {'paramPanelImmediate': 1})
+    iterate_0.configure(*(), **{'paramPanelImmediate': 1})
 except:
-    print "WARNING: failed to restore Iterate named iterate in network masterNet"
+    print("WARNING: failed to restore Iterate named iterate in network masterNet")
     print_exc()
     iterate_0=None
 
@@ -83,7 +83,7 @@ try:
     from Adt.Macro.VirtualScreening import VirtualScreening
     VirtualScreening_1 = VirtualScreening(constrkw={}, name='VirtualScreening', library=Adt)
     masterNet.addNode(VirtualScreening_1,216,497)
-    apply(VirtualScreening_1.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+    VirtualScreening_1.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
     PrepareReceptor_4 = VirtualScreening_1.macroNetwork.nodes[2]
     Pdb2pqrWS_7 = PrepareReceptor_4.macroNetwork.nodes[2]
     Pdb2pqrOpalService_ws_nbcr_net_11 = Pdb2pqrWS_7.macroNetwork.nodes[3]
@@ -97,12 +97,12 @@ try:
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['ligand'].widget.set(r"", run=False)
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['hbond'].widget.set(0, run=False)
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['with_ph'].widget.set(r"", run=False)
-    apply(Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['forcefield'].widget.configure, (), {'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
+    Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['forcefield'].widget.configure(*(), **{'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['forcefield'].widget.set(r"AMBER", run=False)
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['clean'].widget.set(0, run=False)
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['inId'].widget.set(r"", run=False)
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['apbs_input'].widget.set(0, run=False)
-    apply(Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['ffout'].widget.configure, (), {'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
+    Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['ffout'].widget.configure(*(), **{'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['ffout'].widget.set(r"", run=False)
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['localRun'].widget.set(0, run=False)
     Pdb2pqrOpalService_ws_nbcr_net_11.inputPortByName['rama'].widget.set(0, run=False)
@@ -204,7 +204,7 @@ try:
     prepareGPF_kryptonite_nbcr_net_26.inputPortByName['r_url'].widget.set(r"", run=False)
     prepareGPF_kryptonite_nbcr_net_26.inputPortByName['zpoints'].widget.set(r"", run=False)
     prepareGPF_kryptonite_nbcr_net_26.inputPortByName['filter_file_url'].widget.set(r"", run=False)
-    apply(prepareGPF_kryptonite_nbcr_net_26.inputPortByName['lib'].widget.configure, (), {'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'oldNCI', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
+    prepareGPF_kryptonite_nbcr_net_26.inputPortByName['lib'].widget.configure(*(), **{'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'oldNCI', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
     prepareGPF_kryptonite_nbcr_net_26.inputPortByName['lib'].widget.set(r"", run=False)
     prepareGPF_kryptonite_nbcr_net_26.inputPortByName['ypoints'].widget.set(r"", run=False)
     prepareGPF_kryptonite_nbcr_net_26.inputPortByName['xcenter'].widget.set(r"auto", run=False)
@@ -259,11 +259,11 @@ try:
     AutodockVS_31 = VirtualScreening_1.macroNetwork.nodes[4]
     autodock_kryptonite_nbcr_net_35 = AutodockVS_31.macroNetwork.nodes[3]
     autodock_kryptonite_nbcr_net_35.inputPortByName['ga_run'].widget.set(r"", run=False)
-    apply(autodock_kryptonite_nbcr_net_35.inputPortByName['lib'].widget.configure, (), {'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
+    autodock_kryptonite_nbcr_net_35.inputPortByName['lib'].widget.configure(*(), **{'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
     autodock_kryptonite_nbcr_net_35.inputPortByName['lib'].widget.set(r"", run=False)
     autodock_kryptonite_nbcr_net_35.inputPortByName['filter_file_url'].widget.set(r"", run=False)
     autodock_kryptonite_nbcr_net_35.inputPortByName['ga_num_evals'].widget.set(r"", run=False)
-    apply(autodock_kryptonite_nbcr_net_35.inputPortByName['sched'].widget.configure, (), {'choices': ('SGE', 'CSF')})
+    autodock_kryptonite_nbcr_net_35.inputPortByName['sched'].widget.configure(*(), **{'choices': ('SGE', 'CSF')})
     autodock_kryptonite_nbcr_net_35.inputPortByName['sched'].widget.set(r"SGE", run=False)
     autodock_kryptonite_nbcr_net_35.inputPortByName['ga_num_generations'].widget.set(r"", run=False)
     autodock_kryptonite_nbcr_net_35.inputPortByName['userlib'].widget.set(r"", run=False)
@@ -329,9 +329,9 @@ try:
     VirtualScreening_1.outputPorts[0].configure(datatype='string')
     ## configure MacroNode output ports
     VirtualScreening_1.shrink()
-    apply(VirtualScreening_1.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+    VirtualScreening_1.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
 except:
-    print "WARNING: failed to restore VirtualScreening named VirtualScreening in network masterNet"
+    print("WARNING: failed to restore VirtualScreening named VirtualScreening in network masterNet")
     print_exc()
     VirtualScreening_1=None
 
@@ -341,9 +341,9 @@ try:
     PublicServerLigandDB_37 = PublicServerLigandDB(constrkw={}, name='PublicServerLigandDB', library=Adt)
     masterNet.addNode(PublicServerLigandDB_37,345,23)
     PublicServerLigandDB_37.inputPortByName['server_lib'].widget.set(r"sample", run=False)
-    apply(PublicServerLigandDB_37.configure, (), {'paramPanelImmediate': 1})
+    PublicServerLigandDB_37.configure(*(), **{'paramPanelImmediate': 1})
 except:
-    print "WARNING: failed to restore PublicServerLigandDB named PublicServerLigandDB in network masterNet"
+    print("WARNING: failed to restore PublicServerLigandDB named PublicServerLigandDB in network masterNet")
     print_exc()
     PublicServerLigandDB_37=None
 
@@ -363,9 +363,9 @@ try:
     FilterLigandsNode_38.inputPortByName['nat_max'].widget.set(999, run=False)
     FilterLigandsNode_38.inputPortByName['torsdof_min'].widget.set(0, run=False)
     FilterLigandsNode_38.inputPortByName['torsdof_max'].widget.set(32, run=False)
-    apply(FilterLigandsNode_38.configure, (), {'paramPanelImmediate': 1})
+    FilterLigandsNode_38.configure(*(), **{'paramPanelImmediate': 1})
 except:
-    print "WARNING: failed to restore FilterLigandsNode named FilterLigandsNode in network masterNet"
+    print("WARNING: failed to restore FilterLigandsNode named FilterLigandsNode in network masterNet")
     print_exc()
     FilterLigandsNode_38=None
 
@@ -375,9 +375,9 @@ try:
     PreserveCharges__39 = CheckButtonNE(constrkw={}, name='PreserveCharges?', library=stdlib)
     masterNet.addNode(PreserveCharges__39,617,20)
     PreserveCharges__39.inputPortByName['button'].widget.set(1, run=False)
-    apply(PreserveCharges__39.configure, (), {'paramPanelImmediate': 1})
+    PreserveCharges__39.configure(*(), **{'paramPanelImmediate': 1})
 except:
-    print "WARNING: failed to restore CheckButtonNE named PreserveCharges? in network masterNet"
+    print("WARNING: failed to restore CheckButtonNE named PreserveCharges? in network masterNet")
     print_exc()
     PreserveCharges__39=None
 
@@ -386,13 +386,13 @@ try:
     from WebServices.VisionInterface.WSNodes import DownloadSaveDirNode
     DownloadSaveDir_40 = DownloadSaveDirNode(constrkw={}, name='DownloadSaveDir', library=wslib)
     masterNet.addNode(DownloadSaveDir_40,170,558)
-    apply(DownloadSaveDir_40.inputPortByName['url'].configure, (), {'defaultValue': None})
+    DownloadSaveDir_40.inputPortByName['url'].configure(*(), **{'defaultValue': None})
     DownloadSaveDir_40.inputPortByName['url'].rebindWidget()
     DownloadSaveDir_40.inputPortByName['url'].widget.set(r"", run=False)
     DownloadSaveDir_40.inputPortByName['url'].unbindWidget()
-    apply(DownloadSaveDir_40.configure, (), {'paramPanelImmediate': 1})
+    DownloadSaveDir_40.configure(*(), **{'paramPanelImmediate': 1})
 except:
-    print "WARNING: failed to restore DownloadSaveDirNode named DownloadSaveDir in network masterNet"
+    print("WARNING: failed to restore DownloadSaveDirNode named DownloadSaveDir in network masterNet")
     print_exc()
     DownloadSaveDir_40=None
 
@@ -402,9 +402,9 @@ try:
     GetStructuresFromDir_41 = GetStructuresFromDir(constrkw={}, name='GetStructuresFromDir', library=Adt)
     masterNet.addNode(GetStructuresFromDir_41,16,22)
     GetStructuresFromDir_41.inputPortByName['directory'].widget.set(r"VS", run=False)
-    apply(GetStructuresFromDir_41.configure, (), {'paramPanelImmediate': 1})
+    GetStructuresFromDir_41.configure(*(), **{'paramPanelImmediate': 1})
 except:
-    print "WARNING: failed to restore GetStructuresFromDir named GetStructuresFromDir in network masterNet"
+    print("WARNING: failed to restore GetStructuresFromDir named GetStructuresFromDir in network masterNet")
     print_exc()
     GetStructuresFromDir_41=None
 
@@ -413,9 +413,9 @@ try:
     from Adt.Mapper.InputValidation import InputValidation
     InputValidation_42 = InputValidation(constrkw={}, name='InputValidation', library=Adt)
     masterNet.addNode(InputValidation_42,86,318)
-    apply(InputValidation_42.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+    InputValidation_42.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
 except:
-    print "WARNING: failed to restore InputValidation named InputValidation in network masterNet"
+    print("WARNING: failed to restore InputValidation named InputValidation in network masterNet")
     print_exc()
     InputValidation_42=None
 
@@ -429,70 +429,70 @@ if PublicServerLigandDB_37 is not None and FilterLigandsNode_38 is not None:
             PublicServerLigandDB_37, FilterLigandsNode_38, "ligDB", "ligands", blocking=True
             , splitratio=[0.33190502385589948, 0.21642002589850867])
     except:
-        print "WARNING: failed to restore connection between PublicServerLigandDB_37 and FilterLigandsNode_38 in network masterNet"
+        print("WARNING: failed to restore connection between PublicServerLigandDB_37 and FilterLigandsNode_38 in network masterNet")
 if FilterLigandsNode_38 is not None and VirtualScreening_1 is not None:
     try:
         masterNet.connectNodes(
             FilterLigandsNode_38, VirtualScreening_1, "ligands", "ComputeGrids_GetComputeGridsInputs_ligands", blocking=True
             , splitratio=[0.37455111543238506, 0.32420948165762498])
     except:
-        print "WARNING: failed to restore connection between FilterLigandsNode_38 and VirtualScreening_1 in network masterNet"
+        print("WARNING: failed to restore connection between FilterLigandsNode_38 and VirtualScreening_1 in network masterNet")
 if PreserveCharges__39 is not None and VirtualScreening_1 is not None:
     try:
         masterNet.connectNodes(
             PreserveCharges__39, VirtualScreening_1, "value_bool", "PrepareReceptor_PrepareReceptorWS_PrepareReceptorOpalService_ws_nbcr_net_C", blocking=True
             , splitratio=[0.26471965480569831, 0.73857142767746442])
     except:
-        print "WARNING: failed to restore connection between PreserveCharges__39 and VirtualScreening_1 in network masterNet"
+        print("WARNING: failed to restore connection between PreserveCharges__39 and VirtualScreening_1 in network masterNet")
 if VirtualScreening_1 is not None and DownloadSaveDir_40 is not None:
     try:
         masterNet.connectNodes(
             VirtualScreening_1, DownloadSaveDir_40, "AutodockVS_GetMainURLFromList_newurl", "url", blocking=True
             , splitratio=[0.74808619960402778, 0.23329088335740467])
     except:
-        print "WARNING: failed to restore connection between VirtualScreening_1 and DownloadSaveDir_40 in network masterNet"
+        print("WARNING: failed to restore connection between VirtualScreening_1 and DownloadSaveDir_40 in network masterNet")
 if GetStructuresFromDir_41 is not None and iterate_0 is not None:
     try:
         masterNet.connectNodes(
             GetStructuresFromDir_41, iterate_0, "structure_list_obj", "listToLoopOver", blocking=True
             , splitratio=[0.64404900652669483, 0.66433287135542574])
     except:
-        print "WARNING: failed to restore connection between GetStructuresFromDir_41 and iterate_0 in network masterNet"
+        print("WARNING: failed to restore connection between GetStructuresFromDir_41 and iterate_0 in network masterNet")
 if iterate_0 is not None and VirtualScreening_1 is not None:
     try:
         masterNet.connectNodes(
             iterate_0, VirtualScreening_1, "oneItem", "PrepareReceptor_Pdb2pqrWS_CheckFileFormat_value", blocking=True
             , splitratio=[0.24975750410316327, 0.47366759074690934])
     except:
-        print "WARNING: failed to restore connection between iterate_0 and VirtualScreening_1 in network masterNet"
+        print("WARNING: failed to restore connection between iterate_0 and VirtualScreening_1 in network masterNet")
 if iterate_0 is not None and InputValidation_42 is not None:
     try:
         masterNet.connectNodes(
             iterate_0, InputValidation_42, "oneItem", "recpetor_obj", blocking=True
             , splitratio=[0.58378184959869772, 0.29053011237456339])
     except:
-        print "WARNING: failed to restore connection between iterate_0 and InputValidation_42 in network masterNet"
+        print("WARNING: failed to restore connection between iterate_0 and InputValidation_42 in network masterNet")
 if InputValidation_42 is not None and VirtualScreening_1 is not None:
     try:
         masterNet.connectNodes(
             InputValidation_42, VirtualScreening_1, "GPF_template", "ComputeGrids_GetComputeGridsInputs_gpf_obj", blocking=True
             , splitratio=[0.63709387814855534, 0.40809312341502446])
     except:
-        print "WARNING: failed to restore connection between InputValidation_42 and VirtualScreening_1 in network masterNet"
+        print("WARNING: failed to restore connection between InputValidation_42 and VirtualScreening_1 in network masterNet")
 if InputValidation_42 is not None and VirtualScreening_1 is not None:
     try:
         masterNet.connectNodes(
             InputValidation_42, VirtualScreening_1, "DPF_template", "AutodockVS_PrepareADVSInputs_dpf_template_obj", blocking=True
             , splitratio=[0.50008775545983264, 0.21584255901641733])
     except:
-        print "WARNING: failed to restore connection between InputValidation_42 and VirtualScreening_1 in network masterNet"
+        print("WARNING: failed to restore connection between InputValidation_42 and VirtualScreening_1 in network masterNet")
 if InputValidation_42 is not None and DownloadSaveDir_40 is not None:
     try:
         masterNet.connectNodes(
             InputValidation_42, DownloadSaveDir_40, "result_dir", "path", blocking=True
             , splitratio=[0.32102505593374198, 0.64313754588560501])
     except:
-        print "WARNING: failed to restore connection between InputValidation_42 and DownloadSaveDir_40 in network masterNet"
+        print("WARNING: failed to restore connection between InputValidation_42 and DownloadSaveDir_40 in network masterNet")
 masterNet.runOnNewData.value = False
 
 if __name__=='__main__':
@@ -512,7 +512,7 @@ if __name__=='__main__':
          # create communicator
         from NetworkEditor.net import Communicator
         masterNet.communicator = Communicator(masterNet)
-        print 'Communicator listening on port:', masterNet.communicator.port
+        print('Communicator listening on port:', masterNet.communicator.port)
 
         import socket
         f = open(argv[0]+'.sock', 'w')

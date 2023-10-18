@@ -34,7 +34,7 @@ class AutodockVS(MacroNode):
 
     def __init__(self, constrkw={}, name='AutodockVS', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -67,18 +67,18 @@ class AutodockVS(MacroNode):
         try:
             ## saving node input Ports ##
             input_Ports_10 = self.macroNetwork.ipNode
-            apply(input_Ports_10.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            input_Ports_10.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_10=None
 
         try:
             ## saving node output Ports ##
             output_Ports_11 = self.macroNetwork.opNode
-            apply(output_Ports_11.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            output_Ports_11.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_11=None
 
@@ -87,14 +87,14 @@ class AutodockVS(MacroNode):
             from Vision.StandardNodes import Generic
             PrepareADVSInputs_12 = Generic(constrkw={}, name='PrepareADVSInputs', library=stdlib)
             self.macroNetwork.addNode(PrepareADVSInputs_12,217,76)
-            apply(PrepareADVSInputs_12.addInputPort, (), {'singleConnection': True, 'name': 'ligands', 'cast': True, 'datatype': 'LigandDB', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'rect', 'color': '#FFCCFF', 'originalDatatype': 'None'})
-            apply(PrepareADVSInputs_12.addInputPort, (), {'singleConnection': True, 'name': 'autogrid_results', 'cast': True, 'datatype': 'autogrid_results', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#FF33CC', 'originalDatatype': 'None'})
-            apply(PrepareADVSInputs_12.addInputPort, (), {'singleConnection': True, 'name': 'dpf_template_obj', 'cast': True, 'datatype': 'dpf_template', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#9933FF', 'originalDatatype': 'None'})
-            apply(PrepareADVSInputs_12.addOutputPort, (), {'name': 'filter_file', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(PrepareADVSInputs_12.addOutputPort, (), {'name': 'ligand_lib', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(PrepareADVSInputs_12.addOutputPort, (), {'name': 'dpf_template_file', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(PrepareADVSInputs_12.addOutputPort, (), {'name': 'autogrid_res_url', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
-            apply(PrepareADVSInputs_12.addOutputPort, (), {'name': 'autogrid_res_local', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            PrepareADVSInputs_12.addInputPort(*(), **{'singleConnection': True, 'name': 'ligands', 'cast': True, 'datatype': 'LigandDB', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'rect', 'color': '#FFCCFF', 'originalDatatype': 'None'})
+            PrepareADVSInputs_12.addInputPort(*(), **{'singleConnection': True, 'name': 'autogrid_results', 'cast': True, 'datatype': 'autogrid_results', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#FF33CC', 'originalDatatype': 'None'})
+            PrepareADVSInputs_12.addInputPort(*(), **{'singleConnection': True, 'name': 'dpf_template_obj', 'cast': True, 'datatype': 'dpf_template', 'defaultValue': None, 'required': True, 'height': 8, 'width': 12, 'shape': 'triangle', 'color': '#9933FF', 'originalDatatype': 'None'})
+            PrepareADVSInputs_12.addOutputPort(*(), **{'name': 'filter_file', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            PrepareADVSInputs_12.addOutputPort(*(), **{'name': 'ligand_lib', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            PrepareADVSInputs_12.addOutputPort(*(), **{'name': 'dpf_template_file', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            PrepareADVSInputs_12.addOutputPort(*(), **{'name': 'autogrid_res_url', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
+            PrepareADVSInputs_12.addOutputPort(*(), **{'name': 'autogrid_res_local', 'datatype': 'string', 'height': 8, 'width': 12, 'shape': 'oval', 'color': 'white'})
             code = """def doit(self, ligands, autogrid_results, dpf_template_obj):
         dpf = dpf_template_obj.fullpath
 
@@ -138,9 +138,9 @@ class AutodockVS(MacroNode):
 
 """
             PrepareADVSInputs_12.configure(function=code)
-            apply(PrepareADVSInputs_12.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            PrepareADVSInputs_12.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore Generic named PrepareADVSInputs in network self.macroNetwork"
+            print("WARNING: failed to restore Generic named PrepareADVSInputs in network self.macroNetwork")
             print_exc()
             PrepareADVSInputs_12=None
 
@@ -149,31 +149,31 @@ class AutodockVS(MacroNode):
             from NetworkEditor.items import FunctionNode
             autodock_kryptonite_nbcr_net_13 = FunctionNode(functionOrString='autodock_kryptonite_nbcr_net', host="http://kryptonite.nbcr.net/opal2", namedArgs={'ga_run': '', 'lib': '', 'filter_file_url': '', 'ga_num_evals': '', 'filter_file': '', 'sched': 'SGE', 'urllib': '', 'ga_num_generations': '', 'dpf': '', 'u': '', 'utar': '', 'userlib': '', 'ga_pop_size': '', 'localRun': False, 'email': '', 'execPath': ''}, constrkw={'functionOrString': "'autodock_kryptonite_nbcr_net'", 'host': '"http://kryptonite.nbcr.net/opal2"', 'namedArgs': {'ga_run': '', 'lib': '', 'filter_file_url': '', 'ga_num_evals': '', 'filter_file': '', 'sched': 'SGE', 'urllib': '', 'ga_num_generations': '', 'dpf': '', 'u': '', 'utar': '', 'userlib': '', 'ga_pop_size': '', 'localRun': False, 'email': '', 'execPath': ''}}, name='autodock_kryptonite_nbcr_net', library=wslib)
             self.macroNetwork.addNode(autodock_kryptonite_nbcr_net_13,217,132)
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['ga_run'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['lib'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['filter_file_url'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['ga_num_evals'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['filter_file'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['sched'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['urllib'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['ga_num_generations'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['dpf'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['u'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['utar'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['userlib'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['ga_pop_size'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['localRun'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['email'].configure, (), {'defaultValue': None})
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['execPath'].configure, (), {'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['ga_run'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['lib'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['filter_file_url'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['ga_num_evals'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['filter_file'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['sched'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['urllib'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['ga_num_generations'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['dpf'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['u'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['utar'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['userlib'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['ga_pop_size'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['localRun'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['email'].configure(*(), **{'defaultValue': None})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['execPath'].configure(*(), **{'defaultValue': None})
             autodock_kryptonite_nbcr_net_13.inputPortByName['ga_run'].widget.set(r"", run=False)
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['lib'].widget.configure, (), {'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['lib'].widget.configure(*(), **{'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
             autodock_kryptonite_nbcr_net_13.inputPortByName['lib'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_13.inputPortByName['filter_file_url'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_13.inputPortByName['ga_num_evals'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_13.inputPortByName['filter_file'].rebindWidget()
             autodock_kryptonite_nbcr_net_13.inputPortByName['filter_file'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_13.inputPortByName['filter_file'].unbindWidget()
-            apply(autodock_kryptonite_nbcr_net_13.inputPortByName['sched'].widget.configure, (), {'choices': ('SGE', 'CSF')})
+            autodock_kryptonite_nbcr_net_13.inputPortByName['sched'].widget.configure(*(), **{'choices': ('SGE', 'CSF')})
             autodock_kryptonite_nbcr_net_13.inputPortByName['sched'].widget.set(r"SGE", run=False)
             autodock_kryptonite_nbcr_net_13.inputPortByName['urllib'].rebindWidget()
             autodock_kryptonite_nbcr_net_13.inputPortByName['urllib'].widget.set(r"", run=False)
@@ -193,9 +193,9 @@ class AutodockVS(MacroNode):
             autodock_kryptonite_nbcr_net_13.inputPortByName['localRun'].widget.set(0, run=False)
             autodock_kryptonite_nbcr_net_13.inputPortByName['email'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_13.inputPortByName['execPath'].widget.set(r"", run=False)
-            apply(autodock_kryptonite_nbcr_net_13.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            autodock_kryptonite_nbcr_net_13.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore FunctionNode named autodock_kryptonite_nbcr_net in network self.macroNetwork"
+            print("WARNING: failed to restore FunctionNode named autodock_kryptonite_nbcr_net in network self.macroNetwork")
             print_exc()
             autodock_kryptonite_nbcr_net_13=None
 
@@ -204,10 +204,10 @@ class AutodockVS(MacroNode):
             from WebServices.VisionInterface.WSNodes import GetMainURLFromListNode
             GetMainURLFromList_14 = GetMainURLFromListNode(constrkw={}, name='GetMainURLFromList', library=wslib)
             self.macroNetwork.addNode(GetMainURLFromList_14,217,188)
-            apply(GetMainURLFromList_14.inputPortByName['urls'].configure, (), {'defaultValue': None})
-            apply(GetMainURLFromList_14.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            GetMainURLFromList_14.inputPortByName['urls'].configure(*(), **{'defaultValue': None})
+            GetMainURLFromList_14.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore GetMainURLFromListNode named GetMainURLFromList in network self.macroNetwork"
+            print("WARNING: failed to restore GetMainURLFromListNode named GetMainURLFromList in network self.macroNetwork")
             print_exc()
             GetMainURLFromList_14=None
 
@@ -222,28 +222,28 @@ class AutodockVS(MacroNode):
                     input_Ports_10, PrepareADVSInputs_12, "new", "ligands", blocking=True
                     , splitratio=[0.60597534741634829, 0.41083180453223428])
             except:
-                print "WARNING: failed to restore connection between input_Ports_10 and PrepareADVSInputs_12 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_10 and PrepareADVSInputs_12 in network self.macroNetwork")
         if input_Ports_10 is not None and PrepareADVSInputs_12 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_10, PrepareADVSInputs_12, "new", "autogrid_results", blocking=True
                     , splitratio=[0.64561658610430228, 0.21974682015753622])
             except:
-                print "WARNING: failed to restore connection between input_Ports_10 and PrepareADVSInputs_12 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_10 and PrepareADVSInputs_12 in network self.macroNetwork")
         if input_Ports_10 is not None and PrepareADVSInputs_12 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_10, PrepareADVSInputs_12, "new", "dpf_template_obj", blocking=True
                     , splitratio=[0.52491295380143521, 0.32751034461281114])
             except:
-                print "WARNING: failed to restore connection between input_Ports_10 and PrepareADVSInputs_12 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_10 and PrepareADVSInputs_12 in network self.macroNetwork")
         if autodock_kryptonite_nbcr_net_13 is not None and GetMainURLFromList_14 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     autodock_kryptonite_nbcr_net_13, GetMainURLFromList_14, "result", "urls", blocking=True
                     , splitratio=[0.36974288957131424, 0.63465596053596318])
             except:
-                print "WARNING: failed to restore connection between autodock_kryptonite_nbcr_net_13 and GetMainURLFromList_14 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between autodock_kryptonite_nbcr_net_13 and GetMainURLFromList_14 in network self.macroNetwork")
         output_Ports_11 = self.macroNetwork.opNode
         if GetMainURLFromList_14 is not None and output_Ports_11 is not None:
             try:
@@ -251,42 +251,42 @@ class AutodockVS(MacroNode):
                     GetMainURLFromList_14, output_Ports_11, "newurl", "new", blocking=True
                     , splitratio=[0.34850477186787743, 0.35637513198385085])
             except:
-                print "WARNING: failed to restore connection between GetMainURLFromList_14 and output_Ports_11 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between GetMainURLFromList_14 and output_Ports_11 in network self.macroNetwork")
         if PrepareADVSInputs_12 is not None and autodock_kryptonite_nbcr_net_13 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     PrepareADVSInputs_12, autodock_kryptonite_nbcr_net_13, "filter_file", "filter_file", blocking=True
                     , splitratio=[0.33230642287344903, 0.65770700108889613])
             except:
-                print "WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork")
         if PrepareADVSInputs_12 is not None and autodock_kryptonite_nbcr_net_13 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     PrepareADVSInputs_12, autodock_kryptonite_nbcr_net_13, "ligand_lib", "urllib", blocking=True
                     , splitratio=[0.50680104599665787, 0.51414170500293577])
             except:
-                print "WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork")
         if PrepareADVSInputs_12 is not None and autodock_kryptonite_nbcr_net_13 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     PrepareADVSInputs_12, autodock_kryptonite_nbcr_net_13, "dpf_template_file", "dpf", blocking=True
                     , splitratio=[0.51615646597598808, 0.25661305528484007])
             except:
-                print "WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork")
         if PrepareADVSInputs_12 is not None and autodock_kryptonite_nbcr_net_13 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     PrepareADVSInputs_12, autodock_kryptonite_nbcr_net_13, "autogrid_res_url", "u", blocking=True
                     , splitratio=[0.5760732944947704, 0.2032376887917188])
             except:
-                print "WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork")
         if PrepareADVSInputs_12 is not None and autodock_kryptonite_nbcr_net_13 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     PrepareADVSInputs_12, autodock_kryptonite_nbcr_net_13, "autogrid_res_local", "utar", blocking=True
                     , splitratio=[0.52802808938949819, 0.66978534572736881])
             except:
-                print "WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareADVSInputs_12 and autodock_kryptonite_nbcr_net_13 in network self.macroNetwork")
         self.macroNetwork.runOnNewData.value = False
 
         ## modifying MacroInputNode dynamic ports

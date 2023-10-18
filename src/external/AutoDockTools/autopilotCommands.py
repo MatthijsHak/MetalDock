@@ -9,7 +9,7 @@ This Module facilitates the launching of large numbers of AutoDock jobs
 """
 
 
-import string, Tkinter
+import string, tkinter
 from ViewerFramework.VFCommand import CommandGUI
 from Pmv.mvCommand import MVCommand
 from mglutil.gui.InputForm.Tk.gui import InputFormDescr
@@ -248,7 +248,7 @@ class ADpilot_Cluster(MVCommand):
         """This method is invoked by saying self.vf.ADpilot_Cluster
         in the Python Shell.
         """
-        apply(self.doitWrapper, (), kw)
+        self.doitWrapper(*(), **kw)
 
 
     def onAddCmdToViewer(self):
@@ -262,7 +262,7 @@ class ADpilot_Cluster(MVCommand):
     def doit(self):
         """The real work gets done here
         """
-        print 'in doit'
+        print('in doit')
 
 
 class ADpilot_ClusterGUICommand(MVCommand):
@@ -275,7 +275,7 @@ class ADpilot_ClusterGUICommand(MVCommand):
         """This method is invoked by saying self.vf.ADpilot_ClusterGUICommand
         in the Python Shell.
         """
-        apply(self.doitWrapper, (), kw)
+        self.doitWrapper(*(), **kw)
 
 
     def onAddCmdToViewer(self):
@@ -291,7 +291,7 @@ class ADpilot_ClusterGUICommand(MVCommand):
             idf = self.idf = InputFormDescr(title = self.name)
             # append to idf here
             idf.append( {'name': 'template',
-                         'widgetType': Tkinter.Button,
+                         'widgetType': tkinter.Button,
                          'wcfg': { 'text': 'template button label'},
                          'gridcfg': { 'sticky' : 'we'}})
             # only return idf for template
@@ -304,7 +304,7 @@ class ADpilot_ClusterGUICommand(MVCommand):
         idf_dict = self.showForm('template')
     
         # get the kw key:value pairs from the gui
-        apply(self.doitWrapper, (), idf_dict)
+        self.doitWrapper(*(), **idf_dict)
 
 
     def doit(self, **kw):
@@ -332,7 +332,7 @@ class ADpilot_Template(MVCommand):
         """This method is invoked by saying self.vf.ADpilot_Template
         in the Python Shell.
         """
-        apply(self.doitWrapper, (), kw)
+        self.doitWrapper(*(), **kw)
 
 
     def onAddCmdToViewer(self):
@@ -347,7 +347,7 @@ class ADpilot_Template(MVCommand):
     def doit(self):
         """The real work gets done here
         """
-        print 'in doit'
+        print('in doit')
 
 
 
@@ -361,7 +361,7 @@ class ADpilot_TemplateGUICommand(MVCommand):
         """This method is invoked by saying self.vf.ADpilot_TemplateGUICommand
         in the Python Shell.
         """
-        apply(self.doitWrapper, (), kw)
+        self.doitWrapper(*(), **kw)
 
 
     def onAddCmdToViewer(self):
@@ -377,7 +377,7 @@ class ADpilot_TemplateGUICommand(MVCommand):
             idf = self.idf = InputFormDescr(title = self.name)
             # append to idf here
             idf.append( {'name': 'template',
-                         'widgetType': Tkinter.Button,
+                         'widgetType': tkinter.Button,
                          'wcfg': { 'text': 'template button label'},
                          'gridcfg': { 'sticky' : 'we'}})
             # only return idf for template
@@ -390,7 +390,7 @@ class ADpilot_TemplateGUICommand(MVCommand):
         idf_dict = self.showForm('template')
     
         # get the kw key:value pairs from the gui
-        apply(self.doitWrapper, (), idf_dict)
+        self.doitWrapper(*(), **idf_dict)
 
 
     def doit(self, **kw):

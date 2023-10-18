@@ -62,7 +62,7 @@ of freedom (TORSDOF) which is the number of possible torsions less the number of
 symmetry-equivalent torsions (such as a bond to a NH3). This key word is the 
 last line of the pdbq file. 
 """
-import Tkinter
+import tkinter
 from ViewerFramework.VFCommand import CommandGUI
 
 from AutoDockTools.autotorsCommands import rootSph, markSph,\
@@ -211,20 +211,20 @@ def initModule(vf):
 
     if vf.hasGui:
         vf.GUI.menuBars['AutoTools4Bar']._frame.config( {'background':'tan'})
-        for item in vf.GUI.menuBars['AutoTools4Bar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoTools4Bar'].menubuttons.values()):
             item.configure(background = 'tan')
         if not hasattr(vf.GUI, 'adt4Bar'):
             vf.GUI.adt4Bar = vf.GUI.menuBars['AutoTools4Bar']
-            vf.GUI.adt4Frame = vf.GUI.adt4Bar.menubuttons.values()[0].master
+            vf.GUI.adt4Frame = list(vf.GUI.adt4Bar.menubuttons.values())[0].master
         if not hasattr(vf.GUI, 'adt4ModeLabel'):
             mbs = {}
             packing_list = []
-            for c in vf.GUI.adt4Frame.children.values():
-                if isinstance(c, Tkinter.Menubutton):
+            for c in list(vf.GUI.adt4Frame.children.values()):
+                if isinstance(c, tkinter.Menubutton):
                     mbs[c.cget('text')] = c
                     packing_list.append(c.cget('text'))
                     c.pack_forget()
-            vf.GUI.adt4ModeLabel=Tkinter.Label(vf.GUI.adt4Frame, text="ADT4.0", width=6,
+            vf.GUI.adt4ModeLabel=tkinter.Label(vf.GUI.adt4Frame, text="ADT4.0", width=6,
                              relief='sunken', borderwidth=1, fg='DarkGreen',
                              bg = 'ivory',anchor='w' )
             vf.GUI.adt4ModeLabel.pack(side='left')

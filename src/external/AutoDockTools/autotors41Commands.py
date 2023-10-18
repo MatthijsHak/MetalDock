@@ -64,7 +64,7 @@ last line of the pdbq file.
 """
 
 
-import Tkinter
+import tkinter
 from ViewerFramework.VFCommand import CommandGUI
 from AutoDockTools.autotorsCommands import rootSph, markSph,\
 menuText, AtorsMoleculeChooser, MAXTORS, AdtSetMode,\
@@ -224,22 +224,22 @@ def initModule(vf):
 
     if not hasattr(vf, 'ADTSetMode'):
         vf.addCommand(AdtSetMode(), 'ADTSetMode')
-    if vf.hasGui and 'AutoTools41Bar' in vf.GUI.menuBars.keys():
+    if vf.hasGui and 'AutoTools41Bar' in list(vf.GUI.menuBars.keys()):
         vf.GUI.menuBars['AutoTools41Bar']._frame.config( {'background':'tan'})
-        for item in vf.GUI.menuBars['AutoTools41Bar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoTools41Bar'].menubuttons.values()):
             item.configure(background = 'tan')
         if not hasattr(vf.GUI, 'adt41Bar'):
             vf.GUI.adt41Bar = vf.GUI.menuBars['AutoTools41Bar']
-            vf.GUI.adt41Frame = vf.GUI.adt41Bar.menubuttons.values()[0].master
+            vf.GUI.adt41Frame = list(vf.GUI.adt41Bar.menubuttons.values())[0].master
         if not hasattr(vf.GUI, 'adt41ModeLabel'):
             mbs = {}
             packing_list = []
-            for c in vf.GUI.adt41Frame.children.values():
-                if isinstance(c, Tkinter.Menubutton):
+            for c in list(vf.GUI.adt41Frame.children.values()):
+                if isinstance(c, tkinter.Menubutton):
                     mbs[c.cget('text')] = c
                     packing_list.append(c.cget('text'))
                     c.pack_forget()
-            vf.GUI.adt41ModeLabel=Tkinter.Label(vf.GUI.adt41Frame, text="ADT4.2", width=6,
+            vf.GUI.adt41ModeLabel=tkinter.Label(vf.GUI.adt41Frame, text="ADT4.2", width=6,
                              relief='sunken', borderwidth=1, fg='DarkGreen',
                              bg = 'ivory',anchor='w' )
             vf.GUI.adt41ModeLabel.pack(side='left')

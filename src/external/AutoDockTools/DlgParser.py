@@ -23,11 +23,10 @@ This Object parses the result of an AutoDock job and returns a dictionary.
 
 """
 import os
-from string import find, join, replace, split, rfind, strip
 import re
 import numpy
 
-from AutoDockTools.ResultParser import ResultParser
+from ResultParser import ResultParser
 
 
 class DlgParser(ResultParser):
@@ -136,7 +135,7 @@ class DlgParser(ResultParser):
 
     def getReDict(self):
         if hasattr(self, 'reDict'):
-            for k, d in self.reDict.items():
+            for k, d in list(self.reDict.items()):
                 d['lines'] = []
             return
         self.reDict = {}
@@ -228,20 +227,20 @@ class DlgParser(ResultParser):
                 input_key = 'INPUT-PDBQ: '
                 if k==input_key:
                     if verbose and self.version<4.0:
-                        print "!!no lines found for key=", k, "!!"
+                        print("!!no lines found for key=", k, "!!")
                 else:
                     if verbose:
-                        print "!!no lines found for key=", k, "!!"
+                        print("!!no lines found for key=", k, "!!")
             else:
-                apply(d['func'], (lines,), {})
+                d['func'](*(lines,), **{})
 
 
     def setADVersion(self,lines):
     	#May need to modify for next autodock version -Huameng
         if len(lines):
             for l in lines:
-                if find(l, 'AutoDock')>-1:
-                    ll = split(l)
+                if l.find('AutoDock') > -1:
+                    ll = l.split()
                     version = ll[2]
                     if len(version)>3:
                         version = version[:3]
@@ -253,10 +252,10 @@ class DlgParser(ResultParser):
 
     def setOutlev(self,lines):
         if len(lines):
-            ll = split(lines[0])
+            ll = lines[0].split()
             if ll[2] in self.outlevs_list:
                 self.outlev = self.outlevs_list.index(ll[2]) - 2 
-                print "set self.outlev to ", self.outlev
+                print("set self.outlev to ", self.outlev)
             else:
                 self.outlev = int(ll[2])
         else:
@@ -274,7 +273,7 @@ class DlgParser(ResultParser):
 
 
     def getLigandAtomCount(self, lines):
-        self.ligand_atom_count = int(split(lines[0])[-2])
+        self.ligand_atom_count = int(lines[0].split()[-2])
         #print "parsed ligand_atom_count =", self.ligand_atom_count
 
 
@@ -289,17 +288,17 @@ class DlgParser(ResultParser):
         x = len(lines)/2
         for j in range(x):
             energy = float(lines[2*j].strip().split()[-1])
-            clist = map(float, lines[2*j+1].strip().split())
+            clist = list(map(float, lines[2*j+1].strip().split()))
             self.initial_clist.append([energy, clist])
 
 
     def getCenterMapPt(self, lines):
         for l in lines:
             if l.find('Coordinates of Central Grid Point of Maps')>-1:
-                ll = split(l, '=')
+                ll = l.split('=')
                 str_pt = ll[1].strip()  #"(13.231, 56.852, 54.080)
                 #str_pt = ll[1]  #"(13.231, 56.852, 54.080)
-                self.center_pt = map(float, str_pt[2:-2].split(','))
+                self.center_pt = list(map(float, str_pt[2:-2].split(',')))
 
 
     def getTime(self, lines, echo=False):
@@ -331,28 +330,28 @@ class DlgParser(ResultParser):
     def getPopulations(self, lines, echo=False):
         currently_build_pop = True
         ind = self.allLines.index(lines[0])
-        if echo: print "found start of population at index=", ind
+        if echo: print("found start of population at index=", ind)
         found = False
         all_population_lines = []
         plist = []
         currently_building_pop = True
         for line in self.allLines[ind:]:
             if line.find("</pop")==0:
-                if echo: print 'found end of a population', ind
+                if echo: print('found end of a population', ind)
                 found = True
                 all_population_lines.append(plist)
-                if echo: print "added plist:", len(plist)
+                if echo: print("added plist:", len(plist))
                 currently_building_pop = False
                 plist = []
                 #break
             elif line.find("<pop")==0:
-                if echo: print 'found start of a population', ind
+                if echo: print('found start of a population', ind)
                 currently_building_pop = True
                 plist = []
             elif currently_building_pop:
                 plist.append(line)
         x = len(plist)
-        if echo: print x, 'lines in getInitialPopulation'
+        if echo: print(x, 'lines in getInitialPopulation')
         self.population_list = []
         #figure out number of torsions:
         num_values = len(all_population_lines[0][0].strip().split())
@@ -370,7 +369,7 @@ class DlgParser(ResultParser):
                 ll = line.strip().split()
                 ind_index = int(ll[0])
                 age  = int(ll[2])
-                clist = map(float, ll[3:])
+                clist = list(map(float, ll[3:]))
                 cdict = {}
                 cdict['binding_energy'] = float(ll[1])
                 cdict['age'] = int(ll[2])
@@ -397,7 +396,7 @@ class DlgParser(ResultParser):
         self.nb_array = numpy.zeros((ct, ct))
         if echo:
             for l in nb_lines:
-                print l,
+                print(l, end=' ')
         for i in range(ct):
             l = nb_lines[i][10:-1]
             for j in range(ct):
@@ -405,15 +404,15 @@ class DlgParser(ResultParser):
                 if l[jind]=='X':
                     self.nb_array[i][j]=1
             if echo:
-                print
-                print l
-                print self.nb_array[i]
+                print()
+                print(l)
+                print(self.nb_array[i])
 
 
     def getSeedInfo(self, lines):
         seeds = []
         for l in lines:
-            ilist = split(l)
+            ilist = l.split()
             slist = []
             for item in ilist[1:]:
                 slist.append(int(item))
@@ -426,7 +425,7 @@ class DlgParser(ResultParser):
         if len(seeds)==len(self.clist):
             for i in range(len(seeds)):
                 conf = self.clist[i]
-                if conf.has_key('run') or self.version>=4.0:
+                if 'run' in conf or self.version>=4.0:
                     #outlev -1 prints States in order
                     s = seeds[i]
                     conf['rseed1'] = s[0]
@@ -460,9 +459,9 @@ class DlgParser(ResultParser):
         cl = self.clusterlines
         hl = self.histogramlines
         for l in lines:
-            if find(l, 'RANKING')>-1:
+            if l.find('RANKING') > -1:
                 cl.append(l[:-1])
-            elif find(l, '#')>-1:
+            elif l.find('#') > -1:
                 hl.append(l[:-1])
         if len(cl):
             self.getClusterRecord(cl)
@@ -475,19 +474,19 @@ class DlgParser(ResultParser):
         clRecList = []
         curList = []
         #curList gets list of conf info
-        curInd = int(split(cl[0])[0])
+        curInd = int(cl[0].split()[0])
         ctr = 1
         for l in cl:
-            ll = split(l)
+            ll = l.split()
             #when built, newList is
             #[Rank,SubRank,Run,DockedEnergy,ClusterRMSD,RefREMSD]
-            newList = map(lambda x:int(x),ll[:3])
+            newList = [int(x) for x in ll[:3]]
             #3/29/05
             if self.wroteAll and self.version<4.0:
                 #print "setting run number to ", ctr
                 newList[2] = ctr
                 ctr = ctr + 1
-            newList2 = map(lambda x:float(x),ll[3:-1])
+            newList2 = [float(x) for x in ll[3:-1]]
             newList.extend(newList2)
             if newList[0]==curInd:
                 curList.append(newList)
@@ -534,21 +533,21 @@ class DlgParser(ResultParser):
                     self.mlsd_count +=1 #mlsd_docking
                 self.dpfLines.append(l[5:-1])
                 if l.find('ga_run')>-1:
-                    ll = split(l)
+                    ll = l.split()
                     self.runs = int(ll[2])
                     #print "self.runs=", self.runs
                 elif l.find('runs')>-1 and l.find('simanneal')<0:
-                    ll = split(l)
+                    ll = l.split()
                     self.runs = int(ll[2])
                     #print "SA: self.runs=", self.runs
                 elif l.find('do_local_only')>-1:
-                    ll = split(l)
+                    ll = l.split()
                     self.runs = int(ll[2])
                 elif l.find('simanneal')>-1:
                     if len(l.split())==2:   #'DPF> simanneal' so number of runs set elsewhere
                         continue
                     else:
-                        ll = split(l)
+                        ll = l.split()
                         #'DPF>', 'simanneal', '#', 'do', 'as', 'many', 'SA', 'runs', 'as', 'set', 'by', 'runs', 'keyword', 'above'
                         if l.find('#') >-1 and ll.index('#') ==2:  # number of runs set elsewhere
                             continue
@@ -556,7 +555,7 @@ class DlgParser(ResultParser):
                             #'DPF>', 'simanneal', '10', '#', 'do', 'as', 'many', 'SA', 'runs', 'as', 'set', 'by', 'runs', 'keyword', 'above'
                             self.runs = int(ll[2])
                 elif l.find('ga_run')>-1:
-                    ll = split(l)
+                    ll = l.split()
                     self.runs = int(ll[2])
 
     
@@ -566,12 +565,12 @@ class DlgParser(ResultParser):
         dpfLines = []
         keys = []
         for l in lines:
-            ll = split(l)
+            ll = l.split()
             ind = ll.index('NEWDPF')
             k = ll[ind+1]
             #only add each key once
             if k not in keys:
-                dpfLines.append(join(ll[ind+1:]))
+                dpfLines.append(''.join(ll[ind+1:]))
                 keys.append(k)
         if len(dpfLines):
             self.dpfLines.extend(dpfLines)
@@ -585,16 +584,16 @@ class DlgParser(ResultParser):
         foundRun = 0
         for l in lines:
             #in clustering dlg, multiple copies of input-pdbq are present
-            if find(l, ' Run')>-1 and foundRun:
+            if l.find(' Run') > -1 and foundRun:
                 break
-            elif find(l, ' Run')>-1:
+            elif l.find(' Run') > -1:
                 foundRun = 1
             else:
                 ligLINES.append(l[12:-1])
         #check here to remove lines of just spaces
         nl = []
         for l in ligLINES:
-            if len(strip(l)):
+            if len(l.strip()):
                 nl.append(l)
         self.ligLines = nl
         #print "in processLigLines:len(ligLines)=", len(nl)
@@ -604,18 +603,18 @@ class DlgParser(ResultParser):
     def processFlexResLinesV4(self, lines):
         #print "in processFlexResLinesV4: len(self.ligLines=)", len(self.ligLines)
         if self.version<4.0:
-            print "not version 4.0! RETURNING!!"
+            print("not version 4.0! RETURNING!!")
             return
         ligLINES = []
         foundRun = 0
         ind = 21
         for l in lines:
             #in clustering dlg, multiple copies of input-pdbq are present
-            if find(l, 'Run')>-1 and foundRun:
+            if l.find('Run') > -1 and foundRun:
                 break
-            elif find(l, 'Run')>-1:
+            elif l.find('Run') > -1:
                 foundRun = 1
-            elif find(l, '^_____________________')>-1:
+            elif l.find('^_____________________') > -1:
                 #last line is ________________-
                 break
             else:
@@ -623,7 +622,7 @@ class DlgParser(ResultParser):
         #check here to remove lines of just spaces
         nl = []
         for l in ligLINES:
-            if len(strip(l)):
+            if len(l.strip()):
                 nl.append(l)
         self.flex_res_lines = nl
         #print "end pFRLV4: len(self.flex_res_lines)=", len(nl)
@@ -635,7 +634,7 @@ class DlgParser(ResultParser):
     def processLigLinesV4(self, lines, verbose=False):
         #use this only for versions 4.0 and greater
         #hack to fix run-on INPUT-PDBQT: line from wcg 
-        if verbose: print " self.ligand_count =", self.ligand_count
+        if verbose: print(" self.ligand_count =", self.ligand_count)
         first_line = lines[0]
         if len(first_line)>100 and first_line.count("INPUT-PDBQT:")>2:
             lines = first_line.replace("INPUT-PDBQT:", "\nINPUT-PDBQT:").split('\n')
@@ -643,21 +642,21 @@ class DlgParser(ResultParser):
             lines = lines[1:-1]
             #print "replaced lines with ", len(lines), ' lines'
         if self.version<4.0:
-            print "ERROR in processLigLinesV4: self.version=", self.version, "<4.0"
+            print("ERROR in processLigLinesV4: self.version=", self.version, "<4.0")
             return
         ligLINES = []
         foundRun = 0
-        if find(lines[0], 'INPUT-LIGAND-PDBQT')==0:
+        if lines[0].find('INPUT-LIGAND-PDBQT') == 0:
             ind = 20
-        elif find(lines[0], 'INPUT-PDBQ')==0:
+        elif lines[0].find('INPUT-PDBQ') == 0:
             ind = 13
         for l in lines:
             #in clustering dlg, multiple copies of input-pdbq are present
-            if find(l, 'Run')>-1 and foundRun:
+            if l.find('Run') > -1 and foundRun:
                 break
-            elif find(l, 'Run')>-1:
+            elif l.find('Run') > -1:
                 foundRun = 1
-            elif find(l, 'TORSDOF')>-1:
+            elif l.find('TORSDOF') > -1:
                 #eg run-on TORSDOF line: 
                 #TORSDOF 3___
                 lastChar = l.find('_')
@@ -666,25 +665,25 @@ class DlgParser(ResultParser):
                 ligLINES.append(l[ind:lastChar])
                 l_index = lines.index(l)
                 if l_index==len(lines)-1 or self.ligand_count>1:
-                    if verbose: print "found TORSDOF on last line!"
+                    if verbose: print("found TORSDOF on last line!")
                     break
                 next_line = lines[l_index+1]
-                if find(next_line, 'BEGIN_RES')<0 and find(next_line, 'active torsions:')<0: #hack for multiple ligands
+                if next_line.find('BEGIN_RES') < 0 and next_line.find('active torsions:') < 0: #hack for multiple ligands
                     if self.recluster==0:
-                        print len(lines[l_index:]), ' lines left unparsed!!!'
+                        print(len(lines[l_index:]), ' lines left unparsed!!!')
                         break
                     else:   
-                        print "@@This dlg file is a RE-CLUSTERING file@@"
+                        print("@@This dlg file is a RE-CLUSTERING file@@")
             else:
                 #ligLINES.append(l[13:-1])
                 ligLINES.append(l[ind:-1])
          
         lig_ct = ligLINES.count("REMARK  status: ('A' for Active; 'I' for Inactive)")
-        if verbose: print '2: INPUT_LIGAND number from ligLINES = ', lig_ct
+        if verbose: print('2: INPUT_LIGAND number from ligLINES = ', lig_ct)
         #check here to remove lines of just spaces
         nl = []
         for l in ligLINES:
-            if len(strip(l)):
+            if len(l.strip()):
                 nl.append(l)
         #print "end pLV4: len(self.ligLines)=", len(nl)
         self.ligLines = nl
@@ -701,11 +700,11 @@ class DlgParser(ResultParser):
         if not len(lines):
             return
         modelList = []
-        if find(lines[0], 'DOCKED')==0:
+        if lines[0].find('DOCKED') == 0:
             ind = 8
-        elif find(lines[0], 'INPUT-LIGAND-PDBQT')==0:
+        elif lines[0].find('INPUT-LIGAND-PDBQT') == 0:
             ind = 20
-        elif find(lines[0], 'INPUT-PDBQ')==0:
+        elif lines[0].find('INPUT-PDBQ') == 0:
             ind = 12
         #preprocess lines to remove DOCKED or INPUT-PDBQ
         nlines = []
@@ -739,7 +738,7 @@ class DlgParser(ResultParser):
                         try:
                             nlines.append(l[ind:-1])
                         except:
-                            print 'cutting out 64+65 of ', l
+                            print('cutting out 64+65 of ', l)
                             nlines.append(l[ind:64]+ l[66:-1])
                     else:
                         nlines.append(l[ind:-1])
@@ -749,7 +748,7 @@ class DlgParser(ResultParser):
         if self.version<4.0:
             curMod = [nlines[0]]
             for l in nlines[1:]:
-                if find(l, 'MODEL')>-1:
+                if l.find('MODEL') > -1:
                     modelList.append(curMod)
                     curMod = [l]
                 else:
@@ -763,7 +762,7 @@ class DlgParser(ResultParser):
                 try:
                     modelList.append(self.run_models[i+1])
                 except:
-                    print "unable to load expected model number ", i+1
+                    print("unable to load expected model number ", i+1)
         self.modelList = modelList
         self.makeModels(modelList)
 
@@ -778,7 +777,7 @@ class DlgParser(ResultParser):
             #use endmdl because cluster dlg format
             # has MODEL then lines w/o MODEL then MODEL
             #again in desc of 1 model...
-            if find(l, 'ENDMDL')>-1:
+            if l.find('ENDMDL') > -1:
                 curMod.append(l)
                 modelList.append(curMod)
                 endmdl = 1
@@ -802,7 +801,7 @@ class DlgParser(ResultParser):
         if len(self.clist)==self.runs:
             for i in range(len(self.clist)):
                 cl = self.clist[i]
-                if not cl.has_key('run'):
+                if 'run' not in cl:
                     cl['run'] = i+1
             return
         else:
@@ -810,15 +809,15 @@ class DlgParser(ResultParser):
             self.clist = []
         for l in lines:
             # in test-1 State= + 17 items: 3 trans, 4quat + ndihe(10) torsions
-            xx = split(l)
+            xx = l.split()
             # remove possible punctuation
             for ind in range(len(xx)):
                 if xx[ind][-1]==',': 
                     xx[ind] = xx[ind][:-1]
-                    raise 'comma'
+                    raise ValueError('comma')
                 if xx[ind][-1]=='.': 
                     xx[ind] = xx[ind][:-1]
-                    raise 'period'
+                    raise ValueError('period')
                 
             #transList = xx[1:4]
             trans = []
@@ -881,103 +880,102 @@ class DlgParser(ResultParser):
         binding_energy2 = None
         version = self.version
         for l in lines:
-            ll = split(l)
+            ll = l.split()
             #if find(l, 'MODEL')>-1:
             #    d['num'] = int((ll)[1])
-            if find(l, 'Run')>-1 and find(l, 'Rank')==-1:
+            if l.find('Run') > -1 and l.find('Rank') == -1:
                 d['run'] = int((ll)[3])
-            elif find(l, 'Estimated Free Energy of Binding')>-1:
+            elif l.find('Estimated Free Energy of Binding') > -1:
                 d['binding_energy'] = float((ll)[7])
                 if version>=4.0: d['energy'] = float((ll)[7])
-            elif find(l, 'vdW + Hbond + desolv Energy')>-1:
+            elif l.find('vdW + Hbond + desolv Energy') > -1:
                 d['vdw_hb_desolv_energy'] = float((ll)[8])
-            elif find(l, 'Electrostatic Energy')>-1:
+            elif l.find('Electrostatic Energy') > -1:
                 if (ll[1] == 'Electrostatic'):
                     d['electrostatic_energy'] = float((ll)[4])
                 elif (ll[1] == 'Intermol.'):
                     d['electrostatic_energy'] = float((ll)[5])
-            elif find(l, 'Moving Ligand-Fixed Receptor')>-1:
+            elif l.find('Moving Ligand-Fixed Receptor') > -1:
                 d['moving_ligand_fixed_receptor'] = float((ll)[5])
-            elif find(l, 'Moving Ligand-Moving Receptor')>-1:
+            elif l.find('Moving Ligand-Moving Receptor') > -1:
                 d['moving_ligand_moving_receptor'] = float((ll)[5])
-            elif find(l, 'Total Internal Energy')>-1:
+            elif l.find('Total Internal Energy') > -1:
                 d['total_internal'] = float((ll)[7])
-            elif find(l, 'Internal Energy Ligand')>-1:
+            elif l.find('Internal Energy Ligand') > -1:
                 d['ligand_internal'] = float((ll)[5])
-            elif find(l, 'Internal Energy Receptor')>-1:
+            elif l.find('Internal Energy Receptor') > -1:
                 d['receptor_internal'] = float((ll)[5])
-            elif find(l, 'Torsional Free Energy')>-1:
+            elif l.find('Torsional Free Energy') > -1:
                 d['torsional_energy'] = float((ll)[6])
-            elif find(l, 'Estimated Inhibition Constant')>-1:
-                if find(l, 'N/A') < 0:
+            elif l.find('Estimated Inhibition Constant') > -1:
+                if l.find('N/A') < 0:
                     d['inhib_constant'] = float((ll)[6])
-                    if version>=4.0:
+                    if version >= 4.0:
                         d['inhib_constant_units'] = ll[7]
-            elif find(l, 'Final Docked Energy')>-1:
+            elif l.find('Final Docked Energy') > -1:
                 d['docking_energy'] = float((ll)[5])
-            elif find(l, 'Final Intermolecular Energy')>-1:
+            elif l.find('Final Intermolecular Energy') > -1:
                 d['intermol_energy'] = float((ll)[6])
-            elif find(l, 'Final Internal Energy of Ligand')>-1:
+            elif l.find('Final Internal Energy of Ligand') > -1:
                 d['internal_energy'] = float((ll)[8])
-            elif find(l, 'Final Internal Energy')>-1:
+            elif l.find('Final Internal Energy') > -1:
                 d['internal_energy'] = float((ll)[6])
-            elif find(l, 'Torsional Free Energy')>-1:
+            elif l.find('Torsional Free Energy') > -1:
                 d['torsional_energy'] = float((ll)[6])
-            elif find(l, 'NEWDPF tran0')>-1:
+            elif l.find('NEWDPF tran0') > -1:
                 d['trn_x'] = float(ll[3])
                 d['trn_y'] = float(ll[4])
                 d['trn_z'] = float(ll[5])
-            elif find(l, 'NEWDPF quat0')>-1:
+            elif l.find('NEWDPF quat0') > -1:
                 d['qtn_nx'] = float(ll[3])
                 d['qtn_ny'] = float(ll[4])
                 d['qtn_nz'] = float(ll[5])
                 d['qtn_ang_deg'] = float(ll[6])
-            elif find(l, 'NEWDPF quaternion0')>-1:
+            elif l.find('NEWDPF quaternion0') > -1:
                 d['quaternion_nx'] = float(ll[3])
                 d['quaternion_ny'] = float(ll[4])
                 d['quaternion_nz'] = float(ll[5])
                 d['quaternion_nw'] = float(ll[6])
-            elif find(l, 'NEWDPF dihe0')>-1:
+
+            elif l.find('NEWDPF dihe0') > -1:
                 angList = []
                 for n in ll[3:]:
                     angList.append(float(n))
                 d['torsion_values'] = angList
                 d['num_torsions'] = len(angList)
-            elif find(l, 'Intermol. vdW + Hbond Energy ')>-1:
-                #AD4 specific model information:
+            elif l.find('Intermol. vdW + Hbond Energy ') > -1:
+                # AD4 specific model information:
                 # USER         Intermol. vdW + Hbond Energy   =  -14.63 kcal/mol
                 d['vdw_energy'] = float((ll)[7])
-            elif find(l, 'Intermol. Electrostatic Energy')>-1:
-                #USER         Intermol. Electrostatic Energy =   -0.62 kcal/mol
+            elif l.find('Intermol. Electrostatic Energy') > -1:
+                # USER         Intermol. Electrostatic Energy =   -0.62 kcal/mol
                 d['estat_energy'] = float((ll)[5])
-            elif find(l, '(3) Torsional Free Energy')>-1:
-                #USER    (3) Torsional Free Energy           =   +3.84 kcal/mol
+            elif l.find('(3) Torsional Free Energy') > -1:
+                # USER    (3) Torsional Free Energy           =   +3.84 kcal/mol
                 d['torsional_energy'] = float((ll)[6])
-            elif find(l, "(4) Unbound System's Energy")>-1:
-                #USER    (4) Unbound System's Energy         =   -0.85 kcal/mol
+            elif l.find("(4) Unbound System's Energy") > -1:
+                # USER    (4) Unbound System's Energy         =   -0.85 kcal/mol
                 try:
                     d['unbound_energy'] = float((ll)[7])
                 except:
                     d['unbound_energy'] = float((ll)[6])
-            elif find(l, 'ATOM')>-1:
-                coords.append([float(l[30:38]),float(l[38:46]),float(l[46:54])])
+            elif l.find('ATOM') > -1:
+                coords.append([float(l[30:38]), float(l[38:46]), float(l[46:54])])
                 try:
                     vdW.append(float(l[54:60]))
                 except:
-                    #print 'vdw:', l[54:60], ' RAISED!'
                     vdW.append(0.0)
                 try:
                     Elec.append(float(l[60:66]))
                 except:
-                    #print 'estat:', l[60:66], ' RAISED!'
                     Elec.append(0.0)
-                if len(l)>77:
+                if len(l) > 77:
                     try:
                         binding_energy2 = float(l[70:76])
                     except:
                         pass
-            elif find(l, 'HETA')>-1:
-                coords.append([float(l[30:38]),float(l[38:46]),float(l[46:54])])
+            elif l.find('HETA') > -1:
+                coords.append([float(l[30:38]), float(l[38:46]), float(l[46:54])])
                 try:
                     vdW.append(float(l[54:60]))
                 except:
@@ -986,13 +984,16 @@ class DlgParser(ResultParser):
                     Elec.append(float(l[60:66]))
                 except:
                     Elec.append(0.0)
+
             d['coords'] = coords
             d['vdw_energies'] = vdW
             d['estat_energies'] = Elec
-            d['total_energies'] = numpy.array(numpy.array(vdW)+numpy.array(Elec)).tolist()
-            if binding_energy2 and not d.has_key('binding_energy'):
+            d['total_energies'] = numpy.array(numpy.array(vdW) + numpy.array(Elec)).tolist()
+
+            if binding_energy2 and 'binding_energy' not in d:
                 d['binding_energy'] = binding_energy2
                 d['docking_energy'] = binding_energy2
+
         return d
 
 

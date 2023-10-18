@@ -54,16 +54,16 @@ class AutoDockHosts(UserDict.UserDict):
 		#always write a localHost line
 		#get the correct macroList here
 		if whichOnes=='all':
-			macroList=self.keys()
+			macroList=list(self.keys())
 		elif whichOnes=='userSpecific':
 			#get the one with userSpecific=1, only
 			macroList=[]
-			for item in self.items():
+			for item in list(self.items()):
 				if item[1]['userSpecific']: 
 					macroList.append(item)
 		else:
 			macroList=[]
-			for item in self.items():
+			for item in list(self.items()):
 				if not item[1]['userSpecific']: 
 					macroList.append(item)
 			#get the other ones...
@@ -85,7 +85,7 @@ class AutoDockHosts(UserDict.UserDict):
 		fptr.write(outstr)
 		d = self[macroName]
 		#d = self[hostName]
-		klist = d.keys()
+		klist = list(d.keys())
 		for i in range(len(klist)):
 			k=klist[i]
 			if k=='userSpecific':

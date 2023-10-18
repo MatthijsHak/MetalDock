@@ -20,33 +20,8 @@ def find_command_path(command):
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))[:-11] # Project Root
 os.environ['ROOT_DIR']=ROOT_DIR
 
-#os.environ['LIB_DIR']=sys.executable.split( os.path.sep+'bin'+os.path.sep,1)[0]
-
 os.environ['OBABEL']=find_command_path('obabel')
-#os.path.join(os.environ['LIB_DIR'],'bin','obabel')
 os.environ['PDB2PQR']=find_command_path('pdb2pqr30')
-#os.path.join(os.environ['LIB_DIR'],'bin','pdb2pqr30')
-os.environ['MGLTOOLS']=os.path.join(os.environ['ROOT_DIR'],'external','AutoDockTools','Utilities24')
+os.environ['MGLTOOLS']=os.path.join(os.environ['ROOT_DIR'],'external','AutoDockTools')
 os.environ['PYTHON_2']=find_command_path('python2.7')
-#os.path.join(os.environ['LIB_DIR'],'bin','python2.7')
 os.environ['PYTHON_3']=find_command_path('python3')
-#os.path.join(os.environ['LIB_DIR'],'bin','python3')
-
-
-#obabel_path = find_command_path('obabel')
-#print(obabel_path)
-#
-#pdb2pqr30 = find_command_path('pdb2pqr30')
-#print(pdb2pqr30)
-#
-#python2_path = find_command_path('python2.7')
-#print(python2_path)
-#
-#python3_path = find_command_path('python3')
-#print(python3_path)
-#
-#print(os.environ['OBABEL'])
-#print(os.environ['PDB2PQR'])
-#print(os.environ['PYTHON_2'])
-#print(os.environ['PYTHON_3'])
-#sys.exit()

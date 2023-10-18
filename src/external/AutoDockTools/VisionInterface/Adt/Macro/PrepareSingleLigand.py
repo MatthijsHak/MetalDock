@@ -33,7 +33,7 @@ class PrepareSingleLigand(MacroNode):
 
     def __init__(self, constrkw={}, name='PrepareSingleLigand', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -63,18 +63,18 @@ class PrepareSingleLigand(MacroNode):
         try:
             ## saving node input Ports ##
             input_Ports_19 = self.macroNetwork.ipNode
-            apply(input_Ports_19.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            input_Ports_19.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_19=None
 
         try:
             ## saving node output Ports ##
             output_Ports_20 = self.macroNetwork.opNode
-            apply(output_Ports_20.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            output_Ports_20.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_20=None
 
@@ -83,23 +83,23 @@ class PrepareSingleLigand(MacroNode):
             from NetworkEditor.items import FunctionNode
             PrepareLigandSingle_kryptonite_nbcr_net_21 = FunctionNode(functionOrString='PrepareLigandSingle_kryptonite_nbcr_net', host="http://kryptonite.nbcr.net/opal2", namedArgs={'A': '', 'C': False, 'B': '', 'ligand': '', 'g': False, 'F': False, 'I': '', 'M': False, 'p': '', 'R': '', 'U': '', 'v': False, 'Z': False, 'localRun': False, 'execPath': '', 'd': ''}, constrkw={'functionOrString': "'PrepareLigandSingle_kryptonite_nbcr_net'", 'host': '"http://kryptonite.nbcr.net/opal2"', 'namedArgs': {'A': '', 'C': False, 'B': '', 'ligand': '', 'g': False, 'F': False, 'I': '', 'M': False, 'p': '', 'R': '', 'U': '', 'v': False, 'Z': False, 'localRun': False, 'execPath': '', 'd': ''}}, name='PrepareLigandSingle_kryptonite_nbcr_net', library=wslib)
             self.macroNetwork.addNode(PrepareLigandSingle_kryptonite_nbcr_net_21,217,92)
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['A'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['C'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['B'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['ligand'].configure, (), {'defaultValue': None, 'required': True})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['g'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['F'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['I'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['M'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['p'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['R'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['U'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['v'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['Z'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['localRun'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['execPath'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['d'].configure, (), {'defaultValue': None})
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['A'].widget.configure, (), {'choices': ('bonds_hydrogens', 'bonds', 'hydrogens')})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['A'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['C'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['B'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['ligand'].configure(*(), **{'defaultValue': None, 'required': True})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['g'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['F'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['I'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['M'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['p'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['R'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['U'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['v'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['Z'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['localRun'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['execPath'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['d'].configure(*(), **{'defaultValue': None})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['A'].widget.configure(*(), **{'choices': ('bonds_hydrogens', 'bonds', 'hydrogens')})
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['A'].widget.set(r"", run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['C'].widget.set(0, run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['B'].widget.set(r"", run=False)
@@ -112,16 +112,16 @@ class PrepareSingleLigand(MacroNode):
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['M'].widget.set(0, run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['p'].widget.set(r"", run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['R'].widget.set(r"", run=False)
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['U'].widget.configure, (), {'choices': ('nphs_lps', 'nphs', 'lps')})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['U'].widget.configure(*(), **{'choices': ('nphs_lps', 'nphs', 'lps')})
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['U'].widget.set(r"", run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['v'].widget.set(0, run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['Z'].widget.set(0, run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['localRun'].widget.set(0, run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['execPath'].widget.set(r"", run=False)
             PrepareLigandSingle_kryptonite_nbcr_net_21.inputPortByName['d'].widget.set(r"", run=False)
-            apply(PrepareLigandSingle_kryptonite_nbcr_net_21.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            PrepareLigandSingle_kryptonite_nbcr_net_21.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore FunctionNode named PrepareLigandSingle_kryptonite_nbcr_net in network self.macroNetwork"
+            print("WARNING: failed to restore FunctionNode named PrepareLigandSingle_kryptonite_nbcr_net in network self.macroNetwork")
             print_exc()
             PrepareLigandSingle_kryptonite_nbcr_net_21=None
 
@@ -130,12 +130,12 @@ class PrepareSingleLigand(MacroNode):
             from WebServices.VisionInterface.WSNodes import GetURLFromListNode
             GetURLFromList_22 = GetURLFromListNode(constrkw={}, name='GetURLFromList', library=wslib)
             self.macroNetwork.addNode(GetURLFromList_22,217,171)
-            apply(GetURLFromList_22.inputPortByName['urllist'].configure, (), {'defaultValue': None})
-            apply(GetURLFromList_22.inputPortByName['ext'].configure, (), {'defaultValue': None})
+            GetURLFromList_22.inputPortByName['urllist'].configure(*(), **{'defaultValue': None})
+            GetURLFromList_22.inputPortByName['ext'].configure(*(), **{'defaultValue': None})
             GetURLFromList_22.inputPortByName['ext'].widget.set(r"pdbqt", run=False)
-            apply(GetURLFromList_22.configure, (), {'paramPanelImmediate': 1})
+            GetURLFromList_22.configure(*(), **{'paramPanelImmediate': 1})
         except:
-            print "WARNING: failed to restore GetURLFromListNode named GetURLFromList in network self.macroNetwork"
+            print("WARNING: failed to restore GetURLFromListNode named GetURLFromList in network self.macroNetwork")
             print_exc()
             GetURLFromList_22=None
 
@@ -149,7 +149,7 @@ class PrepareSingleLigand(MacroNode):
                     PrepareLigandSingle_kryptonite_nbcr_net_21, GetURLFromList_22, "result", "urllist", blocking=True
                     , splitratio=[0.32868238447942777, 0.66102005033481848])
             except:
-                print "WARNING: failed to restore connection between PrepareLigandSingle_kryptonite_nbcr_net_21 and GetURLFromList_22 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareLigandSingle_kryptonite_nbcr_net_21 and GetURLFromList_22 in network self.macroNetwork")
         output_Ports_20 = self.macroNetwork.opNode
         if GetURLFromList_22 is not None and output_Ports_20 is not None:
             try:
@@ -157,7 +157,7 @@ class PrepareSingleLigand(MacroNode):
                     GetURLFromList_22, output_Ports_20, "url", "new", blocking=True
                     , splitratio=[0.24357139972148803, 0.60352121442381113])
             except:
-                print "WARNING: failed to restore connection between GetURLFromList_22 and output_Ports_20 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between GetURLFromList_22 and output_Ports_20 in network self.macroNetwork")
         input_Ports_19 = self.macroNetwork.ipNode
         if input_Ports_19 is not None and PrepareLigandSingle_kryptonite_nbcr_net_21 is not None:
             try:
@@ -165,7 +165,7 @@ class PrepareSingleLigand(MacroNode):
                     input_Ports_19, PrepareLigandSingle_kryptonite_nbcr_net_21, "new", "ligand", blocking=True
                     , splitratio=[0.58130558930809739, 0.62673128127582967])
             except:
-                print "WARNING: failed to restore connection between input_Ports_19 and PrepareLigandSingle_kryptonite_nbcr_net_21 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_19 and PrepareLigandSingle_kryptonite_nbcr_net_21 in network self.macroNetwork")
         self.macroNetwork.runOnNewData.value = True
 
         ## modifying MacroInputNode dynamic ports

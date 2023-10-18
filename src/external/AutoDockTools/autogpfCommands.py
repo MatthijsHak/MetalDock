@@ -122,23 +122,23 @@ from MolKit import Read
 from Pmv.mvCommand import MVCommand, MVAtomICOM
 from Pmv.guiTools import MoleculeChooser
 from Pmv.qkollua import q
-from SimpleDialog import SimpleDialog
-import types, Tkinter, math, os
+from tkinter.simpledialog import SimpleDialog
+import types, tkinter, math, os
 import numpy
 
-from energyConstants import Rij, epsij, SolVol, SolPar, SolCon
+from .energyConstants import Rij, epsij, SolVol, SolPar, SolCon
 #from AutoDockTools.Objects.energyConstants import Rij, epsij, SolVol, SolPar, SolCon
-from autotorsCommands import checkMolCharges
-from autotorsCommands import  set_autoMergeNPHS
-from GridParameters import GridParameters, \
+from .autotorsCommands import checkMolCharges
+from .autotorsCommands import  set_autoMergeNPHS
+from .GridParameters import GridParameters, \
                 grid_parameter_list, grid_parameter_list4
 #from AutoDockTools.Objects.GridParameters import GridParameters, grid_parameter_list
 from mglutil.gui.BasicWidgets.Tk.thumbwheel import ThumbWheel
-import tkSimpleDialog
+import tkinter.simpledialog
 from string import split, find, join, upper, rfind, replace
-from MoleculePreparation import ReceptorPreparation, AD4ReceptorPreparation
+from .MoleculePreparation import ReceptorPreparation, AD4ReceptorPreparation
 
-from atomTypeTools import AutoDock4_AtomTyper
+from .atomTypeTools import AutoDock4_AtomTyper
 
 from DejaVu.Geom import Geom
 
@@ -304,10 +304,10 @@ class GpfSetGpo(MVCommand):
 
 
     def doit(self, *args, **kw):
-        if not len(kw.items()):
+        if not len(list(kw.items())):
             return 'ERROR'
 
-        for key, val in kw.items():
+        for key, val in list(kw.items()):
             self.vf.gpo[key]['value'] = val
 
 
@@ -324,7 +324,7 @@ class GpfLoadDefaults(MVCommand):
     def __call__(self, gpffile, **kw):
         if not os.path.exists(gpffile):
             raise IOError
-        apply(self.doitWrapper,(gpffile,),kw)
+        self.doitWrapper(*(gpffile,), **kw)
         
 
     def doit(self, gpffile):
@@ -383,18 +383,18 @@ class GpfMacroInit(MVCommand):
         self.vf.loadModule('editCommands','Pmv')
 
         checkHasGpo(self.vf)
-        self.resKeys = q.keys()
+        self.resKeys = list(q.keys())
         self.editHISprotonation = None
-        if 'Automerge NPHS' not in self.vf.userpref.keys():
+        if 'Automerge NPHS' not in list(self.vf.userpref.keys()):
             doc = """Automatically merge non-polar hydrogens in formatting molecules for AutoDock. Valid values are 1 or 0"""
-            if 'Automerge NPHS' in self.vf.userpref.settings.keys():
+            if 'Automerge NPHS' in list(self.vf.userpref.settings.keys()):
                 value = self.vf.userpref.settings['Automerge NPHS']
             else:
                 value = 1
             self.vf.userpref.add('Automerge NPHS', value, [0,1],
                 callbackFunc = [set_autoMergeNPHS], doc=doc, category='AutoDockTools')
-        if 'HIS Protonation' not in self.vf.userpref.keys():
-            if 'HIS Protonation' in self.vf.userpref.settings.keys():
+        if 'HIS Protonation' not in list(self.vf.userpref.keys()):
+            if 'HIS Protonation' in list(self.vf.userpref.settings.keys()):
                 value = self.vf.userpref.settings['HIS Protonation']
             else:
                 value =  'No change'
@@ -418,7 +418,7 @@ class GpfMacroInit(MVCommand):
         dict = {}
         for r in resSet:
             dict[r.type] = 0
-        for t in dict.keys():
+        for t in list(dict.keys()):
             if t not in self.resKeys:
                 return 0
         #only get to this point if all
@@ -433,7 +433,7 @@ class GpfMacroInit(MVCommand):
             return 'ERROR'
         #kw should be mol and possibly filename
         kw['filename'] = filename
-        apply(self.doitWrapper,(mols[0],), kw)
+        self.doitWrapper(*(mols[0],), **kw)
 
 
     def doit(self, mol, **kw):
@@ -466,7 +466,7 @@ class GpfMacroInit(MVCommand):
                 needToAddCharges = 1
             elif len(chargedAts)!=len(mol.allAtoms):
                 needToAddCharges = 1
-            elif len(filter(lambda x:x.charge==0, chargedAts))==len(chargedAts):
+            elif len([x for x in chargedAts if x.charge==0])==len(chargedAts):
                 #this checks that each atom doesn't have charge=0
                 needToAddCharges = 1
             if needToAddCharges:     
@@ -509,8 +509,8 @@ class GpfMacroInit(MVCommand):
             if hs: self.vf.fixHNames(hs, topCommand=0)
 
             #always merge lone pairs
-            lps = filter(lambda x: x.element=='Xx' and \
-                      (x.name[0]=='L' or x.name[1]=='L'),mol.allAtoms)
+            lps = [x for x in mol.allAtoms if x.element=='Xx' and \
+                      (x.name[0]=='L' or x.name[1]=='L')]
             if len(lps):
                 renumber = 1
                 if self.vf.hasGui:
@@ -524,7 +524,7 @@ class GpfMacroInit(MVCommand):
                 atSet = mol.allAtoms
                 atSet.sort()
                 fst = atSet[0].number
-                atSet.number = range(fst, len(atSet)+fst)
+                atSet.number = list(range(fst, len(atSet)+fst))
             #FIX THIS: CHECK THAT DISPLAY GETS UPDATED
             #if self.vf.hasGui and redisplay:
             #    self.vf.displayLines(mol, negate=1, topCommand=0, log=0)
@@ -644,7 +644,7 @@ len(newtypes):number of atom types which had to be changed: to M or X
         if not mols:
             return 'ERROR'
         kw['newfilename'] = newfilename
-        return apply(self.doitWrapper, (mols[0],), kw)
+        return self.doitWrapper(*(mols[0],), **kw)
         
 
     def doit(self, mol, **kw):
@@ -656,8 +656,7 @@ len(newtypes):number of atom types which had to be changed: to M or X
 
         #make sure every atom has autodock_element field
         #IS THIS REDUNDANT... ie was it already done before this is called
-        has_ad_element = filter(lambda x: hasattr(x, 'autodock_element'), \
-                                            mol.allAtoms)
+        has_ad_element = [x for x in mol.allAtoms if hasattr(x, 'autodock_element')]
         if len(has_ad_element)!=len(mol.allAtoms):
             setAutoDockElements(mol)
 
@@ -667,7 +666,7 @@ len(newtypes):number of atom types which had to be changed: to M or X
         typeD = {}
         for a in mol.allAtoms:
             typeD[a.autodock_element[0]] = 0
-        autodockTypes = typeD.keys()
+        autodockTypes = list(typeD.keys())
         #NB: made autodockTypes 1 character only
         #THIS IS PROBABLY WRONG...what about Zn, Mg....
 
@@ -759,7 +758,7 @@ len(newtypes):number of atom types which had to be changed: to M or X
             mol = mols[0]
             kw = {}
             kw['newfilename'] = None
-            return apply(self.doitWrapper, (mol,), kw)
+            return self.doitWrapper(*(mol,), **kw)
 
 
 #FIX THIS: it needs updating
@@ -790,7 +789,7 @@ def setAutoDockElements(mol):
                     item.element = item.element[1]
                 else:
                     item.element = 'C'
-            elif item.element not in autodockElementDict.keys():
+            elif item.element not in list(autodockElementDict.keys()):
                 item.autodock_element=item.element
             else:
                 item.autodock_element = autodockElementDict[item.element]
@@ -820,15 +819,15 @@ def checkFile(vf, filename):
     mergeNPHS = None
     mergeLPS = None
     ifd = InputFormDescr(title = 'Options')
-    mergenphs = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+    mergenphs = tkinter.IntVar(master=self.vf.GUI.ROOT)
     mergenphs.set(0)
-    mergelps = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+    mergelps = tkinter.IntVar(master=self.vf.GUI.ROOT)
     mergelps.set(0)
-    chargeType = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+    chargeType = tkinter.IntVar(master=self.vf.GUI.ROOT)
     chargeType.set(3)
-    addSol = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+    addSol = tkinter.IntVar(master=self.vf.GUI.ROOT)
     addSol.set(3)
-    newname = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+    newname = tkinter.StringVar(master=self.vf.GUI.ROOT)
     #newname.set(os.path.basename(filename[:rfind(filename,'.')]+'.pdbqs'))
     # eg ('1crn', 'pdbqs')[0]+'.pdbqs'
     nameParts = os.path.splitext(os.path.basename(filename)) 
@@ -839,84 +838,84 @@ def checkFile(vf, filename):
         if ftype != 'pdbq':
             chargeType.set(0)
             ifd.append({'name': 'typeChargeLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'text':'charge type to use:',
-                'gridcfg':{'sticky':Tkinter.W}}),
+                'gridcfg':{'sticky':tkinter.W}}),
             ifd.append({'name':    'gastCharg',
-                'widgetType':Tkinter.Radiobutton,
+                'widgetType':tkinter.Radiobutton,
                 'text':'gasteiger',
                 'variable':chargeType,
                 'value':1, 
-                'gridcfg':{'sticky':Tkinter.W,
+                'gridcfg':{'sticky':tkinter.W,
                         'row':-1,'column':1}}),
             ifd.append({'name':    'kollCharg',
-                'widgetType':Tkinter.Radiobutton,
+                'widgetType':tkinter.Radiobutton,
                 'text':'Kollman united atom ',
                 'variable':chargeType,
                 'value':0, 
-                'gridcfg':{'sticky':Tkinter.W,'row':-1,'column':2}}),
+                'gridcfg':{'sticky':tkinter.W,'row':-1,'column':2}}),
             if ftype == 'mol2' or ftype == 'pdbq':
                 ifd.append({'name':    'keepCharg',
-                    'widgetType':Tkinter.Radiobutton,
+                    'widgetType':tkinter.Radiobutton,
                     'text':'keep original charges',
                     'variable':chargeType,
                     'value':3, 
-                    'gridcfg':{'sticky':Tkinter.W,'column':1}}),
+                    'gridcfg':{'sticky':tkinter.W,'column':1}}),
         addSol.set(1)
         ifd.append({'name': 'addSolLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text':'add solvation parameters?',
-            'gridcfg':{'sticky':Tkinter.W}}),
+            'gridcfg':{'sticky':tkinter.W}}),
         ifd.append({'name':    'yesAddSol',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg':{'text':'yes',
                     'variable':addSol,
                     'value':1},
-            'gridcfg':{'sticky':Tkinter.W,'row':-1,'column':1}}),
+            'gridcfg':{'sticky':tkinter.W,'row':-1,'column':1}}),
         ifd.append({'name':    'noAddSol',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg':{'text':'no',
                     'variable':addSol,
                     'value':0}, 
-            'gridcfg':{'sticky':Tkinter.W,'row':-1,'column':2}}),
+            'gridcfg':{'sticky':tkinter.W,'row':-1,'column':2}}),
     ifd.append({'name': 'mergeNPHSLab',
-        'widgetType':Tkinter.Label,
+        'widgetType':tkinter.Label,
         'text':'automatically merge non-polar Hs?',
-        'gridcfg':{'sticky':Tkinter.W}}),
+        'gridcfg':{'sticky':tkinter.W}}),
     ifd.append({'name':    'yesMergeNPHs',
-        'widgetType':Tkinter.Radiobutton,
+        'widgetType':tkinter.Radiobutton,
         'wcfg':{'text':'yes',
                 'variable':mergenphs,
                 'value':1},
-        'gridcfg':{'sticky':Tkinter.W,'row':-1,'column':1}}),
+        'gridcfg':{'sticky':tkinter.W,'row':-1,'column':1}}),
     ifd.append({'name':    'noMergeNPHs',
-        'widgetType':Tkinter.Radiobutton,
+        'widgetType':tkinter.Radiobutton,
         'wcfg':{'text':'no',
                 'variable':mergenphs,
                 'value':0}, 
-        'gridcfg':{'sticky':Tkinter.W,'row':-1,'column':2}}),
+        'gridcfg':{'sticky':tkinter.W,'row':-1,'column':2}}),
     ifd.append({'name': 'mergeLPSLab',
-        'widgetType':Tkinter.Label,
+        'widgetType':tkinter.Label,
         'text':'automatically merge lone pairs?',
-        'gridcfg':{'sticky':Tkinter.W}}),
+        'gridcfg':{'sticky':tkinter.W}}),
     ifd.append({'name':    'yesMergeLPS',
-        'widgetType':Tkinter.Radiobutton,
+        'widgetType':tkinter.Radiobutton,
         'wcfg':{'text':'yes',
                 'variable':mergelps,
                 'value':1},
-        'gridcfg':{'sticky':Tkinter.W,'row':-1,'column':1}}),
+        'gridcfg':{'sticky':tkinter.W,'row':-1,'column':1}}),
     ifd.append({'name':    'noMergeLPS',
-        'widgetType':Tkinter.Radiobutton,
+        'widgetType':tkinter.Radiobutton,
         'wcfg':{'text':'no',
                 'variable':mergelps,
                 'value':0}, 
-        'gridcfg':{'sticky':Tkinter.W,'row':-1,'column':2}}),
+        'gridcfg':{'sticky':tkinter.W,'row':-1,'column':2}}),
     ifd.append({'name':    'newfileEnt',
-        'widgetType':Tkinter.Entry,
+        'widgetType':tkinter.Entry,
         'wcfg':{
             'label':'save result as:',
             'textvariable':newname},
-        'gridcfg':{'sticky':Tkinter.E,'columnspan':2}}),
+        'gridcfg':{'sticky':tkinter.E,'columnspan':2}}),
     vals = vf.getUserInput(ifd)
 
     if vals:
@@ -954,13 +953,13 @@ class GpfMacroReader(MVCommand):
         #if macroFile is not None:
         if macroFile:
             kw = {}
-            apply(self.doitWrapper, (macroFile,), kw)
+            self.doitWrapper(*(macroFile,), **kw)
 
 
     def __call__(self, macroFile, **kw):
         if not os.path.exists(macroFile):
             raise IOError
-        apply(self.doitWrapper,(macroFile,),kw)
+        self.doitWrapper(*(macroFile,), **kw)
 
 
     def doit(self, macroFile, **kw):
@@ -977,7 +976,7 @@ class GpfMacroReader(MVCommand):
                 self.vf.displayLines(mol,topCommand=0,redraw=1)
 
         kw['topCommand'] = 0
-        apply(self.vf.ADgpf_initMacro, (mol,), kw)
+        self.vf.ADgpf_initMacro(*(mol,), **kw)
 
 
 GpfMacroReaderGUI = CommandGUI()
@@ -1011,16 +1010,16 @@ class GpfMacroChooser(MVCommand):
         if mol: 
             macroFile = os.path.basename(mol.parser.filename)
             kw = {}
-            apply(self.doitWrapper, (mol,), kw)
+            self.doitWrapper(*(mol,), **kw)
 
 
     def guiCallback(self):
         self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Molecule',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseMolecule_cb})
         self.form = self.chooser.go(modal=0, blocking=0)
         lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -1028,7 +1027,7 @@ class GpfMacroChooser(MVCommand):
 
 
     def __call__(self, nodes, **kw):
-        apply(self.doitWrapper,(nodes,),kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes, **kw):
@@ -1036,7 +1035,7 @@ class GpfMacroChooser(MVCommand):
         if not len(mols):
             return 'ERROR'
         kw['topCommand'] = 0
-        apply(self.vf.ADgpf_initMacro, (mols[0],), kw)
+        self.vf.ADgpf_initMacro(*(mols[0],), **kw)
 
 
 GpfMacroChooserGUI = CommandGUI()
@@ -1069,10 +1068,10 @@ class GpfAddSol(MVCommand):
         if ok==0:
             self.chooser = MoleculeChooser(self.vf, 'single', 'Choose Macromolecule')
             self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Molecule',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseMolecule_cb})
             self.form = self.chooser.go(modal=0, blocking=0)
             lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -1127,7 +1126,7 @@ class GpfAddSol(MVCommand):
             msg="AutoGrid requires written pdbqs molecule"
             self.vf.warningMsg(msg)
         kw['outfile'] = outfile
-        return apply(self.doitWrapper,(mol,), kw)
+        return self.doitWrapper(*(mol,), **kw)
 
 
     def __call__(self, mol, outfile=None , **kw):
@@ -1135,7 +1134,7 @@ class GpfAddSol(MVCommand):
             mol is macromolecule 
             outfile is new  filename"""
         kw['outfile'] = outfile
-        return apply(self.doitWrapper,(mol,),kw)
+        return self.doitWrapper(*(mol,), **kw)
 
 
     def doit(self, mol, **kw):
@@ -1160,7 +1159,7 @@ class GpfAddSol(MVCommand):
         nuc_acid_list = ['  A','  C','  G']
 
         atSet = mol.allAtoms
-        solvsKeys = self.solvs.keys()
+        solvsKeys = list(self.solvs.keys())
         for at in atSet:
             if at.name in bblist:
                 atKey = at.name + '---'
@@ -1170,7 +1169,7 @@ class GpfAddSol(MVCommand):
                 if 'O2*' in childnames or 'O2\'' in childnames:
                     #build special 
                     atKey = at.name + ' R' + at.parent.type[2]
-                    print 'special rna key', atKey
+                    print('special rna key', atKey)
                 else:
                     atKey = at.name + at.parent.type
             else:
@@ -1194,7 +1193,7 @@ class GpfAddSol(MVCommand):
         #Renumber HERE!??!
         atSet.sort()
         fst = atSet[0].number
-        atSet.number = range(fst, len(atSet)+fst)
+        atSet.number = list(range(fst, len(atSet)+fst))
 
         #don't want to write any CONECT records
         #self.vf.writePDBQS(outfile, atSet, recType='none', topCommand=0)
@@ -1231,18 +1230,18 @@ class GpfInitLigand(MVCommand):
     def onAddCmdToViewer(self):
         checkHasGpo(self.vf)
         if self.vf.hasGui:
-            self.gtypes = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.gtypes = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.gtypes.set('')
-            self.showLig = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showLig = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showLig.set(0)
-            self.NHBonds = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.OHBonds = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.SHBonds = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.NHBonds = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.OHBonds = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.SHBonds = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.vf.loadModule('colorCommands','Pmv')
 
 
     def __call__(self, mol,  **kw):
-        apply(self.doitWrapper,(mol,),kw)
+        self.doitWrapper(*(mol,), **kw)
 
 
     def doit(self, mol):
@@ -1272,8 +1271,7 @@ class GpfInitLigand(MVCommand):
         if self.vf.hasGui:
             self.vf.displayLines(lig, topCommand=0)
             self.vf.colorByAtomType(lig,['lines'], topCommand=0)
-            aromCs = AtomSet(filter(lambda x:x.autodock_element=='A',\
-                lig.allAtoms))
+            aromCs = AtomSet([x for x in lig.allAtoms if x.autodock_element=='A'])
             if len(aromCs):
                 self.vf.color(aromCs,((0.,1.,0.,),),['lines'],\
                     topCommand=0, redraw=1)
@@ -1313,55 +1311,55 @@ class GpfInitLigand(MVCommand):
                 for item in ['NHB','OHB','SHB']:
                     if self.vf.gpo[item]['value']:
                         changeVals[item]['value'] = 0
-        if len(changeVals.items()):
-            apply(self.vf.ADgpf_setGpo, (), changeVals)
+        if len(list(changeVals.items())):
+            self.vf.ADgpf_setGpo(*(), **changeVals)
 
 
     def buildForm(self):
         lig = self.vf.gpo.ligand
         ifd = self.ifd = InputFormDescr(title = "AutoGpf Ligand")
-        ifd.append( {'widgetType':Tkinter.Entry,
+        ifd.append( {'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'Ligand Atom Types:',
                 'textvariable': self.gtypes,
                 'command':self.updateTypes,
                 'eventType':'<Key>'
             },
-            'gridcfg':{'sticky':Tkinter.W,'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W,'columnspan':2}})
         ifd.append({'name': 'Show Ligand',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text': 'Show Ligand',
             'variable': self.showLig,
-            'gridcfg':{'sticky':Tkinter.W},
+            'gridcfg':{'sticky':tkinter.W},
             'command': CallBackFunction(self.showLigand, lig)})
         ifd.append({'name': 'HBondsLabel',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text': 'Model Hydrogen Bonding',
-            'gridcfg':{'sticky':Tkinter.W}})
+            'gridcfg':{'sticky':tkinter.W}})
         ifd.append({'name': 'N-HBonds',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text': 'Nitrogens ',
             'variable': self.NHBonds,
-            'gridcfg':{'sticky':Tkinter.W}})
+            'gridcfg':{'sticky':tkinter.W}})
         ifd.append({'name': 'O-HBonds',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text': 'Oxygens ',
             'variable': self.OHBonds,
-            'gridcfg':{'sticky':Tkinter.W}})
+            'gridcfg':{'sticky':tkinter.W}})
         ifd.append({'name': 'S-HBonds',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text': 'Sulphurs ',
             'variable': self.SHBonds,
-            'gridcfg':{'sticky':Tkinter.W}})
-        ifd.append({'widgetType': Tkinter.Button,
+            'gridcfg':{'sticky':tkinter.W}})
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Accept',
             'wcfg':{'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'columnspan':2},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'columnspan':2},
             'command':self.Accept_cb})
-        ifd.append({'widgetType': Tkinter.Button,
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Close',
             'wcfg':{'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'column':2, 'row':-1},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'column':2, 'row':-1},
             'command':self.Close_cb})
     
 
@@ -1383,9 +1381,9 @@ class GpfInitLigand(MVCommand):
         shb = self.SHBonds.get()
         if shb != self.vf.gpo['SHB']['value']:
             changeVals['SHB'] = shb
-        if len(changeVals.items()):
+        if len(list(changeVals.items())):
             changeVals['topCommand'] = 0
-            apply(self.vf.ADgpf_setGpo, (), changeVals)
+            self.vf.ADgpf_setGpo(*(), **changeVals)
         self.form.withdraw()
 
 
@@ -1403,7 +1401,7 @@ class GpfInitLigand(MVCommand):
         for at in ligand.allAtoms:
             dict[at.autodock_element] = 0
 
-        dictKeyList = dict.keys()
+        dictKeyList = list(dict.keys())
         for k in dictKeyList:
             if k not in ['C','A','N','O','S','P','H','n','f','F','c','b','I','M']:
                 if self.vf.hasGui:
@@ -1415,7 +1413,7 @@ class GpfInitLigand(MVCommand):
                 sortedList.append(kk)
         for k in dictKeyList:
             if k not in sortedList:
-                print 'unknown autodock_type ', k
+                print('unknown autodock_type ', k)
                 sortedList.append(k)
         sortedstring = join(sortedList,'')
         ligand.types = sortedstring
@@ -1479,7 +1477,7 @@ class GpfLigandChooser(MVCommand):
             ok = 0
             if hasattr(mol, 'torTree'):
                 ok = 1
-            elif dict.has_key('molecule') and mol==dict['molecule']:
+            elif 'molecule' in dict and mol==dict['molecule']:
                 ok = hasattr(mol, 'outputfile')
             if not ok:
                 self.vf.warningMsg('can only select molecule with written autotors output file')
@@ -1494,10 +1492,10 @@ class GpfLigandChooser(MVCommand):
     def guiCallback(self):
         self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Ligand',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseLigand_cb})
         self.form = self.chooser.go(modal=0, blocking=0)
         lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -1505,7 +1503,7 @@ class GpfLigandChooser(MVCommand):
 
 
     def __call__(self, nodes, **kw):
-        apply(self.doitWrapper,(nodes,),kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes):
@@ -1541,7 +1539,7 @@ class GpfLigReader(MVCommand):
     def __call__(self, ligFile, **kw):
         if not os.path.exists(ligFile):
             raise IOError
-        apply(self.doitWrapper,(ligFile,),kw)
+        self.doitWrapper(*(ligFile,), **kw)
 
 
     def doit(self, ligFile):
@@ -1582,7 +1580,7 @@ class GpfEditor(MVCommand):
                 title = 'gpf File:')
         #if filename is not None:
         if filename:
-            apply(self.doitWrapper,(filename,),kw)
+            self.doitWrapper(*(filename,), **kw)
 
 
     def doit(self, filename):
@@ -1632,7 +1630,7 @@ class GpfWriter(MVCommand):
 
             
     def __call__(self, outfile, **kw):
-        apply(self.doitWrapper,(outfile,),kw)
+        self.doitWrapper(*(outfile,), **kw)
 
 
     def doit(self, outfile):
@@ -1688,7 +1686,7 @@ class SelectCenter(MVCommand, MVAtomICOM):
 
 
     def dismiss_cb(self, event = None):
-        if self.vf.ADgpf_setGrid.ifd.entryByName.has_key('Pick Center'):
+        if 'Pick Center' in self.vf.ADgpf_setGrid.ifd.entryByName:
             self.vf.ADgpf_setGrid.ifd.entryByName['Pick Center']['variable'].set(0)
         if hasattr(self.vf.ADgpf_setGrid, 'form') and self.vf.ADgpf_setGrid.form.root.winfo_ismapped():
             self.vf.ADgpf_setGrid.form.root.withdraw()
@@ -1698,7 +1696,7 @@ class SelectCenter(MVCommand, MVAtomICOM):
         if not hasattr(self.vf.ADgpf_setGrid, 'ifd'):
             return
         d = self.vf.ADgpf_setGrid.ifd.entryByName
-        if d.has_key('Pick Center'):
+        if 'Pick Center' in d:
             d['Pick Center']['variable'].set(0)
 
 
@@ -1718,7 +1716,7 @@ to the picked atom's coordinates"""
         atoms = self.vf.expandNodes(atom).findType(Atom)
         if not len(atoms): return 'ERROR'
         atom = atoms[0]
-        apply( self.doitWrapper, (atom,), kw)
+        self.doitWrapper(*(atom,), **kw)
 
 
     def doit(self,atom):
@@ -1735,7 +1733,7 @@ to the picked atom's coordinates"""
         self.vf.ADgpf_setGrid.showBox.set(1)
         if hasattr(self.vf.ADgpf_setGrid, 'ifd'):
             d = self.vf.ADgpf_setGrid.ifd.entryByName
-            if d.has_key('Pick Center'):
+            if 'Pick Center' in d:
                 d['Pick Center']['variable'].set(-1)
         if self.save:
             self.vf.setICOM(self.save, modifier="Shift_L", topCommand=0)
@@ -1761,10 +1759,10 @@ class SetMapTypes(MVCommand):
     def onAddCmdToViewer(self):
         checkHasGpo(self.vf)
         if self.vf.hasGui:
-            self.gtypes= Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.NHBonds= Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.OHBonds= Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.SHBonds= Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.gtypes= tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.NHBonds= tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.OHBonds= tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.SHBonds= tkinter.IntVar(master=self.vf.GUI.ROOT)
 
 
     def guiCallback(self):
@@ -1781,45 +1779,45 @@ class SetMapTypes(MVCommand):
     def buildForm(self):
         ifd = self.ifd = InputFormDescr(title = "AutoGpf Ligand")
         ifd.append( {'name': 'MapTypesEntry',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'Map Atom Types:',
                 'textvariable': self.gtypes,
                 'command':self.updateHbonds,
                 'eventType':'<Key>'
              },
-            'gridcfg':{'sticky':Tkinter.W,'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W,'columnspan':2}})
         ifd.append({'name': 'HBondsLabel',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text': 'Model Hydrogen Bonding',
-            'gridcfg':{'sticky':Tkinter.W}})
+            'gridcfg':{'sticky':tkinter.W}})
         ifd.append({'name': 'N-HBonds',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text': 'Nitrogens ',
             'variable': self.NHBonds,
-            'gridcfg':{'sticky':Tkinter.W},
+            'gridcfg':{'sticky':tkinter.W},
             'command': self.updateHbonds})
         ifd.append({'name': 'O-HBonds',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text': 'Oxygens ',
             'variable': self.OHBonds,
-            'gridcfg':{'sticky':Tkinter.W},
+            'gridcfg':{'sticky':tkinter.W},
             'command': self.updateHbonds})
         ifd.append({'name': 'S-HBonds',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text': 'Sulphurs ',
             'variable': self.SHBonds,
-            'gridcfg':{'sticky':Tkinter.W},
+            'gridcfg':{'sticky':tkinter.W},
             'command': self.updateHbonds})
-        ifd.append({'widgetType': Tkinter.Button,
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Accept',
             'wcfg':{'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'columnspan':2},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'columnspan':2},
             'command':self.Accept_cb})
-        ifd.append({'widgetType': Tkinter.Button,
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Close',
             'wcfg':{'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'column':2, 'row':-1},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'column':2, 'row':-1},
             'command':self.Close_cb})
         self.form = self.vf.getUserInput(self.ifd, modal=0, blocking=0)
         self.form.root.protocol('WM_DELETE_WINDOW',self.Close_cb)
@@ -1836,7 +1834,7 @@ class SetMapTypes(MVCommand):
         SHB = self.SHBonds.get()
         kw={}
         kw['topCommand'] = 0
-        apply(self.doitWrapper, (types, NHB, OHB, SHB), kw)
+        self.doitWrapper(*(types, NHB, OHB, SHB), **kw)
         self.form.withdraw()
 
 
@@ -1865,7 +1863,7 @@ nbh: flag to model nitrogen hydrogen bonding
 obh: flag to model oxygen hydrogen bonding
 sbh: flag to model sulfur hydrogen bonding
         """
-        apply(self.doitWrapper,(typeList, nbh, ohb, shb,), kw)
+        self.doitWrapper(*(typeList, nbh, ohb, shb,), **kw)
 
 
     def doit(self, types, NHB, OHB, SHB):
@@ -1880,9 +1878,9 @@ sbh: flag to model sulfur hydrogen bonding
         for item in ['types','NHB','OHB','SHB']:
             if self.vf.gpo[item]['value']!= eval(item):
                 changeVals[item]=eval(item)
-        if len(changeVals.keys()):
+        if len(list(changeVals.keys())):
             changeVals['topCommand'] = 1
-            apply(self.vf.ADgpf_setGpo, (), changeVals)
+            self.vf.ADgpf_setGpo(*(), **changeVals)
         
 
 SetMapTypesGUI= CommandGUI()
@@ -1905,18 +1903,18 @@ class SetUpCovalentMap(MVCommand):
         self.version='AD3'
         self.z_string = "Z"
         if self.vf.hasGui:
-            self.setPickAtom=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.setSelAtom=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.setSelectedAtom=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.constantVar=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.coordStr=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.atomType=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.wellDepth=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.wellWidth=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.setPickAtom=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.setSelAtom=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.setSelectedAtom=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.constantVar=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.coordStr=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.atomType=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.wellDepth=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.wellWidth=tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.wellWidth.set("5.0")
-            self.xVar=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.yVar=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.zVar=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.xVar=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.yVar=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.zVar=tkinter.StringVar(master=self.vf.GUI.ROOT)
 
 
     def guiCallback(self):
@@ -1948,7 +1946,7 @@ class SetUpCovalentMap(MVCommand):
             'gridcfg':{'sticky':'w','columnspan':4}})
         if self.version=='AD3':
             ifd.append( {'name': 'constantEnt',
-                'widgetType':Tkinter.Entry,
+                'widgetType':tkinter.Entry,
                 'wcfg': {
                     'label': 'Covalent Map constant',
                     'textvariable': self.constantVar,
@@ -1961,7 +1959,7 @@ class SetUpCovalentMap(MVCommand):
             #'gridcfg':{'sticky':'w','columnspan':2},
             #'command': self.setAtomPick_cb})
         ifd.append({'name': 'UseSelection',
-            'widgetType':Tkinter.Checkbutton,
+            'widgetType':tkinter.Checkbutton,
             'text': 'Use selection for Attachment Atom:',
             'variable':self.setSelAtom,
             'command': self.setAtomSel_cb,
@@ -1969,21 +1967,21 @@ class SetUpCovalentMap(MVCommand):
             #'gridcfg':{'sticky':'w', 'row':-1, 'column':1},
             #'gridcfg':{'sticky':'we','columnspan':2,'row':-1,'column':2},
         ifd.append({'name': 'SaveSelection',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'text': 'Save with Z atom',
             'gridcfg':{'sticky':'w', 'row':-1, 'column':1},
             #'gridcfg':{'sticky':'we','columnspan':2,'row':-1,'column':2},
             'command': self.saveAtomSel_cb})
         ifd.append( {'name': 'typeLabel',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text': 'Atom Type:',
             'gridcfg':{'sticky':'w','row':-1,'column':2}})
         ifd.append( {'name': 'coordsLabel',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text': ' Coords:',
             'gridcfg':{'sticky':'w', 'columnspan':4}})
         ifd.append( {'name': 'xEnt',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'x:',
                 'textvariable': self.xVar,
@@ -1991,7 +1989,7 @@ class SetUpCovalentMap(MVCommand):
             },
             'gridcfg':{'sticky':'we'}})
         ifd.append( {'name': 'yEnt',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'y:',
                 'textvariable': self.yVar,
@@ -1999,19 +1997,19 @@ class SetUpCovalentMap(MVCommand):
             },
             'gridcfg':{'sticky':'we', 'row':-1, 'column':1}})
         ifd.append( {'name': 'zEnt',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'z:',
                 'textvariable': self.zVar,
                 'command':self.updateCoordStr,
             },
             'gridcfg':{'sticky':'we', 'row':-1, 'column':2}})
-        ifd.append({'widgetType': Tkinter.Button,
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Accept',
             'wcfg':{'bd':6},
             'gridcfg':{'sticky':'ew', 'columnspan':2},
             'command':self.Accept_cb})
-        ifd.append({'widgetType': Tkinter.Button,
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Close',
             'wcfg':{'bd':6},
             'gridcfg':{'sticky':'ew', 
@@ -2067,7 +2065,7 @@ wellWidth: covalent_half_width, for the Gaussian
 wellDepth: covalent_energy_barrier, for the Gaussian
         """
         kw['topCommand'] = 0
-        apply(self.doitWrapper,(coords,types,constant,wellWidth,wellDepth),kw)
+        self.doitWrapper(*(coords,types,constant,wellWidth,wellDepth), **kw)
 
 
     def doit(self, coords, types, constant, wellWidth, wellDepth):
@@ -2088,8 +2086,8 @@ wellDepth: covalent_energy_barrier, for the Gaussian
             changeVals['covalent_half_width'] = wellWidth
         if self.vf.gpo['covalentmap']['value']!=1:
             changeVals['covalentmap'] = 1
-        if len(changeVals.keys()):
-            apply(self.vf.ADgpf_setGpo,(), changeVals)
+        if len(list(changeVals.keys())):
+            self.vf.ADgpf_setGpo(*(), **changeVals)
 
 
     def setUpConstants(self, atomType):
@@ -2287,17 +2285,17 @@ class SetUpCovalentMap4(SetUpCovalentMap):
         self.typeList=[('PDBQT files', '*.pdbqt')]
         self.z_string = " Z"
         if self.vf.hasGui:
-            self.setPickAtom=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.setSelAtom=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.setSelectedAtom=Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.constantVar=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.coordStr=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.atomType=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.wellDepth=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.wellWidth=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.xVar=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.yVar=Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.zVar=Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.setPickAtom=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.setSelAtom=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.setSelectedAtom=tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.constantVar=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.coordStr=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.atomType=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.wellDepth=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.wellWidth=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.xVar=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.yVar=tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.zVar=tkinter.StringVar(master=self.vf.GUI.ROOT)
 
 
 #    def updateValues(self):
@@ -2343,7 +2341,7 @@ wellWidth: covalent_half_width, for the Gaussian
 wellDepth: covalent_energy_barrier, for the Gaussian
         """
         kw['topCommand'] = 0
-        apply(self.doitWrapper,(coords,types,constant,wellWidth,wellDepth),kw)
+        self.doitWrapper(*(coords,types,constant,wellWidth,wellDepth), **kw)
 
 
     def setUpConstants(self, atomType):
@@ -2429,37 +2427,37 @@ class DefineNewAtomParms(MVCommand):
     def onAddCmdToViewer(self):
         checkHasGpo(self.vf)
         if self.vf.hasGui:
-            self.elem= Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.elem= tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.elem.set('')
-            self.Rij= Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.epsij= Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.Rij= tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.epsij= tkinter.StringVar(master=self.vf.GUI.ROOT)
             ##Tkinter.Widget.bind(self.ifd.form, '<Key>',self.clearElem)
 
 
     def guiCallback(self):
         ifd = self.ifd = InputFormDescr(title = "Enter Atom Type Parameters")
         ifd.append( {'name': 'eName',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'Atom Type:\n(Only M or X is valid!)',
                 #'label': 'Atom Type:\n(Only first character valid!)',
                 'textvariable': self.elem
             },
-            'gridcfg':{'sticky':Tkinter.E,'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.E,'columnspan':2}})
         ifd.append( {'name': 'rij',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'Rii:\n(Equilibrium separation between\nnuclei of 2 like atoms)',
                 'textvariable': self.Rij
             },
-            'gridcfg':{'sticky':Tkinter.E,'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.E,'columnspan':2}})
         ifd.append( {'name': 'eps',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'epsii:\n(Potential energy well-depth\n(.1485 * epsii)',
                 'textvariable': self.epsij
             },
-            'gridcfg':{'sticky':Tkinter.E,'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.E,'columnspan':2}})
         vals = self.vf.getUserInput(self.ifd)
         if vals is not None and len(vals) and vals['eName'] in ['X','M']:
             self.doitWrapper(self.elem.get(), float(self.Rij.get()),
@@ -2474,7 +2472,7 @@ elem: name of new element, 'M' or 'X' currently
 Rij: lennard jones 12-6 parameter for element-element equilibrium distance
 epsij: lennard jones 12-6 parameter for element-element equilibrium
 well-depth"""
-        apply(self.doitWrapper,(elem, rij, Epsij,), kw)
+        self.doitWrapper(*(elem, rij, Epsij,), **kw)
 
 
     def doit(self, elem, rij, Epsij):
@@ -2516,7 +2514,7 @@ class SetBoxParameters(MVCommand):
 
     def __init__(self):
         self.gridcenter = (0.,0.,0.)
-        apply(MVCommand.__init__, (self,), {})
+        MVCommand.__init__(*(self,), **{})
 
 
     def onAddCmdToViewer(self):
@@ -2542,33 +2540,33 @@ class SetBoxParameters(MVCommand):
             self.oldx = 0.0
             self.oldy = 0.0
             self.oldz = 0.0
-            self.xCen = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.yCen = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.zCen = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.xCen = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.yCen = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.zCen = tkinter.StringVar(master=self.vf.GUI.ROOT)
             #now for the rest of the Tkinter vars:
-            self.cenVal = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.cenVal = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.cenVal.set(-1)
-            self.visiVal = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.showFileMenu = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.visiVal = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showFileMenu = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showFileMenu.set(0)
-            self.showCenMenu = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showCenMenu = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showCenMenu.set(0)
-            self.showVisiMenu = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showVisiMenu = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showVisiMenu.set(0)
-            self.pickCen = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.autoLigCen = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.autoCen = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.nameCen = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.showBox = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.showCross = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.pickCen = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.autoLigCen = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.autoCen = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.nameCen = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.showBox = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showCross = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showCross.set(1)
-            self.adjustCross = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.adjustCross = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.adjustCross.set(0)
-            self.showBoxMode = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showBoxMode = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showBoxMode.set(0)
-            self.showLig = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.showLig = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.showLig.set(1)
-            self.totalPtsVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.totalPtsVar = tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.totalPtsVar.set('Current Total Grid Pts per map:    64000')
 
 
@@ -2620,39 +2618,39 @@ class SetBoxParameters(MVCommand):
         ifd = self.ifd = InputFormDescr(title = "Grid Options")
         specfont = (ensureFontCase('helvetica'), 12, 'bold')
         ifd.append( {'name': 'FileMB',
-            'widgetType':Tkinter.Menubutton,
+            'widgetType':tkinter.Menubutton,
             'wcfg':{'text': 'File',
                     #'font': specfont,
                     'relief': 'flat'},
             'gridcfg':{'sticky':'we'}})
         ifd.append({'name': 'CenMB',
-            'widgetType': Tkinter.Menubutton,
+            'widgetType': tkinter.Menubutton,
             'wcfg':{'text': 'Center',
                     #'font': specfont,
                     'relief': 'flat'},
             'gridcfg': {'sticky':'we', 'row':-1, 'column':1}})
         ifd.append({'name': 'VisiMB',
-            'widgetType': Tkinter.Menubutton,
+            'widgetType': tkinter.Menubutton,
             'wcfg':{'text': 'View',
                     #'font': specfont,
                     'relief': 'flat'},
             'gridcfg': {'sticky':'we', 'row':-1, 'column':2}})
         ifd.append({'name': 'HelpMB',
-            'widgetType': Tkinter.Menubutton,
+            'widgetType': tkinter.Menubutton,
             'wcfg':{'text': '  Help  ',
                     #'font': specfont,
                     'relief': 'flat'},
             'gridcfg': {'sticky':'we', 'row':-1, 'column':3}})
         ifd.append( {'name': 'totalPts',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'textvariable': self.totalPtsVar,
             'wcfg':{'font':(ensureFontCase('helvetica'),12,'bold')},
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':4}})
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':4}})
         ifd.append( {'name': 'xScaleLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'wcfg':{'text':'number of points in x-dimension:', 
                 'font':(ensureFontCase('helvetica'),12,'bold')},
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':4}})
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':4}})
         #ifd.append( {'name': 'xnumber',
         #    'widgetType':Tkinter.Scale,
         #    'wcfg':{'troughcolor':'red', 'from_':10,'to_':126,
@@ -2684,10 +2682,10 @@ class SetBoxParameters(MVCommand):
                 'continuous':1, 'wheelPad':1, 'height':20},
             'gridcfg':{'sticky':'e','columnspan':4}})
         ifd.append( {'name': 'yScaleLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'wcfg':{'text':'number of points in y-dimension:', 
                 'font':(ensureFontCase('helvetica'),12,'bold')},
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':4}})
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':4}})
         #ifd.append( {'name': 'ynumber',
             #'widgetType':Tkinter.Scale,
             #'wcfg':{'troughcolor':'green', 'from_':10,'to_':126,
@@ -2717,10 +2715,10 @@ class SetBoxParameters(MVCommand):
                 'continuous':1, 'wheelPad':1, 'height':20},
             'gridcfg':{'sticky':'e','columnspan':4}})
         ifd.append( {'name': 'zScaleLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'wcfg':{'text':'number of points in z-dimension:', 
                 'font':(ensureFontCase('helvetica'),12,'bold')},
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':4}})
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':4}})
         #ifd.append( {'name': 'znumber',
         #    'widgetType':Tkinter.Scale,
         #    'wcfg':{'troughcolor':'blue', 'from_':10,'to_':126,
@@ -2749,10 +2747,10 @@ class SetBoxParameters(MVCommand):
                 'callback':self.updateBoth,
                 'continuous':1, 'wheelPad':1, 'height':20},
             'gridcfg':{'sticky':'e','columnspan':4}})
-        ifd.append({ 'widgetType':Tkinter.Label,
+        ifd.append({ 'widgetType':tkinter.Label,
             'wcfg':{ 'text': '',},
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':4}})
-        ifd.append({ 'widgetType':Tkinter.Label,
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':4}})
+        ifd.append({ 'widgetType':tkinter.Label,
             'wcfg':{ 'text': 'Spacing (angstrom):',
                 'font':(ensureFontCase('helvetica'),12,'bold')},
             'gridcfg':{'sticky':'w', 'columnspan':2}})
@@ -2767,18 +2765,18 @@ class SetBoxParameters(MVCommand):
                 'callback': self.updateBox,
                 'continuous':1, 'oneTurn':2, 'wheelPad':2, 'height':20},
             'gridcfg':{'sticky':'e', 'row':-1, 'column':2,'columnspan':2}})
-        ifd.append({ 'widgetType':Tkinter.Label,
+        ifd.append({ 'widgetType':tkinter.Label,
             'wcfg':{ 'text': gridOpts['CenterGridBoxLabel'],
                 'font':(ensureFontCase('helvetica'),12,'bold')},
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':4}})
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':4}})
         ifd.append( {'name': 'xcenter',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': gridOpts['XCenterLabel'],
                 'width':7,
                 'textvariable': self.xCen
             },
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':2}})
         ifd.append({'name': 'xoffset',
             'wtype':ThumbWheel,
             'widgetType':ThumbWheel,
@@ -2792,13 +2790,13 @@ class SetBoxParameters(MVCommand):
                 'continuous':1, 'oneTurn':10, 'wheelPad':2, 'height':20},
             'gridcfg':{'sticky':'e','row':-1, 'column':2,'columnspan':2}})
         ifd.append( {'name': 'ycenter',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': gridOpts['YCenterLabel'],
                 'width':7,
                 'textvariable': self.yCen
             },
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':2}})
         ifd.append({'name': 'yoffset',
             'wtype':ThumbWheel,
             'widgetType':ThumbWheel,
@@ -2812,13 +2810,13 @@ class SetBoxParameters(MVCommand):
                 'continuous':1, 'oneTurn':10, 'wheelPad':1, 'height':20},
             'gridcfg':{'sticky':'e', 'row':-1, 'column':2,'columnspan':2}})
         ifd.append( {'name': 'zcenter',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': gridOpts['ZCenterLabel'],
                 'width':7,
                 'textvariable': self.zCen
             },
-            'gridcfg':{'sticky':Tkinter.W, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W, 'columnspan':2}})
         ifd.append({'name': 'zoffset',
             'wtype':ThumbWheel,
             'widgetType':ThumbWheel,
@@ -2873,7 +2871,7 @@ class SetBoxParameters(MVCommand):
 
     def buildMenu(self, keyList, mB, vars, cmd, type='radio', cmdList=None):
         #called in building each of the following 4 menus
-        mB.menu = Tkinter.Menu(mB)
+        mB.menu = tkinter.Menu(mB)
         mB['menu'] = mB.menu
         for i in range(len(keyList)):
             if type=='radio':
@@ -2988,7 +2986,7 @@ class SetBoxParameters(MVCommand):
         changeVals['spacing'] = self.spacewheel.get()
         changeVals['topCommand'] = 0
         #NB this is what calls doit->
-        apply(self.doitWrapper, (), changeVals)
+        self.doitWrapper(*(), **changeVals)
         self.Close_cb()
 
 
@@ -3008,7 +3006,7 @@ class SetBoxParameters(MVCommand):
     def setCenVal(self, val, event=None):
         opt = self.cenOpts[val]
         f = self.cenDict[opt]
-        apply(f, (),{})
+        f(*(), **{})
 
 
 
@@ -3055,7 +3053,7 @@ class SetBoxParameters(MVCommand):
     def findAutoLigandCenter(self):
         if not hasattr(self.vf.gpo, 'ligand'):
             self.vf.warningMsg(' no current ligand')
-            if self.ifd.entryByName.has_key('Auto Lig Center'):
+            if 'Auto Lig Center' in self.ifd.entryByName:
                 self.ifd.entryByName['Auto Lig Center']['widget'].toggle()
             return
         ligand = self.vf.gpo.ligand
@@ -3071,7 +3069,7 @@ class SetBoxParameters(MVCommand):
                 self.nxpts.set(ligand.npts[0])
                 self.nypts.set(ligand.npts[1])
                 self.nzpts.set(ligand.npts[2])
-            if self.ifd.entryByName.has_key('Auto Lig Center'):
+            if 'Auto Lig Center' in self.ifd.entryByName:
                 self.ifd.entryByName['Auto Lig Center']['widget'].toggle()
 
 
@@ -3094,7 +3092,7 @@ class SetBoxParameters(MVCommand):
                 eval('self.'+ llist2[i]+'.set(ceiling)')
         self.updateTotalPtsVar()
         #for some reason, have to do a print to get desired result
-        print ' '
+        print(' ')
 
 
     # center on autodock macromolecule
@@ -3109,13 +3107,13 @@ class SetBoxParameters(MVCommand):
     def findAutoMacroCenter(self):
         if not hasattr(self.vf.gpo, 'receptor'):
             self.vf.warningMsg(' no current macromolecule')
-            if self.ifd.entryByName.has_key('Auto Center'):
+            if 'Auto Center' in self.ifd.entryByName:
                 self.ifd.entryByName['Auto Center']['widget'].toggle()
             return
         receptor = self.vf.gpo.receptor 
         self.setCenter(receptor)
         if self.vf.hasGui:
-            if self.ifd.entryByName.has_key('Auto Center'):
+            if 'Auto Center' in self.ifd.entryByName:
                 self.ifd.entryByName['Auto Center']['widget'].toggle()
 
 
@@ -3125,11 +3123,11 @@ class SetBoxParameters(MVCommand):
         self.gridCenterType = 'set'
         ifd = InputFormDescr(title= 'Center on Named Atom')
         ifd.append({'name':'cenName',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg':{
                 'label':'enter full name of atom:',
                 'textvariable':self.nameCen.get()},
-            'gridcfg':{'sticky':Tkinter.E,'columnspan':2}}),
+            'gridcfg':{'sticky':tkinter.E,'columnspan':2}}),
         vals = self.vf.getUserInput(ifd)
         if vals is not None and len(vals):
             cenName = vals['cenName']
@@ -3334,11 +3332,11 @@ class SetBoxParameters(MVCommand):
         # do something here
         opt = self.visiOpts[val]
         f = self.visiDict[opt]
-        apply(f, (),{})
+        f(*(), **{})
 
 
     def adjustMarker(self, event=None):
-        newval = tkSimpleDialog.askfloat('Set Marker Length', 'Enter new marker length', 
+        newval = tkinter.simpledialog.askfloat('Set Marker Length', 'Enter new marker length', 
                 initialvalue = cenCross.offset,
                 minvalue=.1, maxvalue=10)
         if not newval: return
@@ -3389,7 +3387,7 @@ class SetBoxParameters(MVCommand):
         kw['npts'] = npts
         kw['spacing'] = spacing
         kw['topCommand'] = 0
-        apply(self.doitWrapper,(), kw)
+        self.doitWrapper(*(), **kw)
 
 
     def doit(self, *args, **kw):
@@ -3408,7 +3406,7 @@ class SetBoxParameters(MVCommand):
             if self.vf.gpo[item]['value'] != eval(item):
                 changeVals[item] = eval(item)
         if self.vf.hasGui:
-            if changeVals.has_key('gridcenter'):
+            if 'gridcenter' in changeVals:
                 if changeVals['gridcenter']=='auto':
                     changeVals['gridcenterAuto'] = 1
                     if hasattr(self.vf.gpo, 'receptor'):
@@ -3421,13 +3419,13 @@ class SetBoxParameters(MVCommand):
                 self.xCen.set(gridcenter[0])
                 self.yCen.set(gridcenter[1])
                 self.zCen.set(gridcenter[2])
-            if changeVals.has_key('npts'):
+            if 'npts' in changeVals:
                 self.nxpts.set(npts[0])
                 self.nypts.set(npts[1])
                 self.nzpts.set(npts[2])
             self.updateCoords()
-        if len(changeVals.items()):
-            apply(self.vf.ADgpf_setGpo, (), changeVals)
+        if len(list(changeVals.items())):
+            self.vf.ADgpf_setGpo(*(), **changeVals)
         
 
 SetBoxParametersGUI= CommandGUI()
@@ -3445,10 +3443,10 @@ class SetOtherOptions(MVCommand):
     def onAddCmdToViewer(self):
         checkHasGpo(self.vf)
         if self.vf.hasGui:
-            self.smoothVal = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.constDiel = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.MakeFmap = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.DDDielConst = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.smoothVal = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.constDiel = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.MakeFmap = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.DDDielConst = tkinter.IntVar(master=self.vf.GUI.ROOT)
 
 
     def guiCallback(self):
@@ -3465,64 +3463,64 @@ class SetOtherOptions(MVCommand):
     def buildForm(self):
         ifd = self.ifd = InputFormDescr(title = "Autogpf Options")
         ifd.append( {'name': 'smooth',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg':{
                 'label': 'SmoothFactor(Angstrom)\n(Radius w/in which to Store Minimum Energy)',
                 'textvariable': self.smoothVal
             },
-            'gridcfg':{'sticky':Tkinter.W,'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.W,'columnspan':2}})
         ifd.append({'name': 'YesNo',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text': 'Yes             No',
-            'gridcfg':{'sticky':Tkinter.E, 'columnspan':2}})
+            'gridcfg':{'sticky':tkinter.E, 'columnspan':2}})
         ifd.append({'name': 'FMapLabel',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text': 'Floating\nPotential Map?',
-            'gridcfg':{'sticky':Tkinter.W}})
+            'gridcfg':{'sticky':tkinter.W}})
         ifd.append({'name': 'FMap',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg': {'value':1},
             'variable': self.MakeFmap,
-            'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':1}})
+            'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':1}})
         ifd.append({'name': 'NoFMap',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg': {'value':0},
             'variable': self.MakeFmap,
-            'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':2}})
+            'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':2}})
         ifd.append({'name': 'DDCONSLabel',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text': 'Distance Dependent\nDielectric Constant?',
-            'gridcfg':{'sticky':Tkinter.W}})
+            'gridcfg':{'sticky':tkinter.W}})
         ifd.append({'name': 'DDConst',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg': {'value':1},
             'variable': self.DDDielConst,
-            'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':1},
+            'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':1},
             'command': self.getDielConst })
         ifd.append({'name': 'NoDDConst',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg': {'value':0},
             'variable': self.DDDielConst,
-            'gridcfg':{'sticky':Tkinter.W, 'row':-1,'column':2},
+            'gridcfg':{'sticky':tkinter.W, 'row':-1,'column':2},
             'command': self.getDielConst })
         ifd.append({'name': 'dielConstLabel',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text': 'Enter Dielectric Constant:',
-            'gridcfg':{'sticky':Tkinter.W, 'row':6, 'column':0}})
+            'gridcfg':{'sticky':tkinter.W, 'row':6, 'column':0}})
         ifd.append( {'name': 'dielConst',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'textvariable': self.constDiel},
-            'gridcfg':{'sticky':Tkinter.W, 'row':6, 'column':1}})
-        ifd.append({'widgetType': Tkinter.Button,
+            'gridcfg':{'sticky':tkinter.W, 'row':6, 'column':1}})
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Accept',
             'wcfg':{'bd':6},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'columnspan':2},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'columnspan':2},
             'command':self.Accept_cb})
-        ifd.append({'widgetType': Tkinter.Button,
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Close',
             'wcfg':{'bd':6},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'column':2,'row':-1},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'column':2,'row':-1},
             'command':self.Close_cb})
     
 
@@ -3547,7 +3545,7 @@ class SetOtherOptions(MVCommand):
             changeVals['dielectric'] = consD
 
         changeVals['topCommand'] = 0
-        apply(self.doitWrapper,(), changeVals)
+        self.doitWrapper(*(), **changeVals)
         self.form.withdraw()
 
     def updateValues(self, event=None):
@@ -3573,7 +3571,7 @@ class SetOtherOptions(MVCommand):
 
     def __call__(self, smooth=0.5, fmap=0, dielectric=-.1146, **kw):
         kw['topCommand'] = 0
-        apply(self.doitWrapper,(smooth, fmap, dielectric), kw)
+        self.doitWrapper(*(smooth, fmap, dielectric), **kw)
 
 
     def doit(self, smooth, fmap, dielectric):
@@ -3582,8 +3580,8 @@ class SetOtherOptions(MVCommand):
             if self.vf.gpo[item]['value'] != eval(item):
                 changeVals[item] = eval(item)
 
-        if len(changeVals.items()):
-            apply(self.vf.ADgpf_setGpo,(), changeVals)
+        if len(list(changeVals.items())):
+            self.vf.ADgpf_setGpo(*(), **changeVals)
 
 
 SetOtherOptionsGUI= CommandGUI()
@@ -3614,7 +3612,7 @@ class Gpf4ParameterFileSelector(MVCommand):
 """
         if not os.path.exists(paramFile):
             raise IOError
-        apply(self.doitWrapper,(paramFile,),kw)
+        self.doitWrapper(*(paramFile,), **kw)
 
 
     def doit(self, paramFile):
@@ -3654,7 +3652,7 @@ class Gpf4ParameterFileEditor(MVCommand):
 """
         if not os.path.exists(paramFile):
             raise IOError
-        apply(self.doitWrapper,(paramFile,),kw)
+        self.doitWrapper(*(paramFile,), **kw)
 
 
     def doit(self, paramFile):
@@ -3710,10 +3708,10 @@ class GpfMergeNonPolarHs(MVCommand):
         if ok ==0:
             self.chooser = MoleculeChooser(self.vf, 'single', 'Choose Macromolecule')
             self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Molecule',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseMolecule_cb})
             self.form = self.chooser.go(modal=0, blocking=0)
             lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -3747,7 +3745,7 @@ class GpfMergeNonPolarHs(MVCommand):
     def __call__(self, mol, outfile=None, showMsg=1, **kw):
         kw['outfile'] = outfile
         kw['showMsg'] = showMsg
-        apply(self.doitWrapper,(mol,),kw)
+        self.doitWrapper(*(mol,), **kw)
 
 
     def doit(self, mol, **kw):
@@ -3804,7 +3802,7 @@ class Gpf4SetMapTypes(MVCommand):
     def onAddCmdToViewer(self):
         checkHasGpo(self.vf)
         if self.vf.hasGui:
-            self.gtypes= Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.gtypes= tkinter.StringVar(master=self.vf.GUI.ROOT)
             self.gtypes.set(self.vf.gpo['ligand_types']['value'])
 
 
@@ -3819,22 +3817,22 @@ class Gpf4SetMapTypes(MVCommand):
         self.gtypes.set(self.vf.gpo['ligand_types']['value'])
         ifd = self.ifd = InputFormDescr(title = "AutoGpf4 Ligand")
         ifd.append( {'name': 'MapTypesEntry',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg': {
                 'label': 'Map Types:',
                 'textvariable': self.gtypes,
                 'eventType':'<Key>'
              },
-            'gridcfg':{'sticky':Tkinter.W,'columnspan':4}})
-        ifd.append({'widgetType': Tkinter.Button,
+            'gridcfg':{'sticky':tkinter.W,'columnspan':4}})
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Accept',
             'wcfg':{'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'columnspan':2},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'columnspan':2},
             'command':self.Accept_cb})
-        ifd.append({'widgetType': Tkinter.Button,
+        ifd.append({'widgetType': tkinter.Button,
             'text':'Close',
             'wcfg':{'bd':4},
-            'gridcfg':{'sticky':Tkinter.E+Tkinter.W, 'column':2, 'row':-1},
+            'gridcfg':{'sticky':tkinter.E+tkinter.W, 'column':2, 'row':-1},
             'command':self.Close_cb})
         self.form = self.vf.getUserInput(self.ifd, modal=0, blocking=0)
         self.form.root.protocol('WM_DELETE_WINDOW',self.Close_cb)
@@ -3848,7 +3846,7 @@ class Gpf4SetMapTypes(MVCommand):
         typeString = self.gtypes.get()
         kw={}
         kw['topCommand'] = 0
-        apply(self.doitWrapper, (typeString,), kw)
+        self.doitWrapper(*(typeString,), **kw)
         self.form.withdraw()
 
 
@@ -3856,7 +3854,7 @@ class Gpf4SetMapTypes(MVCommand):
         """None<-mv.ADgpf4_setMapTypes(typeString)
 typeString: string listing types of maps to calculate, eg 'C NA N OA SA HD'
 """
-        apply(self.doitWrapper,(typeString,), kw)
+        self.doitWrapper(*(typeString,), **kw)
 
 
     def doit(self, typeString):
@@ -3865,7 +3863,7 @@ typeString: string listing types of maps to calculate, eg 'C NA N OA SA HD'
         changeVals['topCommand'] = 1
         #L1. set LIGAND_TYPES directly
         self.vf.GPF_LIGAND_TYPES = typeString.split()
-        apply(self.vf.ADgpf_setGpo, (), changeVals)
+        self.vf.ADgpf_setGpo(*(), **changeVals)
         
 
 Gpf4SetMapTypesGUI= CommandGUI()
@@ -3890,7 +3888,7 @@ ad4_type_str: string built of unique list of types in the mol
             return 'ERROR'
         if mols.__class__!=mols.top.__class__:
             mols = mols.top.uniq()
-        return apply(self.doitWrapper,(mols[0],), kw)
+        return self.doitWrapper(*(mols[0],), **kw)
 
 
     def doit(self, mol, **kw):
@@ -3908,10 +3906,10 @@ ad4_type_str: string built of unique list of types in the mol
                 a.autodock_element='HD'
                 dict[a.autodock_element] = 1
             else:
-                print "forcing ", a.full_name, " autodock_element to ", a.element
+                print("forcing ", a.full_name, " autodock_element to ", a.element)
                 a.autodock_element=a.element
                 dict[a.autodock_element] = 1
-        adtypes = dict.keys()
+        adtypes = list(dict.keys())
         adtypes.sort()
         mol.types = adtypes
         type_str = mol.types[0]
@@ -3941,8 +3939,8 @@ class AutoGpf4MacroSetup(MVCommand):
     def onAddCmdToViewer(self):
         self.receptor = None
         if self.vf.hasGui:
-            self.inviewer = Tkinter.IntVar(master=self.vf.GUI.ROOT)
-            self.outfileVar = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.inviewer = tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.outfileVar = tkinter.StringVar(master=self.vf.GUI.ROOT)
 
     def onRemoveObjectFromViewer(self, obj):
         if obj==self.receptor:
@@ -3961,37 +3959,37 @@ class AutoGpf4MacroSetup(MVCommand):
     def buildForm(self):
         ifd = self.ifd = InputFormDescr(title = 'Automatic Receptor-Setup Parameters')
         ifd.append({'name': 'typeMolLab',
-            'widgetType':Tkinter.Label,
+            'widgetType':tkinter.Label,
             'text':'molecule location:',
             'gridcfg':{'sticky':'w'}})
         ifd.append({'name':    'pickMol',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg':{'text':'in viewer',
                     'variable':self.inviewer,
                     'value':0, 
                     'command':self.chooseMol},
             'gridcfg':{'sticky':'w','row':-1,'column':1}})
         ifd.append({'name':    'readMol',
-            'widgetType':Tkinter.Radiobutton,
+            'widgetType':tkinter.Radiobutton,
             'wcfg':{'text':'from file',
                     'variable':self.inviewer,
                     'value':1, 
                     'command':self.readMol},
             'gridcfg':{'sticky':'w','row':-1,'column':2}})
         ifd.append({'name':'outputFile',
-            'widgetType':Tkinter.Entry,
+            'widgetType':tkinter.Entry,
             'wcfg':{
                 'label': 'Output filename:',
                 'width': 50,
                 'textvariable':self.outfileVar},
             'gridcfg':{'sticky':'w','columnspan':4}})
         ifd.append({'name':    'goBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg':{'text':'Accept',
                     'command':self.go_cb}, 
             'gridcfg':{'sticky':'we', 'columnspan':2}})
         ifd.append({'name':    'closeBut',
-            'widgetType':Tkinter.Button,
+            'widgetType':tkinter.Button,
             'wcfg':{'text':'Cancel',
                     'command':self.cancel_cb}, 
             'gridcfg':{'sticky':'we','row':-1,'column':2}})
@@ -4017,7 +4015,7 @@ class AutoGpf4MacroSetup(MVCommand):
     def chooseMol(self, event=None):
         self.chooser = MoleculeChooser(self.vf, 'single', 'Choose Receptor')
         self.chooser.ipf.append({'name':'Select Button',
-             'widgetType':Tkinter.Button,
+             'widgetType':tkinter.Button,
              'text':'Select Molecule',
              'wcfg':{'bd':6},
              'gridcfg':{'sticky':'e'+'w'},
@@ -4079,7 +4077,7 @@ if ask_outfile=0, outputfile name is name of molecule + '.out.pdbqt'
 """
         kw['outfile'] = outfile
         kw['ask_outfile'] = ask_outfile
-        apply(self.doitWrapper, (mol,), kw)
+        self.doitWrapper(*(mol,), **kw)
 
 
     def doit(self, mol, **kw):
@@ -4088,7 +4086,7 @@ if ask_outfile=0, outputfile name is name of molecule + '.out.pdbqt'
         if hasattr(self, 'form'):
             self.form.withdraw()
         dict = self.vf.atorsDict
-        if type(mol)==types.StringType:
+        if type(mol)==bytes:
             if len(self.vf.Mols) and mol in self.vf.Mols.name:
                 mol = self.vf.Mols.NodesFromName(mol)
             else:
@@ -4100,7 +4098,7 @@ if ask_outfile=0, outputfile name is name of molecule + '.out.pdbqt'
         mol.getCenter()
         self.vf.gpo.receptor = mol 
         #self.vf.ADgpf4_initMacro(mol)
-        apply(self.vf.ADgpf4_initMacro, (mol,), kw)
+        self.vf.ADgpf4_initMacro(*(mol,), **kw)
          
 #AutoGpf4MacroSetupGUI=CommandGUI()
 #AutoGpf4MacroSetupGUI.addMenuCommand('AutoToolsBar', menuText['AutoTorsMB'], \
@@ -4139,13 +4137,13 @@ class Gpf4MacroInit(MVCommand):
         self.vf.loadModule('editCommands','Pmv')
 
         checkHasGpo(self.vf)
-        self.resKeys = q.keys()
+        self.resKeys = list(q.keys())
         self.editHISprotonation = None
-        if 'Automerge NPHS' not in self.vf.userpref.keys():
+        if 'Automerge NPHS' not in list(self.vf.userpref.keys()):
             doc = """Automatically merge non-polar hydrogens in macromolecule. Valid values are 1 or 0"""
             self.vf.userpref.add('Automerge NPHS', 1, [1,0],
                 callbackFunc = [set_autoMergeNPHS], doc=doc, category='AutoDockTools')
-        if 'HIS Protonation' not in self.vf.userpref.keys():
+        if 'HIS Protonation' not in list(self.vf.userpref.keys()):
             doc = """Automatically set protonation state of all histidine residues in macromolecule. Valid values are 'HD1', 'HE2', 'HD1HE2', 'No change'.  Default value is 'No change' which has no effect on macromolecule. Any other choice invokes editHist_h method of repairCommand module to edit hydrogens on histidine ring. For example, if userpref is set to 'HD1' each histidine ring will have hydrogen atom 'HD1' and not 'HE2' hydrogen atom."""
             self.vf.userpref.add('HIS Protonation', 'No change', 
                     ['No change', 'HD1', 'HE2', 'HD1HE2'],
@@ -4166,7 +4164,7 @@ class Gpf4MacroInit(MVCommand):
         dict = {}
         for r in resSet:
             dict[r.type] = 0
-        for t in dict.keys():
+        for t in list(dict.keys()):
             if t not in self.resKeys:
                 return 0
         #only get to this point if all
@@ -4181,7 +4179,7 @@ class Gpf4MacroInit(MVCommand):
             return 'ERROR'
         #kw should be mol and possibly filename
         kw['filename'] = filename
-        apply(self.doitWrapper,(mols[0],), kw)
+        self.doitWrapper(*(mols[0],), **kw)
 
 
     def doit(self, mol, **kw):
@@ -4209,22 +4207,22 @@ class Gpf4MacroInit(MVCommand):
             msg = msg + "molecule from pdbqt file:autodock_elements and gasteiger charges already added"
             check_nphs = False
             write_file = False
-            if hasattr(self.vf, 'flexDict') and self.vf.flexDict.has_key('macroname') \
+            if hasattr(self.vf, 'flexDict') and 'macroname' in self.vf.flexDict \
                 and self.vf.flexDict['macroname']==mol.name \
-                and self.vf.flexDict.has_key('rigid_filename'):
+                and 'rigid_filename' in self.vf.flexDict:
                 filename = self.vf.flexDict['rigid_filename']
                 stem = os.path.splitext(filename)[1]
                 flexRes = True
                 has_written_file = True
                 msg += "; using " + os.path.basename(filename) + " for autogrid calculation"
-            elif hasattr(self.vf, 'flexDict') and self.vf.flexDict.has_key('macromol'): 
+            elif hasattr(self.vf, 'flexDict') and 'macromol' in self.vf.flexDict: 
                 if self.vf.flexDict['macromol']==mol:
-                    if 'rigid_filename' not in self.vf.flexDict.keys(): 
+                    if 'rigid_filename' not in list(self.vf.flexDict.keys()): 
                         msg = "\nCAUTION: currently no file has been written for rigid residues in " + mol.name 
                         stem = os.path.splitext(filename)[0]
                         msg += ". All of "+filename + "  will be used for autogrid!!"
                     else:
-                        filename = self.vf.flexDict.has_key('rigid_filename')
+                        filename = 'rigid_filename' in self.vf.flexDict
                         has_written_file = True
                         msg += '; this Molecule is currently formatted via Flexible Residues menu-> using '+ filename + ' as the rigid filename'
                     check_nphs= False
@@ -4238,14 +4236,14 @@ class Gpf4MacroInit(MVCommand):
                 filename = os.path.basename(mol.parser.filename)
         elif len(mol.allAtoms.get(lambda x: hasattr(x, 'charge')))==len_atoms: 
             if mol.allAtoms.chargeSet == len_atoms*['gasteiger']:
-                print mol.name, "already has gasteiger charges"
+                print(mol.name, "already has gasteiger charges")
             elif kw['preserve_input_charges']==1:
-                print "preserving input charges on ", mol.name
+                print("preserving input charges on ", mol.name)
             else:
-                print "adding gasteiger charges to ", mol.name
+                print("adding gasteiger charges to ", mol.name)
                 self.vf.computeGasteiger(mol, topCommand=0, log=0)
         else:
-            print "adding gasteiger charges to ", mol.name
+            print("adding gasteiger charges to ", mol.name)
             self.vf.computeGasteiger(mol, topCommand=0, log=0)
         #?first check whether to call setAtomTypes or not
         renumber=0
@@ -4282,8 +4280,8 @@ class Gpf4MacroInit(MVCommand):
             hs = self.vf.allAtoms.get(lambda x: x.element=='H')
             if hs: self.vf.fixHNames(hs, topCommand=0)
             #always merge lone pairs
-            lps = filter(lambda x: x.element=='Xx' and \
-                      (x.name[0]=='L' or x.name[1]=='L'),mol.allAtoms)
+            lps = [x for x in mol.allAtoms if x.element=='Xx' and \
+                      (x.name[0]=='L' or x.name[1]=='L')]
             if len(lps):
                 renumber = 1
                 if self.vf.hasGui:
@@ -4297,7 +4295,7 @@ class Gpf4MacroInit(MVCommand):
                 atSet = mol.allAtoms
                 atSet.sort()
                 fst = atSet[0].number
-                atSet.number = range(fst, len(atSet)+fst)
+                atSet.number = list(range(fst, len(atSet)+fst))
                 #FIX THIS: CHECK THAT DISPLAY GETS UPDATED
                 #if self.vf.hasGui and redisplay:
                 #    self.vf.displayLines(mol, negate=1, topCommand=0, log=0)
@@ -4305,29 +4303,29 @@ class Gpf4MacroInit(MVCommand):
 
         if flexRes:
             flexRESIDUES = ResidueSet()
-            if 'flex_residues' in self.vf.flexDict.keys():
+            if 'flex_residues' in list(self.vf.flexDict.keys()):
                 flexRESIDUES = self.vf.flexDict['flex_residues']
                 flex_t = {}
                 for a in flexRESIDUES.atoms:
                     flex_t[a.autodock_element] = 1
                 #F1: set FLEXRES_TYPES in ADgpf4_initMacro
-                self.vf.GPF_FLEXRES_TYPES = flex_t.keys()    
-                print 'set GPF_FLEXRES_TYPES to', self.vf.GPF_FLEXRES_TYPES
+                self.vf.GPF_FLEXRES_TYPES = list(flex_t.keys())    
+                print('set GPF_FLEXRES_TYPES to', self.vf.GPF_FLEXRES_TYPES)
             residues = mol.chains.residues - flexRESIDUES
             #set up both receptor types and flexres types here
             mol.center = numpy.add.reduce(residues.atoms.coords)/len(residues.atoms)
             errCharge, resList = self.vf.checkResCharges(residues)
             fD = self.vf.flexDict
-            if fD.has_key('rigid_filename'):
+            if 'rigid_filename' in fD:
                 self.vf.gpo.receptor_filename = self.vf.flexDict['rigid_filename']
-                print "set receptor_filename to ", self.vf.gpo.receptor_filename
-            if fD.has_key('rigid_types'):
+                print("set receptor_filename to ", self.vf.gpo.receptor_filename)
+            if 'rigid_types' in fD:
                 receptor_type_str = join(fD['rigid_types'])
                 self.vf.gpo['receptor_types']['value'] = receptor_type_str
-                print 'set GPF_RECEPTOR_TYPES to', self.vf.GPF_RECEPTOR_TYPES
+                print('set GPF_RECEPTOR_TYPES to', self.vf.GPF_RECEPTOR_TYPES)
                 #R1: set RECEPTOR_TYPES in macro4 init 
                 self.vf.GPF_RECEPTOR_TYPES = receptor_type_str.split()    
-                print "set self.vf.gpo[receptor_types] to ", self.vf.gpo['receptor_types']['value']
+                print("set self.vf.gpo[receptor_types] to ", self.vf.gpo['receptor_types']['value'])
         else:
             errCharge, resList = checkMolCharges(mol, self.vf)
         mol.checked_charges = 1
@@ -4430,13 +4428,13 @@ class Gpf4MacroReader(MVCommand):
                     d=SimpleDialog(self.vf.GUI.ROOT, text=msg, buttons=['No','Yes'], default=0, title='Preserve input receptor charges?')
                     ok=d.go()
             kw = {'preserve_input_charges':ok}
-            apply(self.doitWrapper, (macroFile,), kw)
+            self.doitWrapper(*(macroFile,), **kw)
 
 
     def __call__(self, macroFile, **kw):
         if not os.path.exists(macroFile):
             raise IOError
-        apply(self.doitWrapper,(macroFile,),kw)
+        self.doitWrapper(*(macroFile,), **kw)
 
 
     def doit(self, macroFile, **kw):
@@ -4451,7 +4449,7 @@ class Gpf4MacroReader(MVCommand):
                 self.vf.centerScene(topCommand=0)
                 self.vf.displayLines(mol,topCommand=0,redraw=1)
         kw['topCommand'] = 0
-        apply(self.vf.ADgpf4_initMacro, (mol,), kw)
+        self.vf.ADgpf4_initMacro(*(mol,), **kw)
 
 
 Gpf4MacroReaderGUI = CommandGUI()
@@ -4491,16 +4489,16 @@ class Gpf4MacroChooser(MVCommand):
                     d=SimpleDialog(self.vf.GUI.ROOT, text=msg, buttons=['No','Yes'], default=0, title='Preserve input receptor charges?')
                     ok=d.go()
             kw = {'preserve_input_charges':ok}
-            apply(self.doitWrapper, (mol,), kw)
+            self.doitWrapper(*(mol,), **kw)
 
 
     def guiCallback(self):
         self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Molecule',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseMolecule_cb})
         self.form = self.chooser.go(modal=0, blocking=0)
         lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -4508,7 +4506,7 @@ class Gpf4MacroChooser(MVCommand):
 
 
     def __call__(self, nodes, **kw):
-        apply(self.doitWrapper,(nodes,),kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes, **kw):
@@ -4516,7 +4514,7 @@ class Gpf4MacroChooser(MVCommand):
         if not len(mols):
             return 'ERROR'
         kw['topCommand'] = 0
-        apply(self.vf.ADgpf4_initMacro, (mols[0],), kw)
+        self.vf.ADgpf4_initMacro(*(mols[0],), **kw)
 
 
 Gpf4MacroChooserGUI = CommandGUI()
@@ -4550,7 +4548,7 @@ class Gpf4InitLigand(MVCommand):
 
     def __call__(self, mol,  **kw):
         """ADgpf4_initLigand """
-        apply(self.doitWrapper,(mol,),kw)
+        self.doitWrapper(*(mol,), **kw)
 
 
     def doit(self, mol, **kw):
@@ -4572,7 +4570,7 @@ class Gpf4InitLigand(MVCommand):
         for a in lig.allAtoms:
             d[a.autodock_element] = 1
         #L1. set LIGAND_TYPES in Gpf4InitLigand
-        newTYPES = self.vf.GPF_LIGAND_TYPES = d.keys()
+        newTYPES = self.vf.GPF_LIGAND_TYPES = list(d.keys())
         for t in self.vf.GPF_FLEXRES_TYPES:
             if t not in newTYPES:
                 newTYPES.append(t)
@@ -4595,8 +4593,7 @@ class Gpf4InitLigand(MVCommand):
         if self.vf.hasGui:
             self.vf.displayLines(lig, topCommand=0)
             self.vf.colorByAtomType(lig,['lines'], topCommand=0)
-            aromCs = AtomSet(filter(lambda x:x.autodock_element=='A',\
-                lig.allAtoms))
+            aromCs = AtomSet([x for x in lig.allAtoms if x.autodock_element=='A'])
             if len(aromCs):
                 self.vf.color(aromCs,((0.,1.,0.,),),['lines'],\
                     topCommand=0, redraw=1)
@@ -4638,9 +4635,9 @@ class Gpf4LigandChooser(MVCommand):
             ok = 0
             if hasattr(mol, 'torTree') and os.path.splitext(mol.parser.filename)[-1][-1]=='t':
                 ok = 1
-            elif dict.has_key('molecule') and mol==dict['molecule']:
+            elif 'molecule' in dict and mol==dict['molecule']:
                 ok = hasattr(mol, 'outputfile') and mol.outputfile[-1]=='t'
-            elif dict2 is not None and dict2.has_key('ligand_name') and mol.name==dict['ligand_name']:
+            elif dict2 is not None and 'ligand_name' in dict2 and mol.name==dict['ligand_name']:
                 ok = 1
             if not ok:
                 self.vf.warningMsg('can only select molecule with written autotors pdbqt output file')
@@ -4655,10 +4652,10 @@ class Gpf4LigandChooser(MVCommand):
     def guiCallback(self):
         self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Ligand',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseLigand_cb})
         self.form = self.chooser.go(modal=0, blocking=0)
         lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -4666,7 +4663,7 @@ class Gpf4LigandChooser(MVCommand):
 
 
     def __call__(self, nodes, **kw):
-        apply(self.doitWrapper,(nodes,),kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes):
@@ -4702,7 +4699,7 @@ class Gpf4LigReader(MVCommand):
     def __call__(self, ligFile, **kw):
         if not os.path.exists(ligFile):
             raise IOError
-        apply(self.doitWrapper,(ligFile,),kw)
+        self.doitWrapper(*(ligFile,), **kw)
 
 
     def doit(self, ligFile):
@@ -4753,7 +4750,7 @@ class Gpf4FlexResChooser(MVCommand):
             dict2 = None
             if hasattr(self.vf, 'flexDict'):
                 dict2 = self.vf.flexDict
-                dict2_keys = dict2.keys()
+                dict2_keys = list(dict2.keys())
             #check that the molecule has been read from a flexible residue 
             # file (it has a torTree)
             # OR
@@ -4780,10 +4777,10 @@ class Gpf4FlexResChooser(MVCommand):
     def guiCallback(self):
         self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select molecule providing flexible residues',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseFlexResMol_cb})
         self.form = self.chooser.go(modal=0, blocking=0)
         lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -4795,7 +4792,7 @@ class Gpf4FlexResChooser(MVCommand):
         if not len(nodes):
             return "ERROR"
         nodes = nodes.findType(Atom)
-        apply(self.doitWrapper,(nodes,),kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes):
@@ -4806,7 +4803,7 @@ class Gpf4FlexResChooser(MVCommand):
         for atom in nodes:
             type_d[atom.autodock_element] = 1
         #F2: set FLEXRES_TYPES in ADgpf4_chooseFormattedFlexRes
-        new_types = self.vf.GPF_FLEXRES_TYPES = type_d.keys()
+        new_types = self.vf.GPF_FLEXRES_TYPES = list(type_d.keys())
         self.vf.flexDict['flex_types'] = new_types
         self.vf.flexDict['flex_types'] = new_types
         self.vf.flexDict['flexres_filename'] = flex_filename
@@ -4817,7 +4814,7 @@ class Gpf4FlexResChooser(MVCommand):
         lig_types = self.vf.GPF_LIGAND_TYPES
         for t in lig_types:
             type_d[t] = 1
-        type_list = join(type_d.keys(),' ')
+        type_list = join(list(type_d.keys()),' ')
         self.vf.gpo['ligand_types']['value'] = type_list
             
 
@@ -4847,7 +4844,7 @@ class Gpf4FlexResReader(MVCommand):
     def __call__(self, flexResFile, **kw):
         if not os.path.exists(flexResFile):
             raise IOError
-        apply(self.doitWrapper,(flexResFile,),kw)
+        self.doitWrapper(*(flexResFile,), **kw)
 
 
     def doit(self, flexResFile):
@@ -4869,10 +4866,10 @@ class Gpf4FlexResReader(MVCommand):
             dict[at.autodock_element] = 1
         if not hasattr(self.vf, 'flexDict'):
             self.vf.flexDict = {}
-        self.vf.flexDict['flex_types'] = dict.keys()
+        self.vf.flexDict['flex_types'] = list(dict.keys())
         #F2: set FLEXRES_TYPES in ADgpf4_readFormattedFlexRes
-        self.vf.GPF_FLEXRES_TYPES = dict.keys()
-        alltypes = dict.keys()
+        self.vf.GPF_FLEXRES_TYPES = list(dict.keys())
+        alltypes = list(dict.keys())
         for t in self.vf.GPF_LIGAND_TYPES:
             if t not in alltypes:
                 alltypes.append(t)
@@ -4880,7 +4877,7 @@ class Gpf4FlexResReader(MVCommand):
         for t in alltypes[1:]:
             lig_types = lig_types + ' ' + t
         self.vf.gpo['ligand_types']['value'] = lig_types
-        print "set gpo ligand_types to", lig_types
+        print("set gpo ligand_types to", lig_types)
             
 
 Gpf4FlexResReaderGUI= CommandGUI()
@@ -4901,7 +4898,7 @@ class Gpf4Writer(MVCommand):
         """None <- ADgpf4_writeGPF( outfile)
 outfile = filename for AutoGrid4 parameters
 """
-        apply(self.doitWrapper,(outfile,),kw)
+        self.doitWrapper(*(outfile,), **kw)
 
 
     def doit(self, outfile):
@@ -4980,11 +4977,11 @@ def initModule(vf):
         vf.addCommand(dict['cmd'],dict['name'],dict['gui'])
 
     if hasattr(vf, 'GUI'):
-        for item in vf.GUI.menuBars['AutoToolsBar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoToolsBar'].menubuttons.values()):
             item.configure(background = 'tan')
             item.configure(underline = '-1')
         if not hasattr(vf.GUI, 'adtBar'):
             vf.GUI.adtBar = vf.GUI.menuBars['AutoToolsBar']
-            vf.GUI.adtFrame = vf.GUI.adtBar.menubuttons.values()[0].master
+            vf.GUI.adtFrame = list(vf.GUI.adtBar.menubuttons.values())[0].master
 
 

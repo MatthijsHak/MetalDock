@@ -46,7 +46,7 @@ class Histogram:
         self.max = self.max+0.
         self.bin_width = (self.max-self.min)/nbins
         if self.bin_width==0:
-            print 'range is 0 so set bin_width to 1.'
+            print('range is 0 so set bin_width to 1.')
             self.bin_width = 1.
         self.array = numpy.zeros((nbins, 2), numpy.float)
         self.array[:, 0] = self.min + self.bin_width*(numpy.arange(nbins)+0.5)

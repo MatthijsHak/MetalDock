@@ -43,7 +43,7 @@ filebrowser."""
     
     def __init__(self, name='Grid Parameter File Browser', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         #self.readOnly = 1
         code = """def doit(self, filename):
@@ -82,7 +82,7 @@ filebrowser."""
     
     def __init__(self, name='Docking Parameter File Browser', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         #self.readOnly = 1
         code = """def doit(self, filename):
@@ -116,7 +116,7 @@ class ReadGridParameterFile(NetworkNode):
     def __init__(self, constrkw = {},  name='ReadGridParameterFile', **kw):
         kw['constrkw'] = constrkw
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw)
+        NetworkNode.__init__(*(self,), **kw)
         fileTypes=[('gpf', '*')]
 
         self.widgetDescr['filename'] = {
@@ -146,7 +146,7 @@ class ReadGridParameterFile(NetworkNode):
             ed = net.getEditor()
         except:
             import traceback; traceback.print_exc()
-            print 'Warning! Could not import widgets'
+            print('Warning! Could not import widgets')
 
 
 
@@ -157,7 +157,7 @@ class ReadDockingParameterFile(NetworkNode):
     def __init__(self, constrkw = {},  name='ReadDockingParameterFile', **kw):
         kw['constrkw'] = constrkw
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw)
+        NetworkNode.__init__(*(self,), **kw)
         fileTypes=[('dpf', '*')]
 
         self.widgetDescr['filename'] = {
@@ -187,7 +187,7 @@ class ReadDockingParameterFile(NetworkNode):
             ed = net.getEditor()
         except:
             import traceback; traceback.print_exc()
-            print 'Warning! Could not import widgets'
+            print('Warning! Could not import widgets')
 
 
 ###class ReadGridParameterFile(NetworkNode):
@@ -249,7 +249,7 @@ Output: molecules where all atoms in HOH residues have been removed(MoleculeSet)
     
     def __init__(self, name='RemoveWaters', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='MoleculeSet', name='molecules')
         ip.append(datatype='str', required=False, name='residue_type_str', defaultValue='HOH')
@@ -312,7 +312,7 @@ Output: mols where each non-polar hydrogen atom has been removed(MoleculeSet)"""
     
     def __init__(self, name='Nonpolar Hydrogen Merger', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='MoleculeSet', name='mols')
         ip.append(datatype='int', required=False, name='renumber', defaultValue=1)
@@ -352,7 +352,7 @@ Output: mols where each lone pair 'atom' has been removed(MoleculeSet)"""
     
     def __init__(self, name='Lone Pair Merger', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='MoleculeSet', name='mols')
         ip.append(datatype='int', required=False, name='renumber', defaultValue=1)
@@ -395,7 +395,7 @@ Output: mols where aromatic carbons have been detected (MoleculeSet)"""
     
     def __init__(self, name='Manage Aromatic Carbons', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         self.widgetDescr['cutoff'] = {
                 'class':'NEDial', 'size':50,
@@ -449,7 +449,7 @@ Output: typed_mols where each atom has autodock_element field(MoleculeSet)"""
     
     def __init__(self, name='AD4_typer', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='MoleculeSet', name='mols')
         ip.append(datatype='int', required=False, name='set_aromatic_carbons', defaultValue=1)
@@ -488,7 +488,7 @@ Output: typed_mols where each atom has SolVol and AtSolPar fields(MoleculeSet)""
     
     def __init__(self, name='AD4_SolvationParameterizer', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='MoleculeSet', name='mols')
 
@@ -530,7 +530,7 @@ Output: mol with marked bonds """
     
     def __init__(self, name='Manage Rotatable Bonds', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='MoleculeSet', name='mols', defaultValue='auto')
         ip.append(datatype='string', required=False, name='root')
@@ -578,7 +578,7 @@ Output: mol """
     
     def __init__(self, name='Ligand_Writer', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         fileTypes=[('pdbq', '*.pdbq'), ('all', '*')]
 
@@ -627,7 +627,7 @@ Output: mol, output_filename """
     
     def __init__(self, name='Ligand_Writer_AD4', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         fileTypes=[('pdbqt', '*.pdbqt'), ('all', '*')]
 
@@ -737,7 +737,7 @@ Output: gpf ('string')"""
     
     def __init__(self, name='Prepare Autogrid3 Gpf', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         ip = self.inputPortsDescr
         ip.append(datatype='string', name='ligand_filename')
@@ -785,7 +785,7 @@ Output: gpf ('string')"""
     
     def __init__(self, name='Prepare Autogrid4 Gpf', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         ip = self.inputPortsDescr
         ip.append(datatype='string', name='ligand_filename')
@@ -833,7 +833,7 @@ Output: dpf ('string')"""
     
     def __init__(self, name='Prepare Autodock3 Dpf', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         ip = self.inputPortsDescr
         ip.append(datatype='string', name='ligand_filename')
@@ -881,7 +881,7 @@ Output: dpf ('string')"""
     
     def __init__(self, name='Prepare Autodock4 Dpf', **kw):
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         ip = self.inputPortsDescr
         ip.append(datatype='string', name='ligand_filename')
@@ -999,6 +999,6 @@ adtlib.addNode(Ligand_Writer_AD4, 'AD4 Ligand Writer', 'Output')
 
 try:
     UserLibBuild.addTypes(adtlib, 'MolKit.VisionInterface.MolKitTypes')
-except Exception, e:
-    print "loading types failed:", e
+except Exception as e:
+    print("loading types failed:", e)
 

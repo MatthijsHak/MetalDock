@@ -11,7 +11,7 @@ class GetStructuresFromDir(NetworkNode):
     def __init__(self, constrkw = {},  name='GetStructuresFromDir', **kw):
         kw['constrkw'] = constrkw
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw)
+        NetworkNode.__init__(*(self,), **kw)
 
         ip = self.inputPortsDescr
         ip.append({'name': 'directory', 'datatype': 'string'})
@@ -101,5 +101,5 @@ class GetStructuresFromDir(NetworkNode):
             ed = net.getEditor()
         except:
             import traceback; traceback.print_exc()
-            print 'Warning! Could not import widgets'
+            print('Warning! Could not import widgets')
 

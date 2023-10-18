@@ -5,13 +5,13 @@
 # the AutoDock code.
 
 import numpy
-import UserList
+import collections
 from mglutil.math.rmsd import RMSDCalculator
 from Pmv.setangleCommands import SetRelativeTorsion, SetQuaternion
 
-class Clust(UserList.UserList):
+class Clust(collections.UserList):
     def __init__(self, mol, seed, coords):
-        UserList.UserList.__init__(self)
+        collections.UserList.__init__(self)
         self.seed = seed
         self.mol = mol
         self.seed_coords = coords 

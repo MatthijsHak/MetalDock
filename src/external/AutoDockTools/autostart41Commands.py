@@ -74,7 +74,7 @@ def initModule(vf):
         vf.addCommand(dict['cmd'],dict['name'],dict['gui'])
 
     if hasattr(vf,'GUI'):
-        for item in vf.GUI.menuBars['AutoTools41Bar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoTools41Bar'].menubuttons.values()):
             item.configure(background = 'tan')
             item.configure(underline = '-1')
     else:

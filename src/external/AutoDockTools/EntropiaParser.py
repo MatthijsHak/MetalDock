@@ -38,7 +38,7 @@ class EntropiaParser(ResultParser):
             # version 1.0 Entropia result file
             dict = self._parseStateLineList(line_list)
         else:
-            print "Unparsable result file line: %s" % (line)
+            print("Unparsable result file line: %s" % (line))
             return # without doing anything
         self.clist.append(dict)
 
@@ -101,9 +101,9 @@ class EntropiaParser(ResultParser):
 
 
     type_conv = {
-        types.IntType    : lambda x: int(x),
-        types.FloatType  : lambda x: float(x),
-        types.StringType : lambda x: x,
+        int    : lambda x: int(x),
+        float  : lambda x: float(x),
+        bytes : lambda x: x,
         'PercentType'    : lambda x: float(x[:-1]),
         'TimeType'       : lambda x: x
         }
@@ -111,33 +111,33 @@ class EntropiaParser(ResultParser):
 
     field_defn = {
     #    key                : (type, whitespace delimited sub-fields)
-        'output_id'         : (types.IntType, 1),
-        'data_run_id'       : (types.IntType, 1),
-        'dpf_id'            : (types.IntType, 1),
+        'output_id'         : (int, 1),
+        'data_run_id'       : (int, 1),
+        'dpf_id'            : (int, 1),
         'creation_dtime'    : ('TimeType', 3),
         'last_update_dtime' : ('TimeType', 3),
-        'ei_version'        : (types.FloatType, 1),
-        'ag_version'        : (types.FloatType, 1),
-        'ad_version'        : (types.FloatType, 1),
-        'run_rank'          : (types.IntType, 1),
-        'run_number'        : (types.IntType, 1),
-        'cluster_rank'      : (types.IntType, 1),
-        'cluster_size'      : (types.IntType, 1),
-        'run_size'          : (types.IntType, 1),
-        'rseed1'            : (types.IntType, 1),
-        'rseed2'            : (types.IntType, 1),
-        'rmsd'              : (types.FloatType, 1),
-        'binding_energy'    : (types.FloatType, 1),
-        'docking_energy'    : (types.FloatType, 1),
-        'trn_x'             : (types.FloatType, 1),
-        'trn_y'             : (types.FloatType, 1),
-        'trn_z'             : (types.FloatType, 1),
-        'qtn_nx'            : (types.FloatType, 1),
-        'qtn_ny'            : (types.FloatType, 1),
-        'qtn_nz'            : (types.FloatType, 1),
-        'qtn_ang_deg'       : (types.FloatType, 1),
-        'num_torsions'      : (types.IntType, 1),
-        'torsion_values'    : (types.FloatType, None)
+        'ei_version'        : (float, 1),
+        'ag_version'        : (float, 1),
+        'ad_version'        : (float, 1),
+        'run_rank'          : (int, 1),
+        'run_number'        : (int, 1),
+        'cluster_rank'      : (int, 1),
+        'cluster_size'      : (int, 1),
+        'run_size'          : (int, 1),
+        'rseed1'            : (int, 1),
+        'rseed2'            : (int, 1),
+        'rmsd'              : (float, 1),
+        'binding_energy'    : (float, 1),
+        'docking_energy'    : (float, 1),
+        'trn_x'             : (float, 1),
+        'trn_y'             : (float, 1),
+        'trn_z'             : (float, 1),
+        'qtn_nx'            : (float, 1),
+        'qtn_ny'            : (float, 1),
+        'qtn_nz'            : (float, 1),
+        'qtn_ang_deg'       : (float, 1),
+        'num_torsions'      : (int, 1),
+        'torsion_values'    : (float, None)
         }
 
 

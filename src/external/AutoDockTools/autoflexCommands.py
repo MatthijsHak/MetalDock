@@ -58,11 +58,11 @@ from MolKit.pdbWriter import PdbqtWriter
 from MolKit.bondSelector import RotatableBondSelector, AmideBondSelector
 from MolKit.bondSelector import GuanidiniumBondSelector, LeafBondSelector
 from Pmv.guiTools import MoleculeChooser
-import types, string, Tkinter, os, Pmw
+import types, string, tkinter, os, Pmw
 from AutoDockTools.autotorsCommands import MAXTORS, SetRotatableBonds
 from AutoDockTools.atomTypeTools import AutoDock4_AtomTyper
 
-from SimpleDialog import SimpleDialog
+from tkinter.simpledialog import SimpleDialog
 
 menuText = {}
 menuText['AutoFlexMB'] = 'Flexible Residues'
@@ -88,7 +88,7 @@ class AF_MacroReader(MVCommand):
     def onRemoveObjectFromViewer(self, obj): #remove the covalent ligand
         if hasattr(self.vf, 'flexDict'):
             dict = self.vf.flexDict
-            if dict.has_key('macrofilename'): 
+            if 'macrofilename' in dict: 
                 macrofilename = dict['macrofilename']
                 if hasattr(obj, 'parser') and obj.parser.filename == macrofilename:
                     msg = "removing flexDict macrofilename entry: ", dict['macrofilename']
@@ -103,7 +103,7 @@ class AF_MacroReader(MVCommand):
     def onAddCmdToViewer(self):
         if not hasattr(self.vf, 'flexDict'):
             self.vf.flexDict={}
-        if not self.vf.commands.has_key('readPDBQT'):
+        if 'readPDBQT' not in self.vf.commands:
             self.vf.loadCommand('fileCommands', 'readPDBQT', 'Pmv')
 
 
@@ -129,7 +129,7 @@ class AF_MacroReader(MVCommand):
             msg = 'File must be PDBQT format'
             self.warningMsg(msg)
             return 'ERROR'
-        apply(self.doitWrapper, (macroFile,), kw)
+        self.doitWrapper(*(macroFile,), **kw)
 
 
     def doit(self, macroFile):
@@ -162,7 +162,7 @@ class AF_MacroChooser(MVCommand):
     def onRemoveObjectFromViewer(self, obj):
         if hasattr(self.vf, 'flexDict'):
             dict = self.vf.flexDict
-            if dict.has_key('macrofilename'): 
+            if 'macrofilename' in dict: 
                 ok = False
                 macrofilename = dict['macrofilename']
                 for m in self.vf.Mols:
@@ -171,9 +171,9 @@ class AF_MacroChooser(MVCommand):
                         break
                 if not ok:
                     del dict['macrofilename']
-            if dict.has_key('macroname') and dict['macroname'] not in self.vf.Mols.name:
+            if 'macroname' in dict and dict['macroname'] not in self.vf.Mols.name:
                 del dict['macroname']
-                if dict.has_key('macromol') and dict['macromol']:
+                if 'macromol' in dict and dict['macromol']:
                     del dict['macromol']
 
 
@@ -182,17 +182,17 @@ class AF_MacroChooser(MVCommand):
         """called each time the 'choose Molecule' button is pressed"""
         mols = self.chooser.getMolSet()
         kw = {'redraw':0}
-        if mols: apply(self.doitWrapper, (mols,), kw)
+        if mols: self.doitWrapper(*(mols,), **kw)
         self.chooser.form.withdraw()
 
 
     def guiCallback(self):
         self.chooser = MoleculeChooser(self.vf, self.mode, self.title)
         self.chooser.ipf.append({'name':'Select Button',
-                                 'widgetType':Tkinter.Button,
+                                 'widgetType':tkinter.Button,
                                  'text':'Select Molecule',
                                  'wcfg':{'bd':6},
-                                 'gridcfg':{'sticky':Tkinter.E+Tkinter.W},
+                                 'gridcfg':{'sticky':tkinter.E+tkinter.W},
                                  'command': self.chooseMolecule_cb})
         self.form = self.chooser.go(modal=0, blocking=0)
         lb = self.chooser.ipf.entryByName['Molecule']['widget'].lb
@@ -203,7 +203,7 @@ class AF_MacroChooser(MVCommand):
         """None<-ADflex_chooseMacro(nodes)"""
         nodes = self.vf.expandNodes(nodes)
         if not len(nodes): return 'ERROR'
-        apply(self.doitWrapper, (nodes,), kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes, **kw):
@@ -241,7 +241,7 @@ class AF_MacroChooser(MVCommand):
         if len(nphs):
             lenNPHS = 0
             beforeLen = len(mol.allAtoms)
-            if 'automerge_nphs' in kw.keys():
+            if 'automerge_nphs' in list(kw.keys()):
                 self.vf.mergeNPHSGC(mol.allAtoms)
             else:
                 nphs_msg="There appear to be some nonpolar hydrogen in "+ mol.name+ "  Do you wish to merge them to conform to AutoDock4 atom types? "
@@ -303,7 +303,7 @@ class AF_SelectResidues(MVCommand):
 
     def guiCallback(self):
         """called each time the 'Set Selected Residues' button is pressed"""
-        if not self.vf.flexDict.has_key('macroname'): 
+        if 'macroname' not in self.vf.flexDict: 
             t='select protein first'
             self.vf.warningMsg(t)
             return 'ERROR'
@@ -336,7 +336,7 @@ class AF_SelectResidues(MVCommand):
         mol.allAtoms.used=0
         kw = {'redraw':0}
         self.torscount = 0
-        apply(self.doitWrapper, (nodes,), kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def __call__(self, nodes=None, **kw):
@@ -344,7 +344,7 @@ class AF_SelectResidues(MVCommand):
         if not len(nodes): return "ERROR"
         if nodes.__class__ != ResidueSet:
             nodes = nodes.findType(Residue).uniq()
-        apply(self.doitWrapper, (nodes,), kw)
+        self.doitWrapper(*(nodes,), **kw)
 
 
     def doit(self, nodes):
@@ -352,12 +352,12 @@ class AF_SelectResidues(MVCommand):
         if not len(flex_residues): return 'ERROR'
 
         #remove all prolines
-        proList = ResidueSet(filter(lambda x: x.type=='PRO', flex_residues))
+        proList = ResidueSet([x for x in flex_residues if x.type=='PRO'])
         if proList:
             flex_residues = flex_residues - proList
 
         #remove all waters
-        h20List = ResidueSet(filter(lambda x: x.type=='HOH', flex_residues))
+        h20List = ResidueSet([x for x in flex_residues if x.type=='HOH'])
         if h20List:
             flex_residues = flex_residues - h20List
 
@@ -366,14 +366,14 @@ class AF_SelectResidues(MVCommand):
             self.vf.warningMsg(t)
             return 'ERROR'
 
-        map(self.setAutoFlexFields, flex_residues)
+        list(map(self.setAutoFlexFields, flex_residues))
         #map(self.setSideChain, flex_residues)
         #map(self.setTorsionFields,flex_residues)
         #for item in flex_residues:
         #    self.setTorsionFields(item)
         #map(self.getAmideBonds,flex_residues)
         #remove any residues with no possible torsions
-        flexList = filter(lambda x: x.torscount!=0, flex_residues)
+        flexList = [x for x in flex_residues if x.torscount!=0]
         flexList = ResidueSet(flexList)
         if not len(flexList):
             t='Current Selected Residues have no active torsions!'
@@ -439,7 +439,7 @@ class AF_SelectResidues(MVCommand):
             res.rootlist = caAtoms
         elif self.vf.hasGui:
             #use inputForm to get root atom and atoms for flexible part
-            rootname = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            rootname = tkinter.StringVar(master=self.vf.GUI.ROOT)
             if hasattr(res, 'rootlist'):
                 rootname.set(res.rootlist[0].name)
             else:
@@ -453,7 +453,7 @@ class AF_SelectResidues(MVCommand):
                 'entries':res.atoms.name,
                 'title': 'Select Root Atom',
                 'lbwcfg':{'height':20,'selectforeground':'red','exportselection':0},
-                'gridcfg':{'sticky':Tkinter.W +Tkinter.E}}),
+                'gridcfg':{'sticky':tkinter.W +tkinter.E}}),
             vals= self.vf.getUserInput(ifd, modal=1, blocking=1)
             if vals:
                 try:
@@ -502,12 +502,12 @@ class AF_ProcessResidues(SetRotatableBonds, MVBondICOM):
         if not hasattr(self.vf, 'setICOM'):
             self.vf.loadCommand('interactiveCommands', 'setICOM', 'Pmv')
         if self.vf.hasGui and not self.torsStr:
-            self.torsStr = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.torsStr = tkinter.StringVar(master=self.vf.GUI.ROOT)
 
 
     def guiCallback(self):
         """called INDIRECTLY each time the 'Choose Torsions in Currently Selected Residues...' button is pressed"""
-        if not self.vf.flexDict.has_key('flex_residues'): 
+        if 'flex_residues' not in self.vf.flexDict: 
             t='select residues first'
             self.vf.warningMsg(t)
             return 'ERROR'
@@ -523,32 +523,32 @@ class AF_ProcessResidues(SetRotatableBonds, MVBondICOM):
             return 'ERROR'
         self.changeFlexResCt(0)
         if not hasattr(self, 'ifd'):
-            self.torsStr= Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.torsStr= tkinter.StringVar(master=self.vf.GUI.ROOT)
             s = 'Number of rotatable bonds ='+str(0)+ ' / '+str(MAXTORS)+'\n'
             self.torsStr.set(s)
-            self.renameAromatic= Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.renameAromatic= tkinter.IntVar(master=self.vf.GUI.ROOT)
             infoStr = '"Shift+pick" or "shift+drag-&-pick bonds".  \nGreen = rotatable, \nMagenta = non-rotatable, \nRed = unrotatable.\n\n'
             ifd = self.ifd=InputFormDescr(title='Torsion Count')
             ifd.append({'name': 'maxTorsLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'wcfg':{'text':infoStr},
-                'gridcfg':{'sticky':Tkinter.W + Tkinter.E}}),
+                'gridcfg':{'sticky':tkinter.W + tkinter.E}}),
             ifd.append({'name':'torsEntryLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'wcfg':{'textvariable':self.torsStr},
-                'gridcfg':{'sticky':Tkinter.W +Tkinter.E}}),
+                'gridcfg':{'sticky':tkinter.W +tkinter.E}}),
             ifd.append({'name': 'noAmideBut',
-                'widgetType':Tkinter.Checkbutton,
+                'widgetType':tkinter.Checkbutton,
                 'wcfg':{'text':'amide torsions are allowed',
                     #'activebackground':'white',
                     'selectcolor':'white',
                     'indicatoron':0,
                     'command':self.setNoAmideTors_cb},
-                'gridcfg':{'sticky':Tkinter.W+Tkinter.E, 'columnspan':2}}),
+                'gridcfg':{'sticky':tkinter.W+tkinter.E, 'columnspan':2}}),
             ifd.append({'name': 'closeBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                 'wcfg':{'text':'Close','command':self.close_cb},
-                'gridcfg':{'sticky':Tkinter.W+Tkinter.E, 'columnspan':2}})
+                'gridcfg':{'sticky':tkinter.W+tkinter.E, 'columnspan':2}})
             self.form= self.vf.getUserInput(self.ifd, modal=0, blocking=0)
         else:
             if hasattr(self,'form'):
@@ -586,7 +586,7 @@ class AF_ProcessResidues(SetRotatableBonds, MVBondICOM):
             if not hasattr(item,'torscount'):
                 badList.append(item)
             if not item.torscount:
-                print "eliminating", item.name
+                print("eliminating", item.name)
                 badList.append(item)
         badSet = ResidueSet(badList)
         flex_residues = flex_residues - badSet
@@ -628,11 +628,11 @@ class AF_ProcessResidues(SetRotatableBonds, MVBondICOM):
 
 
     def turnOffAmides(self):
-        map(self.turnOffAmide, self.vf.flexDict['flex_residues'])
+        [self.turnOffAmide(residue) for residue in self.vf.flexDict['flex_residues']]
         
 
     def turnOnAmides(self):
-        map(self.turnOnAmide, self.vf.flexDict['flex_residues'])
+        [self.turnOnAmide(residue) for residue in self.vf.flexDict['flex_residues']]
 
 
     def turnOnAmide(self, res):
@@ -684,19 +684,18 @@ class AF_ProcessResidues(SetRotatableBonds, MVBondICOM):
     def checkAromatic_cb(self, event=None):
         if self.renameAromatic.get():
             self.ifd.entryByName['checkAromBut']['widget'].config(text='aromatic carbons named A..')
-            map(self.nameA,self.vf.flexDict['flex_residues'])
+            [self.nameA(residue) for residue in self.vf.flexDict['flex_residues']]
         else:
             self.ifd.entryByName['checkAromBut']['widget'].config(text='aromatic carbons named C..')
-            map(self.renameC,self.vf.flexDict['flex_residues'])
-
+            [self.renameC(residue) for residue in self.vf.flexDict['flex_residues']]
 
     def nameA(self, res):
-        print 'changing the names of aromatic carbons is no longer supported'
+        print('changing the names of aromatic carbons is no longer supported')
         return
 
 
     def renameC(self,res):
-        print 'changing the names of aromatic carbons is no longer supported'
+        print('changing the names of aromatic carbons is no longer supported')
         return
 
 
@@ -705,7 +704,7 @@ class AF_ProcessResidues(SetRotatableBonds, MVBondICOM):
         kw['busyIdle'] = 1
         kw['log'] = 0
         #self.setUpDisplay()
-        apply(self.doitWrapper, (bonds,), kw)
+        self.doitWrapper(*(bonds,), **kw)
 
 
     def doit(self, bonds):
@@ -727,11 +726,11 @@ class AF_ProcessResidues(SetRotatableBonds, MVBondICOM):
     def getObjects(self,pick):
         flexMol = self.vf.flexDict['flex_residues'].top.uniq()[0]
         flexMolGeom = flexMol.geomContainer.geoms['bonded']
-        for o, val in pick.hits.items(): #loop over geometries
-            primInd = map(lambda x: x[0], val)
+        for o, val in list(pick.hits.items()): #loop over geometries
+            primInd = [x[0] for x in val]
             if o != flexMolGeom: continue
             else: g = o.mol.geomContainer
-            if g.geomPickToBonds.has_key(o.name):
+            if o.name in g.geomPickToBonds:
                 func = g.geomPickToBonds[o.name]
                 if func: return func(o, primInd)
             else:
@@ -792,56 +791,56 @@ class AF_SetupCovalentFlexibleResidue(MVCommand):
     def buildForm(self, event=None):
         #self.selPick.set(0)
         ifd = self.ifd = InputFormDescr(title = 'Setup Covalent Ligand')
-        ifd.append({'widgetType':Tkinter.Label,
+        ifd.append({'widgetType':tkinter.Label,
                     'wcfg':{'text': 'FlexRes'}, 
                     'tooltip': 'ReceptorName:ChainID:ResidueName\neg: hsg1:A:ARG8', 
                     'gridcfg':{'sticky':'w','columnspan':2} })
         ifd.append({'name':'resWid',
-                    'widgetType':Tkinter.Entry,
+                    'widgetType':tkinter.Entry,
                     'wcfg':{'highlightcolor':'white'}, 
                     'gridcfg':{'sticky':'ew','row':-1, 'column':3, 'columnspan':3} })
-        ifd.append({'widgetType':Tkinter.Label,
+        ifd.append({'widgetType':tkinter.Label,
                     'wcfg':{'text': 'FlexRes'},
                     'tooltip': 'Name 3 residue atoms in this order:\natom1-atom2-atom3-receptor\neg: HG,SG,CB', 
                     'gridcfg':{'sticky':'w', 'columnspan':2} })
         ifd.append({'name':'rec_atomWid',
-                    'widgetType':Tkinter.Entry,
+                    'widgetType':tkinter.Entry,
                     'wcfg':{'highlightcolor':'white'}, 
                     'gridcfg':{'sticky':'ew','row':-1, 'column':2, 'columnspan':2} })
-        ifd.append({'widgetType':Tkinter.Label,
+        ifd.append({'widgetType':tkinter.Label,
                     'wcfg':{'text': '--Receptor'},
                     'tooltip': "overlap atom bond requirements:\nHG ONLY one bond ->SG\nSG two:->HG, ->CB\nCB two:->SG, ->some other atom in residue", 
                     'gridcfg':{'sticky':'w', 'row':-1, 'column':4} })
-        ifd.append({'widgetType':Tkinter.Label,
+        ifd.append({'widgetType':tkinter.Label,
                     'wcfg':{'text': 'Ligand       ligand--'},
                     'tooltip': 'Name 3 ligand atoms in this order:\nligand-atom1-atom2-atom3\neg: C1,S,CS\neach name must match only\na single atom in the ligand', 
                     'gridcfg':{'sticky':'w', 'columnspan':2} })
         ifd.append({'name':'lig_atomWid',
-                    'widgetType':Tkinter.Entry,
+                    'widgetType':tkinter.Entry,
                     'wcfg':{'highlightcolor':'white'}, 
                     'gridcfg':{'sticky':'ew','row':-1, 'column':2, 'columnspan':2} })
                     #'gridcfg':{'sticky':'ew','row':-1, 'column':1, 'columnspan':2} })
-        ifd.append({'widgetType':Tkinter.Label,
+        ifd.append({'widgetType':tkinter.Label,
                     'wcfg':{'text': 'Ligand'}, 
                     'tooltip': 'name of small molecule to be covalently attached\n eg "ind"',
                     'gridcfg':{'sticky':'w', 'columnspan':2} })
         ifd.append({'name':'ligWid',
-                    'widgetType':Tkinter.Entry,
+                    'widgetType':tkinter.Entry,
                     'wcfg':{'highlightcolor':'white'}, 
                     'gridcfg':{'sticky':'ew','row':-1, 'column':2, 'columnspan':2} })
 # some kind of doit button...
         ifd.append({'name': 'OK Button',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text': 'OK',
                             'borderwidth':1, 'command': self.Ok_cb},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,
                                'columnspan':3},
                     })
         ifd.append({'name': 'Cancel Button',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text': 'Cancel',
                             'borderwidth':1, 'command': self.Cancel_cb},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,
                                'row':-1, 'column':3, 'columnspan':2},
                     })
  
@@ -905,11 +904,11 @@ class AF_SetupCovalentFlexibleResidue(MVCommand):
                 r_attach = ra
                 cb.bonds.remove(b)
                 ra.bonds.remove(b)
-                print " found atom to attach:" + r_attach.full_name()
+                print(" found atom to attach:" + r_attach.full_name())
                 found = True
                 break
         if found==False: 
-            print "Unable to find atom for covalent bond based on " + rec_ats_str
+            print("Unable to find atom for covalent bond based on " + rec_ats_str)
             return
         self.vf.flexDict['macromol'] = rec
         self.vf.flexDict['macroname'] = recMol_name
@@ -955,7 +954,7 @@ class AF_SetupCovalentFlexibleResidue(MVCommand):
         resP.atoms.top = rec
         rec.allAtoms = rec.chains.residues.atoms
         num_allAtoms_plus_one = len(rec.allAtoms) + 1
-        rec.allAtoms.number = range(1, num_allAtoms_plus_one)
+        rec.allAtoms.number = list(range(1, num_allAtoms_plus_one))
         try:
             self.vf.ADflex_setResidues(resPSet)
         except:
@@ -1021,12 +1020,12 @@ class AF_ProcessHingeResidues(SetRotatableBonds, MVBondICOM):
         if not hasattr(self.vf, 'setICOM'):
             self.vf.loadCommand('interactiveCommands', 'setICOM', 'Pmv')
         if self.vf.hasGui and not self.torsStr:
-            self.torsStr = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.torsStr = tkinter.StringVar(master=self.vf.GUI.ROOT)
 
 
     def setAutoFlexFieldsHinge(self, res, atomOne, atomTwo, atoms):
         if hasattr(res, 'processed'): 
-            print res.full_name(), ' already has autoflexFields'
+            print(res.full_name(), ' already has autoflexFields')
             return
         #PROCESS HINGE RESIDUES
         #backbone_names = ['CA', 'C','N','O','HN','HN1','HN2', 'HA', 
@@ -1074,7 +1073,7 @@ class AF_ProcessHingeResidues(SetRotatableBonds, MVBondICOM):
 
     def guiCallback(self):
         """called INDIRECTLY each time the 'Set Selected Residues' button is pressed"""
-        if not self.vf.flexDict.has_key('hinge_list'): 
+        if 'hinge_list' not in self.vf.flexDict: 
             t='set hinge first'
             self.vf.warningMsg(t)
             return 'ERROR'
@@ -1101,24 +1100,24 @@ class AF_ProcessHingeResidues(SetRotatableBonds, MVBondICOM):
         self.torscount = numpy.add.reduce(hinge_resSet.torscount)
         self.changeHingeFlexResCt(len(hinge_resSet))
         if not hasattr(self, 'ifdX'):
-            self.torsStr= Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.torsStr= tkinter.StringVar(master=self.vf.GUI.ROOT)
             s = 'Number of rotatable bonds ='+str(0)+ ' / '+str(MAXTORS)+'\n'
             self.torsStr.set(s)
-            self.renameAromatic= Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.renameAromatic= tkinter.IntVar(master=self.vf.GUI.ROOT)
             infoStr = '"Shift + pick" or "shift + drag-&-pick" bonds.  \nGreen = rotatable, \nMagenta = non-rotatable, \nRed = unrotatable.\n\n'
             ifdX = self.ifdX=InputFormDescr(title='Torsion Count')
             ifdX.append({'name': 'maxTorsLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'wcfg':{'text':infoStr},
-                'gridcfg':{'sticky':Tkinter.W + Tkinter.E}}),
+                'gridcfg':{'sticky':tkinter.W + tkinter.E}}),
             ifdX.append({'name':'torsEntryLab',
-                'widgetType':Tkinter.Label,
+                'widgetType':tkinter.Label,
                 'wcfg':{'textvariable':self.torsStr},
-                'gridcfg':{'sticky':Tkinter.W +Tkinter.E}}),
+                'gridcfg':{'sticky':tkinter.W +tkinter.E}}),
             ifdX.append({'name': 'closeBut',
-                'widgetType':Tkinter.Button,
+                'widgetType':tkinter.Button,
                 'wcfg':{'text':'Close','command':self.closeX_cb},
-                'gridcfg':{'sticky':Tkinter.W+Tkinter.E, 'columnspan':2}})
+                'gridcfg':{'sticky':tkinter.W+tkinter.E, 'columnspan':2}})
             self.formX= self.vf.getUserInput(self.ifdX, modal=0, blocking=0)
         else:
             if hasattr(self,'formX'):
@@ -1129,7 +1128,7 @@ class AF_ProcessHingeResidues(SetRotatableBonds, MVBondICOM):
 ####    #need to set up display by torsion activity here
         #could have preexisting flexible residues... or not
         self.vf.flexDict.setdefault('torscount', 0)
-        if 'flex_residues' in self.vf.flexDict.keys() and \
+        if 'flex_residues' in list(self.vf.flexDict.keys()) and \
                 len(self.vf.flexDict['flex_residues']):
             self.vf.flexDict['torscount'] += self.torscount
         else:
@@ -1188,7 +1187,7 @@ class AF_ProcessHingeResidues(SetRotatableBonds, MVBondICOM):
         kw['log'] = 0
         #kw['flexRes'] = False
         #self.setUpDisplay()
-        apply(self.doitWrapper, (bonds,), kw)
+        self.doitWrapper(*(bonds,), **kw)
 
 
     def doit(self, bonds, **kw):
@@ -1212,11 +1211,11 @@ class AF_ProcessHingeResidues(SetRotatableBonds, MVBondICOM):
     def getObjects(self,pick):
         flexMol = self.mol
         flexMolGeom = flexMol.geomContainer.geoms['bonded']
-        for o, val in pick.hits.items(): #loop over geometries
-            primInd = map(lambda x: x[0], val)
+        for o, val in list(pick.hits.items()): #loop over geometries
+            primInd = [x[0] for x in val]
             if o != flexMolGeom: continue
             else: g = o.mol.geomContainer
-            if g.geomPickToBonds.has_key(o.name):
+            if o.name in g.geomPickToBonds:
                 func = g.geomPickToBonds[o.name]
                 if func: return func(o, primInd)
             else:
@@ -1267,7 +1266,7 @@ class AF_EditHinge(MVCommand, MVAtomICOM):
         if not hasattr(self.vf, 'ADflex_setHinge'):
             self.vf.loadCommand('autoflexCommands', 'ADflex_setHinge', 'AutoDockTools')
         if self.vf.hasGui:
-            self.mode = Tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.mode = tkinter.StringVar(master=self.vf.GUI.ROOT)
     
 
     def continuousUpdate_cb(self, name, oldval, newval):
@@ -1289,7 +1288,7 @@ class AF_EditHinge(MVCommand, MVAtomICOM):
     def update(self, forward=1, event=None):
         #print 'in update: self.atomList=', self.atomList
         if not len(self.atomList):
-            print 'Currently no atoms: resetting geoms'
+            print('Currently no atoms: resetting geoms')
             return
         for at in self.atomList:
             c1 = self.getTransformedCoords(at)
@@ -1305,12 +1304,12 @@ class AF_EditHinge(MVCommand, MVAtomICOM):
             #    'widgetType':Tkinter.Label,
             #    'wcfg':{'text':'Mode:'},
             #    'gridcfg':{'columnspan':3,'sticky':'w'}})
-            ifd.append({'widgetType':Tkinter.Radiobutton,
+            ifd.append({'widgetType':tkinter.Radiobutton,
                 'wcfg':{'text':'adding Atoms',
                     'variable':self.mode,
                     'value': 'add'},
                 'gridcfg':{'sticky':'we'}})
-            ifd.append({'widgetType':Tkinter.Radiobutton,
+            ifd.append({'widgetType':tkinter.Radiobutton,
                 'wcfg':{'text':'removing Atoms', 
                     'variable':self.mode,
                     'value': 'remove'},
@@ -1350,7 +1349,7 @@ class AF_EditHinge(MVCommand, MVAtomICOM):
             self.warningMsg('no flexDIct!')
             return "ERROR"
         dict = self.vf.flexDict
-        if not 'hinge_list' in dict.keys():
+        if not 'hinge_list' in list(dict.keys()):
             self.warningMsg('no hinge_list in flexDict!')
             return "ERROR"
         hinges = self.vf.flexDict['hinge_list']
@@ -1489,13 +1488,13 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
                 offset=0.1,lineWidth=2, protected=True, visible=True)
             self.hingeAtoms.Set(visible=0, tagModified=False)
             self.hingeAtoms.pickable = 0
-            self.selLevel = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.selectionBase = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.selectHingeMethod = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.selectionCenter = Tkinter.StringVar(master=self.vf.GUI.ROOT)
-            self.adjustPt = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.selLevel = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.selectionBase = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.selectHingeMethod = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.selectionCenter = tkinter.StringVar(master=self.vf.GUI.ROOT)
+            self.adjustPt = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.adjustPt.set(0)
-            self.editAtomsToMove = Tkinter.IntVar(master=self.vf.GUI.ROOT)
+            self.editAtomsToMove = tkinter.IntVar(master=self.vf.GUI.ROOT)
             self.editAtomsToMove.set(0)
             self.vf.GUI.VIEWER.AddObject(self.spheres, redo=0,
                                 parent=self.masterGeom)
@@ -1527,7 +1526,7 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
 
     def update(self, forward=1, event=None):
         if not len(self.atomList):
-            print 'Currently no atoms: resetting geoms'
+            print('Currently no atoms: resetting geoms')
             self.spheres.Set(vertices=[])
             self.labels.Set(vertices=[])
             self.line.Set(vertices=[])
@@ -1562,26 +1561,26 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
     def buildForm(self):
         #build ifd and form
         ifd = self.ifd = InputFormDescr(title='Set Up Hinge')
-        ifd.append({'widgetType': Tkinter.Label,
+        ifd.append({'widgetType': tkinter.Label,
                     'name':'set hinge atoms label',
                     'wcfg':{'text':'Set Hinge Atoms by:',
                             'bd':2,'relief':'ridge'},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,
                                'columnspan':8}})
-        ifd.append({'widgetType':Tkinter.Radiobutton,
+        ifd.append({'widgetType':tkinter.Radiobutton,
                     'name':'pickingRB',
                     'wcfg':{'variable':self.selectHingeMethod,
                             'text':'picking',
                             'value':'picking',
                             'command':self.updateHinge},  #1
-                    'gridcfg':{'sticky':Tkinter.W}}),
-        ifd.append({'widgetType':Tkinter.Radiobutton,
+                    'gridcfg':{'sticky':tkinter.W}}),
+        ifd.append({'widgetType':tkinter.Radiobutton,
                     'name':'selectionRB',
                     'wcfg':{'variable':self.selectHingeMethod,
                             'text':'current selection',
                             'value':'cursel',
                             'command':self.updateHinge},  #1
-                    'gridcfg':{'sticky':Tkinter.W, 'row':-1, 'column':3}}),
+                    'gridcfg':{'sticky':tkinter.W, 'row':-1, 'column':3}}),
 #        ifd.append({'widgetType':Tkinter.Checkbutton,
 #                    'name':'pt1CB',
 #                    'wcfg':{ 'text':'adjust  x y z coords of hingePts ',
@@ -1691,71 +1690,71 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
 #                    'oneTurn':50.,},
 #             'gridcfg':{'columnspan':1,'sticky':'e', 'row':-1, 'column':5}})
         ifd.append({'name': 'atoms to move label',
-                    'widgetType': Tkinter.Label,
+                    'widgetType': tkinter.Label,
                     'wcfg':{'bd':2,'relief':'ridge',
                             'text':'Atoms to move:'},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,
                                'columnspan':8}})
-        ifd.append({'widgetType':Tkinter.Radiobutton,
+        ifd.append({'widgetType':tkinter.Radiobutton,
                     'name':'betweenRB',
                     'wcfg':{'variable':self.selectionBase,
                             'text':'between hinge points',
                             'value':'between',
                             'command':self.updateBase},
-                    'gridcfg':{'sticky':Tkinter.W, 'columnspan':2}})
-        ifd.append({'widgetType':Tkinter.Radiobutton,
+                    'gridcfg':{'sticky':tkinter.W, 'columnspan':2}})
+        ifd.append({'widgetType':tkinter.Radiobutton,
                     'name':'selectionRB',
                     'wcfg':{'text':'current selection',
                             'variable':self.selectionBase,
                             'value':'selection',
                             'command':self.updateBase},
-                    'gridcfg':{'sticky':Tkinter.W, 'row':-1, 'column':3}})
-        ifd.append({'widgetType':Tkinter.Radiobutton,
+                    'gridcfg':{'sticky':tkinter.W, 'row':-1, 'column':3}})
+        ifd.append({'widgetType':tkinter.Radiobutton,
                     'name':'savedSetRB',
                     'wcfg':{'text':'a saved set',
                             'variable':self.selectionBase,
                             'value':'set',
                             'command':self.updateBase},
-                    'gridcfg':{'sticky':Tkinter.W, 'row':-1, 'column':5}})
+                    'gridcfg':{'sticky':tkinter.W, 'row':-1, 'column':5}})
                     #'gridcfg':{'sticky':Tkinter.W}})
-        ifd.append({'widgetType':Tkinter.Checkbutton,
+        ifd.append({'widgetType':tkinter.Checkbutton,
                     'name':'editLastHingeCB',
                     'wcfg':{'variable':self.editAtomsToMove,
                             'text':'edit atoms to move',
                             'command':self.editAtomsToMove_cb},
-                    'gridcfg':{'sticky':Tkinter.W}})
+                    'gridcfg':{'sticky':tkinter.W}})
                     #'gridcfg':{'sticky':Tkinter.W, 'row':-1, 'column':2}}),
         ifd.append({'name':'selectB',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Set Hinge',
                             'command':self.setHinge_cb},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E, 'columnspan':2}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E, 'columnspan':2}})
         ifd.append({'name':'selectTorsionsB',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Select Torsions in Last Hinge',
                             'command':self.selectTorsions_cb},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,'row':-1, 'column':2, 'columnspan':2}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,'row':-1, 'column':2, 'columnspan':2}})
         ifd.append({'name':'clearLastB',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Remove Last Hinge',
                             'command':self.removeLastHinge_cb},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E, 'row':-1,'columnspan':2, 'column':4 }})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E, 'row':-1,'columnspan':2, 'column':4 }})
         ifd.append({'name':'clearB',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Clear',
                             'command':self.clear_cb},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E, 'columnspan':2}})
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E, 'columnspan':2}})
         ifd.append({'name':'clearAllB',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Clear Hinge List',
                             'command':self.clearAll_cb},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,
                                'row':-1, 'column':2, 'columnspan':2}})
         ifd.append({'name':'closeB',
-                    'widgetType':Tkinter.Button,
+                    'widgetType':tkinter.Button,
                     'wcfg':{'text':'Close',
                             'command':self.close_cb},
-                    'gridcfg':{'sticky':Tkinter.W+Tkinter.E,
+                    'gridcfg':{'sticky':tkinter.W+tkinter.E,
                                'row':-1,'column':4, 'columnspan':2}})
 
         self.form = self.vf.getUserInput(ifd, modal=0,blocking=0)
@@ -1784,7 +1783,7 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
 
     def editAtomsToMove_cb(self, event=None):
         flexDict = self.vf.flexDict
-        if 'hinge_list' not in flexDict.keys() or len(self.vf.flexDict['hinge_list'])==0:
+        if 'hinge_list' not in list(flexDict.keys()) or len(self.vf.flexDict['hinge_list'])==0:
             msg = 'no hinges to edit'
             self.warningMsg(msg)
             self.editAtomsToMove.set(0)
@@ -1875,9 +1874,9 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
     def getSet(self, event=None):
         idf = InputFormDescr(title ='')
         entries = []
-        names = self.vf.sets.keys()
+        names = list(self.vf.sets.keys())
         names.sort()
-        for key, value in self.vf.sets.items():
+        for key, value in list(self.vf.sets.items()):
             entries.append( (key, value.comments) )
         idf.append({'name':'set',
                     'widgetType':ListChooser,
@@ -1887,7 +1886,7 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
         vals = self.vf.getUserInput(idf)
         if len(vals['set'])> 0:
             setNames = vals['set']
-            print 'returning ', setNames
+            print('returning ', setNames)
             return self.vf.sets[setNames[0]]
  
 
@@ -1906,7 +1905,7 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
                 'entries':hinges,
                 'title': s,
                 'lbwcfg':{'height':20,'selectforeground':'red','exportselection':0},
-                'gridcfg':{'sticky':Tkinter.W +Tkinter.E}}),
+                'gridcfg':{'sticky':tkinter.W +tkinter.E}}),
             vals= self.vf.getUserInput(ifd, modal=1, blocking=1)
             if vals:
                 try:
@@ -1964,7 +1963,7 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
             d[h[0][0]] = 1
             d[h[0][1]] = 1
             for at in h[1]: d[at] = 1
-            all_hinge_atoms = AtomSet(d.keys())
+            all_hinge_atoms = AtomSet(list(d.keys()))
             resSet = all_hinge_atoms.parent.uniq()
             non_hinge_atoms = resSet.atoms - all_hinge_atoms
         #caution:  should this reorder the residues?
@@ -2061,7 +2060,7 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
                 self.ap.stop()
                 del self.ap
             #self.hingeAtoms.Set(visible=0, tagModified=False)
-            self.centerList = [map(float,[self.xval.get(),self.yval.get(),self.zval.get()]),]
+            self.centerList = [list(map(float,[self.xval.get(),self.yval.get(),self.zval.get()])),]
             self.spheres.Set(vertices = self.centerList)
         else:
             msg = val + "is not a recognized center for SelectInSphere"
@@ -2098,10 +2097,10 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
 
     def saveHinge(self, newval, event=None):
         if len(newval)!=2:
-            print newval, ' not required format which is [(atom1, atom2), atoms_to_move]'
+            print(newval, ' not required format which is [(atom1, atom2), atoms_to_move]')
             return
         if len(newval[0])!=2:
-            print newval, ' not required format which is [(atom1, atom2), atoms_to_move]'
+            print(newval, ' not required format which is [(atom1, atom2), atoms_to_move]')
             return
         (atomOne, atomTwo), atoms = newval
         dict = self.vf.flexDict
@@ -2109,7 +2108,7 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
         self.check_torscount(atoms)
         #print "flexDict['hinge_list']=", dict['hinge_list']
         kw = {'log': 1}
-        apply(self.doitWrapper,((atomOne, atomTwo), atoms), kw)
+        self.doitWrapper(*((atomOne, atomTwo), atoms), **kw)
         
 
     def setHinge_cb(self, event=None):
@@ -2179,13 +2178,14 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
         self.vf.GUI.pickLabel.configure(text=msg)
 
 
-    def __call__(self, (atomOne, atomTwo), atoms,  **kw):
+    def __call__(self, xxx_todo_changeme, atoms,  **kw):
         """
         atomOne: first atom in hinge
         atomTwo: second atom in hinge
         atoms: all atoms which will be moved by this hinge
 
         """
+        (atomOne, atomTwo) = xxx_todo_changeme
         kw['topCommand'] = 0
         kw['busyIdle'] = 1
         kw['log'] = 0
@@ -2201,13 +2201,14 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
         atoms = self.vf.expandNodes(atoms)
         if not len(atoms):
             return "ERROR"
-        apply(self.doitWrapper, ((atomOne, atomTwo), atoms), kw)
+        self.doitWrapper(*((atomOne, atomTwo), atoms), **kw)
 
 
-    def doit(self, (atomOne, atomTwo), atoms, **kw):
+    def doit(self, xxx_todo_changeme1, atoms, **kw):
         """
         atomOne
         """
+        (atomOne, atomTwo) = xxx_todo_changeme1
         dict = self.vf.flexDict
         #if 'hinge_list' is not in dict.keys, add it with [] as its value
         hinge_list = dict.setdefault('hinge_list', [])
@@ -2217,7 +2218,7 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
             dict['all_hinge_atoms'], dict['non_hinge_atoms'] = self.getAllHingeAtoms()
             #created a log string here
         else:
-            print newval, " already saved in flexDict['hinge_list']"
+            print(newval, " already saved in flexDict['hinge_list']")
             return "ERROR"
 
 
@@ -2226,10 +2227,10 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
 
 
     def getObjects(self,pick):
-        print "in get Objects with ", pick
-        if 'flex_residues' in self.vf.flexDict.keys():
+        print("in get Objects with ", pick)
+        if 'flex_residues' in list(self.vf.flexDict.keys()):
             flexMol = self.vf.flexDict['flex_residues'].top.uniq()[0]
-        elif 'hinge_list' in self.vf.flexDict.keys():
+        elif 'hinge_list' in list(self.vf.flexDict.keys()):
             #hinge_list= [[(at1,at2),atoms]]
             #get the first atom's top
             flexMol = self.vf.flexDict['hinge_list'][0][0][0].top
@@ -2237,11 +2238,11 @@ class AF_SetHinge(MVCommand, MVAtomICOM):
             return 'ERROR'
         flexMolGeom = flexMol.geomContainer.geoms['bonded']
 ##         flexMolGeom = flexMol.geomContainer.geoms['lines']
-        for o, val in pick.hits.items(): #loop over geometries
-            primInd = map(lambda x: x[0], val)
+        for o, val in list(pick.hits.items()): #loop over geometries
+            primInd = [x[0] for x in val]
             if o != flexMolGeom: continue
             else: g = o.mol.geomContainer
-            if g.geomPickToBonds.has_key(o.name):
+            if o.name in g.geomPickToBonds:
                 func = g.geomPickToBonds[o.name]
                 if func: return func(o, primInd)
             else:
@@ -2314,7 +2315,7 @@ class AF_SetBondRotatableFlag(SetRotatableBonds):
         
         bonds = atoms[:2].bonds
         if len(bonds[0])==0:
-            print 'ERROR: no bond between ...'
+            print('ERROR: no bond between ...')
             return 'ERROR'
 
         bond = bonds[0][0]
@@ -2360,7 +2361,7 @@ class AF_SetBondRotatableFlag(SetRotatableBonds):
         if len(atoms)<2: return
         assert isinstance( atoms[0], Atom )
         kw.setdefault('flexRes', False)
-        apply( self.doitWrapper, (atoms, rotatable), kw ) 
+        self.doitWrapper(*(atoms, rotatable), **kw) 
 
 
 
@@ -2376,11 +2377,11 @@ class AF_StepBack(MVCommand):
     def guiCallback(self):
         """called each time the 'Redisplay Macromolecule' button is pressed"""
         dict=self.vf.flexDict
-        if not dict.has_key('macroname') or not dict['macroname']:
+        if 'macroname' not in dict or not dict['macroname']:
             msg='No Protein designated'
             self.vf.warningMsg(msg)
             return
-        if not dict.has_key('flex_residues') or not dict['flex_residues']:
+        if 'flex_residues' not in dict or not dict['flex_residues']:
             msg='No residues designated'
             self.vf.warningMsg(msg)
             return
@@ -2430,22 +2431,22 @@ class AF_FlexFileWriter(MVCommand):
 
     def __call__(self, outfile=None, **kw):
         if not outfile: return 'ERROR'
-        apply(self.doitWrapper, (outfile,), kw)
+        self.doitWrapper(*(outfile,), **kw)
 
 
     def doit(self, outfile):
         self.writtenAtoms = []
         outfileptr=open(outfile,'w')
         dict=self.vf.flexDict
-        if dict.has_key('macrofilename'):
+        if 'macrofilename' in dict:
             macrofilename = dict['macrofilename']
-        elif not dict.has_key('macrofilename') and dict.has_key('macromol'):
+        elif 'macrofilename' not in dict and 'macromol' in dict:
             dict['macrofilename'] = os.path.basename(dict['macromol'].parser.filename)
         else:
             self.vf.warningMsg("No Protein File Selected!")
             return 'ERROR'
         macrofilename = dict['macrofilename']
-        if not dict.has_key('flex_residues') and not dict.has_key('hinge_list'):
+        if 'flex_residues' not in dict and 'hinge_list' not in dict:
             self.vf.warningMsg("Must Specify Residues for Flexible Side Chains or set Hinge First")
             return 'ERROR'
         flex_residues=dict.get('flex_residues',[])
@@ -2462,7 +2463,7 @@ class AF_FlexFileWriter(MVCommand):
             ###self.torsdof += item.torsdof
             for a in item.atoms:
                 flex_types[a.autodock_element] = 1
-        if 'hinge_list' in dict.keys():
+        if 'hinge_list' in list(dict.keys()):
             for item in dict['hinge_list']:
                 self.writeHinge(item, outfileptr)
                 #include hinge atoms' types, also
@@ -2472,7 +2473,7 @@ class AF_FlexFileWriter(MVCommand):
                     flex_types[a.autodock_element] = 1
         outfileptr.close()
         dict['flex_filename'] = outfile
-        dict['flex_types'] = flex_types.keys()
+        dict['flex_types'] = list(flex_types.keys())
 
 
     def writeHinge(self, item, outfileptr):
@@ -2652,10 +2653,10 @@ class AF_FlexFileWriter(MVCommand):
         outstring = "BRANCH %3d %3d\n"%(startIndex, endIndex)
         outfileptr.write(outstring)
         queue = self.writeBreadthFirst(outfileptr, fromAtom, nextAtom)
-        if self.debug: print fromAtom.name, ':', nextAtom.name, ': queue=', queue
+        if self.debug: print(fromAtom.name, ':', nextAtom.name, ': queue=', queue)
         if len(queue):
             for fromAtom, nextAtom in queue:
-                if self.debug: print " processing queue entry: ", fromAtom.name, '-', nextAtom.name
+                if self.debug: print(" processing queue entry: ", fromAtom.name, '-', nextAtom.name)
                 self.process(fromAtom, nextAtom, outfileptr)
         outstring = "ENDBRANCH %3d %3d\n"%(startIndex, endIndex)
         outfileptr.write(outstring)
@@ -2667,30 +2668,30 @@ class AF_FlexFileWriter(MVCommand):
         bonds
         """
         if self.debug: 
-            print "\n\nin writeLevel with ", atom.name, " outatom_counter=", self.outatom_counter
-            print "len(", atom.name, ").bonds=", len(atom.bonds)
+            print("\n\nin writeLevel with ", atom.name, " outatom_counter=", self.outatom_counter)
+            print("len(", atom.name, ").bonds=", len(atom.bonds))
         queue = []
         nextAts = []
         for b in atom.bonds:
             if self.debug:
-                print "processing b=", b.atom1.name, '-', b.atom2.name, ' activeTors=', b.activeTors
-                print 'atom1 in writtenAtoms=', b.atom1 in self.writtenAtoms
-                print 'atom2 in writtenAtoms=', b.atom2 in self.writtenAtoms
+                print("processing b=", b.atom1.name, '-', b.atom2.name, ' activeTors=', b.activeTors)
+                print('atom1 in writtenAtoms=', b.atom1 in self.writtenAtoms)
+                print('atom2 in writtenAtoms=', b.atom2 in self.writtenAtoms)
             if b.activeTors: 
                 at2 = b.atom1
                 if at2==atom: at2=b.atom2
                 queue.append((atom, at2))
-                if self.debug: print atom.name, 'wL: queue=', queue
+                if self.debug: print(atom.name, 'wL: queue=', queue)
                 continue
             a2 = b.atom1
             if a2==atom:
                 a2 = b.atom2
             if a2.used: 
-                if self.debug: print "!!a2 is already used!!", a2.name
+                if self.debug: print("!!a2 is already used!!", a2.name)
                 continue    
             if a2 not in self.writtenAtoms:
                 a2.number = a2.newindex = self.outatom_counter
-                if self.debug: print "writeLevel: wrote bonded atom named=", a2.name, 'a2.used=', a2.used
+                if self.debug: print("writeLevel: wrote bonded atom named=", a2.name, 'a2.used=', a2.used)
                 self.writer.write_atom(outfptr, a2)
                 self.writtenAtoms.append(a2)
                 a2.used = 1
@@ -2698,14 +2699,14 @@ class AF_FlexFileWriter(MVCommand):
                 nextAts.append(a2)
         for a2 in nextAts:
             if self.debug: 
-                print 'in for nextAts loop with a2=', a2.name
-                print 'calling wL'
+                print('in for nextAts loop with a2=', a2.name)
+                print('calling wL')
             nq = self.writeLevel(a2, outfptr)
             if len(nq):
-                if self.debug: print "extending queue with", nq
+                if self.debug: print("extending queue with", nq)
                 queue.extend(nq)
         if self.debug:
-            print 'returning queue=', queue
+            print('returning queue=', queue)
         return queue
             
 
@@ -2722,16 +2723,16 @@ class AF_FlexFileWriter(MVCommand):
             statements are added. 
         """
         if self.debug: 
-            print "in wBF with fromAtom=", fromAtom.name, '+ startAtom=', startAtom.name, 'startAtom.used=', startAtom.used
+            print("in wBF with fromAtom=", fromAtom.name, '+ startAtom=', startAtom.name, 'startAtom.used=', startAtom.used)
         queue = []
         if startAtom.used==0:
             startAtom.used = 1
             startAtom.number = startAtom.newindex = self.outatom_counter
             self.writer.write_atom(outfptr,startAtom)
-            if self.debug: print 'wBF: wrote ', startAtom.name
+            if self.debug: print('wBF: wrote ', startAtom.name)
             self.writtenAtoms.append(startAtom)
             self.outatom_counter += 1
-            if self.debug: print "self.outatom_counter=", self.outatom_counter
+            if self.debug: print("self.outatom_counter=", self.outatom_counter)
             activeTors = []
             #outfptr.write(outstring)
             for bond in startAtom.bonds:
@@ -2746,26 +2747,26 @@ class AF_FlexFileWriter(MVCommand):
                     else:
                         at2.number = at2.newindex = self.outatom_counter
                         if self.debug: 
-                            print "\n\nwriting and calling wL with nA=", at2.name, '-', at2.number
+                            print("\n\nwriting and calling wL with nA=", at2.name, '-', at2.number)
                         self.writer.write_atom(outfptr, at2)
-                        if self.debug: print 'wBF2: wrote ', at2.name
+                        if self.debug: print('wBF2: wrote ', at2.name)
                         at2.written = 1
                         self.writtenAtoms.append(at2)
                         at2.newindex = self.outatom_counter
                         self.outatom_counter = self.outatom_counter + 1
-                        if self.debug: print '!!!2:calling wL'
+                        if self.debug: print('!!!2:calling wL')
                         newQ = self.writeLevel(at2, outfptr)
-                        if self.debug: print "newQ=", newQ
+                        if self.debug: print("newQ=", newQ)
                         at2.used = 1
                         if len(newQ): 
-                            if self.debug: print "@@@@len(newq)=", len(newQ)
+                            if self.debug: print("@@@@len(newq)=", len(newQ))
                             queue.extend(newQ)
-                            if self.debug: print "queue=", queue
+                            if self.debug: print("queue=", queue)
             if self.debug: 
-                print " currently queue=",
+                print(" currently queue=", end=' ')
                 for atom1, atom2 in queue: 
-                    print atom1.name, '-', atom2.name, ',',
-                print
+                    print(atom1.name, '-', atom2.name, ',', end=' ')
+                print()
         return  queue
 
 
@@ -2839,8 +2840,8 @@ class AF_FlexFileWriter(MVCommand):
         if self.rootnum > 0:
             if self.outfile == None:
                 self.message( "no output file specified, please select:\n")
-                from Dialog import Dialog
-                from FileDialog import SaveFileDialog
+                from tkinter.dialog import Dialog
+                from tkinter.filedialog import SaveFileDialog
                 fd2 = SaveFileDialog(self.ROOT,title="File for AutoTors Formatted Output")
                 self.outfile = fd2.go (key = "test")
             if self.outfile != None:
@@ -2870,13 +2871,13 @@ class AF_RigidFileWriter(MVCommand):
     def __call__(self, outfile=None, **kw):
         """None<-ADflex_writeRigidFile(outfile)"""
         if not outfile: return 'ERROR'
-        apply(self.doitWrapper, (outfile,), kw)
+        self.doitWrapper(*(outfile,), **kw)
 
 
     def doit(self, outfile):
         #write the reduced macromolecule here
         d = self.vf.flexDict
-        if not (d.has_key('flex_residues') or  d.has_key('all_hinge_atoms')) :
+        if not ('flex_residues' in d or  'all_hinge_atoms' in d) :
             msg = 'flexible residues or hinge must be specified first!'
             self.vf.warningMsg(msg)
             return 'ERROR'
@@ -2901,7 +2902,7 @@ class AF_RigidFileWriter(MVCommand):
         #outatoms = outatoms - hinge_atoms
         #renumber this atoms?
         if len(outatoms):
-            outatoms.number = range(1, len(outatoms)+1)
+            outatoms.number = list(range(1, len(outatoms)+1))
             outatoms_type = {}
             for a in outatoms:
                 outatoms_type[a.autodock_element] = 1
@@ -2911,7 +2912,7 @@ class AF_RigidFileWriter(MVCommand):
             outptr.close()
             d = self.vf.flexDict
             d['rigid_filename'] = outfile
-            d['rigid_types'] = outatoms_type.keys()
+            d['rigid_types'] = list(outatoms_type.keys())
         else:
             d['rigid_filename'] = ""
             d['rigid_types'] = ""
@@ -2944,7 +2945,7 @@ class AF_LigandDirectoryWriter(MVCommand):
     def __call__(self, ligDir=None, **kw):
         """None<-ADflex_writeFlexDir(ligDir)"""
         if not ligDir: return 'ERROR'
-        apply(self.doitWrapper, (ligDir,), kw)
+        self.doitWrapper(*(ligDir,), **kw)
 
 
     def doit(self, ligDir):
@@ -3000,7 +3001,7 @@ def initModule(vf):
         vf.GUI.menuBars['AutoToolsBar'].menubuttons[menuText['AutoFlexMB']].config(bg='tan',underline='-1')    
         if not hasattr(vf.GUI, 'adtBar'):
             vf.GUI.adtBar = vf.GUI.menuBars['AutoToolsBar']
-            vf.GUI.adtFrame = vf.GUI.adtBar.menubuttons.values()[0].master
+            vf.GUI.adtFrame = list(vf.GUI.adtBar.menubuttons.values())[0].master
 #        if hasattr(vf.GUI, 'ligandLabel'):
 #            vf.GUI.ligandLabelLabel.pack_forget()
 #            vf.GUI.ligandLabelLabel.pack(side='left')

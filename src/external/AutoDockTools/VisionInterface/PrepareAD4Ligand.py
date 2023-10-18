@@ -23,7 +23,7 @@ class PrepareAD4Ligand(MacroNode):
 
     def __init__(self, constrkw={}, name='Prepare AD4 Ligands', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -56,7 +56,7 @@ class PrepareAD4Ligand(MacroNode):
             ## saving node input Ports ##
             input_Ports_12 = self.macroNetwork.ipNode
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_12=None
 
@@ -64,7 +64,7 @@ class PrepareAD4Ligand(MacroNode):
             ## saving node output Ports ##
             output_Ports_13 = self.macroNetwork.opNode
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_13=None
 
@@ -73,15 +73,15 @@ class PrepareAD4Ligand(MacroNode):
             from AutoDockTools.VisionInterface.AdtNodes import ManageRotatableBonds
             Manage_Rotatable_Bonds_23 = ManageRotatableBonds(constrkw = {}, name='Manage Rotatable Bonds', library=adtlib)
             self.macroNetwork.addNode(Manage_Rotatable_Bonds_23,217,143)
-            apply(Manage_Rotatable_Bonds_23.inputPortByName['mols'].configure, (), {'color': '#c64e70', 'cast': True, 'shape': 'oval'})
-            apply(Manage_Rotatable_Bonds_23.inputPortByName['root'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Manage_Rotatable_Bonds_23.inputPortByName['allowed_bonds'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Manage_Rotatable_Bonds_23.inputPortByName['check_for_fragments'].configure, (), {'color': 'yellow', 'cast': True, 'shape': 'circle'})
-            apply(Manage_Rotatable_Bonds_23.inputPortByName['bonds_to_inactivate'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Manage_Rotatable_Bonds_23.inputPortByName['limit_torsions'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Manage_Rotatable_Bonds_23.outputPortByName['mols'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
+            Manage_Rotatable_Bonds_23.inputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'cast': True, 'shape': 'oval'})
+            Manage_Rotatable_Bonds_23.inputPortByName['root'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Manage_Rotatable_Bonds_23.inputPortByName['allowed_bonds'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Manage_Rotatable_Bonds_23.inputPortByName['check_for_fragments'].configure(*(), **{'color': 'yellow', 'cast': True, 'shape': 'circle'})
+            Manage_Rotatable_Bonds_23.inputPortByName['bonds_to_inactivate'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Manage_Rotatable_Bonds_23.inputPortByName['limit_torsions'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Manage_Rotatable_Bonds_23.outputPortByName['mols'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore ManageRotatableBonds named Manage Rotatable Bonds in network self.macroNetwork"
+            print("WARNING: failed to restore ManageRotatableBonds named Manage Rotatable Bonds in network self.macroNetwork")
             print_exc()
             Manage_Rotatable_Bonds_23=None
 
@@ -96,7 +96,7 @@ class PrepareAD4Ligand(MacroNode):
             Prepare_AD4Molecule_24.macroNetwork.unfreeze()
             Prepare_AD4Molecule_24.shrink()
         except:
-            print "WARNING: failed to restore PrepareAD4Molecule named Prepare AD4Molecule in network self.macroNetwork"
+            print("WARNING: failed to restore PrepareAD4Molecule named Prepare AD4Molecule in network self.macroNetwork")
             print_exc()
             Prepare_AD4Molecule_24=None
 
@@ -109,20 +109,20 @@ class PrepareAD4Ligand(MacroNode):
                 self.macroNetwork.connectNodes(
                     Manage_Rotatable_Bonds_23, output_Ports_13, "mols", "new", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Manage_Rotatable_Bonds_23 and output_Ports_13 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Manage_Rotatable_Bonds_23 and output_Ports_13 in network self.macroNetwork")
         input_Ports_12 = self.macroNetwork.ipNode
         if input_Ports_12 is not None and Prepare_AD4Molecule_24 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_12, Prepare_AD4Molecule_24, "new", "Remove Water Residues_molecules", blocking=True)
             except:
-                print "WARNING: failed to restore connection between input_Ports_12 and Prepare_AD4Molecule_24 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_12 and Prepare_AD4Molecule_24 in network self.macroNetwork")
         if Prepare_AD4Molecule_24 is not None and Manage_Rotatable_Bonds_23 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Prepare_AD4Molecule_24, Manage_Rotatable_Bonds_23, "AD4_typer_typed_mols", "mols", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Prepare_AD4Molecule_24 and Manage_Rotatable_Bonds_23 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Prepare_AD4Molecule_24 and Manage_Rotatable_Bonds_23 in network self.macroNetwork")
         self.macroNetwork.unfreeze()
 
         Prepare_AD4_Ligands_11.shrink()

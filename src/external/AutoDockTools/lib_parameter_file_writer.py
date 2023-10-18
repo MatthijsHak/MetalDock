@@ -19,7 +19,7 @@ class LibraryGpfWriter:
     def __init__(self, gpffile, extension='pdbq', err_file="write_lib_gpf_errors", 
                            prefix='',alltypes=None, extratypes_dict={}, verbose=0):
         self.verbose = verbose
-        if verbose: print "self.verbose = ", verbose
+        if verbose: print("self.verbose = ", verbose)
         self.extratypes_dict = extratypes_dict
         self.setup(gpffile)
         self.alltypes = alltypes
@@ -37,7 +37,7 @@ class LibraryGpfWriter:
         self.gpo = GridParameters() 
         self.gpo.read(gpffile)
         if len(self.extratypes_dict):
-            print "update each type in extratypes here"
+            print("update each type in extratypes here")
         #????RENAME extratype in receptor and write new output file here?
 
 
@@ -51,13 +51,13 @@ class LibraryGpfWriter:
         key = name + '*.' + extension
         ligandfilenames = glob.glob(key)
         if self.verbose:
-            print "processing ", len(ligandfilenames), " files matching ", key
+            print("processing ", len(ligandfilenames), " files matching ", key)
         for ligand_file in ligandfilenames:
             m = Read(ligand_file)[0]
             for a in m.allAtoms:
                 typeDict[a.autodock_element] = 1
             del(m)
-        alltypes = typeDict.keys()
+        alltypes = list(typeDict.keys())
         return alltypes
 
 
@@ -95,7 +95,7 @@ class LibraryDpfWriter:
                     err_file="write_lib_dpf_errors", 
                     prefix='', verbose=0):
         self.verbose = verbose
-        if verbose: print "self.verbose = ", verbose
+        if verbose: print("self.verbose = ", verbose)
         self.prefix = prefix
         self.setup(dpffile)
         self.parm_list_dict = {}
@@ -135,7 +135,7 @@ class LibraryDpfWriter:
             m = Read(ligand_file)[0]
             for a in m.allAtoms:
                 typeDict[a.autodock_element] = 1
-            type_list = typeDict.keys()
+            type_list = list(typeDict.keys())
             #check that there is a map for each type
             ok = 1
             for t in type_list:
@@ -150,11 +150,11 @@ class LibraryDpfWriter:
             #update dpo with ligand specific values
             if not ok:
                 if self.verbose:
-                    print "problem with ", ligand_file
+                    print("problem with ", ligand_file)
                 continue
             types = string.join(type_list,'')
             self.dpo['move']['value'] = ligand_file
-            if self.verbose: print "set types to ", types
+            if self.verbose: print("set types to ", types)
             self.dpo['types']['value'] = types
             #CAUTION: dpo['torsdof']['value'] is [0,0.3113]
             self.dpo['torsdof']['value'][0] = m.TORSDOF
@@ -166,10 +166,10 @@ class LibraryDpfWriter:
                 ndihe = len(m.torTree.torsionMap)
             else:
                 msg = ligand_file + " is not properly formatted: no torsions!"
-                raise AttributeError, msg
+                raise AttributeError(msg)
             self.dpo['ndihe']['value'] = ndihe
             outputfilename = self.prefix + m.name + "_" + style + ".dpf"
-            if self.verbose: print "writing ", outputfilename
+            if self.verbose: print("writing ", outputfilename)
             self.dpo.write(outputfilename, parm_list)
             dpffiles.append(outputfilename)
         return dpffiles

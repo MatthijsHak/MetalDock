@@ -25,18 +25,18 @@ from MolKit.data.qkollua import q
 from MolKit.bondSelector import RotatableBondSelector, AmideBondSelector, LeafBondSelector
 from MolKit.bondSelector import GuanidiniumBondSelector
 
-from AutoDockTools.atomTypeTools import NonpolarHydrogenMerger
-from AutoDockTools.atomTypeTools import LonepairMerger
-from AutoDockTools.atomTypeTools import SolvationParameterizer
-from AutoDockTools.atomTypeTools import AromaticCarbonManager
-from AutoDockTools.atomTypeTools import AutoDock4_AtomTyper
+from atomTypeTools import NonpolarHydrogenMerger
+from atomTypeTools import LonepairMerger
+from atomTypeTools import SolvationParameterizer
+from atomTypeTools import AromaticCarbonManager
+from atomTypeTools import AutoDock4_AtomTyper
 
-from AutoDockTools.AutoDockBondClassifier import AutoDockBondClassifier
+from AutoDockBondClassifier import AutoDockBondClassifier
 
 # for LigandRandomizer
 from mglutil.math.statetocoords import StateToCoords
 from mglutil.math.transformation import Transformation
-from AutoDockTools.Conformation import Conformation, State
+from Conformation import Conformation, State
 import random
 
 
@@ -102,24 +102,24 @@ class AutoDockMoleculePreparation:
         self.delete_single_nonstd_residues = delete_single_nonstd_residues
         if version==3:
             revlist = ['c','f','b']
-            reversedAts = AtomSet(filter(lambda x: x.element in revlist, mol.allAtoms))
+            reversedAts = AtomSet([x for x in mol.allAtoms if x.element in revlist])
             for at in reversedAts:
-                if debug: print 'restoring ', at.element, ' to ',
+                if debug: print('restoring ', at.element, ' to ', end=' ')
                 at.autodock_element = at.element
                 at.element = self.reverse_autodock_elements[at.element]
-                if debug: print  at.element, ' for processing...'
+                if debug: print(at.element, ' for processing...')
         # build bonds if necessary      #ALWAYS DO THIS!!!
         if not len(mol.allAtoms.bonds[0]): #what if not enough bonds
             mol.buildBondsByDistance()
 
         #PROCESS molecule
-        self.cleanup_type_list = string.split(cleanup, '_')
+        self.cleanup_type_list = cleanup.split('_')
         #if mode=='automatic':  #DO this ANYWAY???
         #remove waters + chains composed of nonstd residues
         self.cleanUpResidues(mol, self.cleanup_type_list)
 
         # REPAIR: possibly add bonds to non-bonded atoms + add hydrogens
-        self.repair_type_list = string.split(repairs, '_')
+        self.repair_type_list = repairs.split('_')
         #if mode=='automatic':  #SHOULD THIS BE DONE ANYWAY???
         self.repairMol(mol, self.repair_type_list)
         ##3/25/2008: have to remove lps first because there is no atomic
@@ -130,13 +130,13 @@ class AutoDockMoleculePreparation:
             #lps = filter(lambda x: x.element=='Xx' and \
                   #(x.name[0]=='L' or x.name[1]=='L'), mol.allAtoms)
             lenLPS = self.lenLPS = LPM.mergeLPS(mol.allAtoms)
-            if debug: print 'merged ', lenLPS, ' lonepairs'
+            if debug: print('merged ', lenLPS, ' lonepairs')
             self.cleanup_type_list.remove('lps')
         # CHARGES: ALWAYS add charges last after atoms are set but
         # before merging nphs and lps
         self.chargeType = charges_to_add
         self.chargeError = 'ERROR'
-        if debug: print "charges_to_add=", charges_to_add
+        if debug: print("charges_to_add=", charges_to_add)
         #if mode=='automatic':  #SHOULD THIS BE DONE ANYWAY???
         self.addCharges(mol, charges_to_add)
         if self.chargeType!='ERROR':
@@ -148,7 +148,7 @@ class AutoDockMoleculePreparation:
         #set autodock_element for all atoms
         mol.allAtoms.autodock_element = mol.allAtoms.element
         self.outputfilename = outputfilename
-        if debug: print "end of base class init"
+        if debug: print("end of base class init")
 
 
     def repairMol(self, mol, repair_list):
@@ -158,26 +158,26 @@ class AutoDockMoleculePreparation:
         if 'bonds' in repair_list:
             non_bonded_atoms = mol.allAtoms.get(lambda x: len(x.bonds)==0)
             if non_bonded_atoms:
-                if self.debug: print "!!adding bonds to ", non_bonded_atoms.name, "!!"
+                if self.debug: print("!!adding bonds to ", non_bonded_atoms.name, "!!")
                 for a in non_bonded_atoms:
                     nearestAt = self.findNearest(a, mol.allAtoms)
                     Bond(a, nearestAt, bondOrder=1, origin='AddedBond', check=0,
                                 addBond=1)
-                    if self.debug: print 'added bond:', a.bonds[0]
+                    if self.debug: print('added bond:', a.bonds[0])
             repair_list.remove('bonds')
         # possibly add hydrogens 
         #MODE SWITCH 1: adding hydrogens  ||IN USE||
         self.newHs = 0
         hs = mol.allAtoms.get(lambda x: x.element=='H')
         if 'hydrogens' in repair_list:
-            if self.debug: print "addinghydrogens!"
+            if self.debug: print("addinghydrogens!")
             self.newHs = self.addHydrogens(mol)
-            if self.debug: print "added ", self.newHs, " hydrogens"
+            if self.debug: print("added ", self.newHs, " hydrogens")
             repair_list.remove('hydrogens')
         elif not hs and 'checkhydrogens' in self.repair_type_list:
-            if self.debug: print "addinghydrogens from check hydrogens"
+            if self.debug: print("addinghydrogens from check hydrogens")
             self.newHs = self.addHydrogens(mol)
-            if self.debug: print "added ", self.newHs, " hydrogens"
+            if self.debug: print("added ", self.newHs, " hydrogens")
             repair_list.remove('checkhydrogens')
 
     def addHydrogens(self, mol):
@@ -194,38 +194,36 @@ class AutoDockMoleculePreparation:
     def addCharges(self, mol, charges_to_add):
         #detect whether isPeptide first
         debug = self.debug
-        if debug: print "in addCharges:mol.name=", mol.name, " and charges_to_add=", charges_to_add
+        if debug: print("in addCharges:mol.name=", mol.name, " and charges_to_add=", charges_to_add)
         isPeptide = mol.isPeptide = self.detectIsPeptide()
         if charges_to_add=='gasteiger':
             chargeCalculator = self.chargeCalculator = GasteigerChargeCalculator()
             if isPeptide:
-                print "adding gasteiger charges to peptide"
+                print("adding gasteiger charges to peptide")
                 chargeCalculator = self.chargeCalculator = GasteigerChargeCalculator()
         elif charges_to_add=='Kollman':
             if not mol.isPeptide:
-                print "adding Kollman charges to non-peptide"
+                print("adding Kollman charges to non-peptide")
             chargeCalculator = self.chargeCalculator = KollmanChargeCalculator()
         #KEEP charges from file, if there are any
         #MODE SWITCH 2: adding charges????  ||NOT IN USE||
-        if debug: print "self.chargeType=", self.chargeType
+        if debug: print("self.chargeType=", self.chargeType)
         if self.chargeType is None:
-            len_zero_charges = len(filter(lambda x: x.charge==0, 
-                                mol.chains.residues.atoms))
+            len_zero_charges = len([x for x in mol.chains.residues.atoms if x.charge==0])
             if len_zero_charges==len(mol.allAtoms):
-                print "WARNING: all atoms in '%s' had zero charges! Adding gasteiger charges..."%mol.name
+                print("WARNING: all atoms in '%s' had zero charges! Adding gasteiger charges..."%mol.name)
                 chargeCalculator = self.chargeCalculator = GasteigerChargeCalculator()
                 chargeCalculator.addCharges(mol.allAtoms)
             else:
-                len_charged = len(filter(lambda x:x.chargeSet!=None, 
-                                mol.chains.residues.atoms))
+                len_charged = len([x for x in mol.chains.residues.atoms if x.chargeSet!=None])
                 if len_charged!=len(mol.chains.residues.atoms):
                     #charges could come from file or ?
-                    print "WARNING: some atoms in '%s' had no charge! Adding gasteiger charges to all..."%mol.name
-                if debug: print "no change to charges!"
+                    print("WARNING: some atoms in '%s' had no charge! Adding gasteiger charges to all..."%mol.name)
+                if debug: print("no change to charges!")
             self.chargeType = mol.allAtoms[0].chargeSet
         else: 
             chargeCalculator.addCharges(mol.allAtoms)
-            if debug: print 'added ' + charges_to_add + 'charges to ', mol.name
+            if debug: print('added ' + charges_to_add + 'charges to ', mol.name)
 
 
     def cleanUpAtomTypes(self, mol, cleanup_list):
@@ -234,7 +232,7 @@ class AutoDockMoleculePreparation:
         if merge_nonpolar_hydrogens:
             NPHM = self.NPHM = NonpolarHydrogenMerger()
             lenNPHS = self.lenNPHS = NPHM.mergeNPHS(mol.allAtoms)
-            if debug: print 'merged ', lenNPHS, ' nonpolar hydrogens'
+            if debug: print('merged ', lenNPHS, ' nonpolar hydrogens')
             cleanup_list.remove('nphs')
         merge_lonepairs = 'lps' in cleanup_list
         if merge_lonepairs:
@@ -242,7 +240,7 @@ class AutoDockMoleculePreparation:
             #lps = filter(lambda x: x.element=='Xx' and \
                   #(x.name[0]=='L' or x.name[1]=='L'), mol.allAtoms)
             lenLPS = self.lenLPS = LPM.mergeLPS(mol.allAtoms)
-            if debug: print 'merged ', lenLPS, ' lonepairs'
+            if debug: print('merged ', lenLPS, ' lonepairs')
             cleanup_list.remove('lps')
         if self.delete_single_nonstd_residues:
             #delete non-standard residues from within a single chain
@@ -261,7 +259,7 @@ class AutoDockMoleculePreparation:
                         at2.bonds.remove(b)
                         a.bonds.remove(b)
                 names = names + r.parent.id +r.name + '_'
-            print "\'Deleting non-standard residues:" + names + " from " + mol.name
+            print("\'Deleting non-standard residues:" + names + " from " + mol.name)
             for res in non_std:
                 res.parent.remove(res)
                 del res
@@ -270,23 +268,23 @@ class AutoDockMoleculePreparation:
         delete_alternateB = 'deleteAltB' in cleanup_list        
         if delete_alternateB:
             alt_ats = mol.allAtoms.get(lambda x: '@' in x.name)
-            if self.debug: print "found alt_ats=", len(alt_ats), " to delete"
+            if self.debug: print("found alt_ats=", len(alt_ats), " to delete")
             if not len(alt_ats):
-                if self.debug: print "no @ats found"
+                if self.debug: print("no @ats found")
                 return
             dict_alts = {}
             for a in alt_ats: 
                 dict_alts[a.name[-1]] = 1
-            alt_types = dict_alts.keys()
+            alt_types = list(dict_alts.keys())
             if self.debug: 
-                print len(alt_ats), ' of types ',  alt_types, ' to rename'
+                print(len(alt_ats), ' of types ',  alt_types, ' to rename')
             alt_types.sort()
             Astr = "@" + alt_types[0]
             altA_ats = mol.allAtoms.get(lambda x: Astr in x.name)
             for t in alt_types[1:]:
                 alt_s = '@' + t
                 t_alt_ats = mol.allAtoms.get(lambda x: alt_s in x.name)
-                if self.debug: print alt_s, 'now removing ', len(t_alt_ats), ' atoms:'
+                if self.debug: print(alt_s, 'now removing ', len(t_alt_ats), ' atoms:')
                 ct = 0
                 for a in t_alt_ats:
                     res = a.parent
@@ -298,19 +296,19 @@ class AutoDockMoleculePreparation:
                     res.remove(a)
                     del a
                     ct = ct+1
-                if self.debug: print 'removed ', ct, ' atoms:'
+                if self.debug: print('removed ', ct, ' atoms:')
             count = 0
             #rename any remaining @
             for a in altA_ats:
                 ind = a.name.index('@')
-                if self.debug: print "changing name of ", a.name,
+                if self.debug: print("changing name of ", a.name, end=' ')
                 a.name = a.name[:ind]
-                if self.debug: print " to ", a.name
+                if self.debug: print(" to ", a.name)
                 count = count+1
-            if self.debug: print "end of processing altA_ats: count=", count
+            if self.debug: print("end of processing altA_ats: count=", count)
             mol.allAtoms = mol.chains.residues.atoms
-            if self.debug: print "resetting numbers to 1-", len(mol.allAtoms)+1
-            mol.allAtoms.number = range(1, len(mol.allAtoms)+1)
+            if self.debug: print("resetting numbers to 1-", len(mol.allAtoms)+1)
+            mol.allAtoms.number = list(range(1, len(mol.allAtoms)+1))
 
 
     def cleanUpResidues(self, mol, cleanup_list):
@@ -336,11 +334,11 @@ class AutoDockMoleculePreparation:
                     if len(h.parent.children)==0:
                         res = h.parent
                         chain = res.parent
-                        if self.debug: print "removing residue: ", res.name
+                        if self.debug: print("removing residue: ", res.name)
                         chain.remove(res)
                         if len(chain.children)==0:
                             mol = chain.parent
-                            if self.debug: print "removing chain", chain.id
+                            if self.debug: print("removing chain", chain.id)
                             mol.remove(chain)
                             del chain
                         del res
@@ -361,7 +359,7 @@ class AutoDockMoleculePreparation:
                         if res.type not in self.std_types:
                             non_std.append(res)
                     if len(c.residues)==len(non_std):
-                        print "\'"+ c.name, "\' apparently composed of not std residues. Deleting "
+                        print("\'"+ c.name, "\' apparently composed of not std residues. Deleting ")
                         chains_to_delete.append(c)
                 if len(chains_to_delete):
                     self.lenChainsRemoved = len(chains_to_delete)
@@ -407,8 +405,8 @@ class AutoDockMoleculePreparation:
         d = {}
         for r in self.molecule.chains.residues:
             d[r.type] = 0
-        for t in d.keys():
-            if t not in q.keys():
+        for t in list(d.keys()):
+            if t not in list(q.keys()):
                 isPeptide = False
                 break
         return isPeptide
@@ -470,16 +468,16 @@ class ReceptorPreparation(AutoDockMoleculePreparation):
 
         self.dict = dict
         if len(preserved):
-            for atom, chargeList in preserved.items():
+            for atom, chargeList in list(preserved.items()):
                 atom._charges[chargeList[0]] = chargeList[1]
                 atom.chargeSet = chargeList[0]
-                if debug: print 'preserved charge on ', atom.name, ' charge=', atom.charge
+                if debug: print('preserved charge on ', atom.name, ' charge=', atom.charge)
 
         # add solvation parameters here:
         SP = self.SP = SolvationParameterizer()
         unknownatoms = SP.addParameters(molecule.chains.residues.atoms)
         if len(unknownatoms) and debug:
-            print len(unknownatoms), " unknown atoms: set solvation parameters to 0. 0."
+            print(len(unknownatoms), " unknown atoms: set solvation parameters to 0. 0.")
 
         self.writer = ReceptorWriter()
         #MODE SWITCH 5: write outputfile     ||IN USE||
@@ -515,11 +513,11 @@ class ReceptorPreparation(AutoDockMoleculePreparation):
         mol = self.molecule
         if not outputfilename and not self.outputfilename:
             outputfilename = self.outputfilename = mol.name + ".pdbqs"
-            if self.debug: print 'using std outputfilename ', outputfilename
+            if self.debug: print('using std outputfilename ', outputfilename)
         #should this be done at Molecule level or at Atom level?
         #Atom level would allow multiple molecules in Receptor, at no price
         self.writer.write(mol, outputfilename)
-        if self.debug: print "wrote ", mol.name, " to ", outputfilename
+        if self.debug: print("wrote ", mol.name, " to ", outputfilename)
 
 
 
@@ -565,10 +563,10 @@ class AD4ReceptorPreparation(AutoDockMoleculePreparation):
         atomTyper = AutoDock4_AtomTyper()
         atomTyper.setAutoDockElements(molecule, reassign=True) #4/15/05 catch here?
         if len(preserved):
-            for atom, chargeList in preserved.items():
+            for atom, chargeList in list(preserved.items()):
                 atom._charges[chargeList[0]] = chargeList[1]
                 atom.chargeSet = chargeList[0]
-                if debug: print 'preserved charge on ', atom.name, ' charge=', atom.charge
+                if debug: print('preserved charge on ', atom.name, ' charge=', atom.charge)
 
         self.writer = AD4ReceptorWriter()
         #MODE SWITCH 5: write outputfile     ||IN USE||
@@ -584,11 +582,11 @@ class AD4ReceptorPreparation(AutoDockMoleculePreparation):
         mol = self.molecule
         if not outputfilename and not self.outputfilename:
             outputfilename = self.outputfilename = mol.name + ".pdbqt"
-            if self.debug: print 'using std outputfilename ', outputfilename
+            if self.debug: print('using std outputfilename ', outputfilename)
         #should this be done at Molecule level or at Atom level?
         #Atom level would allow multiple molecules in Receptor, at no price
         self.writer.write(mol, outputfilename)
-        if self.debug: print "wrote ", mol.name, " to ", outputfilename
+        if self.debug: print("wrote ", mol.name, " to ", outputfilename)
         if self.dict is not None:
             if not os.path.exists(self.dict):
                 fptr = open(self.dict, 'a')
@@ -663,7 +661,7 @@ class ReceptorWriter:
 
         ##check each condition for receptor_atoms
         for cond in self.conditions:
-            assert len(filter(cond, receptor_atoms))==len_receptor_atoms
+            assert len(list(filter(cond, receptor_atoms)))==len_receptor_atoms
 
         outptr = open(outputfile, 'w')
         records = ['ATOM']
@@ -755,7 +753,7 @@ class LigandPreparation(AutoDockMoleculePreparation):
                     detect_bonds_between_cycles=False):
         # why aren't repairs, cleanup and allowed_bonds lists??
         # to run tests: use allowed_bonds = 'guanidinium'
-        if debug: print "LPO: allowed_bonds=", allowed_bonds
+        if debug: print("LPO: allowed_bonds=", allowed_bonds)
         self.detect_bonds_between_cycles = detect_bonds_between_cycles
 
 
@@ -823,37 +821,37 @@ class LigandPreparation(AutoDockMoleculePreparation):
         return msg
 
     def set_autodock_element_types_for_writing(self, allAtoms):
-        sublist = self.autodock_element_dict.keys()
-        problem_ats = AtomSet(filter(lambda x: x.element in sublist, allAtoms))
+        sublist = list(self.autodock_element_dict.keys())
+        problem_ats = AtomSet([x for x in allAtoms if x.element in sublist])
         for at in problem_ats:
             #there is a substitute 'name' for this atom
-            if self.debug: print "changed ", at.name,
+            if self.debug: print("changed ", at.name, end=' ')
             newval = self.autodock_element_dict[at.element]
             at.name = newval
             #have to change element to get correct written output
             #because the stupid pdbWriter writes the element not the name
             at.element = newval
             at.autodock_element = at.element
-            if self.debug: print "to ", at.name
+            if self.debug: print("to ", at.name)
         return problem_ats
 
 
     def restore_autodock_element_types_after_writing(self, problem_ats):
         for at in problem_ats:
             #there is a substitute 'name' for this atom
-            if self.debug: print "changed back", at.name,"'s element "
+            if self.debug: print("changed back", at.name,"'s element ")
             newval = self.reverse_autodock_elements[at.element]
             #have to change element to get correct written output
             #because the stupid pdbWriter writes the element not the name
             at.element = newval
-            if self.debug: print "to ", at.element
+            if self.debug: print("to ", at.element)
 
 
     def write(self, outputfilename=None, write_CONECT=False):
         #write ligand to outputfile
         mol = self.molecule
         if not hasattr(mol, 'ROOT'):
-            print 'must specify ROOT before writing'
+            print('must specify ROOT before writing')
             return 'ERROR' 
         if hasattr(mol, 'torTree') and not hasattr(mol, 'torscount'):
             mol.torscount = len(mol.torTree.torsionMap)
@@ -863,7 +861,7 @@ class LigandPreparation(AutoDockMoleculePreparation):
                 outputfilename = stem + ".pdbqt"
             else:
                 outputfilename = stem + ".pdbq"
-            if self.debug: print 'using std outputfilename ', outputfilename
+            if self.debug: print('using std outputfilename ', outputfilename)
             #if self.debug: print 'using std outputfilename ', outputfilename
         #writer = LigandWriter()
         #print "calling writer.write with ", mol.name, ' ',  outputfilename
@@ -895,7 +893,7 @@ class LigandPreparation(AutoDockMoleculePreparation):
             type_dict = {}
             for a in self.molecule.allAtoms:
                 type_dict[a.autodock_element] = 1
-            atom_types = type_dict.keys()
+            atom_types = list(type_dict.keys())
             atom_types.sort()
             ostr = "d['" + self.molecule.name +"'] = {"
             ostr = ostr + "'atom_types': [" 
@@ -936,10 +934,10 @@ class LigandPreparation(AutoDockMoleculePreparation):
 
     def set_all_torsions(self, flag):
         mol = self.molecule
-        if self.debug: print "LPO:set_all_torsions with flag=", flag
-        if self.debug: print "activeBonds=", len(filter(lambda x: x.activeTors, mol.allAtoms.bonds[0]))
+        if self.debug: print("LPO:set_all_torsions with flag=", flag)
+        if self.debug: print("activeBonds=", len([x for x in mol.allAtoms.bonds[0] if x.activeTors]))
         self.RBM.set_all_torsions(flag)
-        if self.debug: print "2: activeBonds=", len(filter(lambda x: x.activeTors, mol.allAtoms.bonds[0]))
+        if self.debug: print("2: activeBonds=", len([x for x in mol.allAtoms.bonds[0] if x.activeTors]))
         
 
     def set_amide_torsions(self, flag):
@@ -967,14 +965,13 @@ class LigandPreparation(AutoDockMoleculePreparation):
     def changePlanarityCriteria(self, cutoff):
         oldAromCs = self.aromCs
         self.aromCs = self.ACM.setAromaticCarbons(self.molecule, cutoff)
-        if self.debug: print "now there are ", len(self.aromCs), " aromaticCs"
+        if self.debug: print("now there are ", len(self.aromCs), " aromaticCs")
 
 
     def set_carbon_names(self, atoms, type):
         self.ACM.set_carbon_names(atoms, type)
         #have to reset this field here
-        self.aromCs = AtomSet(filter(lambda x: (x.autodock_element=='A' and x.element=='C'),
-                                          self.molecule.allAtoms))
+        self.aromCs = AtomSet([x for x in self.molecule.allAtoms if (x.autodock_element=='A' and x.element=='C')])
 
 
     def setAromaticCarbons(self):
@@ -1069,7 +1066,7 @@ class LigandWriter:
         old_torscount=ligand.torscount
         ligand.torscount = len(ligand.allAtoms.bonds[0].get(lambda x:x.activeTors))
         if self.debug and old_torscount!=ligand.torscount:
-            print "reset torscount from ", old_torscount, " to ", ligand.torscount
+            print("reset torscount from ", old_torscount, " to ", ligand.torscount)
         
         ttc = ligand.torscount
             
@@ -1125,7 +1122,7 @@ class LigandWriter:
                     continue
                 if at2 not in rootlist:
                     rootlist.append(at2)
-                    if self.debug: print 'added ', at2.name, ' to rootlist'
+                    if self.debug: print('added ', at2.name, ' to rootlist')
                     at2.rnum0 = rootnum
                     rootnum = rootnum + 1
         #before writing, sort rootlist
@@ -1218,10 +1215,10 @@ class LigandWriter:
             #outstring = "BRANCH %3d %3d\n"%(fromAtom.rnum+1, marker)
             self.outfptr.write(outstring)
         queue = self.writeBreadthFirst(self.outfptr, fromAtom, nextAtom)
-        if self.debug: print fromAtom.name, ':', nextAtom.name, ': queue=', queue
+        if self.debug: print(fromAtom.name, ':', nextAtom.name, ': queue=', queue)
         if len(queue):
             for fromAtom, nextAtom in queue:
-                if self.debug: print " processing queue entry: ", fromAtom.name, '-', nextAtom.name
+                if self.debug: print(" processing queue entry: ", fromAtom.name, '-', nextAtom.name)
                 self.process(fromAtom, nextAtom)
         if new_branch:
             outstring = "ENDBRANCH %3d %3d\n"%(startIndex, endIndex)
@@ -1234,20 +1231,20 @@ class LigandWriter:
         bonds
         """
         if self.debug: 
-            print "\n\nin writeLevel with ", atom.name, " outatom_counter=", self.outatom_counter
-            print "len(", atom.name, ").bonds=", len(atom.bonds)
+            print("\n\nin writeLevel with ", atom.name, " outatom_counter=", self.outatom_counter)
+            print("len(", atom.name, ").bonds=", len(atom.bonds))
         queue = []
         nextAts = []
         for b in atom.bonds:
             if self.debug:
-                print "processing b=", b.atom1.name, '-', b.atom2.name, ' activeTors=', b.activeTors
-                print 'atom1 in writtenAtoms=', b.atom1 in self.writtenAtoms
-                print 'atom2 in writtenAtoms=', b.atom2 in self.writtenAtoms
+                print("processing b=", b.atom1.name, '-', b.atom2.name, ' activeTors=', b.activeTors)
+                print('atom1 in writtenAtoms=', b.atom1 in self.writtenAtoms)
+                print('atom2 in writtenAtoms=', b.atom2 in self.writtenAtoms)
             if b.activeTors: 
                 at2 = b.atom1
                 if at2==atom: at2=b.atom2
                 queue.append((atom, at2))
-                if self.debug: print atom.name, 'wL: queue=', queue
+                if self.debug: print(atom.name, 'wL: queue=', queue)
                 continue
             a2 = b.atom1
             if a2==atom:
@@ -1260,15 +1257,15 @@ class LigandWriter:
                 self.writtenAtoms.append(a2)
                 a2.used = 1
                 self.outatom_counter+=1
-                if self.debug: print "writeLevel: wrote ", a2.name," and increased outatom_counter =", a2.name, 'a2.used=', a2.used
+                if self.debug: print("writeLevel: wrote ", a2.name," and increased outatom_counter =", a2.name, 'a2.used=', a2.used)
                 nextAts.append(a2)
         for a2 in nextAts:
-            if self.debug: print 'for nextAts loop with a2=', a2.name, 'calling wL'
+            if self.debug: print('for nextAts loop with a2=', a2.name, 'calling wL')
             nq = self.writeLevel(a2, outfptr)
             if len(nq):
-                if self.debug: print "extending queue with", nq
+                if self.debug: print("extending queue with", nq)
                 queue.extend(nq)
-        if self.debug: print 'returning queue=', queue
+        if self.debug: print('returning queue=', queue)
         return queue
             
 
@@ -1285,16 +1282,16 @@ class LigandWriter:
             statements are added. 
         """
         if self.debug: 
-            print "in wBF with fromAtom=", fromAtom.name, '+ startAtom=', startAtom.name, 'startAtom.used=', startAtom.used
+            print("in wBF with fromAtom=", fromAtom.name, '+ startAtom=', startAtom.name, 'startAtom.used=', startAtom.used)
         queue = []
         if startAtom.used==0:
             startAtom.used = 1
             startAtom.number = startAtom.newindex = self.outatom_counter
             self.writer.write_atom(outfptr,startAtom)
-            if self.debug: print 'wBF: wrote ', startAtom.name
+            if self.debug: print('wBF: wrote ', startAtom.name)
             self.writtenAtoms.append(startAtom)
             self.outatom_counter += 1
-            if self.debug: print "self.outatom_counter=", self.outatom_counter
+            if self.debug: print("self.outatom_counter=", self.outatom_counter)
             activeTors = []
             #outfptr.write(outstring)
             for bond in startAtom.bonds:
@@ -1306,26 +1303,26 @@ class LigandWriter:
                         queue.append((startAtom,at2))
                     else:
                         at2.number = at2.newindex = self.outatom_counter
-                        if self.debug: print "\n\nwriting and calling wL with nA=", at2.name, '-', at2.number
+                        if self.debug: print("\n\nwriting and calling wL with nA=", at2.name, '-', at2.number)
                         self.writer.write_atom(outfptr, at2)
-                        if self.debug: print 'wBF2: wrote ', at2.name
+                        if self.debug: print('wBF2: wrote ', at2.name)
                         at2.written = 1
                         self.writtenAtoms.append(at2)
                         at2.newindex = self.outatom_counter
                         self.outatom_counter = self.outatom_counter + 1
-                        if self.debug: print '!!!2:calling wL'
+                        if self.debug: print('!!!2:calling wL')
                         newQ = self.writeLevel(at2, outfptr)
-                        if self.debug: print "newQ=", newQ
+                        if self.debug: print("newQ=", newQ)
                         at2.used = 1
                         if len(newQ): 
-                            if self.debug: print "@@@@len(newq)=", len(newQ)
+                            if self.debug: print("@@@@len(newq)=", len(newQ))
                             queue.extend(newQ)
-                            if self.debug: print "queue=", queue
+                            if self.debug: print("queue=", queue)
             if self.debug: 
-                print " currently queue=",
+                print(" currently queue=", end=' ')
                 for atom1, atom2 in queue: 
-                    print atom1.name, '-', atom2.name, ',',
-                print
+                    print(atom1.name, '-', atom2.name, ',', end=' ')
+                print()
         return  queue
 
 
@@ -1375,7 +1372,7 @@ class LigandWriter:
                     isleaf = len(nextAtom.bonds)==1
                     testcond = len(nextAtom.bonds)>1
                     #testcond: isleaf = len(nextAtom.bonds[0].neighborAtom(nextAtom).bonds)==1
-                    if self.debug: print nextAtom.full_name(), '-isleaf=', isleaf, 'len(bonds)=', len(nextAtom.bonds)
+                    if self.debug: print(nextAtom.full_name(), '-isleaf=', isleaf, 'len(bonds)=', len(nextAtom.bonds))
                     if bond.activeTors and bond.possibleTors and not isleaf:
                         if testcond >0:
                             outstring = "BRANCH %3d %3d\n"%(at.newindex,marker)
@@ -1492,7 +1489,7 @@ class LigandRandomizer:
         m = molecule
         if verbose:
             msg =  "LR: molecule=%s\ninfo_lo=%s\ninfo_hi=%s\ntorsOnly=%d\nrelTrans=%d\n"%(molecule.name, info_lo,info_hi,torsOnly,relTrans)
-            print msg
+            print(msg)
         #CHECK FOR TORTREE HERE:
         assert hasattr(m, 'torTree'), "specified ligand does not have a torsion tree"
         if m.parser.keys.count("ROOT")>0:
@@ -1500,12 +1497,12 @@ class LigandRandomizer:
         else:
             #do something else here @@ ??FILTER OUT ALL INACTIVE @@#1
             ndihe = len(m.allAtoms.bonds[0].get(lambda x: x.activeTors==True))
-            if verbose: print "ndihe =", ndihe
+            if verbose: print("ndihe =", ndihe)
         if outputfilename is None:
             outputfilename= m.name + "_rand.pdbqt"
         if verbose: 
-            print m.name, ' has ', ndihe, ' active torsions'
-            print "output will be written to ", outputfilename
+            print(m.name, ' has ', ndihe, ' active torsions')
+            print("output will be written to ", outputfilename)
         m.buildBondsByDistance()
         # first time only
         if not hasattr(m, 'orig_coords'): 
@@ -1527,7 +1524,7 @@ class LigandRandomizer:
         if not hasattr(m, 'stoc'):
             m.stoc = StateToCoords(m, m.mol_cen, coord_slot)
         m.allAtoms.setConformation(coord_slot)
-        if verbose: print "IN LIGAND RANDOMIZER: m.mol_cen=", m.mol_cen
+        if verbose: print("IN LIGAND RANDOMIZER: m.mol_cen=", m.mol_cen)
         #build reference dictionary of original bonds
         orig = len(m.allAtoms.bonds[0])
         orig_d = {}
@@ -1550,8 +1547,8 @@ class LigandRandomizer:
             #info_hiX, info_hiY, info_hiZ = map(float, info_hi.split(','))
             info_lo_list = info_lo.split(',')
             info_hi_list = info_lo.split(',')
-            info_loX, info_loY, info_loZ = map(float, info_lo_list)
-            info_hiX, info_hiY, info_hiZ = map(float, info_hi_list)
+            info_loX, info_loY, info_loZ = list(map(float, info_lo_list))
+            info_hiX, info_hiY, info_hiZ = list(map(float, info_hi_list))
             self.info_loX = info_loX - m.mol_cen[0]
             self.info_loY = info_loY - m.mol_cen[1]
             self.info_loZ = info_loZ - m.mol_cen[2]
@@ -1585,7 +1582,7 @@ class LigandRandomizer:
                 self.trans = trans
                 m.state['origin'] = m.mol_cen
                 m.state['trans'] = trans
-                if verbose: print 'translation=', self.trans
+                if verbose: print('translation=', self.trans)
                 #try to build torTree here to use to update torsions:
                 if not hasattr(m, 'torTree'): 
                     m.LPO.write("JUNK.pdbqt")
@@ -1596,7 +1593,7 @@ class LigandRandomizer:
                 #**  Shoemake, Graphics Gems III.6, pp.124-132, "Uniform Random Rotations",
                 #**  published by Academic Press, Inc., (1992) */
                 r1 = random.uniform(0,1) #constants.h:local_random: >=0. and <1.0 @@??1??
-                if verbose: print "r1=", r1
+                if verbose: print("r1=", r1)
                 random_sign = +1
                 if r1<0.5: random_sign = -1 #from constants.h
                 PI = math.pi
@@ -1608,7 +1605,7 @@ class LigandRandomizer:
                 x0 = random.uniform(0,1) #constants.h:local_random: >=0. and <1.0
                 r1 =  random_sign * math.sqrt(1. - x0)
                 t1 = TWOPI * random.uniform(0, 1)  #t1 = genunf(0., TWOPI)<-line 298 qmultiply.cc
-                if verbose: print 'x0=', x0, ' r1=', r1, ' t1=', t1
+                if verbose: print('x0=', x0, ' r1=', r1, ' t1=', t1)
                 #now.Q.x
                 quat.append(math.sin(t1)*r1) #q.x 'strict Shoemake version'
                 #now.Q.y
@@ -1620,14 +1617,14 @@ class LigandRandomizer:
                 #now.Q.w
                 quat.append(math.cos(t2)*r2) #Q.w @@lookup python function equivalents
                 self.quat = quat
-                if verbose: print 'quat=', quat
+                if verbose: print('quat=', quat)
                 m.state['quat'] = quat
                 # CONVERT TO AXISANGLE in order to use stoc:
                 retval = [] #to hold x,y,z,ang
                 x,y,z,w  = quat 
                 # TODO handle big W! Singularities line219 qmultiply.cc
                 #check for identity
-                if abs(w)>1.001: raise 'too big W' #?@@?
+                if abs(w)>1.001: raise ValueError('too big W') #?@@?
                 if w>1.: w = 1.
                 if w<-1.: w = -1. #if abs(w)==1 return sidentityAxisAngle==[1.,0.,0.,0.]
                 angle = 2. * math.acos(w)
@@ -1655,7 +1652,7 @@ class LigandRandomizer:
                 #2.then generate random orientation using bits from autodock
                 newState = Conformation(m, m.mol_cen, trans, axisangle, dihe) #@@
                 m.stoc.applyState(newState)
-                if verbose: print "axisangle=", axisangle
+                if verbose: print("axisangle=", axisangle)
                 # from qmultiply.cc: set orientation 
                 #/*15 adds, 9 multiplies*/
                 tx  = x+x;
@@ -1693,7 +1690,7 @@ class LigandRandomizer:
                     tmpy = (tcoord[0])*r12 + (tcoord[1])*r22 + (tcoord[2])*r32 + Ty;
                     tmpz = (tcoord[0])*r13 + (tcoord[1])*r23 + (tcoord[2])*r33 + Tz;
                     newCrds.append((tmpx,tmpy,tmpz))
-                if verbose: print 'used quat'
+                if verbose: print('used quat')
                 m.allAtoms.updateCoords(newCrds, ind=m.orig_coord_index)
                 #remove all original bonds and set hasBonds to 0 on all levels
                 #@@ REMEMBER WHICH ARE activeTors and not
@@ -1717,26 +1714,26 @@ class LigandRandomizer:
                 #do it again here??
                 rbm = RotatableBondManager(m, allowed_bonds='backbone') #5/2014
                 newLen = len(m.allAtoms.bonds[0])
-                if verbose: print "originally %d bonds form; after transformation %d bonds form" %(orig, newLen)
+                if verbose: print("originally %d bonds form; after transformation %d bonds form" %(orig, newLen))
                 new_d = {}
                 for a in m.allAtoms: new_d[a]=set(a.bonds.getAtoms())
                 ok = True
                 for a in m.allAtoms:
                     if orig_d[a]!=new_d[a]:
                         ok = False
-                        if verbose: print "bonds differ for %s: %d v %d" %(a.full_name(), len(orig_d[a]), len(new_d[a]))
-                if verbose: print "end of try ", new_try+1
+                        if verbose: print("bonds differ for %s: %d v %d" %(a.full_name(), len(orig_d[a]), len(new_d[a])))
+                if verbose: print("end of try ", new_try+1)
                 if ok: 
                     if verbose: 
-                        print "new conformation found in",
+                        print("new conformation found in", end=' ')
                         if new_try==0:
-                            print "1 try" 
+                            print("1 try") 
                         else:
-                            print "%d tries" %(new_try+1)
+                            print("%d tries" %(new_try+1))
                     break
             if ok:
                 #reset bond activity:
-                for k, v in aBD.items(): # k = (b.atom1, b.atom2);  
+                for k, v in list(aBD.items()): # k = (b.atom1, b.atom2);  
                     for b in k[0].bonds:
                         found = 0
                         b.possibleTors = 0
@@ -1745,20 +1742,20 @@ class LigandRandomizer:
                             found = 1
                             b.possibleTors, b.activeTors = v
                 if verbose: 
-                    print 'no new contacts formed so writing file after ', new_try+1,
+                    print('no new contacts formed so writing file after ', new_try+1, end=' ')
                     if new_try==0:
-                        print ' try...'
+                        print(' try...')
                     else:
-                        print ' tries...'
+                        print(' tries...')
                 #might have been a pdb or ? file so this won't do:
-                if verbose: print "now write ", outputfilename, " @@"
+                if verbose: print("now write ", outputfilename, " @@")
                 m.parser.write_with_new_coords(newCrds, outputfilename)
-                if verbose: print "wrote new conformation in ", outputfilename
+                if verbose: print("wrote new conformation in ", outputfilename)
                 self.ok = 1
             else:
                 self.ok = 0
-                print "FAILED! no new conformation found in %d attempts!!!" %ntries
-            if verbose: print "END OF LIGAND RANDOMIZATION!!!"
+                print("FAILED! no new conformation found in %d attempts!!!" %ntries)
+            if verbose: print("END OF LIGAND RANDOMIZATION!!!")
 
 
 
@@ -1776,8 +1773,8 @@ class RotatableBondManager:
                     bonds_to_inactivate='',
                     detectAll=False):
         if debug: 
-            print "bonds_to_inactivate=", bonds_to_inactivate, " with len=", 
-            print len(bonds_to_inactivate)
+            print("bonds_to_inactivate=", bonds_to_inactivate, " with len=", end=' ') 
+            print(len(bonds_to_inactivate))
         self.detectAll = detectAll
         allowed_bond_list = []
         if allowed_bonds:
@@ -1785,7 +1782,7 @@ class RotatableBondManager:
         #set up flags:
         allow_amide_torsions = 'amide' in allowed_bond_list
         molecule.has_amide = allow_amide_torsions
-        if debug: print "allow amide=", allow_amide_torsions
+        if debug: print("allow amide=", allow_amide_torsions)
         allow_backbone_torsions = 'backbone' in allowed_bond_list
         molecule.has_backbone = allow_backbone_torsions
         allow_guanidinium_torsions = 'guanidinium' in allowed_bond_list
@@ -1806,17 +1803,17 @@ class RotatableBondManager:
         else:
             self.setroot(int(root))
         if len(bonds_to_inactivate):
-            bnds_list = map(int,string.split(bonds_to_inactivate,'_'))
+            bnds_list = list(map(int,string.split(bonds_to_inactivate,'_')))
             #???
             #molecule.has_amide = 'amide' not in bnds_list
             #molecule.has_guanidinium = 'guanidinium' not in bnds_list
             #molecule.has_backbone = 'backbone' not in bnds_list
             #molecule.has_active = 'all' not in bnds_list
-            if debug: print "bnds_list=", bnds_list
+            if debug: print("bnds_list=", bnds_list)
             for i in range(len(bnds_list)/2):
                 ind1 = bnds_list[i*2]
                 ind2 = bnds_list[i*2+1]
-                if debug: print "inactivating ", ind1, ' to ', ind2
+                if debug: print("inactivating ", ind1, ' to ', ind2)
                 self.toggle_torsion(ind1, ind2)
 
 
@@ -1844,11 +1841,11 @@ class RotatableBondManager:
         if len(dict['cycle']): 
             dict['cycle'].incycle = 1
         if len(dict['rotatable']): 
-            if self.debug: print "len(dict['rotatable'])=", len(dict['rotatable'])
+            if self.debug: print("len(dict['rotatable'])=", len(dict['rotatable']))
             for b in dict['rotatable']:
                 #check for mistake
                 if b.incycle: 
-                    print "removing rotatable ERROR: bnd", b
+                    print("removing rotatable ERROR: bnd", b)
                     b.possibleTors = 0
                     b.activeTors = 0
                     dict['rotatable'].remove(b)
@@ -1858,9 +1855,9 @@ class RotatableBondManager:
         #mol.guanidiniumbnds = BondSet()
         #self.set_guanidinium_torsions(allow_guanidinium_torsions)
         for b in dict['guanidinium']:
-            if self.debug: print b, ' ', b.bondOrder
+            if self.debug: print(b, ' ', b.bondOrder)
             if not b.incycle and not b.leaf and b.bondOrder==1:
-                if self.debug: print 'set ', b,'.possible/active to 1/0'
+                if self.debug: print('set ', b,'.possible/active to 1/0')
                 b.possibleTors = 1 
                 b.activeTors = allow_guanidinium_torsions
         #if len(dict['guanidinium']): and not allow_guanidinium_bonds: 
@@ -1891,17 +1888,17 @@ class RotatableBondManager:
         if self.debug:
             for b in rotatable_bnds:
                 if b not in dict['rotatable']:
-                    print "ERROR in rotatable_bnds set:"
-                    print b.atom1.full_name(), '-', b.atom2.full_name()
-        if self.debug: print "set ", mol.name, ".torscount=", mol.torscount
+                    print("ERROR in rotatable_bnds set:")
+                    print(b.atom1.full_name(), '-', b.atom2.full_name())
+        if self.debug: print("set ", mol.name, ".torscount=", mol.torscount)
         #mol.TORSDOF = mol.torscount - len(dict['hydrogenRotators'])
         mol.TORSDOF = possible_tors_ct - len(dict['hydrogenRotators'])
         mol.possible_tors = possible_tors_ct
         if self.debug:
             for b in dict['hydrogenRotators']:
-                print "possible_tors_ct =", possible_tors_ct
-                print "len(dict['hydrogenRotators']) =", len(dict['hydrogenRotators'])
-                print "set ", mol.name, ".TORSDOF=", mol.TORSDOF
+                print("possible_tors_ct =", possible_tors_ct)
+                print("len(dict['hydrogenRotators']) =", len(dict['hydrogenRotators']))
+                print("set ", mol.name, ".TORSDOF=", mol.TORSDOF)
         mol.amidebnds = dict['amide']
         mol.ppbbbnds = dict['ppbb']
         mol.guanidiniumbnds = dict['guanidinium']
@@ -1930,14 +1927,14 @@ class RotatableBondManager:
         """ 
         set rotability of all amide bonds to flag: True/False
         """
-        if self.debug: print "in set_amide_torsions with flag", flag
+        if self.debug: print("in set_amide_torsions with flag", flag)
         assert flag in [True, False, 1, 0]
         mol = self.molecule
         #print "before call to set_torsions: mol.amidebnds.activeTors=", mol.amidebnds.activeTors
         ct = self.set_torsions(mol, mol.amidebnds, flag)
         if self.debug: 
-            print mol.name, ':', ct, " amide torsions: ", mol.name, 
-            print ".torscount=", mol.torscount
+            print(mol.name, ':', ct, " amide torsions: ", mol.name, end=' ') 
+            print(".torscount=", mol.torscount)
 
 
     def set_peptidebackbone_torsions(self, flag): 
@@ -1948,21 +1945,21 @@ class RotatableBondManager:
         mol = self.molecule
         ct = self.set_torsions(mol, mol.ppbbbnds, flag)
         if self.debug: 
-            print mol.name,':',ct, " peptidebackbone torsions: ", mol.name,
-            print ".torscount=", mol.torscount
+            print(mol.name,':',ct, " peptidebackbone torsions: ", mol.name, end=' ')
+            print(".torscount=", mol.torscount)
 
 
     def set_guanidinium_torsions(self, flag): 
         """ 
         set rotability of all guanidinium bonds to flag: True/False
         """
-        if self.debug: print "SGT: flag=", flag
+        if self.debug: print("SGT: flag=", flag)
         assert flag in [True, False, 1, 0]
         mol = self.molecule
         ct = self.set_torsions(mol, mol.guanidiniumbnds, flag)
         if self.debug: 
-            print mol.name,':',ct, " guanidinium torsions: ", mol.name,
-            print ".torscount=", mol.torscount
+            print(mol.name,':',ct, " guanidinium torsions: ", mol.name, end=' ')
+            print(".torscount=", mol.torscount)
 
 
     def set_all_torsions(self, flag): 
@@ -1971,12 +1968,12 @@ class RotatableBondManager:
         """
         assert flag in [True, False, 1, 0]
         mol = self.molecule
-        rotatable = filter(lambda x: x.possibleTors==1, mol.allAtoms.bonds[0])
+        rotatable = [x for x in mol.allAtoms.bonds[0] if x.possibleTors==1]
         if len(rotatable):
             ct = self.set_torsions(mol, rotatable, flag)
             if self.debug: 
-                print mol.name, ':', ct, " active torsions: ", mol.name, 
-                print ".torscount=", mol.torscount
+                print(mol.name, ':', ct, " active torsions: ", mol.name, end=' ') 
+                print(".torscount=", mol.torscount)
 
 
     def toggle_torsion(self, ind1, ind2, use_tt_ind=0):
@@ -1992,24 +1989,24 @@ class RotatableBondManager:
         if use_tt_ind:
             at1 = mol.allAtoms.get(lambda x: hasattr(x, 'tt_ind') and x.tt_ind==ind1)
             if not at1: 
-                print "unable to toggle torsion with tt_ind[0]=", ind1
+                print("unable to toggle torsion with tt_ind[0]=", ind1)
                 return "ERROR"
             at1 = at1[0]
             at2 = mol.allAtoms.get(lambda x: hasattr(x, 'tt_ind') and x.tt_ind==ind2)
             if not at2: 
-                print "unable to toggle torsion with tt_ind[1]=", ind2
+                print("unable to toggle torsion with tt_ind[1]=", ind2)
                 return "ERROR"
             at2 = at2[0]
         bnds = AtomSet([at1,at2]).bonds[0]
         if not len(bnds):
-            print "ERROR: atoms at indices ", ind1, ' and ', ind2, ' have no common bond'
+            print("ERROR: atoms at indices ", ind1, ' and ', ind2, ' have no common bond')
             return 
         bnd = bnds[0]
         if bnd.possibleTors:
             #print "calling set_torsions with ", bnd, " and flag=", abs(bnd.activeTors-1)
             self.set_torsions(mol, [bnd], abs(bnd.activeTors-1))
         else:
-            print "ERROR: bond between these atoms is non-rotatable"
+            print("ERROR: bond between these atoms is non-rotatable")
             return 
 
         
@@ -2022,7 +2019,7 @@ class RotatableBondManager:
         bond_dict = {}
         for b in atoms.bonds[0]:
             bond_dict[b] = 1  
-        bnds = bond_dict.keys()
+        bnds = list(bond_dict.keys())
         #first pass: try to connect pieces
         for b in bnds:
             ind1 = b.atom1
@@ -2030,7 +2027,7 @@ class RotatableBondManager:
             found = b in fb
             if not found:
                 for d in l:
-                    d_keys = d.keys()
+                    d_keys = list(d.keys())
                     if ind1 in d_keys:
                         d[ind2] = 1
                         fb.append(b)
@@ -2044,7 +2041,7 @@ class RotatableBondManager:
         #now to try to merge fragments, use lists of keys
         key_list = []
         for dict in l:
-            key_list.append(dict.keys())
+            key_list.append(list(dict.keys()))
         #check each list of keys against following lists
         #if there are any duplications, merge current
         #into the following one..
@@ -2067,7 +2064,7 @@ class RotatableBondManager:
                         #.......set found flag
                         found = 1
                         #..........update jth list of keys
-                        key_list[j]= l[j].keys()
+                        key_list[j]= list(l[j].keys())
                         #............skip rest of jl
                         break
                 if found:
@@ -2088,7 +2085,7 @@ class RotatableBondManager:
                 #print z_keys
         if ct>0:
             #build an atomset of the keys
-            self.molecule.largest_fragment = AtomSet(largest_fragment.keys())
+            self.molecule.largest_fragment = AtomSet(list(largest_fragment.keys()))
         
     
     def autoroot(self, verbose=0):
@@ -2098,37 +2095,37 @@ class RotatableBondManager:
         mol = self.molecule
         #clear old root
         if hasattr(mol, 'ROOT') and hasattr(mol.ROOT, 'rnum0'):
-            if verbose: print "delattr mol.ROOT.rnum0"
+            if verbose: print("delattr mol.ROOT.rnum0")
             delattr(mol.ROOT, 'rnum0')
         if hasattr(mol, 'autoRoot'):
             mol.ROOT = mol.autoRoot
             mol.ROOT.rnum0 = 0
-            if verbose: print "mol.ROOT exists! setting ROOT.rnum0"
+            if verbose: print("mol.ROOT exists! setting ROOT.rnum0")
             return
         if len(mol.chains)>1:
             return  "AutoRoot not implemented for molecules with >1 chain"
         if hasattr(mol, 'largest_fragment'):
-            if verbose: print "mol.largest_fragment exists=", mol.largest_fragment 
+            if verbose: print("mol.largest_fragment exists=", mol.largest_fragment) 
             atoms_to_check = mol.largest_fragment
         else:
             atoms_to_check = mol.allAtoms
-            if verbose: print "mol.largest_fragment doesn't exists=> using ", len(mol.allAtoms)
+            if verbose: print("mol.largest_fragment doesn't exists=> using ", len(mol.allAtoms))
         #mol.bestBranch = len(mol.allAtoms)
         mol.bestBranch = atoms_to_check
-        if verbose: print "length mol.bestBranch=", len(mol.bestBranch)
+        if verbose: print("length mol.bestBranch=", len(mol.bestBranch))
         bestList = []
         #for item in mol.allAtoms:
         for item in atoms_to_check:
             if not hasattr(item, 'bonds'): 
-                if verbose: print 'skip ', item.number, ': no bonds'
+                if verbose: print('skip ', item.number, ': no bonds')
                 continue
             if len(item.bonds)==1 and item.bonds[0].leaf: 
-                if verbose: print 'skip ', item.number, ': leaf atom'
+                if verbose: print('skip ', item.number, ': leaf atom')
                 continue
             if hasattr(item,'leaf'): 
-                if verbose: print 'skip ', item.number, ': leaf atom'
+                if verbose: print('skip ', item.number, ': leaf atom')
                 continue
-            if verbose: print "processing atom ", item.number
+            if verbose: print("processing atom ", item.number)
             item.maxbranch = 0
             for b in item.bonds:
                 nxtAtom = b.atom1
@@ -2138,24 +2135,24 @@ class RotatableBondManager:
                     thistree = mol.subTree(item, nxtAtom, atoms_to_check)
                     #thistree = mol.subTree(item, nxtAtom, mol.allAtoms)
                     thisbranch = len(thistree)
-                    if verbose: print 'subtree for bond ', b.atom1.number, '-', b.atom2.number, ' consists of ', thisbranch, ' atoms'
+                    if verbose: print('subtree for bond ', b.atom1.number, '-', b.atom2.number, ' consists of ', thisbranch, ' atoms')
                     if thisbranch>item.maxbranch:
-                        if verbose: print item.number, '-', item.name,': new largest subtree=', thisbranch
+                        if verbose: print(item.number, '-', item.name,': new largest subtree=', thisbranch)
                         item.maxbranch = thisbranch
             #bestList holds all current best choices for Root..
             if item.maxbranch<mol.bestBranch:
-                if verbose: print 'NEW ROOT CANDIDATE ', item.number,'-', item.name, ': largest subtree length =', item.maxbranch
+                if verbose: print('NEW ROOT CANDIDATE ', item.number,'-', item.name, ': largest subtree length =', item.maxbranch)
                 bestList = []
                 bestList.append(item)
                 mol.bestBranch = item.maxbranch
                 if verbose: 
-                    print 'currently there is/are ', len(bestList), ' root candidates:'
+                    print('currently there is/are ', len(bestList), ' root candidates:')
                     for a in bestList: 
-                        print a.full_name(),
-                    print
+                        print(a.full_name(), end=' ')
+                    print()
             if item.maxbranch==mol.bestBranch and item not in bestList:
                 bestList.append(item)
-                if verbose: print 'added item', len(bestList)
+                if verbose: print('added item', len(bestList))
         if len(bestList)>1:
             foundCycle = 0
             for at in bestList:
@@ -2172,7 +2169,7 @@ class RotatableBondManager:
                     foundCycle = 1
                     break
             #if bestList had a cycle atom, it's been set to root..if NOT:
-            if verbose: print 'foundCycle= ', foundCycle
+            if verbose: print('foundCycle= ', foundCycle)
             if not foundCycle:
                 mol.autoRoot = bestList[0]
                 mol.ROOT = bestList[0]
@@ -2180,17 +2177,17 @@ class RotatableBondManager:
         #if ties for possible root, use first entry in bestRoot list...
         elif len(bestList):
             if verbose: 
-                print 'using first entry in bestList of ', len(bestList)
+                print('using first entry in bestList of ', len(bestList))
                 for item in bestList:
-                    print item.name,
-                print
+                    print(item.name, end=' ')
+                print()
             mol.autoRoot = bestList[0]
             mol.ROOT = bestList[0]
             mol.ROOT.rnum0 =0
         else:
             #if the list is empty, use the first atom
             # this is a correction added for 'HF' ligand
-            if verbose: print 'no entries in bestList using first atom '
+            if verbose: print('no entries in bestList using first atom ')
             mol.autoRoot = mol.allAtoms[0]
             mol.ROOT = mol.autoRoot
             mol.ROOT.rnum0 =0
@@ -2207,7 +2204,7 @@ class RotatableBondManager:
             delattr(mol.autoRoot, 'rnum0')
         if hasattr(mol, 'ROOT') and hasattr(mol.ROOT, 'rnum0'):
             if self.debug:
-                print "deleting ", mol.ROOT.name, ' rnum0'
+                print("deleting ", mol.ROOT.name, ' rnum0')
             delattr(mol.ROOT, 'rnum0')
         #set the root to indicated atom
         mol.ROOT = mol.allAtoms[index]
@@ -2229,8 +2226,8 @@ class RotatableBondManager:
         """
         mol = self.molecule
         if not hasattr(mol, 'ROOT'):
-            print 'no ROOT specified for ', mol.name, 
-            print ' unable to limit torsions'
+            print('no ROOT specified for ', mol.name, end=' ') 
+            print(' unable to limit torsions')
             return 'ERROR'
         if not hasattr(mol, 'torTree') or \
                 not hasattr(mol.allAtoms[0], 'tt_ind'):
@@ -2245,14 +2242,14 @@ class RotatableBondManager:
         torsionMap = mol.torTree.torsionMap
         tNum = len(torsionMap)
         if numTors>tNum:
-            print 'too many torsions specified! '+ str(numTors)+  ' reducing to'+str(tNum)
+            print('too many torsions specified! '+ str(numTors)+  ' reducing to'+str(tNum))
             numTors = tNum
         #set up rangeList to implement which kind of torsion
         # to turn off or on
         #fewest uses range 0,1,2,.... (from beginning toward end)
         #most uses range -1, -2,-3,.... (from end toward beginning)
         if type=='fewest':
-            rangeList = range(numTors)
+            rangeList = list(range(numTors))
         else:
             rangeList = []
             for k in range(1, numTors+1):
@@ -2333,11 +2330,11 @@ class AD4FlexibleDockingPreparation:
             atomTyper = AutoDock4_AtomTyper()
             atomTyper.setAutoDockElements(molecule, reassign=reassign) #
         else:
-            print file_type, " unknown type: must be .pdbqt, .pdbqs, .pdbq, .pdb or .mol2" 
+            print(file_type, " unknown type: must be .pdbqt, .pdbqs, .pdbq, .pdb or .mol2") 
         self.ligand = ligand
         self.writer = PdbqtWriter()
         if not hasattr(ligand, 'torTree'):
-            if self.debug: print "creating ligand.lpo"
+            if self.debug: print("creating ligand.lpo")
             #???which other input options should be supported???
             self.ligand.lpo = AD4LigandPreparation(ligand, charges_to_add='gasteiger')
         try:
@@ -2357,9 +2354,9 @@ class AD4FlexibleDockingPreparation:
             if rigid_filename is None:
                 rigid_filename = self.ligand.name+'_'+self.molecule.name+'_rigid.pdbqt'
             self.write_flex(flex_residues, self.ligand.parser.filename, flex_filename)
-            if self.debug: print "wrote flexible file:", flex_filename
+            if self.debug: print("wrote flexible file:", flex_filename)
             self.write_rigid(self.molecule, rigid_filename)
-            if self.debug: print "wrote rigid file:", rigid_filename
+            if self.debug: print("wrote rigid file:", rigid_filename)
 
 
     def write(self, outputfilenames=None):
@@ -2367,10 +2364,10 @@ class AD4FlexibleDockingPreparation:
             flex_filename = outputfilenames[0]
             rigid_filename = outputfilenames[1]
         else:
-            if self.debug: print "using default filenames: ", 
+            if self.debug: print("using default filenames: ", end=' ') 
             flex_filename = self.ligand.name+'_'+self.molecule.name+'_flex.pdbqt'
             rigid_filename = self.ligand.name+'_'+self.molecule.name+'_rigid.pdbqt'
-            if self.debug: print flex_filename, ' and ', rigid_filename
+            if self.debug: print(flex_filename, ' and ', rigid_filename)
         self.write_flex(self.ligand, self.flex_residues, flex_filename)
         self.write_rigid(self.molecule, rigid_filename)
         delattr(self.flex_residues.atoms, 'used')
@@ -2416,7 +2413,7 @@ class AD4FlexibleDockingPreparation:
         for res in flex_residues:
             self.writeResidue(res, outfileptr)
         outfileptr.close()
-        if self.debug: print "wrote flex file", outputfilename
+        if self.debug: print("wrote flex file", outputfilename)
 
 
     def writeResidue(self, res, outfileptr):
@@ -2555,7 +2552,7 @@ class AD4FlexibleDockingPreparation:
         
 
     def setAutoFlexFields(self, res):
-        if self.debug: print "in setAutoFlexFields with ", res.full_name()
+        if self.debug: print("in setAutoFlexFields with ", res.full_name())
         if hasattr(res, 'setup'): 
             return
         res.setup = 1
@@ -2580,7 +2577,7 @@ class AD4FlexibleDockingPreparation:
         bondlist.activeTors = 0
         rbs = RotatableBondSelector()
         rotatables = rbs.select(bondlist)
-        if self.debug: print "len(rotatables)=", len(rotatables)
+        if self.debug: print("len(rotatables)=", len(rotatables))
         for b in rotatables:
             b.possibleTors = 1
             b.activeTors = 1
@@ -2657,7 +2654,7 @@ class AD4FlexibleReceptorPreparation:
             atomTyper = AutoDock4_AtomTyper()
             atomTyper.setAutoDockElements(receptor, reassign=reassign) #
         else:
-            print file_type, " unknown type: must be .pdbqt, .pdbqs, .pdbq, .pdb or .mol2" 
+            print(file_type, " unknown type: must be .pdbqt, .pdbqs, .pdbq, .pdb or .mol2") 
         self.torsion_ct = 0
         self.writer = PdbqtWriter()
         self.writerR = PdbqtWriter()
@@ -2670,7 +2667,7 @@ class AD4FlexibleReceptorPreparation:
         self.non_rotatable_bonds_first_atoms = AtomSet()
         for b in self.non_rotatable_bonds:
             self.non_rotatable_bonds_first_atoms.append(b.atom1)           
-        if self.debug: print "about to process_residues: ", residues
+        if self.debug: print("about to process_residues: ", residues)
         flex_residues = self.flex_residues = self.process_residues(residues)
         #MODE SWITCH 5: write outputfiles     ||IN USE||
         if mode=='automatic':
@@ -2681,9 +2678,9 @@ class AD4FlexibleReceptorPreparation:
             if rigid_filename is None:
                 rigid_filename = self.receptor.name+'_rigid.pdbqt'
             self.write_flex(flex_residues, flexres_filename)
-            if self.debug: print "wrote flexible file:", flexres_filename
+            if self.debug: print("wrote flexible file:", flexres_filename)
             self.write_rigid(self.receptor, rigid_filename)
-            if self.debug: print "wrote rigid file:", rigid_filename
+            if self.debug: print("wrote rigid file:", rigid_filename)
 
 
     def write(self, outputfilenames=None):
@@ -2691,16 +2688,16 @@ class AD4FlexibleReceptorPreparation:
             flexres_filename = outputfilenames[0]
             rigid_filename = outputfilenames[1]
         else:
-            if self.debug: print "using default filenames: ", 
+            if self.debug: print("using default filenames: ", end=' ') 
             flexres_filename = self.receptor.name+'_flex.pdbqt'
             rigid_filename = self.receptor.name+'_rigid.pdbqt'
-            if self.debug: print flexres_filename, ' and ', rigid_filename     
+            if self.debug: print(flexres_filename, ' and ', rigid_filename)     
         self.write_flex(self.flex_residues, flexres_filename)
         self.write_rigid(self.receptor, rigid_filename)
         self.flex_atoms_to_write = self.flex_residues.atoms.get(lambda x: hasattr(x, 'used')==False)
         self.rigid_atoms_to_write = self.rigid_residues.atoms.get(lambda x: hasattr(x, 'used')==False)
         if len(self.rigid_atoms_to_write):
-             if self.debug: print "writing rigid atoms to ", rigid_filename
+             if self.debug: print("writing rigid atoms to ", rigid_filename)
              outptr = open(rigid_filename, 'a')
              for at in self.rigid_atoms_to_write:
                  if not hasattr(at, 'used') or at.used==False:
@@ -2737,9 +2734,9 @@ class AD4FlexibleReceptorPreparation:
                         self.writer.write_atom(outptr, at)
                         at.used = True
                         self.rigid_outctr +=1
-		    elif not hasattr(at, 'used'):
+                    elif not hasattr(at, 'used'):
                         at.number = self.rigid_outctr
-		        self.writer.write_atom(outptr, at)
+                        self.writer.write_atom(outptr, at)
                         self.rigid_outctr +=1
                         at.used = True  
         for at in molecule.allAtoms:  #@@HACKED: write any atoms that haven't been written yet at the end of the rigid file...
@@ -2753,11 +2750,11 @@ class AD4FlexibleReceptorPreparation:
     def write_flex(self, flex_residues, flexres_filename):
         #need to know total rotatable bonds in flex_residues
         if self.debug: 
-            print "in write_flex: len(flex_residues)=", len(flex_residues), 'ffn=', flexres_filename
+            print("in write_flex: len(flex_residues)=", len(flex_residues), 'ffn=', flexres_filename)
         res_total = 0
         for r in flex_residues:
             res_total = res_total + r.torscount
-        if self.debug: print "res_total=", res_total
+        if self.debug: print("res_total=", res_total)
         self.writtenAtoms = []
         outfileptr = open(flexres_filename,'w')
         self.outatom_counter = 1
@@ -2767,7 +2764,7 @@ class AD4FlexibleReceptorPreparation:
             self.writeResidue(item, outfileptr)
         outfileptr.close()
         self.flex_outctr = self.outatom_counter
-        if self.debug: print "wrote flex file", flexres_filename
+        if self.debug: print("wrote flex file", flexres_filename)
 
 
     def writeResidue(self, res, outfileptr):
@@ -2777,7 +2774,7 @@ class AD4FlexibleReceptorPreparation:
         # also must have these fields: torscount, torsdof, and bonds know if active
         # also res.bondlist
         #start output
-        if self.debug: print "in writeResidue with ", res.full_name()
+        if self.debug: print("in writeResidue with ", res.full_name())
         outfileptr.write("BEGIN_RES %s %s%4s\n" %(res.type, res.parent.id, res.number))
         #first write out remarks about torsions
         outfileptr.write("REMARK  " + "%d" %(res.torscount) + " active torsions:\n")
@@ -2858,10 +2855,10 @@ class AD4FlexibleReceptorPreparation:
             outstring = "BRANCH %3d %3d\n"%(startIndex, endIndex)
             outfileptr.write(outstring)
             queue = self.writeBreadthFirst(outfileptr, fromAtom, nextAtom)
-            if self.debug: print fromAtom.name, ':', nextAtom.name, ': queue=', queue
+            if self.debug: print(fromAtom.name, ':', nextAtom.name, ': queue=', queue)
             if len(queue):
                 for fromAtom, nextAtom in queue:
-                    if self.debug: print " processing queue entry: ", fromAtom.name, '-', nextAtom.name
+                    if self.debug: print(" processing queue entry: ", fromAtom.name, '-', nextAtom.name)
                     self.process(fromAtom, nextAtom, outfileptr)
             outstring = "ENDBRANCH %3d %3d\n"%(startIndex, endIndex)
             outfileptr.write(outstring)
@@ -2877,33 +2874,33 @@ class AD4FlexibleReceptorPreparation:
         bonds
         """
         if self.debug: 
-            print "\n\nin writeLevel with ", atom.name, " outatom_counter=", self.outatom_counter
-            print "len(", atom.name, ").bonds=", len(atom.bonds)
+            print("\n\nin writeLevel with ", atom.name, " outatom_counter=", self.outatom_counter)
+            print("len(", atom.name, ").bonds=", len(atom.bonds))
         queue = []
         nextAts = []
         for b in atom.bonds:
             if b.atom1 in self.writtenAtoms and b.atom2 in self.writtenAtoms:
-                if self.debug: print "skipping b=", b.atom1.name, '-', b.atom2.name
+                if self.debug: print("skipping b=", b.atom1.name, '-', b.atom2.name)
                 continue
             if self.debug:
-                print "processing b=", b.atom1.name, '-', b.atom2.name, ' activeTors=', b.activeTors
-                print 'atom1 in writtenAtoms=', b.atom1 in self.writtenAtoms
-                print 'atom2 in writtenAtoms=', b.atom2 in self.writtenAtoms
+                print("processing b=", b.atom1.name, '-', b.atom2.name, ' activeTors=', b.activeTors)
+                print('atom1 in writtenAtoms=', b.atom1 in self.writtenAtoms)
+                print('atom2 in writtenAtoms=', b.atom2 in self.writtenAtoms)
             if b.activeTors: 
                 at2 = b.atom1
                 if at2==atom: at2=b.atom2
                 queue.append((atom, at2))
-                if self.debug: print atom.name, 'wL: queue=', queue
+                if self.debug: print(atom.name, 'wL: queue=', queue)
                 continue
             a2 = b.atom1
             if a2==atom:
                 a2 = b.atom2
             if a2.used: 
-                if self.debug: print "!!a2 is already used!!", a2.name
+                if self.debug: print("!!a2 is already used!!", a2.name)
                 continue    
             if a2 not in self.writtenAtoms:
                 a2.number = a2.newindex = self.outatom_counter
-                if self.debug: print "writeLevel: wrote bonded atom named=", a2.name, 'a2.used=', a2.used
+                if self.debug: print("writeLevel: wrote bonded atom named=", a2.name, 'a2.used=', a2.used)
                 self.writer.write_atom(outfptr, a2)
                 self.writtenAtoms.append(a2)
                 a2.used = True
@@ -2911,14 +2908,14 @@ class AD4FlexibleReceptorPreparation:
                 nextAts.append(a2)
         for a2 in nextAts:
             if self.debug: 
-                print 'in for nextAts loop with a2=', a2.name
-                print 'calling wL'
+                print('in for nextAts loop with a2=', a2.name)
+                print('calling wL')
             nq = self.writeLevel(a2, outfptr)
             if len(nq):
-                if self.debug: print "extending queue with", nq
+                if self.debug: print("extending queue with", nq)
                 queue.extend(nq)
         if self.debug:
-            print 'returning queue=', queue
+            print('returning queue=', queue)
         return queue
             
 
@@ -2935,16 +2932,16 @@ class AD4FlexibleReceptorPreparation:
             statements are added. 
         """
         if self.debug: 
-            print "in wBF with fromAtom=", fromAtom.name, '+ startAtom=', startAtom.name, 'startAtom.used=', startAtom.used
+            print("in wBF with fromAtom=", fromAtom.name, '+ startAtom=', startAtom.name, 'startAtom.used=', startAtom.used)
         queue = []
         if startAtom.used==False:
             startAtom.used = True
             startAtom.number = startAtom.newindex = self.outatom_counter
             self.writer.write_atom(outfptr,startAtom)
-            if self.debug: print 'wBF: wrote ', startAtom.name
+            if self.debug: print('wBF: wrote ', startAtom.name)
             self.writtenAtoms.append(startAtom)
             self.outatom_counter += 1
-            if self.debug: print "self.outatom_counter=", self.outatom_counter
+            if self.debug: print("self.outatom_counter=", self.outatom_counter)
             activeTors = []
             #outfptr.write(outstring)
             for bond in startAtom.bonds:
@@ -2959,26 +2956,26 @@ class AD4FlexibleReceptorPreparation:
                     else:
                         at2.number = at2.newindex = self.outatom_counter
                         if self.debug: 
-                            print "\n\nwriting and calling wL with nA=", at2.name, '-', at2.number
+                            print("\n\nwriting and calling wL with nA=", at2.name, '-', at2.number)
                         self.writer.write_atom(outfptr, at2)
-                        if self.debug: print 'wBF2: wrote ', at2.name
+                        if self.debug: print('wBF2: wrote ', at2.name)
                         at2.written = 1
                         self.writtenAtoms.append(at2)
                         at2.newindex = self.outatom_counter
                         self.outatom_counter = self.outatom_counter + 1
-                        if self.debug: print '!!!2:calling wL'
+                        if self.debug: print('!!!2:calling wL')
                         newQ = self.writeLevel(at2, outfptr)
-                        if self.debug: print "newQ=", newQ
+                        if self.debug: print("newQ=", newQ)
                         at2.used = True
                         if len(newQ): 
-                            if self.debug: print "@@@@len(newq)=", len(newQ)
+                            if self.debug: print("@@@@len(newq)=", len(newQ))
                             queue.extend(newQ)
-                            if self.debug: print "queue=", queue
+                            if self.debug: print("queue=", queue)
             if self.debug: 
-                print " currently queue=",
+                print(" currently queue=", end=' ')
                 for atom1, atom2 in queue: 
-                    print atom1.name, '-', atom2.name, ',',
-                print
+                    print(atom1.name, '-', atom2.name, ',', end=' ')
+                print()
         return  queue
 
 
@@ -3076,9 +3073,9 @@ class AD4FlexibleReceptorPreparation:
                 continue
             if res.type=="HOH":
                 continue
-            if self.debug: print 'calling setAutoFlexFields with ', res.full_name()
+            if self.debug: print('calling setAutoFlexFields with ', res.full_name())
             ntors = self.setAutoFlexFields(res)
-            if self.debug:  print "ntors=", ntors
+            if self.debug:  print("ntors=", ntors)
             #only keep residues with at least 1 torsion
             if ntors>0:
                 processed_residues.append(res)
@@ -3086,7 +3083,7 @@ class AD4FlexibleReceptorPreparation:
         
 
     def setAutoFlexFields(self, res):
-        if self.debug: print "in setAutoFlexFields with ", res.full_name()
+        if self.debug: print("in setAutoFlexFields with ", res.full_name())
         if hasattr(res, 'setup'): 
             return
         res.setup = 1
@@ -3109,7 +3106,7 @@ class AD4FlexibleReceptorPreparation:
         bondlist.activeTors = 0
         rbs = RotatableBondSelector()
         rotatables = rbs.select(bondlist)
-        if self.debug: print "len(rotatables)=", len(rotatables)
+        if self.debug: print("len(rotatables)=", len(rotatables))
         for b in rotatables:
             b.possibleTors = 1
             b.activeTors = 1
@@ -3137,8 +3134,8 @@ class AD4FlexibleReceptorPreparation:
             res.rootlist = AtomSet([at0])
             res.root = at0
         if self.debug: 
-            print 'returning res.torscount=', res.torscount
-            print 'res.root=', res.root.name
+            print('returning res.torscount=', res.torscount)
+            print('res.root=', res.root.name)
         return res.torscount
 
                 

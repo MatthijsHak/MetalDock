@@ -4,14 +4,14 @@
 # $Id: AutoLigandCommand.py,v 1.26 2011/01/06 21:21:14 rhuey Exp $
 from ViewerFramework.VFCommand import CommandGUI
 from Pmv.mvCommand import MVCommand, MVAtomICOM
-import Pmw, os, glob, sys, tkMessageBox, Tkinter, subprocess, tkFileDialog
+import Pmw, os, glob, sys, tkinter.messagebox, tkinter, subprocess, tkinter.filedialog
 from MolKit.molecule import Atom
 from mglutil.gui.InputForm.Tk.gui import InputFormDescr
 from mglutil.gui.BasicWidgets.Tk.customizedWidgets import ExtendedSliderWidget
-from autostartCommands import menuText
+from .autostartCommands import menuText
 import AutoDockTools 
 from mglutil.popen2Threads import SysCmdInThread
-import cPickle
+import pickle
 from Pmv.pmvPalettes import AtomElements
 from MolKit.radii_patterns import AAradii
 import copy
@@ -35,9 +35,9 @@ class FloodPlayer(Player):
         pkl_file = open(file, 'rb')
         self.floods = []
         try:
-            data = cPickle.load(pkl_file)
-        except Exception, inst:
-            print "Error loading ", __file__, "\n", inst
+            data = pickle.load(pkl_file)
+        except Exception as inst:
+            print("Error loading ", __file__, "\n", inst)
         self.xcent = data[0]
         self.ycent = data[1]
         self.zcent = data[2]
@@ -46,11 +46,11 @@ class FloodPlayer(Player):
         self.centerz = data[5]
         self.spacing = data[6]
         self.centers = []
-        data = cPickle.load(pkl_file)
+        data = pickle.load(pkl_file)
         self.floods.append(data[1])
         try:
             while data:
-                data = cPickle.load(pkl_file)
+                data = pickle.load(pkl_file)
                 flood = copy.copy(self.floods[-1])
                 for item in data[0]:
                     flood.remove(item)
@@ -107,7 +107,7 @@ class FloodPlayer(Player):
         self.autoLigandCommand.vf.displayCPK(self.mol, scaleFactor=0.4)
         self.autoLigandCommand.vf.colorByAtomType(self.mol, ['cpk'], log=0)
         self.autoLigandCommand.vf.displayLines(self.mol, negate=True, displayBO=False, lineWidth=2, log=0, only=False)
-        self.colorKeys = a.colors.keys()
+        self.colorKeys = list(a.colors.keys())
         maxLen =len(self.floods)-1
         Player.__init__(self, master=master, endFrame=maxLen, maxFrame=maxLen, 
                         titleStr="AutoLigand Flood Player", hasSlider=True)
@@ -296,8 +296,8 @@ Harris R, Olson AJ, Goodsell DS.  Proteins. (2008) 70 1506..
         fileList = [] 
         fld_list = glob.glob('*.maps.fld')
         if not fld_list:
-            tkMessageBox.showinfo("AutoLigand Info", "AutoLigand requires input AutoGrid maps. \nPlease click OK to select directory containing grid maps.")
-            folder = tkFileDialog.askdirectory(title="Select A Folder")
+            tkinter.messagebox.showinfo("AutoLigand Info", "AutoLigand requires input AutoGrid maps. \nPlease click OK to select directory containing grid maps.")
+            folder = tkinter.filedialog.askdirectory(title="Select A Folder")
             if folder:
                 os.chdir(folder)
                 fld_list = glob.glob('*.maps.fld')
@@ -410,7 +410,7 @@ Harris R, Olson AJ, Goodsell DS.  Proteins. (2008) 70 1506..
         ifd.append({'name':'pdbFile',
                     'tooltip':"""Creates PDB_fill_#Nout1.pdb file where #N is the number of fill points.""",
                     'parent':'output',
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'defaultValue': 1,
                     'wcfg':{'text':'Create PDB of the Final Fill',
                             'state':'disabled',
@@ -422,15 +422,15 @@ Harris R, Olson AJ, Goodsell DS.  Proteins. (2008) 70 1506..
         ifd.append({'name':'showProgress',
                     'parent':'output',
                     'tooltip':"""Save intermediate results in a file and open flood player when AutoLigand finishes.""",
-                    'widgetType':Tkinter.Checkbutton,
+                    'widgetType':tkinter.Checkbutton,
                     'defaultValue': 0,
                     'wcfg':{'text':'Save Intermediate Results for Movie',
-                            'variable':Tkinter.IntVar(),
+                            'variable':tkinter.IntVar(),
                             },
                     'gridcfg':{'sticky':'w'}
                     })        
         #Connected Fill
-        ifd.append({'widgetType':Tkinter.Label,
+        ifd.append({'widgetType':tkinter.Label,
                 'name':'label',
                 'parent':'Connected Fill',
                 'wcfg':{'text':'Select End Location for Connected Fill'}
@@ -504,7 +504,7 @@ Harris R, Olson AJ, Goodsell DS.  Proteins. (2008) 70 1506..
             if not val['FileBaseName'][0]:
                 msg = "AutoGrid files are missing.\n"
                 msg += "Please generate grid maps. AutoLigand requires input AutoGrid maps."
-                tkMessageBox.showerror("Error!", msg)
+                tkinter.messagebox.showerror("Error!", msg)
                 return
             selection =  self.ifd.entryByName['autoligandNotebook']['widget'].getcurselection()
             cmdString = [sys.executable, AutoLigandPath]
@@ -556,7 +556,7 @@ Harris R, Olson AJ, Goodsell DS.  Proteins. (2008) 70 1506..
                     self.cmdTxt += ' &'#run in a background
                 
                 subprocess.Popen(self.cmdTxt, shell=True)
-                tkMessageBox.showinfo("Success!", """AutoLigand launched successfully.""")                              
+                tkinter.messagebox.showinfo("Success!", """AutoLigand launched successfully.""")                              
         else:
             self.hideGeoms()
             
@@ -601,7 +601,7 @@ Harris R, Olson AJ, Goodsell DS.  Proteins. (2008) 70 1506..
         zlen = round(spacing*dimZ, 4)  
         self.minX = c[0]-xlen*0.5
         self.maxX = c[0]+xlen*0.5
-        if self.grids.has_key(value):
+        if value in self.grids:
             centerX = self.grids[value][0]
             centerY = self.grids[value][1]
             centerZ = self.grids[value][2]
@@ -703,7 +703,7 @@ Harris R, Olson AJ, Goodsell DS.  Proteins. (2008) 70 1506..
         atoms = atoms.findType(Atom)
         if not atoms:
             return 'ERROR'
-        apply( self.doitWrapper, (atoms,), kw)
+        self.doitWrapper(*(atoms,), **kw)
 
     def doit(self, atoms=None):
         if len(atoms)==0: return 

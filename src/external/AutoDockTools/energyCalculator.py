@@ -142,7 +142,7 @@ class EnergyCalculator:
                             nbd[ind4] = 0
                             self.energy_matrix[ind1, ind4] = 0
                             self.energy_matrix[ind4, ind1] = 0
-            self.nb[ind1] = nbd.keys()
+            self.nb[ind1] = list(nbd.keys())
 
 
     def dist(self, a, b):
@@ -221,10 +221,10 @@ class EnergyCalculator:
         subset_intEnergy = 0
         for a1 in ats:
             if id(a1) not in self.data_ids:
-                print 'warning', a1.name, ' not in self.data'
+                print('warning', a1.name, ' not in self.data')
             for a2 in ats:
                 if id(a2) not in self.data_ids:
-                    print 'warning', a2.name, ' not in self.data'
+                    print('warning', a2.name, ' not in self.data')
                 eij = self.get_energy(a1, a2)
                 subset_intEnergy = subset_intEnergy + eij
         return subset_intEnergy
@@ -242,9 +242,9 @@ class EnergyCalculator:
         s = 'Atom: ID:'
         for i in range(1,n+1):
             s = s + '%2d'%i
-        print s
+        print(s)
         s = '_'*n
-        print s
+        print(s)
         em = self.energy_matrix
         for i in range(n):
             at = self.data[i]
@@ -254,7 +254,7 @@ class EnergyCalculator:
                     s = s + '|x'
                 else:
                     s = s + '|_'
-            print s
+            print(s)
 
 
     def print_half_nb_matrix(self):
@@ -267,5 +267,5 @@ class EnergyCalculator:
                     s = s + 'x'
                 else:
                     s = s + '_'
-            print s
+            print(s)
 

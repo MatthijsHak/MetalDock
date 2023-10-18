@@ -21,7 +21,7 @@
 This Module is used to setup files for autodock3 calculations.
 """
 
-import Tkinter
+import tkinter
 
 from ViewerFramework.VFCommand import CommandGUI
 
@@ -184,20 +184,20 @@ def initModule(vf):
 
     if vf.hasGui:
         vf.GUI.menuBars['AutoTools3Bar']._frame.config( {'background':'tan'})
-        for item in vf.GUI.menuBars['AutoTools3Bar'].menubuttons.values():
+        for item in list(vf.GUI.menuBars['AutoTools3Bar'].menubuttons.values()):
             item.configure(background = 'tan')
         if not hasattr(vf.GUI, 'adt3Bar'):
             vf.GUI.adt3Bar = vf.GUI.menuBars['AutoTools3Bar']
-            vf.GUI.adt3Frame = vf.GUI.adt3Bar.menubuttons.values()[0].master
+            vf.GUI.adt3Frame = list(vf.GUI.adt3Bar.menubuttons.values())[0].master
         if not hasattr(vf.GUI, 'adt3ModeLabel'):
             mbs = {}
             packing_list = []
-            for c in vf.GUI.adt3Frame.children.values():
-                if isinstance(c, Tkinter.Menubutton):
+            for c in list(vf.GUI.adt3Frame.children.values()):
+                if isinstance(c, tkinter.Menubutton):
                     mbs[c.cget('text')] = c
                     packing_list.append(c.cget('text'))
                     c.pack_forget()
-            vf.GUI.adt3ModeLabel=Tkinter.Label(vf.GUI.adt3Frame, text="ADT3.0", width=6,
+            vf.GUI.adt3ModeLabel=tkinter.Label(vf.GUI.adt3Frame, text="ADT3.0", width=6,
                              relief='sunken', borderwidth=1, fg='DarkBlue',
                              bg = 'ivory',anchor='w' )
             vf.GUI.adt3ModeLabel.pack(side='left')

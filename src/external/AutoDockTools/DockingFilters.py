@@ -205,7 +205,7 @@ class LigandEfficiencyFilter(Filter):
     def filter(self, docking):
         d = docking
         cl = d.clusterer
-        rms = cl.clustering_dict.keys()[0]
+        rms = list(cl.clustering_dict.keys())[0]
         clg = cl.clustering_dict[rms]
         conf = cl.data[cl.argsort[0]]
         return conf.ligand_efficiency<=self.ligand_efficiency
@@ -230,7 +230,7 @@ class InteractionFilter(Filter):
     def filter(self, docking):
         d = docking
         cl = d.clusterer
-        rms = cl.clustering_dict.keys()[0]
+        rms = list(cl.clustering_dict.keys())[0]
         clg = cl.clustering_dict[rms]
         conf = cl.data[cl.argsort[0]]
         all_passed = False

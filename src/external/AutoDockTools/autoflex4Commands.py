@@ -120,7 +120,7 @@ def initModule(vf):
         vf.GUI.menuBars['AutoTools4Bar'].menubuttons[menuText['AutoFlexMB']].config(bg='tan',underline='-1')    
         if not hasattr(vf.GUI, 'adtBar'):
             vf.GUI.adtBar = vf.GUI.menuBars['AutoTools4Bar']
-            vf.GUI.adtFrame = vf.GUI.adtBar.menubuttons.values()[0].master
+            vf.GUI.adtFrame = list(vf.GUI.adtBar.menubuttons.values())[0].master
 
 
 

@@ -23,7 +23,6 @@ This Object is the result of an AutoDock job.
 
 """
 import os, glob, time, sys
-from string import replace, rfind, find, strip
 
 from MolKit.pdbParser import PdbqParser, PdbqtParser
 from MolKit.protein import Residue, ResidueSet
@@ -34,14 +33,14 @@ from MolKit import Read
 
 
 
-from AutoDockTools.DockingParameters import DockingParameters
-from AutoDockTools.DlgParser import DlgParser
-from AutoDockTools.Conformation import Conformation, ConformationHandler
-from AutoDockTools.Conformation import PopulationHandler
-from AutoDockTools.cluster import Clusterer
-from AutoDockTools.interactiveHistogramGraph import InteractiveHistogramGraph
+from DockingParameters import DockingParameters
+from DlgParser import DlgParser
+from Conformation import Conformation, ConformationHandler
+from Conformation import PopulationHandler
+from cluster import Clusterer
+# from interactiveHistogramGraph import InteractiveHistogramGraph
 from mglutil.math.rmsd import RMSDCalculator
-from AutoDockTools.InteractionDetector import InteractionDetector
+# from InteractionDetector import InteractionDetector
 
 
 
@@ -139,7 +138,7 @@ class Docking:
                 #NB: any dlg has only 1 rmstol value
                 dlo.cluster_list = dlo.clusterer.clustering_dict[rmstol]
             except:
-                print 'unable to rebuild_clusters '
+                print('unable to rebuild_clusters ')
             rmsref = dlo.dpo['rmsref']['value']
             if len(rmsref):
                 dlo.rmsref = rmsref
@@ -186,7 +185,7 @@ class Docking:
                 lc_hb_list.extend(parser.__dict__[kk])
             ssStr = "~~"
         else:
-            print "unrecognized parser!"
+            print("unrecognized parser!")
             return 'ERROR'
         if receptor:  
             for hlist in [hb_list, le_hb_list, lc_hb_list]:
@@ -198,7 +197,7 @@ class Docking:
                     #d:<0>:N1~~B:ASN83:N,d:<0>:O3~~B:LYS20:NZ
                     str_1, str_2 = hb_str.split(ssStr)
                     if not len(str_1) or not len(str_2):
-                        print "skipping improper hb_str ", hb_str
+                        print("skipping improper hb_str ", hb_str)
                         continue
                     ligStr = ligand.chains[0].id #@@FIX THIS
                     if parser.isV1:
@@ -211,23 +210,23 @@ class Docking:
                         lig_str = str_2
                         rec_str = str_1
                     else:
-                        print "ligand name: ", ligand.name, " not found in hb_str ", hb_str
+                        print("ligand name: ", ligand.name, " not found in hb_str ", hb_str)
                         ok = False                    
                     if ok:
                         #rec_str xJ1_xtal:B:GLY16:N,HN
                         # try to retrieve receptor atoms
-                        rec_ats = self.css.select(receptorSet, strip(rec_str))
+                        rec_ats = self.css.select(receptorSet, rec_str.strip())
                         #rec_ats = self.vf.expandNodes(strip(rec_str))
                         if not len(rec_ats):
-                            print "skipping hb_str because ",  rec_str, " did not match atoms in the receptor"
+                            print("skipping hb_str because ",  rec_str, " did not match atoms in the receptor")
                         #(<AtomSet instance> holding 2 Atom, "xJ1_xtal:B:ARG57:NE,HE", '')
                         rec_ats = rec_ats[0]
                         #add ligand name to lig_str
-                        lig_ats = self.css.select(ligandSet, strip(lig_str))[0]
+                        lig_ats = self.css.select(ligandSet, lig_str.strip())[0]
                         #(<AtomSet instance> holding 1 Atom, "ZINC02025973_vs_le:d:<0>:O3", '')
                         #lig_ats = self.vf.expandNodes(strip(lig_str))
                         if not len(lig_ats):
-                            print "skipping hb_str because ",  lig_str, " did not match atoms in the ligand"
+                            print("skipping hb_str because ",  lig_str, " did not match atoms in the ligand")
                         #(<AtomSet instance> holding 1 Atom, "ZINC02026663_vs:d:<0>:O3", '')
                         #lig_ats = lig_ats[0]
                         donor_ats = rec_ats
@@ -264,16 +263,16 @@ class Docking:
                 if len(parser.lig_close_ats) and ligand.name in parser.lig_close_ats[0]:
                     #self.css.select returns atomset, possibly empty PLUS string
                     #(<AtomSet instance> holding 15 Atom, "ZINC00027719_vs:d:<0>:O3,C5,C3...", '')
-                    close_ats, close_ats_str = self.css.select(ligandSet, strip(parser.lig_close_ats[0]))
+                    close_ats, close_ats_str = self.css.select(ligandSet, (parser.lig_close_ats.strip()[0]))
                     if not len(close_ats):
-                        print "skipping ligand close ats because ",  parser.lig_close_ats[0], " did not match atoms in the ligand"
+                        print("skipping ligand close ats because ",  parser.lig_close_ats[0], " did not match atoms in the ligand")
                     #ligand.close_ats = self.vf.expandNodes(strip(parser.lig_close_ats[0]))
                     ligand.close_ats = close_ats
                 # parser.macro_close_ats
                 rec_close_ats = AtomSet()
                 if hasattr(parser, 'macro_close_ats') and len(parser.macro_close_ats) and receptor.name in parser.macro_close_ats[0]:
                     for macro_close_ats_str in parser.macro_close_ats:
-                        cc_ats = self.css.select(receptorSet, strip(macro_close_ats_str))[0]
+                        cc_ats = self.css.select(receptorSet, macro_close_ats_str.strip())[0]
                         #cc_ats = self.vf.expandNodes(strip(macro_close_ats_str))
                         if len(cc_ats):
                             rec_close_ats.extend(cc_ats)
@@ -287,7 +286,7 @@ class Docking:
                     #pi_st1  'xJ1_xtal:B:TRP42:CD2,CE2,CZ3,CH2,CZ3,CE3,NE1,CD1,CG
                     #pi_st2  'ZINC02026663_vs:d:<0>:C7,C4,C2,C5,C8,N2,N1,C3,C9,C6'
                     if not len(str_1) or not len(str_2):
-                        print "skipping improper pi_str ", pi_str
+                        print("skipping improper pi_str ", pi_str)
                         continue
                     if ligand.name in str_1 and rec_name in str_2:
                         lig_str = str_1
@@ -298,22 +297,22 @@ class Docking:
                         rec_str = str_1
                         ok = True
                     else:
-                        print "ligand name: ", ligand.name, " not found in hb_str ", hb_str
+                        print("ligand name: ", ligand.name, " not found in hb_str ", hb_str)
                     if ok:
                         #rec_str xJ1_xtal:B:GLY16:N,HN
                         # try to retrieve atoms
                         lig_ats = None
                         rec_ats = None
-                        rec_ats = self.css.select(receptorSet, strip(rec_str))
+                        rec_ats = self.css.select(receptorSet, rec_str.strip())
                         #rec_ats = self.vf.expandNodes(strip(rec_str))
                         if not len(rec_ats):
-                            print "skipping ", pi_str,  " because ",  rec_str, " did not match atoms in the receptor"
+                            print("skipping ", pi_str,  " because ",  rec_str, " did not match atoms in the receptor")
                             continue
                         rec_ats = rec_ats[0]
-                        lig_ats = self.css.select(ligandSet, strip(lig_str))
+                        lig_ats = self.css.select(ligandSet, lig_str.strip())
                         #lig_ats = self.vf.expandNodes(strip(lig_str))
                         if not len(lig_ats):
-                            print "skipping ", pi_str,  " because ",  lig_str, " did not match atoms in the ligand"
+                            print("skipping ", pi_str,  " because ",  lig_str, " did not match atoms in the ligand")
                             continue
                         lig_ats = lig_ats[0]
                         if rec_ats and lig_ats:
@@ -327,7 +326,7 @@ class Docking:
                         #pi_st1  'xJ1_xtal:B:LYS55:NZ'
                         #pi_st2  'ZINC02026663_vs:d:<0>:C7,C4,C2,C5,C8,N2,N1,C3,C9,C6'
                         if not len(str_1) or not len(str_2):
-                            print "skipping improper pi_str ", pi_str
+                            print("skipping improper pi_str ", pi_str)
                             continue
                         if ligand.name in str_1 and rec_name in str_2:
                             lig_str = str_1
@@ -338,13 +337,13 @@ class Docking:
                             rec_str = str_1
                             ok = True
                         else:
-                            print "ligand name: ", ligand.name, " not found in hb_str ", hb_str
+                            print("ligand name: ", ligand.name, " not found in hb_str ", hb_str)
                         if ok:
                             # try to retrieve receptor atoms
                             #rec_str xJ1_xtal:B:GLY16:N,HN
                             pi_ats = None
                             cation_at = None
-                            rec_ats = self.css.select(receptorSet, strip(rec_str))
+                            rec_ats = self.css.select(receptorSet, rec_str.strip())
                             #rec_ats = self.vf.expandNodes(strip(rec_str))
                             #if not len(rec_ats):
                                 #print "skipping ", pi_str,  " because ",  rec_str, " did not match atoms in the receptor"
@@ -355,10 +354,10 @@ class Docking:
                             elif len(rec_ats)==1:
                                 receptor.cation_at = rec_ats[0]
                                 #print "set cation_at to rec_ats[0]", rec_ats[0].full_name()
-                            lig_ats = self.css.select(ligandSet, strip(lig_str))
+                            lig_ats = self.css.select(ligandSet, lig_str.strip())
                             #lig_ats = self.vf.expandNodes(strip(lig_str))
                             if not len(lig_ats):
-                                print "skipping ", pi_str,  " because ",  lig_str, " did not match atoms in the ligand"
+                                print("skipping ", pi_str,  " because ",  lig_str, " did not match atoms in the ligand")
                             lig_ats = lig_ats[0] #because css.select returns a tuple
                             if len(lig_ats)==1: 
                                 if cation_at is not None:
@@ -370,7 +369,7 @@ class Docking:
                                     #print "set cation_at to lig_ats[0]", lig_ats[0].full_name()
                                     ligand.cation_at = cation_at
                             elif pi_ats is not None:
-                                print "skipping pi_str because ",  lig_str, " multiple atoms specified for both lig + rec"
+                                print("skipping pi_str because ",  lig_str, " multiple atoms specified for both lig + rec")
                                 continue
                             else:
                                 ligand.pi_ats = lig_ats
@@ -419,7 +418,7 @@ class Docking:
                         new_item = [enrg, num_confs]
                         dataList.append(new_item)
                         if num_confs>1:
-                            reverseList.append(range(ctr, ctr+num_confs+1))
+                            reverseList.append(list(range(ctr, ctr+num_confs+1)))
                         if ll[-3]=='1':
                             #FOUND IT!!
                             # ONLY interested in best energy and largest cluster
@@ -445,7 +444,7 @@ class Docking:
                     le = +100
                     le_index = None
                     if best_energy:
-                        for i,j in ligand.clustNB.geoms.items():
+                        for i,j in list(ligand.clustNB.geoms.items()):
                             if j.point[0]<le:
                                 le = j.point[0]
                                 le_index = i
@@ -453,13 +452,13 @@ class Docking:
                     max_height = -1
                     max_index = None
                     if largest_cluster:
-                        for i,j in ligand.clustNB.geoms.items():
+                        for i,j in list(ligand.clustNB.geoms.items()):
                             if j.height>max_height:
                                 max_height = j.height
                                 max_index = i
                         ligand.clustNB.draw.itemconfig((max_index,), fill='red')
                     if other:
-                        for i,j in ligand.clustNB.geoms.items():
+                        for i,j in list(ligand.clustNB.geoms.items()):
                             if j.point[0]==other_energy:
                                 other_index = i
                         ligand.clustNB.draw.itemconfig((other_index,), fill='red')
@@ -555,7 +554,7 @@ class Docking:
                 ligMol.name = os.path.splitext(ligMol.filename)[0]
                 self.set_ligand(ligMol, dlo)
             except:
-                print "unable to read ligand file: ", ligFile
+                print("unable to read ligand file: ", ligFile)
                 self.ligMol = None
                 dlo.conformations = []
         else:
@@ -574,20 +573,20 @@ class Docking:
 
     def addPopulation(self, population, parser):
         if not hasattr(self, 'ph'): 
-            print 'current docking does not have a population handler'
+            print('current docking does not have a population handler')
             return 
         self.ph.add(population, parser.keywords)
 
     def write_current_conformation(self, filename="", infoStr=None, rms=-1, ncl_to_write=-1, summary_only=False):
         #infoStr: if not None include clustering info
         if not hasattr(self, 'ligMol'):
-            print "docking has no ligand molecule!"
+            print("docking has no ligand molecule!")
             return "ERROR"
          #rms: if -1, use smallest key
         if ncl_to_write>0 and rms==-1:
-            rms_list = self.clusterer.clustering_dict.keys()
+            rms_list = list(self.clusterer.clustering_dict.keys())
             if not len(rms_list):
-                print "docking has no clustering!"
+                print("docking has no clustering!")
                 return "ERROR"
             rms_list.sort()
             rms = rms[0]
@@ -606,7 +605,7 @@ class Docking:
             #    fptr.write(self.clusterer.getInfoStr(infoStr, ind, ncl_to_write, rms))
             #except:
             #    print "error writing clustering information"
-            cl_lengths = map(len,self.clusterer.clustering_dict[rms])
+            cl_lengths = list(map(len,self.clusterer.clustering_dict[rms]))
             max_ind = cl_lengths.index(max(cl_lengths))
             if ncl_to_write<0:
                 ncl_to_write=max_ind+5
@@ -663,7 +662,7 @@ class Docking:
         # if conf==0: write lowest energy conformation
         #this includes setting ligMol to conf and optionally restoring it
         if self.ligMol is None:
-            print "Docking has no ligand molecule: unable to write conformation"
+            print("Docking has no ligand molecule: unable to write conformation")
             return
         dlo = self.dlo_list[0]
         if conf==0 and hasattr(dlo, 'cluster_list'):
@@ -671,7 +670,7 @@ class Docking:
             conf = dlo.cluster_list[0][0]
         #be sure conf is of class "Conformation"
         if conf.__class__!= Conformation:
-            print "conformation must be an instance of Conformation class"
+            print("conformation must be an instance of Conformation class")
             return
         old_conf = self.ch.current_conf
         self.ch.set_conformation(conf)
@@ -682,13 +681,13 @@ class Docking:
         ctr = 0
         for l in allLines:
             if l[-1]!='\n': l = l + '\n'
-            if find(l, 'ROOT')==0 and hasattr(dlo.parser, 'clusterRecord') and dlo.parser.clusterRecord is not None:
+            if l.find('ROOT') == 0 and hasattr(dlo.parser, 'clusterRecord') and dlo.parser.clusterRecord is not None:
                 #put the RMS_REF REMARK here
                 rms_ref = dlo.parser.clusterRecord[0][0][5]
                 nl = "REMARK RMS_REF % 6.4f\n" % (rms_ref)
                 newLines.append(nl)
                 newLines.append(l)
-            elif find(l, 'ATOM')==0 or find(l, 'HETA')==0:
+            elif l.find('ATOM') == 0 or l.find('HETA') == 0:
                 cc = coords[ctr]
                 restLine = l[54:]
                 newLines.append(l[:30]+'%8.3f%8.3f%8.3f'%(cc[0],cc[1],cc[2])+l[54:])
@@ -741,6 +740,8 @@ class DockingLogObject:
             if self.parser.version>=4.0:
                 self.macroFile = self.macroStem + '.pdbqt'
             ##???
+            
+
             filename = self.dpo['move']['value']
             if self.docking and not hasattr(self.docking, 'ligMol'):
                 ligMol = self._buildInputLig(parser.ligLines, filename=filename)
@@ -771,19 +772,19 @@ class DockingLogObject:
     def _hackLigLineFormat(self, lines):
         for i in range(len(lines)):
             l = lines[i]
-            if find(l, 'ATOM')>-1:
+            if l.find('ATOM') > -1:
                 break
         key = lines[i][60:66]
-        if len(strip(key)):
+        if len(key.strip()):
             try:
                 float(key)
-                print 'passed check for extra spaces'
+                print('passed check for extra spaces')
                 return lines
             except:
-                print 'failed check for extra spaces'
+                print('failed check for extra spaces')
                 nl = lines[:i]
                 for l in lines[i:]:
-                    if find(l,'ATOM')>-1:
+                    if l.find('ATOM') > -1:
                         #this stinks!!!
                         nl.append(l[:54]+l[57:60] + l[61:])
                     else:
@@ -845,7 +846,7 @@ class DockingLogObject:
             mol = parser.parse()[0]
             return mol
         except:
-            print "exception in _buildInputLig"
+            print("exception in _buildInputLig")
 
 
 from numpy import array, zeros, sqrt  
@@ -853,7 +854,7 @@ from glob import glob
 import os
 from sys import argv
 from mglutil.math.rmsd import RMSDCalculator
-from bhtree import bhtreelib
+# from bhtree import bhtreelib
 from datetime import date
 import time
 
@@ -910,7 +911,7 @@ class FoxResultProcessor:
     def __init__(self, receptor_filename=None, RMSTOL=2.,verbose=False):
         self.receptor_filename=receptor_filename
         if receptor_filename==None:
-            print "receptor_filename must be specified"
+            print("receptor_filename must be specified")
             return "ERROR"
         self.RMSTOL = RMSTOL
         # rec_crds keys are 'text', 'coord', 'atype'
@@ -919,7 +920,7 @@ class FoxResultProcessor:
         self.rec_mol_name = os.path.splitext(self.rec_name)[0]
         self.verbose = verbose
         if self.verbose:
-            print "__init__: len(self.rec_crds['coord'])=", len(self.rec_crds['coord'])
+            print("__init__: len(self.rec_crds['coord'])=", len(self.rec_crds['coord']))
 
 
     def get_lines(self, filename):
@@ -976,7 +977,7 @@ class FoxResultProcessor:
                         # by default (RMSD calculation *must not* consider HDs!)
                         if (not type == "HD") or include_hydrogens : 
                             #coord.append([float(l[30:38]),float(l[38:46]),float(l[46:54])])
-                            coord.append(map(float, [l[30:38],l[38:46],l[46:54]]))
+                            coord.append(list(map(float, [l[30:38],l[38:46],l[46:54]])))
                             if not self.atype_list_complete: # FUTURE: to be used for the AD David's method
                                 self.atype_list.append( type ) 
                             #try:
@@ -1268,12 +1269,12 @@ CODE TO REPLACE THESE LINES USED FOR TESTING AND DEVELOPMENT:
 
         """
         if directory is None and dlg_list is None:
-            print "directory OR dlg_list must be specified"
+            print("directory OR dlg_list must be specified")
             return
         if self.verbose:
-            print "in process, directory=", directory
-            print " len(self.rec_crds)=", len(self.rec_crds), 
-            print " len(self.rec_crds['coord']=", len(self.rec_crds['coord'])
+            print("in process, directory=", directory)
+            print(" len(self.rec_crds)=", len(self.rec_crds), end=' ') 
+            print(" len(self.rec_crds['coord']=", len(self.rec_crds['coord']))
         #fl = glob(receptor_filename)
         #assert len(fl)==1
         #self.crds = frp.get_coords(filename=fl[0])
@@ -1290,7 +1291,7 @@ CODE TO REPLACE THESE LINES USED FOR TESTING AND DEVELOPMENT:
         fptr = open(pdbqt_filename, 'w')
         fptr.writelines(pdbqt)
         fptr.close()
-        if self.verbose: print "closed ", pdbqt_filename
+        if self.verbose: print("closed ", pdbqt_filename)
 
 
     def createPDBQTplus(self, results, total_runs, histogram, receptor_filename, lig_mol_name , dlg_list, max_dlg_count = None, clusters=[] ):
@@ -1449,7 +1450,7 @@ class DockingResultProcessor:
             #file = os.path.join(directory, self.rms_reference)
             ref = Read(rms_reference)
             if not len(ref): 
-                print "unable to read ", self.rms_reference
+                print("unable to read ", self.rms_reference)
             else:
                 ref = ref[0]
                 coords = ref.allAtoms.coords
@@ -1465,7 +1466,7 @@ class DockingResultProcessor:
         if directory is not None:
             dlg_list = glob.glob(os.path.join(directory, "*.dlg"))
         if self.docking is None and  directory is None:
-            print "either directory or dlg_list or docking must be specified"
+            print("either directory or dlg_list or docking must be specified")
             return "ERROR"
         if self.docking:
             d = self.docking
@@ -1478,17 +1479,17 @@ class DockingResultProcessor:
                     d.readDlg(dlg)
                     ndlgs +=1
                 except:
-                    print "Error reading dlg file \"%s\""  % dlg
+                    print("Error reading dlg file \"%s\""  % dlg)
                     #break
         if not d.dlo_list:
             if self.docking:
-                print "Sorry, provided docking not valid"
+                print("Sorry, provided docking not valid")
             else:
-                print "Sorry, no valid DLG results found in the path : %s" % directory
+                print("Sorry, no valid DLG results found in the path : %s" % directory)
             sys.exit(1)
 
         nconfs = len(d.ch.conformations)
-        if verbose: print "processsing %d conformations from %d dlg files"%(nconfs, ndlgs)
+        if verbose: print("processsing %d conformations from %d dlg files"%(nconfs, ndlgs))
         #if self.le_stem == "":
             #self.le_stem = origname+ "_vs_le"
 
@@ -1502,7 +1503,7 @@ class DockingResultProcessor:
             try:
                 rec_stem = dpf_l.split()[1].split('.')[0]
             except:
-                print "exception deducing receptor_filename based on ", dpf_l
+                print("exception deducing receptor_filename based on ", dpf_l)
                 exit(-1)
             self.receptor_filename = rec_stem + ".pdbqt"
             deduced_name = 1
@@ -1512,9 +1513,9 @@ class DockingResultProcessor:
             assert os.path.exists(self.receptor_filename)
         except:
             if deduced_name:
-                print "Sorry unable to locate '%s' as deduced from gridmap names.\nPlease specify complete path to receptor file after '-r' "%( self.receptor_filename)
+                print("Sorry unable to locate '%s' as deduced from gridmap names.\nPlease specify complete path to receptor file after '-r' "%( self.receptor_filename))
             else:
-                print "Sorry unable to find receptor ", self.receptor_filename
+                print("Sorry unable to find receptor ", self.receptor_filename)
             return
 
         rmsTool = self.rmsTool
@@ -1527,10 +1528,10 @@ class DockingResultProcessor:
         #set up cl_dict here
         cl_dict = d.clusterer.clustering_dict[rms_tolerance]
         nclusters = len(cl_dict)
-        cl_lengths = map(len, cl_dict)
+        cl_lengths = list(map(len, cl_dict))
         # adjust the number of clusters to write down if necessary
         if max_cl_to_write<0 or max_cl_to_write > nclusters:
-            if verbose: print 'setting max_cl_to_write to nclusters ', nclusters
+            if verbose: print('setting max_cl_to_write to nclusters ', nclusters)
             max_cl_to_write = nclusters
 
         index_LC = cl_lengths.index(max(cl_lengths))
@@ -1598,7 +1599,7 @@ class DockingResultProcessor:
             num_clusters = len(cl_dict)
             if num_clusters < num_to_write:
                 num_to_write = num_clusters
-            if verbose: print "num_to_write=", num_to_write
+            if verbose: print("num_to_write=", num_to_write)
             for i in range(0, num_to_write):  #starts with '#binding' so numbers are 1-based
                 cl = cl_dict[i]
                 len_cl = len(cl)
@@ -1634,17 +1635,17 @@ class DockingResultProcessor:
                 else:    
                     be_ptr.write(line + "\n")
             be_ptr.close()
-            if verbose: print " wrote best energy conformation to ", be_outfilename
+            if verbose: print(" wrote best energy conformation to ", be_outfilename)
 
             if index_LC==0 and verbose:
-                print 'be == lc'
+                print('be == lc')
             # here's the point to include interaction information
-            if verbose: print "include_interactions currently set to ", self.include_interactions
+            if verbose: print("include_interactions currently set to ", self.include_interactions)
             if self.include_interactions:
                 outputfilename = d.ligMol.name + ".pdbqt"
                 #self.intF = InteractionDetector(self.receptor_filename, detect_pi=self.detect_pi)
                 outputfilename = os.path.join(directory, outputfilename)
-                if verbose: print "calling self.intF.processLigand with be_outfilename=", be_outfilename, "opf=", outputfilename
+                if verbose: print("calling self.intF.processLigand with be_outfilename=", be_outfilename, "opf=", outputfilename)
                 sss2 = self.intF.processLigand(be_outfilename, outputfilename=outputfilename) 
             # add complete pathname here if not already in...
             if outputfilename==os.path.basename(outputfilename):
@@ -1661,8 +1662,8 @@ class DockingResultProcessor:
         #   TODO #2: CLEAN THIS UP and test...
         if verbose:
             if index_LC==0: 
-                print "LC is BE"
-            print "index_LC =", index_LC
+                print("LC is BE")
+            print("index_LC =", index_LC)
         if (self.write_both or self.largestCl_only) and index_LC!=0:
             # WRITE largestCL here!!
             #UPDATE  the ligand name
@@ -1672,8 +1673,8 @@ class DockingResultProcessor:
             d.ligMol.name = self.lc_stem
             outputfilename = d.ligMol.name + ".pdbqt"
             if verbose: 
-                print "now d.ligMol.name = ", d.ligMol.name
-                print "now outputfilename = ", outputfilename
+                print("now d.ligMol.name = ", d.ligMol.name)
+                print("now outputfilename = ", outputfilename)
 
             largest_cl = d.clusterer.clustering_dict[rms_tolerance][index_LC][0]
             d.ch.set_conformation(largest_cl)
@@ -1735,11 +1736,11 @@ class DockingResultProcessor:
                     lc_ptr.write(line+"\n")
             lc_ptr.close()
             #print " wrote lc to ", lc_outfilename
-            if verbose: print " wrote lc to ", lc_outfilename
+            if verbose: print(" wrote lc to ", lc_outfilename)
             if self.include_interactions:
                 #intF = InteractionDetector(self.receptor_filename, self.detect_pi) #someday, detect_pi=True
                 outputfilename = os.path.join(directory, outputfilename)
-                if verbose: print "calling self.intF.processLigand with lc_outfilename=", lc_outfilename, "opf=", outputfilename
+                if verbose: print("calling self.intF.processLigand with lc_outfilename=", lc_outfilename, "opf=", outputfilename)
                 sss2 = self.intF.processLigand(lc_outfilename, outputfilename=outputfilename) 
             if outputfilename==os.path.basename(outputfilename):
                 outputfilename = os.path.join(directory, outputfilename)
@@ -1787,7 +1788,7 @@ class VinaResultProcessor:
         try:
             assert os.path.exists(receptor_filename)
         except:
-            print "Sorry unable to find receptor file ", receptor_filename
+            print("Sorry unable to find receptor file ", receptor_filename)
             exit()
         self.best_only = best_only
         self.max_num_to_write = max_num_to_write
@@ -1808,12 +1809,12 @@ class VinaResultProcessor:
         #by default Read returns multiple molecules with different sets of coords
         #modelsAs='conformations' returns 1 molecule with multiple sets of coords
         if not len(ligMols):
-            print "unable to read vina resultfile ", vina_resultfile
+            print("unable to read vina resultfile ", vina_resultfile)
             sys.exit()
         #nconfs
         ligname = ligMols[0].name
         nconfs = len(ligMols)
-        if verbose: print "%s contains %d conformations for ligand %s"%(vina_resultfile, nconfs, ligname)
+        if verbose: print("%s contains %d conformations for ligand %s"%(vina_resultfile, nconfs, ligname))
         num_to_write = self.max_num_to_write
         if best_only:
             num_to_write=1
@@ -1835,10 +1836,10 @@ class VinaResultProcessor:
         total_num_lig_ats = len(best.allAtoms)
         num_h_ats = len(best.allAtoms.get(lambda x: x.element=='H'))
         num_lig_ats = total_num_lig_ats - num_h_ats
-        if verbose: print "processsing %d conformations from vina result %s file"%(nconfs, vina_resultfile)
+        if verbose: print("processsing %d conformations from vina result %s file"%(nconfs, vina_resultfile))
         start_str = "USER  AD> "
         vsV_str = "REMARK AutoDockVina VirtualScreeningResult "
-        if verbose: print "num_to_write=", num_to_write
+        if verbose: print("num_to_write=", num_to_write)
         #11/2010:previously next line was "for i in range(len(ligMols)):"
         for i in range(num_to_write):
             curLig = ligMols[i]
@@ -1847,7 +1848,7 @@ class VinaResultProcessor:
                 modelIndex=curName.find("_model")
                 if modelIndex>-1:
                     curName = curName[:modelIndex]+ curName[modelIndex+6:]
-                    if verbose: print "now curName=", curName
+                    if verbose: print("now curName=", curName)
                 curLig.name = curName
             #setup outputfilestem
             if outputfilestem is None:
@@ -1867,12 +1868,12 @@ class VinaResultProcessor:
                 if line.find("MODEL")==0:
                     found_model += 1
                     if found_model>1:
-                        if verbose: print "found ", i,"-TH MODEL!",
+                        if verbose: print("found ", i,"-TH MODEL!", end=' ')
                         parser_lines = parser_lines[ctr:]
-                        if verbose: print "NOW len(parser_lines)=", len(parser_lines), '\n'
+                        if verbose: print("NOW len(parser_lines)=", len(parser_lines), '\n')
                         break
                 optr.write(line)
-            if verbose: print " wrote %dth energy conformation to %s"%(i, outputfilename)
+            if verbose: print(" wrote %dth energy conformation to %s"%(i, outputfilename))
             optr.close()
             remove_modelStr = found_model and remove_model_str
             self.intD.processLigand(outputfilename, outputfilename=outputfilename, buildHB=0, remove_modelStr=remove_modelStr)
@@ -1886,7 +1887,7 @@ class VinaResultProcessor:
             optr.write( "%s %d of %d MODELS\n"%(start_str, i+1, nconfs ))
             b_efficiency = curLig.vina_energy/num_lig_ats
             optr.write( "%s ligand efficiency  %6.4f\n"%(start_str, b_efficiency))
-            energy, min_rms, max_rms = map(float, best.vina_results[i])
+            energy, min_rms, max_rms = list(map(float, best.vina_results[i]))
             optr.write( "%s %4.2f, %6.3f, %6.3f\n"%(start_str, energy, min_rms, max_rms))
             for l in lines:
                 optr.write(l)

@@ -15,15 +15,15 @@ class CADD_Vision:
     def run(self):
         from NetworkEditor.net import Communicator
         self.net.communicator = Communicator(self.net)
-        print 'Communicator listening on port:', self.net.communicator.port
+        print('Communicator listening on port:', self.net.communicator.port)
 
         import socket
         #f = open(argv[0]+'.sock', 'w')
         #f.write("%s %i"%(socket.gethostbyname(socket.gethostname()),
         #                 self.net.communicator.port))
         #f.close()
-        print "%s %i"%(socket.gethostbyname(socket.gethostname()),
-                       self.net.communicator.port)
+        print("%s %i"%(socket.gethostbyname(socket.gethostname()),
+                       self.net.communicator.port))
                        
         self.net.run()
 

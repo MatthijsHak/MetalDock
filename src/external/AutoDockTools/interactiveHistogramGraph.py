@@ -10,9 +10,9 @@
 
 
 import sys
-import Tkinter
+import tkinter
 from Canvas import Line, CanvasText, Rectangle
-import tkFileDialog
+import tkinter.filedialog
 import string, math, os
 
 from mglutil.util.misc import ensureFontCase
@@ -38,7 +38,7 @@ def maxBound(nodeList):
 
 
 
-class InteractiveGraphBuilder(Tkinter.Frame):
+class InteractiveGraphBuilder(tkinter.Frame):
 
 
     def __init__(self, name='NoName', master=None, nodeList=[], **kw):
@@ -48,48 +48,48 @@ class InteractiveGraphBuilder(Tkinter.Frame):
         self.nodes = {}
         self.geoms = {}
 
-        if kw.has_key('visibleWidth'):
+        if 'visibleWidth' in kw:
             self.visibleWidth = visibleWidth
             del kw['visibleWidth']
         else:
             self.visibleWidth = 400
 
-        if kw.has_key('visibleHeight'):
+        if 'visibleHeight' in kw:
             self.visibleWidth = visibleHeight
             del kw['visibleHeight']
         else:
             self.visibleHeight = 400
 
-        if kw.has_key('totalWidth'):
+        if 'totalWidth' in kw:
             self.visibleWidth = totalWidth
             del kw['totalWidth']
         else:
             self.totalWidth = 400
 
-        if kw.has_key('totalHeight'):
+        if 'totalHeight' in kw:
             self.totalHeight = totalHeight
             del kw['totalHeight']
         else:
             self.totalHeight = 400
 
-        if kw.has_key('hasScroll'):
+        if 'hasScroll' in kw:
             self.hasScroll = hasScroll
             del kw['hasScroll']
         else:
             self.hasScroll = 0
 
-        if kw.has_key('font'):
+        if 'font' in kw:
             self.font = font
             del kw['font']
         else:
             self.font = (ensureFontCase('helvetica'), 14)
 
-        Tkinter.Frame.__init__(self, master)
-        Tkinter.Pack.config(self, expand=1, fill=Tkinter.BOTH)
-        apply(self.createCanvas, (), kw)
+        tkinter.Frame.__init__(self, master)
+        tkinter.Pack.config(self, expand=1, fill=tkinter.BOTH)
+        self.createCanvas(*(), **kw)
         self.paramPanelObject = None
         self.plotarea_size = [None, None]
-        Tkinter.Widget.bind(self.draw, '<Enter>', self.enter)
+        tkinter.Widget.bind(self.draw, '<Enter>', self.enter)
         # bind mouse button callbacks
         self.draw.bind("<Any-ButtonPress-1>", self.mouse1DownCanvas)
         self.draw.bind("<Any-ButtonPress-3>", self.mouse1DownCanvas)
@@ -108,7 +108,7 @@ class InteractiveGraphBuilder(Tkinter.Frame):
         self.draw.itemconfig('current', fill = 'red')
         self.draw.old_current = obj
         #print obj
-        if len(obj) and obj[0] in self.geoms.keys():
+        if len(obj) and obj[0] in list(self.geoms.keys()):
             self.currentNode = self.geoms[obj[0]]
             #print 'currentNode=', self.currentNode
             if hasattr(self, 'reverseIndex'):
@@ -137,31 +137,31 @@ class InteractiveGraphBuilder(Tkinter.Frame):
     
     def createCanvas(self):
         """ create the Canvas and Title widgets"""
-        self.widgetArea = Tkinter.Frame(self, borderwidth=2, relief='sunken')
+        self.widgetArea = tkinter.Frame(self, borderwidth=2, relief='sunken')
         self.createMenus()
-        self.canvasFrame = Tkinter.Frame(self)
+        self.canvasFrame = tkinter.Frame(self)
         #if self.hasScroll:
         self.scrollregion = [0, 0, self.totalWidth, self.totalHeight]
         self.visibleOriginX = 0
         self.visibleOriginY = 0
-        self.draw = Tkinter.Canvas(self.canvasFrame, width=self.visibleWidth,
+        self.draw = tkinter.Canvas(self.canvasFrame, width=self.visibleWidth,
                         height=self.visibleHeight,
                         background='white',
                         scrollregion=tuple(self.scrollregion))
-        self.draw.scrollX = Tkinter.Scrollbar(self.canvasFrame,
-                                        orient=Tkinter.HORIZONTAL)
-        self.draw.scrollY = Tkinter.Scrollbar(self.canvasFrame,
-                                        orient=Tkinter.VERTICAL)
+        self.draw.scrollX = tkinter.Scrollbar(self.canvasFrame,
+                                        orient=tkinter.HORIZONTAL)
+        self.draw.scrollY = tkinter.Scrollbar(self.canvasFrame,
+                                        orient=tkinter.VERTICAL)
         self.draw.bind('<Configure>', self.configure)
 
         self.draw['xscrollcommand'] = self.draw.scrollX.set
         self.draw['yscrollcommand'] = self.draw.scrollY.set
         self.draw.scrollX['command'] = self.myxview
         self.draw.scrollY['command'] = self.myyview
-        self.canvasFrame.pack(side=Tkinter.LEFT,expand=1,fill=Tkinter.BOTH)
-        self.draw.scrollX.pack(side=Tkinter.BOTTOM,fill=Tkinter.X)
-        self.draw.scrollY.pack(side=Tkinter.LEFT,expand=1,fill=Tkinter.BOTH)
-        self.draw.pack(side=Tkinter.LEFT,expand=1,fill=Tkinter.BOTH)
+        self.canvasFrame.pack(side=tkinter.LEFT,expand=1,fill=tkinter.BOTH)
+        self.draw.scrollX.pack(side=tkinter.BOTTOM,fill=tkinter.X)
+        self.draw.scrollY.pack(side=tkinter.LEFT,expand=1,fill=tkinter.BOTH)
+        self.draw.pack(side=tkinter.LEFT,expand=1,fill=tkinter.BOTH)
         border_w = self.draw.winfo_reqwidth() - self.visibleWidth
         border_h = self.draw.winfo_reqheight() - self.visibleHeight
         self.border = (border_w, border_h)
@@ -207,21 +207,21 @@ class InteractiveGraphBuilder(Tkinter.Frame):
 
 
     def createMenus(self):
-        self.mBar = Tkinter.Frame(self, relief=Tkinter.RAISED,borderwidth=2)
-        self.mBar.pack(fill=Tkinter.X)
+        self.mBar = tkinter.Frame(self, relief=tkinter.RAISED,borderwidth=2)
+        self.mBar.pack(fill=tkinter.X)
         self.menuButtons = {}
         self.makeFileMenu()
         self.makeEditMenu()
-        apply(self.mBar.tk_menuBar, self.menuButtons.values())
-        self.title = Tkinter.Label(self.mBar, text=self.name)
-        self.title.pack(side=Tkinter.RIGHT)
+        self.mBar.tk_menuBar(*list(self.menuButtons.values()))
+        self.title = tkinter.Label(self.mBar, text=self.name)
+        self.title.pack(side=tkinter.RIGHT)
 
 
     def makeFileMenu(self):
-        File_button = Tkinter.Menubutton(self.mBar, text='File',underline=0)
+        File_button = tkinter.Menubutton(self.mBar, text='File',underline=0)
         self.menuButtons['File'] = File_button
-        File_button.pack(side = Tkinter.LEFT, padx='1m')
-        File_button.menu = Tkinter.Menu(File_button)
+        File_button.pack(side = tkinter.LEFT, padx='1m')
+        File_button.menu = tkinter.Menu(File_button)
         #File_button.menu.add_command(label='Load...', underline=0,
                                     #command = self.loadFile)
         File_button.menu.add_command(label='Exit...', underline=0,
@@ -238,10 +238,10 @@ class InteractiveGraphBuilder(Tkinter.Frame):
 
 
     def makeEditMenu(self, event=None):
-        Edit_button = Tkinter.Menubutton(self.mBar, text='Edit',underline=0)
+        Edit_button = tkinter.Menubutton(self.mBar, text='Edit',underline=0)
         self.menuButtons['Edit'] = Edit_button
-        Edit_button.pack(side = Tkinter.LEFT, padx='1m')
-        Edit_button.menu = Tkinter.Menu(Edit_button)
+        Edit_button.pack(side = tkinter.LEFT, padx='1m')
+        Edit_button.menu = tkinter.Menu(Edit_button)
         Edit_button.menu.add_command(label='Clear...', underline=0,
                                     command = self.clear)
         Edit_button.menu.add_command(label='Redraw...', underline=0,
@@ -264,7 +264,7 @@ class InteractiveGraphBuilder(Tkinter.Frame):
 
     def replot(self):
         if self.last_drawn is not None:
-            apply(self.buildIt, (self.last_drawn,), {})
+            self.buildIt(*(self.last_drawn,), **{})
 
 
     def printCanvas(self, idir=None, ifile=None, title=None):
@@ -277,7 +277,7 @@ class InteractiveGraphBuilder(Tkinter.Frame):
         ifile = ifile
         if title==None:
             title='Postscript File'
-        file = tkFileDialog.asksaveasfilename( filetypes=types,
+        file = tkinter.filedialog.asksaveasfilename( filetypes=types,
                                            initialdir=idir,
                                            initialfile=ifile,
                                            title=title)
@@ -378,12 +378,12 @@ class InteractiveGraphBuilder(Tkinter.Frame):
             if lower <= upper:
                 return lower, upper
             else: return upper, lower
-        raise ValueError, str(spec)+': illegal axis specification'
+        raise ValueError(str(spec)+': illegal axis specification')
 
 
     def _drawAxes(self, canvas, xaxis, yaxis,
                   bb1, bb2, scale, shift, xticks, yticks):
-        dict = {'anchor': Tkinter.N, 'fill': 'black'}
+        dict = {'anchor': tkinter.N, 'fill': 'black'}
         if self.font is not None:
             dict['font'] = self.font
         if xaxis is not None:
@@ -402,10 +402,10 @@ class InteractiveGraphBuilder(Tkinter.Frame):
                              fill = 'black', width = 1)
                         if text:
                             dict['text'] = label
-                            apply(CanvasText, (self.draw, p[0],
-                                               p[1]), dict)
+                            CanvasText(*(self.draw, p[0],
+                                               p[1]), **dict)
                 text = 0
-        dict['anchor'] = Tkinter.E
+        dict['anchor'] = tkinter.E
         if yaxis is not None:
             lower, upper = yaxis
             text = 1
@@ -422,8 +422,8 @@ class InteractiveGraphBuilder(Tkinter.Frame):
                              fill = 'black', width = 1)
                         if text:
                             dict['text'] = label
-                            apply(CanvasText,(self.draw,
-                                              p[0]-2,p[1]), dict)
+                            CanvasText(*(self.draw,
+                                              p[0]-2,p[1]), **dict)
                 text = 0
 
 
@@ -444,10 +444,10 @@ class InteractiveGraphBuilder(Tkinter.Frame):
             format = '%+7.0e'
         elif power >= 0:
             digits = max(1, int(power))
-            format = '%' + `digits`+'.0f'
+            format = '%' + repr(digits)+'.0f'
         else:
             digits = -int(power)
-            format = '%'+`digits+2`+'.'+`digits`+'f'
+            format = '%'+repr(digits+2)+'.'+repr(digits)+'f'
         ticks = []
         t = -grid*math.floor(-lower/grid)
         while t <= upper and len(ticks) < 200:
@@ -462,10 +462,10 @@ class InteractiveGraphBuilder(Tkinter.Frame):
 
     def _textBoundingBox(self, text):
         bg = self.draw.cget('background')
-        dict = {'anchor': Tkinter.NW, 'text': text, 'fill': bg}
+        dict = {'anchor': tkinter.NW, 'text': text, 'fill': bg}
         if self.font is not None:
             dict['font'] = self.font
-        item = apply(CanvasText, (self.draw, 0., 0.), dict)
+        item = CanvasText(*(self.draw, 0., 0.), **dict)
         bb = self.draw.bbox(item)
         self.draw.delete(item)
         return bb
@@ -479,7 +479,7 @@ class GraphPoints:
         self.points = points
         self.scaled = self.points
         self.attributes = {}
-        for name, value in self._attributes.items():
+        for name, value in list(self._attributes.items()):
             try:
                 value = attr[name]
             except KeyError: pass
@@ -526,7 +526,7 @@ class GraphLine(GraphPoints):
                 x1, y1 = self.scaled[i]
                 x2, y2 = self.scaled[i+1]
                 arguments = arguments + (x1, y1, x2, y2)
-        apply(Line, arguments, {'fill': color, 'width': width,
+        Line(*arguments, **{'fill': color, 'width': width,
                                 'smooth': smooth, 'splinesteps':steps})
 
 
@@ -536,12 +536,12 @@ class InteractiveGraphObject:
 
     def __init__(self,  **kw):
         self.id = None
-        if kw.has_key('name'):
+        if 'name' in kw:
             self.name = kw['name']
             del kw['name']
         else:
             self.name = 'NoName'
-        if kw.has_key('editor'):
+        if 'editor' in kw:
             self.editor = kw['editor']
             del kw['editor']
         else:
@@ -550,7 +550,7 @@ class InteractiveGraphObject:
 
 
     def editNoneMenu(self, type, *args, **kw):
-        apply(eval('self.menu'+type), args, kw)
+        eval('self.menu'+type)(*args, **kw)
 
 
     def __repr__(self):
@@ -587,13 +587,13 @@ class InteractiveGraphObject:
         set its tags
         """
         self.editor = editor
-        self.menu = Tkinter.Menu(editor, title = self.name)
+        self.menu = tkinter.Menu(editor, title = self.name)
         self.menu.add_command(label='info', command= self.showInfo)
         self.buildNodeIcon(editor)
 
 
     def buildNodeIcon(self, editor):
-        print 'in buildNodeIcon'
+        print('in buildNodeIcon')
 
 
 
@@ -632,7 +632,7 @@ class HistogramNode(InteractiveGraphObject):
                         editor=None, **kw):
         kw['name'] = name
         kw['editor'] = editor
-        apply(InteractiveGraphObject.__init__,(self,), kw)
+        InteractiveGraphObject.__init__(*(self,), **kw)
         self.width = width
         self.height = height
         #info is a link to state info
@@ -650,12 +650,12 @@ class HistogramNode(InteractiveGraphObject):
         """
         self.editor = editor
         self.info = info
-        self.menu = Tkinter.Menu(editor, title = self.name)
+        self.menu = tkinter.Menu(editor, title = self.name)
         self.menu.add_command(label='info', command= self.showInfo)
 
 
     def showInfo(self, event=None):
-        print 'in showInfo with ', self.info
+        print('in showInfo with ', self.info)
 
 
     def buildNodeIcon(self, editor, x1, y1, x2, y2, fill='red',
@@ -688,7 +688,7 @@ class HistogramNodeSet:
         self.attributes['stipple'] = ''
         self.attributes['outline'] = 'black'
         self.attributes['width'] = 1
-        for name, value in kw.items():
+        for name, value in list(kw.items()):
             self.attributes[name] = value
 
 
@@ -734,7 +734,7 @@ class InteractiveHistogramGraph(InteractiveGraphBuilder):
                nodeList=[], yoffset=200, maxwidth=200, 
                reverseIndex=None, label_text=None,
                xlabel_text=None, ylabel_text=None, **kw):
-        apply( InteractiveGraphBuilder.__init__,(self, name, master), kw)
+        InteractiveGraphBuilder.__init__(*(self, name, master), **kw)
         #then instantiate the nodes in nodeList
         #nodeList is list of tuples-> (width, height, info)
         self.spacing = 5
@@ -751,7 +751,7 @@ class InteractiveHistogramGraph(InteractiveGraphBuilder):
             self.nodes[newname] = newnode
             num = num + 1
         
-        self.nodeSet = HistogramNodeSet(self.nodes.values())
+        self.nodeSet = HistogramNodeSet(list(self.nodes.values()))
         self._setsize()
         self.label_text = label_text
         self.xlabel_text = xlabel_text
@@ -761,7 +761,7 @@ class InteractiveHistogramGraph(InteractiveGraphBuilder):
 
 
 if __name__== '__main__':
-    root = Tkinter.Tk()
+    root = tkinter.Tk()
     #nodeList  = [(0,0,'origin'),(32, 20, 'first'), (15, 35, 'second'),(20, 10,'third')]
     #nodeList  = [(0,0),(32, 20 ), (15, 35 ),(20, 10,)]
     #histNB = InteractiveHistogramGraph('Test', master=root, nodeList=nodeList)

@@ -23,7 +23,7 @@ class AD3Dpf(MacroNode):
 
     def __init__(self, constrkw={}, name='AD3Dpf', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -64,7 +64,7 @@ class AD3Dpf(MacroNode):
             input_Ports_7 = self.macroNetwork.ipNode
             input_Ports_7.move(158, 4)
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_7=None
 
@@ -73,7 +73,7 @@ class AD3Dpf(MacroNode):
             output_Ports_8 = self.macroNetwork.opNode
             output_Ports_8.move(172, 322)
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_8=None
 
@@ -82,11 +82,11 @@ class AD3Dpf(MacroNode):
             from AutoDockTools.VisionInterface.AdtNodes import DockingParameterFileBrowserNE
             Docking_Parameter_File_Browser_9 = DockingParameterFileBrowserNE(constrkw = {}, name='Docking Parameter File Browser', library=adtlib)
             self.macroNetwork.addNode(Docking_Parameter_File_Browser_9,204,93)
-            apply(Docking_Parameter_File_Browser_9.inputPortByName['filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Docking_Parameter_File_Browser_9.outputPortByName['filename'].configure, (), {'color': 'white', 'shape': 'oval'})
+            Docking_Parameter_File_Browser_9.inputPortByName['filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Docking_Parameter_File_Browser_9.outputPortByName['filename'].configure(*(), **{'color': 'white', 'shape': 'oval'})
             Docking_Parameter_File_Browser_9.inputPortByName['filename'].widget.set("/mgl/work4/rhuey/dev23/NEWTEST.dpf", run=False)
         except:
-            print "WARNING: failed to restore DockingParameterFileBrowserNE named Docking Parameter File Browser in network self.macroNetwork"
+            print("WARNING: failed to restore DockingParameterFileBrowserNE named Docking Parameter File Browser in network self.macroNetwork")
             print_exc()
             Docking_Parameter_File_Browser_9=None
 
@@ -95,14 +95,14 @@ class AD3Dpf(MacroNode):
             from AutoDockTools.VisionInterface.AdtNodes import AdtPrepareDpf3
             Prepare_AD3Dpf_10 = AdtPrepareDpf3(constrkw = {}, name='Prepare AD3Dpf', library=adtlib)
             self.macroNetwork.addNode(Prepare_AD3Dpf_10,170,266)
-            apply(Prepare_AD3Dpf_10.inputPortByName['ligand_filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Dpf_10.inputPortByName['receptor_filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Dpf_10.inputPortByName['dpf_filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Dpf_10.inputPortByName['parameters'].configure, (), {'color': 'cyan', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Dpf_10.inputPortByName['outputfilename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Prepare_AD3Dpf_10.outputPortByName['ad3_parameter_file'].configure, (), {'color': 'white', 'shape': 'oval'})
+            Prepare_AD3Dpf_10.inputPortByName['ligand_filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Dpf_10.inputPortByName['receptor_filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Dpf_10.inputPortByName['dpf_filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Dpf_10.inputPortByName['parameters'].configure(*(), **{'color': 'cyan', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Dpf_10.inputPortByName['outputfilename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Prepare_AD3Dpf_10.outputPortByName['ad3_parameter_file'].configure(*(), **{'color': 'white', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore AdtPrepareDpf3 named Prepare AD3Dpf in network self.macroNetwork"
+            print("WARNING: failed to restore AdtPrepareDpf3 named Prepare AD3Dpf in network self.macroNetwork")
             print_exc()
             Prepare_AD3Dpf_10=None
 
@@ -111,10 +111,10 @@ class AD3Dpf(MacroNode):
             from MolKit.VisionInterface.MolKitNodes import ReadMolecule
             Read_Molecule_11 = ReadMolecule(constrkw = {}, name='Read Molecule', library=molkitlib)
             self.macroNetwork.addNode(Read_Molecule_11,94,51)
-            apply(Read_Molecule_11.inputPortByName['filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Read_Molecule_11.outputPortByName['MolSets'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
+            Read_Molecule_11.inputPortByName['filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Read_Molecule_11.outputPortByName['MolSets'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore ReadMolecule named Read Molecule in network self.macroNetwork"
+            print("WARNING: failed to restore ReadMolecule named Read Molecule in network self.macroNetwork")
             print_exc()
             Read_Molecule_11=None
 
@@ -123,10 +123,10 @@ class AD3Dpf(MacroNode):
             from MolKit.VisionInterface.MolKitNodes import ReadMolecule
             Read_Molecule_12 = ReadMolecule(constrkw = {}, name='Read Molecule', library=molkitlib)
             self.macroNetwork.addNode(Read_Molecule_12,187,47)
-            apply(Read_Molecule_12.inputPortByName['filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(Read_Molecule_12.outputPortByName['MolSets'].configure, (), {'color': '#c64e70', 'shape': 'oval'})
+            Read_Molecule_12.inputPortByName['filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            Read_Molecule_12.outputPortByName['MolSets'].configure(*(), **{'color': '#c64e70', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore ReadMolecule named Read Molecule in network self.macroNetwork"
+            print("WARNING: failed to restore ReadMolecule named Read Molecule in network self.macroNetwork")
             print_exc()
             Read_Molecule_12=None
 
@@ -135,10 +135,10 @@ class AD3Dpf(MacroNode):
             from Vision.StandardNodes import FileBrowserNE
             File_Browser_13 = FileBrowserNE(constrkw = {}, name='File Browser', library=stdlib)
             self.macroNetwork.addNode(File_Browser_13,286,143)
-            apply(File_Browser_13.inputPortByName['filename'].configure, (), {'color': 'white', 'cast': True, 'shape': 'oval'})
-            apply(File_Browser_13.outputPortByName['filename'].configure, (), {'color': 'white', 'shape': 'oval'})
+            File_Browser_13.inputPortByName['filename'].configure(*(), **{'color': 'white', 'cast': True, 'shape': 'oval'})
+            File_Browser_13.outputPortByName['filename'].configure(*(), **{'color': 'white', 'shape': 'oval'})
         except:
-            print "WARNING: failed to restore FileBrowserNE named File Browser in network self.macroNetwork"
+            print("WARNING: failed to restore FileBrowserNE named File Browser in network self.macroNetwork")
             print_exc()
             File_Browser_13=None
 
@@ -150,32 +150,32 @@ class AD3Dpf(MacroNode):
                 self.macroNetwork.connectNodes(
                     Docking_Parameter_File_Browser_9, Prepare_AD3Dpf_10, "filename", "dpf_filename", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Docking_Parameter_File_Browser_9 and Prepare_AD3Dpf_10 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Docking_Parameter_File_Browser_9 and Prepare_AD3Dpf_10 in network self.macroNetwork")
         if Read_Molecule_11 is not None and Prepare_AD3Dpf_10 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Read_Molecule_11, Prepare_AD3Dpf_10, "MolSets", "ligand_filename", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Read_Molecule_11 and Prepare_AD3Dpf_10 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Read_Molecule_11 and Prepare_AD3Dpf_10 in network self.macroNetwork")
         if Read_Molecule_12 is not None and Prepare_AD3Dpf_10 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Read_Molecule_12, Prepare_AD3Dpf_10, "MolSets", "receptor_filename", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Read_Molecule_12 and Prepare_AD3Dpf_10 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Read_Molecule_12 and Prepare_AD3Dpf_10 in network self.macroNetwork")
         if File_Browser_13 is not None and Prepare_AD3Dpf_10 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     File_Browser_13, Prepare_AD3Dpf_10, "filename", "outputfilename", blocking=True)
             except:
-                print "WARNING: failed to restore connection between File_Browser_13 and Prepare_AD3Dpf_10 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between File_Browser_13 and Prepare_AD3Dpf_10 in network self.macroNetwork")
         output_Ports_8 = self.macroNetwork.opNode
         if Prepare_AD3Dpf_10 is not None and output_Ports_8 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     Prepare_AD3Dpf_10, output_Ports_8, "ad3_parameter_file", "new", blocking=True)
             except:
-                print "WARNING: failed to restore connection between Prepare_AD3Dpf_10 and output_Ports_8 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between Prepare_AD3Dpf_10 and output_Ports_8 in network self.macroNetwork")
         self.macroNetwork.unfreeze()
 
         AD3Dpf_6.shrink()

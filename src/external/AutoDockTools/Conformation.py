@@ -13,8 +13,8 @@ import numpy
 from mglutil.math.rmsd import RMSDCalculator
 from mglutil.math.statetocoords import StateToCoords
 from mglutil.math.transformation import Transformation
-from AutoDockTools.cluster import Clusterer
-from AutoDockTools.ResultParser import ResultParser
+from cluster import Clusterer
+from ResultParser import ResultParser
 
 
 
@@ -408,7 +408,7 @@ def build_angle_dict(mol):
                     kk = (a1.number, a2.number, a3.number)
                     if a1.number>a3.number:
                         kk = (a3.number, a2.number, a1.number)
-                    if kk not in angles.keys():
+                    if kk not in list(angles.keys()):
                         new_a = getAngle(a1,a2,a3)
                         angles[kk] = new_a
     return angles
@@ -441,27 +441,27 @@ class ConformationHandler:
         test_dict = build_dict(self.mol)
         #test_dict['angles'] = dict
         #test_dict['bonds'] = dict
-        for entry in test_dict.keys():
+        for entry in list(test_dict.keys()):
             tD = test_dict[entry]
             rD = self.ref_dict[entry]
-            for k,v in tD.items():
+            for k,v in list(tD.items()):
                 refv = rD[k]
                 mag_diff = abs(refv-v)
                 if entry=='bonds':
                     if mag_diff>cutoff:
                         found_different_bond_length = True
-                        if verbose: print confInd, ": Distance %d%s-%d%s differs: % 6.4f %6.4f \n" \
-                            %(k[0]-1,self.mol.allAtoms[k[0]-1].name,k[1]-1, self.mol.allAtoms[k[1]-1].name, refv,v)
+                        if verbose: print(confInd, ": Distance %d%s-%d%s differs: % 6.4f %6.4f \n" \
+                            %(k[0]-1,self.mol.allAtoms[k[0]-1].name,k[1]-1, self.mol.allAtoms[k[1]-1].name, refv,v))
                 else:
                     if mag_diff>angle_cutoff:
                         found_different_angle = True
-                        if verbose: print confInd, ": Angle %d%s-%d%s-%d%s differs: % 6.4f %6.4f \n" \
-                            %(k[0]-1,self.mol.allAtoms[k[0]-1].name,k[1]-1, self.mol.allAtoms[k[1]-1].name,k[2]-1, self.mol.allAtoms[k[2]-1].name, refv,v)
+                        if verbose: print(confInd, ": Angle %d%s-%d%s-%d%s differs: % 6.4f %6.4f \n" \
+                            %(k[0]-1,self.mol.allAtoms[k[0]-1].name,k[1]-1, self.mol.allAtoms[k[1]-1].name,k[2]-1, self.mol.allAtoms[k[2]-1].name, refv,v))
         valid = (not found_different_bond_length) and (not found_different_angle)
         if not found_different_bond_length and verbose:
-            print confInd, ": no bonds found differing in length more than ", cutoff
+            print(confInd, ": no bonds found differing in length more than ", cutoff)
         if not found_different_angle and verbose:
-            print confInd, ": no angles found differing more than ", angle_cutoff
+            print(confInd, ": no angles found differing more than ", angle_cutoff)
         return valid
             
 
@@ -537,9 +537,9 @@ class ConformationHandler:
             self.original_conformations = self.conformations
 
         if validate:
-            if verbose: print "pre_validate:len(confs)=", len(self.conformations)
+            if verbose: print("pre_validate:len(confs)=", len(self.conformations))
             self.conformations, self.badconformations = self.validate(self.conformations, verbose=verbose)
-            if verbose: print "post_validate:len(confs)=", len(self.conformations)
+            if verbose: print("post_validate:len(confs)=", len(self.conformations))
 
 
     def set(self, index):

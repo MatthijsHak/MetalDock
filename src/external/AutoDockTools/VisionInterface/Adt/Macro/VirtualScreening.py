@@ -41,7 +41,7 @@ class VirtualScreening(MacroNode):
 
     def __init__(self, constrkw={}, name='VirtualScreening', **kw):
         kw['name'] = name
-        apply( MacroNode.__init__, (self,), kw)
+        MacroNode.__init__(*(self,), **kw)
 
     def beforeAddingToNetwork(self, net):
         MacroNode.beforeAddingToNetwork(self, net)
@@ -85,19 +85,19 @@ class VirtualScreening(MacroNode):
         try:
             ## saving node input Ports ##
             input_Ports_1 = self.macroNetwork.ipNode
-            apply(input_Ports_1.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            input_Ports_1.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroInputNode named input Ports in network self.macroNetwork")
             print_exc()
             input_Ports_1=None
 
         try:
             ## saving node output Ports ##
             output_Ports_2 = self.macroNetwork.opNode
-            apply(output_Ports_2.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            output_Ports_2.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             output_Ports_2.move(217, 346)
         except:
-            print "WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork"
+            print("WARNING: failed to restore MacroOutputNode named output Ports in network self.macroNetwork")
             print_exc()
             output_Ports_2=None
 
@@ -106,7 +106,7 @@ class VirtualScreening(MacroNode):
             from Adt.Macro.PrepareReceptor import PrepareReceptor
             PrepareReceptor_3 = PrepareReceptor(constrkw={}, name='PrepareReceptor', library=Adt)
             self.macroNetwork.addNode(PrepareReceptor_3,96,114)
-            apply(PrepareReceptor_3.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            PrepareReceptor_3.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             Pdb2pqrWS_6 = PrepareReceptor_3.macroNetwork.nodes[2]
             Pdb2pqrOpalService_ws_nbcr_net_10 = Pdb2pqrWS_6.macroNetwork.nodes[3]
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['noopt'].widget.set(0, run=False)
@@ -119,12 +119,12 @@ class VirtualScreening(MacroNode):
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['ligand'].widget.set(r"", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['hbond'].widget.set(0, run=False)
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['with_ph'].widget.set(r"", run=False)
-            apply(Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['forcefield'].widget.configure, (), {'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
+            Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['forcefield'].widget.configure(*(), **{'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['forcefield'].widget.set(r"AMBER", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['clean'].widget.set(0, run=False)
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['inId'].widget.set(r"", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['apbs_input'].widget.set(0, run=False)
-            apply(Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['ffout'].widget.configure, (), {'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
+            Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['ffout'].widget.configure(*(), **{'choices': ('AMBER', 'CHARMM', 'PARSE', 'TYL06')})
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['ffout'].widget.set(r"", run=False)
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['localRun'].widget.set(0, run=False)
             Pdb2pqrOpalService_ws_nbcr_net_10.inputPortByName['rama'].widget.set(0, run=False)
@@ -220,9 +220,9 @@ class VirtualScreening(MacroNode):
             PrepareReceptor_3.outputPorts[1].configure(datatype='string')
             ## configure MacroNode output ports
             PrepareReceptor_3.shrink()
-            apply(PrepareReceptor_3.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            PrepareReceptor_3.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore PrepareReceptor named PrepareReceptor in network self.macroNetwork"
+            print("WARNING: failed to restore PrepareReceptor named PrepareReceptor in network self.macroNetwork")
             print_exc()
             PrepareReceptor_3=None
 
@@ -231,13 +231,13 @@ class VirtualScreening(MacroNode):
             from Adt.Macro.ComputeGrids import ComputeGrids
             ComputeGrids_21 = ComputeGrids(constrkw={}, name='ComputeGrids', library=Adt)
             self.macroNetwork.addNode(ComputeGrids_21,187,205)
-            apply(ComputeGrids_21.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            ComputeGrids_21.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             prepareGPF_kryptonite_nbcr_net_25 = ComputeGrids_21.macroNetwork.nodes[3]
             prepareGPF_kryptonite_nbcr_net_25.inputPortByName['singlelib'].widget.set(r"", run=False)
             prepareGPF_kryptonite_nbcr_net_25.inputPortByName['r_url'].widget.set(r"", run=False)
             prepareGPF_kryptonite_nbcr_net_25.inputPortByName['zpoints'].widget.set(r"", run=False)
             prepareGPF_kryptonite_nbcr_net_25.inputPortByName['filter_file_url'].widget.set(r"", run=False)
-            apply(prepareGPF_kryptonite_nbcr_net_25.inputPortByName['lib'].widget.configure, (), {'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'oldNCI', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
+            prepareGPF_kryptonite_nbcr_net_25.inputPortByName['lib'].widget.configure(*(), **{'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'oldNCI', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
             prepareGPF_kryptonite_nbcr_net_25.inputPortByName['lib'].widget.set(r"", run=False)
             prepareGPF_kryptonite_nbcr_net_25.inputPortByName['ypoints'].widget.set(r"", run=False)
             prepareGPF_kryptonite_nbcr_net_25.inputPortByName['xcenter'].widget.set(r"auto", run=False)
@@ -289,9 +289,9 @@ class VirtualScreening(MacroNode):
             ComputeGrids_21.outputPorts[1].configure(datatype='string')
             ## configure MacroNode output ports
             ComputeGrids_21.shrink()
-            apply(ComputeGrids_21.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            ComputeGrids_21.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore ComputeGrids named ComputeGrids in network self.macroNetwork"
+            print("WARNING: failed to restore ComputeGrids named ComputeGrids in network self.macroNetwork")
             print_exc()
             ComputeGrids_21=None
 
@@ -300,14 +300,14 @@ class VirtualScreening(MacroNode):
             from Adt.Macro.AutodockVS import AutodockVS
             AutodockVS_30 = AutodockVS(constrkw={}, name='AutodockVS', library=Adt)
             self.macroNetwork.addNode(AutodockVS_30,234,289)
-            apply(AutodockVS_30.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            AutodockVS_30.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
             autodock_kryptonite_nbcr_net_34 = AutodockVS_30.macroNetwork.nodes[3]
             autodock_kryptonite_nbcr_net_34.inputPortByName['ga_run'].widget.set(r"", run=False)
-            apply(autodock_kryptonite_nbcr_net_34.inputPortByName['lib'].widget.configure, (), {'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
+            autodock_kryptonite_nbcr_net_34.inputPortByName['lib'].widget.configure(*(), **{'choices': ('sample', 'NCIDS_SC', 'NCI_DS1', 'NCI_DS2', 'human_metabolome', 'chembridge_building_blocks', 'drugbank_nutraceutics', 'drugbank_smallmol', 'fda_approved')})
             autodock_kryptonite_nbcr_net_34.inputPortByName['lib'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_34.inputPortByName['filter_file_url'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_34.inputPortByName['ga_num_evals'].widget.set(r"", run=False)
-            apply(autodock_kryptonite_nbcr_net_34.inputPortByName['sched'].widget.configure, (), {'choices': ('SGE', 'CSF')})
+            autodock_kryptonite_nbcr_net_34.inputPortByName['sched'].widget.configure(*(), **{'choices': ('SGE', 'CSF')})
             autodock_kryptonite_nbcr_net_34.inputPortByName['sched'].widget.set(r"SGE", run=False)
             autodock_kryptonite_nbcr_net_34.inputPortByName['ga_num_generations'].widget.set(r"", run=False)
             autodock_kryptonite_nbcr_net_34.inputPortByName['userlib'].widget.set(r"", run=False)
@@ -341,9 +341,9 @@ class VirtualScreening(MacroNode):
             AutodockVS_30.outputPorts[0].configure(datatype='string')
             ## configure MacroNode output ports
             AutodockVS_30.shrink()
-            apply(AutodockVS_30.configure, (), {'paramPanelImmediate': 1, 'expanded': False})
+            AutodockVS_30.configure(*(), **{'paramPanelImmediate': 1, 'expanded': False})
         except:
-            print "WARNING: failed to restore AutodockVS named AutodockVS in network self.macroNetwork"
+            print("WARNING: failed to restore AutodockVS named AutodockVS in network self.macroNetwork")
             print_exc()
             AutodockVS_30=None
 
@@ -358,49 +358,49 @@ class VirtualScreening(MacroNode):
                     input_Ports_1, PrepareReceptor_3, "new", "Pdb2pqrWS_CheckFileFormat_value", blocking=True
                     , splitratio=[0.73953989601548642, 0.35343455296743803])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and PrepareReceptor_3 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and PrepareReceptor_3 in network self.macroNetwork")
         if input_Ports_1 is not None and ComputeGrids_21 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_1, ComputeGrids_21, "new", "GetComputeGridsInputs_ligands", blocking=True
                     , splitratio=[0.46529144721861959, 0.40210922169933605])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and ComputeGrids_21 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and ComputeGrids_21 in network self.macroNetwork")
         if input_Ports_1 is not None and AutodockVS_30 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_1, AutodockVS_30, "ComputeGrids_GetComputeGridsInputs_ligands", "PrepareADVSInputs_ligands", blocking=True
                     , splitratio=[0.48337865988456058, 0.41105508936996049])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and AutodockVS_30 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and AutodockVS_30 in network self.macroNetwork")
         if PrepareReceptor_3 is not None and ComputeGrids_21 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     PrepareReceptor_3, ComputeGrids_21, "PrepareReceptorWS_UpdateReceptor_receptor_prepared_obj", "GetComputeGridsInputs_receptor_pdbqt", blocking=True
                     , splitratio=[0.32656364590133868, 0.43316260938324158])
             except:
-                print "WARNING: failed to restore connection between PrepareReceptor_3 and ComputeGrids_21 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between PrepareReceptor_3 and ComputeGrids_21 in network self.macroNetwork")
         if ComputeGrids_21 is not None and AutodockVS_30 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     ComputeGrids_21, AutodockVS_30, "MakeAutogridResultObj_autogrid_result_obj", "PrepareADVSInputs_autogrid_results", blocking=True
                     , splitratio=[0.25195726140883218, 0.37435524480319915])
             except:
-                print "WARNING: failed to restore connection between ComputeGrids_21 and AutodockVS_30 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between ComputeGrids_21 and AutodockVS_30 in network self.macroNetwork")
         if input_Ports_1 is not None and ComputeGrids_21 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_1, ComputeGrids_21, "new", "GetComputeGridsInputs_gpf_obj", blocking=True
                     , splitratio=[0.3610566319618409, 0.20507643166097597])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and ComputeGrids_21 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and ComputeGrids_21 in network self.macroNetwork")
         if input_Ports_1 is not None and AutodockVS_30 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_1, AutodockVS_30, "new", "PrepareADVSInputs_dpf_template_obj", blocking=True
                     , splitratio=[0.41221000935616448, 0.71284031297323347])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and AutodockVS_30 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and AutodockVS_30 in network self.macroNetwork")
         output_Ports_2 = self.macroNetwork.opNode
         if AutodockVS_30 is not None and output_Ports_2 is not None:
             try:
@@ -408,14 +408,14 @@ class VirtualScreening(MacroNode):
                     AutodockVS_30, output_Ports_2, "GetMainURLFromList_newurl", "new", blocking=True
                     , splitratio=[0.28632220295352073, 0.59933112675886213])
             except:
-                print "WARNING: failed to restore connection between AutodockVS_30 and output_Ports_2 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between AutodockVS_30 and output_Ports_2 in network self.macroNetwork")
         if input_Ports_1 is not None and PrepareReceptor_3 is not None:
             try:
                 self.macroNetwork.connectNodes(
                     input_Ports_1, PrepareReceptor_3, "new", "PrepareReceptorWS_PrepareReceptorOpalService_ws_nbcr_net_C", blocking=True
                     , splitratio=[0.66210822612399844, 0.69280049494960727])
             except:
-                print "WARNING: failed to restore connection between input_Ports_1 and PrepareReceptor_3 in network self.macroNetwork"
+                print("WARNING: failed to restore connection between input_Ports_1 and PrepareReceptor_3 in network self.macroNetwork")
         self.macroNetwork.runOnNewData.value = False
 
         ## modifying MacroInputNode dynamic ports

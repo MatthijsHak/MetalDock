@@ -288,7 +288,7 @@ try:
     {'name':'AD41analyze_addExtraGridIsocontour','cmd':ADGetAGrid(),'gui':ADGetAGridGUI}, {'name':'AD41analyze_showGridIsocontours','cmd':ADMakeAllGrids(),'gui':ADMakeAllGridsGUI}]:
         commandList.insert(7,i)
 except:
-    print 'skipping the isocontour-dependent commands'
+    print('skipping the isocontour-dependent commands')
 
 
 def initModule(vf):
@@ -310,12 +310,12 @@ def initModule(vf):
         vf.ADanalyze_makeSubsetClustering = vf.AD41analyze_makeSubsetClustering
 
 
-    if hasattr(vf, 'GUI') and 'AutoTools41Bar' in vf.GUI.menuBars.keys():
-        for item in vf.GUI.menuBars['AutoTools41Bar'].menubuttons.values():
+    if hasattr(vf, 'GUI') and 'AutoTools41Bar' in list(vf.GUI.menuBars.keys()):
+        for item in list(vf.GUI.menuBars['AutoTools41Bar'].menubuttons.values()):
             item.configure(background = 'tan')
         if not hasattr(vf.GUI, 'adtBar'):
             vf.GUI.adtBar = vf.GUI.menuBars['AutoTools41Bar']
-            vf.GUI.adtFrame = vf.GUI.adtBar.menubuttons.values()[0].master
+            vf.GUI.adtFrame = list(vf.GUI.adtBar.menubuttons.values())[0].master
             
 
 

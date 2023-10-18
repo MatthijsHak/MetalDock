@@ -19,7 +19,7 @@ from mglutil.util.packageFilePath import getResourceFolderWithVersion
 
 import os
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 class PublicServerLigandDB(NetworkNode):
     """
@@ -32,13 +32,13 @@ class PublicServerLigandDB(NetworkNode):
     """
     
     def __init__(self, name='PublicServerLigandDB', **kw):
-        import urllib
+        import urllib.request, urllib.parse, urllib.error
 
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
 
         kw['name'] = name
-        apply( NetworkNode.__init__, (self,), kw )
+        NetworkNode.__init__(*(self,), **kw)
         ip = self.inputPortsDescr
         ip.append(datatype='string', name='server_lib', required=True, )
 
@@ -60,13 +60,13 @@ class PublicServerLigandDB(NetworkNode):
         try:
             if not(os.path.exists(lock)):
                 open(lock, 'w').close()
-                publibweb = urllib2.urlopen(url)
+                publibweb = urllib.request.urlopen(url)
                 outfile = open(publiblocal, 'w')
                 outfile.write(publibweb.read())
                 outfile.close()
                 os.remove(lock)
         except:
-            print "[INFO]: Getting list of public server libs from cache"
+            print("[INFO]: Getting list of public server libs from cache")
             pass
             
 
@@ -76,7 +76,7 @@ class PublicServerLigandDB(NetworkNode):
             f.close()
         except:
             self.choices = []
-            print "[ERROR]: Unable to public server libs from the web and from cache"
+            print("[ERROR]: Unable to public server libs from the web and from cache")
 
         self.widgetDescr['server_lib'] = {
             'class':'NEComboBox', 'master':'node',

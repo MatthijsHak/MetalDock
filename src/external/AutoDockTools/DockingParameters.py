@@ -15,17 +15,17 @@
 #
 
 from energyConstants import Rij, epsij
-import UserDict
 import string
 import os.path
 import sys
 import types
 from MolKit import Read
-from AutoDockTools.atomTypeTools import AutoDock4_AtomTyper
+from collections import UserDict
+from atomTypeTools import AutoDock4_AtomTyper
 
-class DockingParameters(UserDict.UserDict):
+class DockingParameters(UserDict):
     def __init__(self, receptor_filename='', ligand_filename='', flexres_filename=''):
-        UserDict.UserDict.__init__(self)
+        UserDict.__init__(self)
 
         # if the docking parameters have been read from or written
         # to a file otherthan stdout,
@@ -33,6 +33,7 @@ class DockingParameters(UserDict.UserDict):
         self.dpf_filename = ''
         self.dpf_written_filename = ''
         self.file_params = []
+        print(ligand_filename)
 
         # begin dictionary
         self[ 'about' ] = {
@@ -914,7 +915,7 @@ class DockingParameters(UserDict.UserDict):
         if float(version) in [3.05, 4.0, 4.1, 4.2]:
             self['autodock_parameter_version']['value'] = float(version)
         else:
-            print version, " is not valid. Valid autodock versions are 3.05, 4.1, 4.2]"
+            print(version, " is not valid. Valid autodock versions are 3.05, 4.1, 4.2]")
 
 
     def set_ligand(self, ligand_filename):
@@ -928,7 +929,7 @@ class DockingParameters(UserDict.UserDict):
         self.receptor_filename = os.path.basename(receptor_filename)
         #self.receptor_filename = receptor_filename
         basename = os.path.basename(receptor_filename)
-        self.receptor_stem = basename[:string.rfind(basename, '.')]
+        self.receptor_stem = basename[:basename.rfind('.')]
         if receptor_filename!='':
             self['fld']['value'] = self.receptor_stem + '.maps.fld'
 
@@ -936,12 +937,12 @@ class DockingParameters(UserDict.UserDict):
     def set_ligand_types_from_filename(self, ligand_filename):
         ligand = Read(ligand_filename)[0]
         if ligand is None:
-            print "unable to read ", ligand_filename
+            print("unable to read ", ligand_filename)
             return "ERROR"
         d = {}
         for a in ligand.allAtoms:
             d[a.autodock_element] = 1
-        keys = d.keys()
+        keys = list(d.keys())
         type_str = keys[0]
         for t in keys[1:]:
             type_str = type_str + ' ' + t + ' '
@@ -953,12 +954,12 @@ class DockingParameters(UserDict.UserDict):
     def set_ligand_types_from_filename_v3(self, ligand_filename):
         ligand = Read(ligand_filename)
         if ligand is None:
-            print "unable to read ", ligand_filename
+            print("unable to read ", ligand_filename)
             return "ERROR"
         d = {}
         for a in ligand.allAtoms:
             d[a.autodock_element] = 1
-        keys = d.keys()
+        keys = list(d.keys())
         keys.sort()
         type_str = keys[0]
         for t in keys[1:]:
@@ -982,8 +983,8 @@ class DockingParameters(UserDict.UserDict):
             elif t in ['Fe','FE','fe']:  #AD3 special case: iron
                 d['f'] = 1
             else:
-                print "unrecognized ligand_atom_type:", t
-        all_types = d.keys()
+                print("unrecognized ligand_atom_type:", t)
+        all_types = list(d.keys())
         all_types.sort()
         type_str = all_types[0]
         for t in all_types[1:]:
@@ -1009,17 +1010,17 @@ class DockingParameters(UserDict.UserDict):
         """set the current state according to lines.
         """
         self.file_params = []
-        keys = self.keys()
+        keys = list(self.keys())
         found_compute_unbound_extended = False
         found_include_1_4_interactions = False
         found_reorient = False
         for line in lines:
             p = ''
-            words = string.split(string.replace(line, '\t', ' '))
+            words = line.replace('\t', ' ').split()
             if words!=[] and words[0][0]!='#':
                 p = words[0]
                 if p not in keys:
-                    print "WARNING: unrecognized parameter:\n", p
+                    print("WARNING: unrecognized parameter:\n", p)
                     continue
                 # maintain a list of the parameters read from the file
                 if self.file_params==[] or p!=self.file_params[-1]:
@@ -1049,9 +1050,9 @@ class DockingParameters(UserDict.UserDict):
                 elif p in self.boolean_param_list:
                     self[p]['value'] = 1
                 elif p=='ligand_types':
-                    self['ligand_types']['value'] = string.join(words[1:l])
+                    self['ligand_types']['value'] = ' '.join(words[1:l])
                 elif p=='types':
-                    self['types']['value'] = string.join(words[1:l])
+                    self['types']['value'] = ''.join(words[1:l])
                     self['autodock_parameter_version']['value'] = 3.05
                 elif p=='rmsref':
                     self['rmsref']['value'] = self._get_val(values[0])
@@ -1075,7 +1076,7 @@ class DockingParameters(UserDict.UserDict):
                     self['unbound']['value'] = self._get_val(values[0])
                 elif p=='unbound_intnbp_coeffs':
                     self['unbound_intnbp_coeffs_flag']['value'] = True
-                    self['unbound_intnbp_coeffs']['value'] = string.join(words[1:l])
+                    self['unbound_intnbp_coeffs']['value'] = ''.join(words[1:l])
                 elif p=='rmsatoms' and values[0]=='all':
                     self['rmsatoms_flag']['value'] = True
                     self['rmsatoms']['value'] = values[0]  # this should be 'ligand_only' or'all'
@@ -1086,9 +1087,9 @@ class DockingParameters(UserDict.UserDict):
                     self['custom_parameter_file']['value'] = 1
                     self['parameter_file']['value'] = values[0]
                 elif ((len(values)==1) and
-                      (type(self[p]['default'])!=types.ListType)):
+                      (type(self[p]['default'])!=list)):
                     self[p]['value'] = self._get_val(values[0])
-                elif self.has_key(p):
+                elif p in self:
                     self[p]['value'] = []
                     for v in values:
                         self[p]['value'].append( self._get_val(v))
@@ -1096,10 +1097,10 @@ class DockingParameters(UserDict.UserDict):
                         self['quaternion0']['value'] = self[p]['value']
                         #self['axisangle0']['value'] = self[p]['value']
                 else:
-                    print 'WARNING: unknown keyword=', p
+                    print('WARNING: unknown keyword=', p)
             if p=='fld':
                 # so words[1] ends .maps.fld
-                ind = string.index(words[1], 'maps') - 1
+                ind = words[1].index('maps') - 1
                 self.receptor_stem = words[1][:ind]
             elif p=='map':
                 #problem in this case is that elements may be 1 or 2 char
@@ -1126,10 +1127,11 @@ class DockingParameters(UserDict.UserDict):
             return float(val_str)
         except ValueError:
             pass
-        if type(val_str)==types.StringType:
+        if type(val_str)==bytes:
             return val_str
         else:
-            raise NotImplementedError, "value: %s of unsupport type %s" % (val_str, type(val_str).__name__)
+            pass
+            # raise NotImplementedError("value: %s of unsupport type %s" % (val_str, type(val_str).__name__))
 
     #
     # write methods
@@ -1222,18 +1224,18 @@ class DockingParameters(UserDict.UserDict):
                 return "#\n"
             else:
                 val_str = ""
-        elif ((vt==types.IntType) or
-              (vt==types.LongType) or
-              (vt==types.FloatType) or
-              (vt==types.StringType)):
+        elif ((vt==int) or
+              (vt==int) or
+              (vt==float) or
+              (vt==bytes)):
             val_str = str(p['value'])
-        elif ((vt==types.ListType) or
-              (vt==types.TupleType)):
+        elif ((vt==list) or
+              (vt==tuple)):
             val_str = ""
             for v in p['value']:
                 val_str = val_str + str(v) + " "
         else:
-            raise NotImplementedError, "type (%s) of parameter %s unsupported" % (vt.__name__, param)
+            raise NotImplementedError("type (%s) of parameter %s unsupported" % (vt.__name__, param))
         return self._make_string(p, val_str)
 
 
@@ -2820,26 +2822,26 @@ class DockingParameterFileMaker:
     def set_ligand(self, ligand_filename): 
         verbose = self.verbose
         self.ligand_filename = os.path.basename(ligand_filename)
-        if verbose: print "set ligand_filename to", self.ligand_filename
+        if verbose: print("set ligand_filename to", self.ligand_filename)
         self.dpo.set_ligand(ligand_filename)
         #expect a filename like ind.out.pdbq: get 'ind' from it
         self.ligand_stem = string.split(self.ligand_filename,'.')[0]
-        if verbose: print "set ligand_stem to", self.ligand_stem
+        if verbose: print("set ligand_stem to", self.ligand_stem)
         self.ligand = Read(ligand_filename)[0]
-        if verbose: print "read ", self.ligand.name
+        if verbose: print("read ", self.ligand.name)
         #set dpo:
         #move
         self.dpo['move']['value'] = self.ligand_filename
-        if verbose: print "set move to ", self.dpo['move']['value']
+        if verbose: print("set move to ", self.dpo['move']['value'])
         #ndihe
         #assumes ligand has torTree
         self.dpo['ndihe']['value'] = self.ligand.parser.keys.count("BRANCH")
         #self.dpo['ndihe']['value'] = len(self.ligand.torTree.torsionMap)
-        if verbose: print "set ndihe to ", self.dpo['ndihe']['value']
+        if verbose: print("set ndihe to ", self.dpo['ndihe']['value'])
         #torsdof
         #caution dpo['torsdof']['value'] is a list [ndihe, 0.3113]
         self.dpo['torsdof']['value'][0] = self.ligand.TORSDOF
-        if verbose: print "set torsdof to ", self.dpo['torsdof']['value']
+        if verbose: print("set torsdof to ", self.dpo['torsdof']['value'])
         #types
         d = {}
         for a in self.ligand.allAtoms:
@@ -2847,18 +2849,18 @@ class DockingParameterFileMaker:
         sortKeyList =  ['C','A','N','O','S','H','P','n','f','F','c','b','I','M']
         lig_types = ""
         for t in sortKeyList:
-            if t in d.keys():
+            if t in list(d.keys()):
                 lig_types = lig_types + t
         self.ligand.types = lig_types
         self.dpo['types']['value'] = self.ligand.types
-        if verbose: print "set types to ", self.dpo['types']['value']
+        if verbose: print("set types to ", self.dpo['types']['value'])
         #about
         self.ligand.getCenter()
         cen = self.ligand.center
         self.dpo['about']['value'] =  [round(cen[0],3), round(cen[1],3),\
                                         round(cen[2],3)]
         #print "DP:line 2854: cen =", cen
-        if verbose: print "set about to ", self.dpo['about']['value']
+        if verbose: print("set about to ", self.dpo['about']['value'])
         
 
     def set_receptor(self, receptor_filename):
@@ -2875,8 +2877,8 @@ class DockingParameterFileMaker:
         # newdict = {'ga_num_evals':1750000, 'ga_pop_size':150,
         #            'ga_run':20, 'rmstol':2.0}
         # self.mv.dpo['<parameter>']['value'] = <new value>
-        for parm, newvalue in kw.items():
-            if self.verbose: print 'set dpo for ', parm, ' to ', newvalue, ' check=', self.dpo[parm]['value']
+        for parm, newvalue in list(kw.items()):
+            if self.verbose: print('set dpo for ', parm, ' to ', newvalue, ' check=', self.dpo[parm]['value'])
             self.dpo[parm]['value'] = newvalue
         #self.dpo['ga_num_evals']['value'] = 1750000
         #self.dpo['ga_run']['value'] = 20
@@ -2891,7 +2893,7 @@ class DockingParameterFileMaker:
                            (self.ligand_stem, "_",
                             self.receptor_stem, ".dpf")
         # now that we have a filename...
-        if self.verbose: print "writing ", dpf_filename
+        if self.verbose: print("writing ", dpf_filename)
         self.dpo.write(dpf_filename, parm_list)
 
 
@@ -2917,12 +2919,12 @@ class DockingParameter4FileMaker:
         dict = {}
         for a in molecule.allAtoms:
             dict[a.autodock_element] = 1
-        d_types = dict.keys()
+        d_types = list(dict.keys())
         d_types.sort()
         mol_types = d_types[0]
         for t in d_types[1:]:
             mol_types = mol_types + " " + t
-        if self.verbose: print "end of getTypes: types=", mol_types, ' class=', mol_types.__class__
+        if self.verbose: print("end of getTypes: types=", mol_types, ' class=', mol_types.__class__)
         return mol_types
 
 
@@ -2937,48 +2939,48 @@ class DockingParameter4FileMaker:
             value=0
         verbose = self.verbose
         self.dpo['write_all']['value'] = value
-        if verbose: print "set write_all to", self.dpo['write_all']['value']
+        if verbose: print("set write_all to", self.dpo['write_all']['value'])
 
 
     def set_ligand(self, ligand_filename): 
         verbose = self.verbose
         self.ligand_filename = os.path.basename(ligand_filename)
-        if verbose: print "set ligand_filename to", self.ligand_filename
+        if verbose: print("set ligand_filename to", self.ligand_filename)
         self.dpo.set_ligand(ligand_filename)
         #expect a filename like ind.out.pdbq: get 'ind' from it
         self.ligand_stem = string.split(self.ligand_filename,'.')[0]
-        if verbose: print "set ligand_stem to", self.ligand_stem
+        if verbose: print("set ligand_stem to", self.ligand_stem)
         self.ligand = Read(ligand_filename)[0]
         if self.ligand==None:
-            print 'ERROR reading: ', ligand_filename
+            print('ERROR reading: ', ligand_filename)
             return 
-        if verbose: print "read ", self.ligand.name
+        if verbose: print("read ", self.ligand.name)
         #set dpo:
         #move
         self.dpo['move']['value'] = self.ligand_filename
-        if verbose: print "set move to ", self.dpo['move']['value']
+        if verbose: print("set move to ", self.dpo['move']['value'])
         #ndihe
         #assumes ligand has torTree
         self.dpo['ndihe']['value'] = self.ligand.parser.keys.count("BRANCH")
         #self.dpo['ndihe']['value'] = len(self.ligand.torTree.torsionMap)
-        if verbose: print "set ndihe to ", self.dpo['ndihe']['value']
+        if verbose: print("set ndihe to ", self.dpo['ndihe']['value'])
         #torsdof
         #caution dpo['torsdof4']['value'] is a list [ndihe, 0.274]
         try:
             self.dpo['torsdof4']['value'][0] = self.ligand.TORSDOF
         except:
-            print '!unable to use ligand.TORSDOF! torsdof always set to ligand.ndihe=', self.ligand.ndihe
+            print('!unable to use ligand.TORSDOF! torsdof always set to ligand.ndihe=', self.ligand.ndihe)
             self.dpo['torsdof4']['value'][0] = self.ligand.ndihe
-        if verbose: print "set torsdof4 to ", self.dpo['torsdof4']['value']
+        if verbose: print("set torsdof4 to ", self.dpo['torsdof4']['value'])
         #types
         self.ligand.types = self.getTypes(self.ligand)
         self.dpo['ligand_types']['value'] = self.ligand.types
-        if verbose: print "set types to ", self.dpo['ligand_types']['value']
+        if verbose: print("set types to ", self.dpo['ligand_types']['value'])
         #about
         cen = self.ligand.getCenter()
         self.dpo['about']['value'] =  [round(cen[0],3), round(cen[1],3),\
                                         round(cen[2],3)]
-        if verbose: print "set about to ", self.dpo['about']['value']
+        if verbose: print("set about to ", self.dpo['about']['value'])
         #print "DP:line 2976: cen =", cen
         
 
@@ -3000,8 +3002,8 @@ class DockingParameter4FileMaker:
             d[t] = 1
         for a in flexmol.allAtoms:
             d[a.autodock_element] = 1
-        self.dpo['ligand_types']['value'] = string.join(d.keys())
-            
+        self.dpo['ligand_types']['value'] = ' '.join(d.keys())
+
 
     def set_docking_parameters(self, **kw):
         """Any docking parameters should be set here
@@ -3010,7 +3012,7 @@ class DockingParameter4FileMaker:
         # newdict = {'ga_num_evals':1750000, 'ga_pop_size':150,
         #            'ga_run':20, 'rmstol':2.0}
         # self.mv.dpo['<parameter>']['value'] = <new value>
-        for parm, newvalue in kw.items():
+        for parm, newvalue in list(kw.items()):
             self.dpo[parm]['value'] = newvalue
             if parm=='set_sw1':
                 self.dpo['set_psw1']['value'] = not newvalue
@@ -3043,7 +3045,7 @@ class DockingParameter4FileMaker:
                 parm_list.remove('dihe0') 
         # now that we have a filename...
         if self.verbose:
-            print "writing ", dpf_filename
+            print("writing ", dpf_filename)
         self.dpo.write4(dpf_filename, parm_list)
 
 
@@ -3082,54 +3084,54 @@ class DockingParameter42FileMaker:
             value=0
         verbose = self.verbose
         self.dpo['write_all']['value'] = value
-        if verbose: print "set write_all to", self.dpo['write_all']['value']
+        if verbose: print("set write_all to", self.dpo['write_all']['value'])
 
 
     def set_ligand(self, ligand_filename): 
         verbose = self.verbose
         self.ligand_filename = os.path.basename(ligand_filename)
-        if verbose: print "set ligand_filename to", self.ligand_filename
+        if verbose: print("set ligand_filename to", self.ligand_filename)
         self.dpo.set_ligand(ligand_filename)
         #expect a filename like ind.out.pdbq: get 'ind' from it
-        self.ligand_stem = string.split(self.ligand_filename,'.')[0]
-        if verbose: print "set ligand_stem to", self.ligand_stem
+        self.ligand_stem = self.ligand_filename.split('.')[0]
+        if verbose: print("set ligand_stem to", self.ligand_stem)
         self.ligand = Read(ligand_filename)[0]
         self.dpo.ligand = self.ligand
         if self.ligand==None:
-            print 'ERROR reading: ', ligand_filename
+            print('ERROR reading: ', ligand_filename)
             return 
-        if verbose: print "read ", self.ligand.name
+        if verbose: print("read ", self.ligand.name)
         #set dpo:
         #move
         self.dpo['move']['value'] = self.ligand_filename
-        if verbose: print "set move to ", self.dpo['move']['value']
+        if verbose: print("set move to ", self.dpo['move']['value'])
         #ndihe
         #assumes ligand has torTree
         self.dpo['ndihe']['value'] = self.ligand.parser.keys.count("BRANCH")
         #self.dpo['ndihe']['value'] = len(self.ligand.torTree.torsionMap)
-        if verbose: print "set ndihe to ", self.dpo['ndihe']['value']
+        if verbose: print("set ndihe to ", self.dpo['ndihe']['value'])
         #torsdof
         #caution dpo['torsdof4']['value'] is a list [ndihe, 0.274]
         try:
             self.dpo['torsdof4']['value'][0] = self.ligand.TORSDOF
         except:
-            print '!unable to use ligand.TORSDOF! set torsdof to ligand.ndihe=', self.ligand.ndihe
+            print('!unable to use ligand.TORSDOF! set torsdof to ligand.ndihe=', self.ligand.ndihe)
             self.dpo['torsdof4']['value'][0] = self.ligand.ndihe
-        if verbose: print "set torsdof4 to ", self.dpo['torsdof4']['value']
+        if verbose: print("set torsdof4 to ", self.dpo['torsdof4']['value'])
         #types
         self.ligand.types = self.getTypes(self.ligand)
         self.dpo['ligand_types']['value'] = self.ligand.types
-        if verbose: print "set ligand types to ", self.dpo['ligand_types']['value']
+        if verbose: print("set ligand types to ", self.dpo['ligand_types']['value'])
         #about
         cen = self.ligand.getCenter()
         self.dpo['about']['value'] =  [round(cen[0],3), round(cen[1],3),\
                                         round(cen[2],3)]
-        if verbose: print "set about to ", self.dpo['about']['value']
+        if verbose: print("set about to ", self.dpo['about']['value'])
         #print "DP:line 3122: cen =", cen
 
     def set_receptor(self, receptor_filename):
         self.receptor_filename = os.path.basename(receptor_filename)
-        self.receptor_stem = string.split(self.receptor_filename, '.')[0]
+        self.receptor_stem = self.receptor_filename.split('.')[0]
         self.dpo.set_receptor(receptor_filename)
 
 
@@ -3145,7 +3147,7 @@ class DockingParameter42FileMaker:
             d[t] = 1
         for a in flexmol.allAtoms:
             d[a.autodock_element] = 1
-        self.dpo['ligand_types']['value'] = string.join(d.keys())
+        self.dpo['ligand_types']['value'] = ' '.join(d.keys())
             
 
     def set_docking_parameters(self, **kw):
@@ -3155,7 +3157,7 @@ class DockingParameter42FileMaker:
         # newdict = {'ga_num_evals':1750000, 'ga_pop_size':150,
         #            'ga_run':20, 'rmstol':2.0}
         # self.mv.dpo['<parameter>']['value'] = <new value>
-        for parm, newvalue in kw.items():
+        for parm, newvalue in list(kw.items()):
             self.dpo[parm]['value'] = newvalue
             if parm=='set_sw1':
                 self.dpo['set_psw1']['value'] = not newvalue
@@ -3187,7 +3189,7 @@ class DockingParameter42FileMaker:
                 parm_list.remove('dihe0')
         # now that we have a filename...
         if self.verbose:
-            print "writing ", dpf_filename
+            print("writing ", dpf_filename)
         self.dpo.write42(dpf_filename, parm_list)
 
         # now that we have a filename...
@@ -3200,10 +3202,10 @@ class ConfigFileMaker():
         self.ligand = ligand
         #validate filenames:
         if not len(self.receptor):
-            print "No input receptor specified!"
+            print("No input receptor specified!")
             raise IOError
         if not len(self.ligand):
-            print "No input ligand specified!"
+            print("No input ligand specified!")
             raise IOError
         self.flexres = kw.get("flexres", "")
         self.center_x = kw.get("center_x", 0.0)
@@ -3234,17 +3236,17 @@ class ConfigFileMaker():
         #validate input:
         if not self.score_only:
             if self.size_x <=0:
-                print "Invalid size_x specified: must be >0"
+                print("Invalid size_x specified: must be >0")
             if self.size_y <=0:
-                print "Invalid size_y specified: must be >0"
+                print("Invalid size_y specified: must be >0")
             if self.size_z <=0:
-                print "Invalid size_z specified: must be >0"
+                print("Invalid size_z specified: must be >0")
         if self.center_x==0 and self.verbose:
-            print "@@ setting center_x to 0.0"
+            print("@@ setting center_x to 0.0")
         if self.center_y==0 and self.verbose:
-            print "@@ setting center_y to 0.0"
+            print("@@ setting center_y to 0.0")
         if self.center_z==0 and self.verbose:
-            print "@@setting center_z to 0.0"
+            print("@@setting center_z to 0.0")
 
 
 #############################################################################
@@ -3312,7 +3314,7 @@ class ConfigFileMaker():
     def set_energy_range(self, energy_range=3):
         #?validate? must to be  positive??
         if energy_range<0:
-            print "energy_range less than zero! resetting to default 3"
+            print("energy_range less than zero! resetting to default 3")
             energy_range = 3
         self.energy_range = energy_range
 
@@ -3387,13 +3389,13 @@ class ConfigFileMaker():
             searchspace_vars=[self.center_x,self.center_y,self.center_z, self.size_x, self.size_y, self.size_z]
             #VALIDATE SIZE
             if self.size_x==0:
-                print "invalid x-dim search space size: ", self.size_x
+                print("invalid x-dim search space size: ", self.size_x)
                 raise ValueError
             if self.size_y==0:
-                print "invalid y-dim search space size: ", self.size_y
+                print("invalid y-dim search space size: ", self.size_y)
                 raise ValueError
             if self.size_z==0:
-                print "invalid z-dim search space size: ", self.size_z
+                print("invalid z-dim search space size: ", self.size_z)
                 raise ValueError
             # searchspace required:
             for p,v in zip(searchspace_parms, searchspace_vars):
@@ -3428,7 +3430,7 @@ class ConfigFileMaker():
                     stem, ext = os.path.basename(self.ligand).split('.')
                     new_filename = stem + '_out.' + ext
                     if self.verbose:
-                        print "@@ randomize_only is set to True@@ running vina using this config file ", filename, " will write new coordinates for ", self.ligand, "in ", new_filename, "@@"
+                        print("@@ randomize_only is set to True@@ running vina using this config file ", filename, " will write new coordinates for ", self.ligand, "in ", new_filename, "@@")
                 ostr = "randomize_only = True\n"
                 fptr.write(ostr)
             #self.weight_gauss1 = kw.get("weight_gauss1", -0.035579)
@@ -3473,7 +3475,7 @@ class ConfigFileMaker():
             if self.energy_range != 3:
                 ostr = "energy_range = %s\n"%(self.energy_range)
                 fptr.write(ostr)
-            print "closing new config file: "+ filename
+            print("closing new config file: "+ filename)
             fptr.close()
 #------------------------------------------------------------------
 # END ConfigFileMaker
@@ -3486,8 +3488,8 @@ if __name__=='__main__':
         dpo = DockingParameters()
         try:
             dpo.read(sys.argv[1])
-        except IOError, msg:
-            print "IOError: %s" % (msg)
+        except IOError as msg:
+            print("IOError: %s" % (msg))
             exit(-1)
 
         tmp_filename = '/tmp/%d.dpf' % (os.getpid())
@@ -3500,40 +3502,40 @@ if __name__=='__main__':
         if dpo.file_params!=new_dpo.file_params:
             for p in dpo.file_params:
                 if not p in new_dpo.file_params:
-                    print "%s missing from written dpf!" % p['keyword']
+                    print("%s missing from written dpf!" % p['keyword'])
             for p in new_dpo.file_params:
                 if not p in dpo.file_params:
-                    print "Unexpected %s in written dpf!" % p['keyword']
+                    print("Unexpected %s in written dpf!" % p['keyword'])
         for p in new_dpo.file_params:
             if not dpo[p]['value']==new_dpo[p]['value']:
-                print "Parameter Discrepancy: %s" % (p)
-                print "    I wrote this: %s" % (dpo[p]['value'])
-                print "But, I read this: %s" % (new_dpo[p]['value'])
+                print("Parameter Discrepancy: %s" % (p))
+                print("    I wrote this: %s" % (dpo[p]['value']))
+                print("But, I read this: %s" % (new_dpo[p]['value']))
     else:
         dpo = DockingParameters('receptor.test.pdbqs', 'ligand.pdbq')
 
         # compare docking_parameter_list with keys of DockingParameter
         # dictionary and report discrepancies
 
-        if docking_parameter_list!=dpo.keys():
-            print "Comparing docking paramter dictionary and list..."
-            for p in dpo.keys():
+        if docking_parameter_list!=list(dpo.keys()):
+            print("Comparing docking paramter dictionary and list...")
+            for p in list(dpo.keys()):
                 if not p in docking_parameter_list:
-                    print ">> %s in dictionary but not docking_parameter_list" % (p)
+                    print(">> %s in dictionary but not docking_parameter_list" % (p))
             for p in docking_parameter_list:
-                if not p in dpo.keys():
-                    print ">> %s in docking_parameter_list but not dictionary" % (p)
-            print "done with comparison."
+                if not p in list(dpo.keys()):
+                    print(">> %s in docking_parameter_list but not dictionary" % (p))
+            print("done with comparison.")
 
         # This should also run through all the parameters, write default
         # values to a file and then read the file compare with the defaults
-        print "Here are the parameters implemented so far (write):"
+        print("Here are the parameters implemented so far (write):")
         dpo.write('', implemented)
-        print
-        print "Here are the parameters not implemented yet (write):"
+        print()
+        print("Here are the parameters not implemented yet (write):")
         for p in docking_parameter_list:
             if not p in implemented:
-                print p
+                print(p)
 
         tmp_filename = '/tmp/%d.dpf' % (os.getpid())
         dpo.write( tmp_filename, implemented)
@@ -3544,10 +3546,10 @@ if __name__=='__main__':
         # write the new dpo to /dev/null to update the value fields
         for p in implemented:
             if not dpo[p]['value']==new_dpo[p]['value']:
-                print "%s: %s(%s) -> %s(%s)" % (dpo[p]['keyword'],
+                print("%s: %s(%s) -> %s(%s)" % (dpo[p]['keyword'],
                                                 dpo[p]['value'],
                                                 type(dpo[p]['value']).__name__,
                                                 new_dpo[p]['value'],
-                                                type(new_dpo[p]['value']).__name__)
+                                                type(new_dpo[p]['value']).__name__))
 
 
