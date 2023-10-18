@@ -13,16 +13,18 @@ def adf_engine(xyz_file, var, output_dir):
         shutil.copyfile(xyz_file, os.getcwd()+f'/{var.name_ligand}_c.xyz')
 
         # If Geometry Converged Skip otherwise Run Again#
-        if os.path.isdir(f'{output_dir}/QM/geom_opt/plams_workdir/plamsjob') == False:
+        if os.path.isdir(os.path.join(output_dir,'QM','geom_opt','plams_workdir','plamsjob')) == False:
             adf_geom_opt(xyz_file, var)
-            os.chdir(f'{output_dir}/QM/geom_opt/plams_workdir/plamsjob')
+            os.chdir(os.path.join(output_dir,'QM','geom_opt','plams_workdir','plamsjob'))
             adf_opt_converged('ams.log')
-            subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
+            amsreport_path = os.path.join(os.environ['AMSBIN'],'amsreport')
+            subprocess.call([amsreport_path+' adf.rkf CM5 > CM5_charges'], shell=True)
             energy = adf_extract_energy('ams.log')
         else:
-            os.chdir(f'{output_dir}/QM/geom_opt/plams_workdir/plamsjob')
+            os.chdir(os.path.join(output_dir,'QM','geom_opt','plams_workdir','plamsjob'))
             adf_opt_converged('ams.log')
-            subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
+            amsreport_path = os.path.join(os.environ['AMSBIN'],'amsreport')
+            subprocess.call([amsreport_path+' adf.rkf CM5 > CM5_charges'], shell=True)
             energy = adf_extract_energy('ams.log')
 
     else:
@@ -35,14 +37,16 @@ def adf_engine(xyz_file, var, output_dir):
 
 
         # If single point successful Skip otherwise Run Again#
-        if os.path.isdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob') == False:
+        if os.path.isdir(os.path.join(output_dir,'QM','single_point','plams_workdir','plamsjob')) == False:
             adf_sp(xyz_file, var)
-            os.chdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob')
-            subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
+            os.chdir(os.path.join(output_dir,'QM','single_point','plams_workdir','plamsjob'))
+            amsreport_path = os.path.join(os.environ['AMSBIN'],'amsreport')
+            subprocess.call([amsreport_path+' adf.rkf CM5 > CM5_charges'], shell=True)
             energy = adf_extract_energy('ams.log')
         else:
-            os.chdir(f'{output_dir}/QM/single_point/plams_workdir/plamsjob')
-            subprocess.call([os.environ['AMSBIN']+'/amsreport adf.rkf CM5 > CM5_charges'], shell=True)
+            os.chdir(os.path.join(output_dir,'QM','single_point','plams_workdir','plamsjob'))
+            amsreport_path = os.path.join(os.environ['AMSBIN'],'amsreport')
+            subprocess.call([amsreport_path+' adf.rkf CM5 > CM5_charges'], shell=True)
             energy = adf_extract_energy('ams.log')
 
     return os.getcwd(), energy

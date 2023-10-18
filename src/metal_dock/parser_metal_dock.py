@@ -181,7 +181,7 @@ class Parser:
 
   def atom_types_included(self):
     if self.parameter_file == 'metal_dock.dat':
-      param_file = os.environ['ROOT_DIR']+'/metal_dock.dat'
+      param_file = os.path.join(os.environ['ROOT_DIR'],'metal_dock.dat')
     else:
       param_file = self.parameter_file
 

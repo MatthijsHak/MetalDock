@@ -21,9 +21,13 @@ def random_sample_continuous():
     return sc.random.uniform(low=0, high=7)
 
 def dock_pool(n_prot, par, parameter_set, input_dir, tmp_dir):
-    copy_tree(f'{input_dir}/data_set/protein_{n_prot}/output/docking', f'{os.getcwd()}/protein_{n_prot}/docking')
-    os.chdir(f'{tmp_dir}/protein_{n_prot}/docking')
-    output_temp_dir=f'{tmp_dir}/protein_{n_prot}/docking'
+    dock_dir_in = os.path.join(input_dir, 'data_set', f'protein_{n_prot}', 'output', 'docking')
+    dock_dir_out = os.path.join(os.getcwd(), f'protein_{n_prot}', 'docking')
+    
+    copy_tree(dock_dir_in, dock_dir_out)
+    os.chdir(os.path.join(tmp_dir,f'protein_{n_prot}','docking'))
+    
+    output_temp_dir=os.path.join(tmp_dir,f'protein_{n_prot}','docking')
 
     # Obtain metal complex and protein names
     for files in glob.glob("*_c.xyz"):
@@ -36,10 +40,12 @@ def dock_pool(n_prot, par, parameter_set, input_dir, tmp_dir):
         name_protein = file_list[0]
 
     ##### AutoDock ##### 
-    dock = d.get_coordinates(f'{output_temp_dir}/ref.xyz',par.metal_symbol)
+    dock = d.get_coordinates(os.path.join(output_temp_dir,'ref.xyz'), par.metal_symbol)
     
     if par.parameter_file == 'metal_dock.dat':
-        shutil.copyfile(os.environ['ROOT_DIR']+'/metal_dock.dat', os.getcwd()+f'/metal_dock.dat')
+        dat_in = os.path.join(os.environ['ROOT_DIR'], 'metal_dock.dat')
+        dat_out = os.path.join(output_temp_dir, 'metal_dock.dat')
+        shutil.copyfile(dat_in, dat_out)
         d.docking_func(par, parameter_set, name_ligand, name_protein, dock, par.box_size, energy=None)
 
     ##### Fitness function ######
@@ -49,11 +55,13 @@ def dock_pool(n_prot, par, parameter_set, input_dir, tmp_dir):
     output.append(f'---------------------------------\n')
     rmsd_list = []
     i = 1
-    while os.path.exists(f'{output_temp_dir}/{name_ligand}_{i}.pdbqt'):
-        d.delete_hydrogen(f'{output_temp_dir}/{name_ligand}_{i}.pdbqt')
+    while os.path.exists(os.path.join(output_temp_dir,f'{name_ligand}_{i}.pdbqt')):
+        pdbqt_file = os.path.join(output_temp_dir,f'{name_ligand}_{i}.pdbqt')
+        d.delete_hydrogen(pdbqt_file)
         subprocess.call([os.environ['OBABEL']+f' -ipdbqt {name_ligand}_{i}.pdbqt -oxyz {name_ligand}_{i}.xyz -d > {name_ligand}_{i}.xyz'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['ROOT_DIR']+'/metal_dock/calculate_rmsd.py ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
+        rmsd_func = os.path.join(os.environ['ROOT_DIR'], 'metal_dock', 'calculate_rmsd.py')
+        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+f' {rmsd_func} ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
         rmsd = rmsd_non_rotate
         rmsd_list.append(rmsd)
         output.append(f"RMSD for Conformation {i} = {rmsd:.4f}\n")
@@ -76,11 +84,11 @@ def calculate_rmsd(par, parameter_set, input_dir, tmp_dir, dir_list):
 
 def optimize_MC(input_file):
     input_dir = os.getcwd()
-    output_dir = f'{input_dir}/output'
+    output_dir = os.path.join(input_dir,'output')
     
     par = input_file
     
-    os.chdir(f'{input_dir}/data_set')
+    os.chdir(os.path.join(input_dir,'data_set'))
 
     # Make list of the protein numbers to iterate over
     dir_list = os.listdir(os.getcwd())
@@ -122,13 +130,14 @@ def optimize_MC(input_file):
     with open('parameter_history', 'a') as f:
         f.write(f"PARAMETERS          :        e_NA        e_OA        e_SA        e_HD |       RMSD \n")
 
-    if os.path.isdir(f'{output_dir}/tmp'):
-        shutil.rmtree(f'{output_dir}/tmp', ignore_errors=True)
-        os.mkdir(f'{output_dir}/tmp')
-        os.chdir(f'{output_dir}/tmp')
+    tmp = os.path.join(output_dir,'tmp')
+    if os.path.isdir(tmp):
+        shutil.rmtree(tmp, ignore_errors=True)
+        os.mkdir(tmp)
+        os.chdir(tmp)
     else:
-        os.mkdir(f'{output_dir}/tmp')
-        os.chdir(f'{output_dir}/tmp')
+        os.mkdir(tmp)
+        os.chdir(tmp)
 
     tmp_dir=os.getcwd()
 
@@ -163,7 +172,7 @@ def optimize_MC(input_file):
                 best_rmsd = rmsd
                 print('PARAMETER SET ACCEPTED')
                 print(f'NEW BEST PARAMETER SET {best_parameter_set}\n')
-                with open(f'{output_dir}/parameter_history', 'a') as f:
+                with open(os.path.join(output_dir,'parameter_history'), 'a') as f:
                     f.write('STEP {:>6}         :  '.format(step)+'  '.join(format(best_parameter_set[x], ">10.5f") for x in range(0,len(best_parameter_set)))+' | {:>10.5f}  \n'.format(best_rmsd))
             else:
                 diff_RMSD = best_rmsd - rmsd 
@@ -175,7 +184,7 @@ def optimize_MC(input_file):
                     best_rmsd = rmsd
                     print('ACCEPTED WITH HIGHER RMSD')
                     print(f'NEW PARAMETER SET {best_parameter_set}\n')
-                    with open(f'{output_dir}/parameter_history', 'a') as f:
+                    with open(os.path.join(output_dir,'parameter_history'), 'a') as f:
                         f.write('STEP {:>6}         :  '.format(step)+'  '.join(format(best_parameter_set[x], ">10.5f") for x in range(0,len(best_parameter_set)))+' | {:>10.5f}  \n'.format(best_rmsd))
 
                 else:
@@ -185,7 +194,7 @@ def optimize_MC(input_file):
 
         i+=1
 
-    with open(f'{output_dir}/parameter_history','r') as fin:
+    with open(os.path.join(output_dir,'parameter_history'),'r') as fin:
         lines = [line.strip().split() for line in fin]
         rmsd =  [line[-1] for line in lines[1:]]
         min_idx = np.argmin(rmsd)+1

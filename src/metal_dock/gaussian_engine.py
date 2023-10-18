@@ -15,10 +15,11 @@ def gaussian_engine(xyz_file, var, output_dir):
         else:
             os.chdir('geom_opt')
 
-        shutil.copyfile(xyz_file, os.getcwd()+f'/{var.name_ligand}_c.xyz')
+        shutil.copyfile(xyz_file, os.path.join(os.getcwd(),f'{var.name_ligand}_c.xyz'))
 
         # If Geometry Converged Skip otherwise Run Again#
-        if os.path.exists(f'{output_dir}/QM/geom_opt/geom_opt.chk') == False:
+        chk_file = os.path.join(output_dir, 'QM', 'geom_opt', 'geom_opt.chk')
+        if os.path.exists(chk_file) == False:
             gaussian_geom_opt(xyz_file, var)
             gaussian_opt_converged('geom_opt.log')
         
@@ -26,7 +27,7 @@ def gaussian_engine(xyz_file, var, output_dir):
             gaussian_opt_converged('geom_opt.log') 
 
         ## Single Point ##
-        os.chdir(f'{output_dir}/QM')
+        os.chdir(os.path.join(output_dir,'QM'))
 
         if os.path.isdir('single_point') == False:
             os.mkdir('single_point')
@@ -34,9 +35,12 @@ def gaussian_engine(xyz_file, var, output_dir):
         else:
             os.chdir('single_point')
 
-        shutil.copyfile(f'{output_dir}/QM/geom_opt/output.xyz', os.getcwd()+'/output.xyz')
+        in_output_xyz = os.path.join(output_dir, 'QM', 'geom_opt', 'output.xyz')
+        out_output_xyz = os.path.join(os.getcwd(), 'output.xyz')
+        shutil.copyfile(in_output_xyz, out_output_xyz)
 
-        if os.path.exists(f'{output_dir}/QM/single_point/single_point.chk') == False:
+        chk_file = os.path.join(output_dir, 'QM', 'single_point', 'single_point.chk')
+        if os.path.exists(chk_file) == False:
             gaussian_sp('output.xyz', var)
             gaussian_extract_CM5('single_point.log', 'output.xyz')
             energy = gaussian_extract_energy('single_point.log')
@@ -47,7 +51,7 @@ def gaussian_engine(xyz_file, var, output_dir):
         
     else:
         ## Single Point ##
-        os.chdir(f'{output_dir}/QM')
+        os.chdir(os.path.join(output_dir,'QM'))
 
         if os.path.isdir('single_point') == False:
             os.mkdir('single_point')
@@ -55,9 +59,10 @@ def gaussian_engine(xyz_file, var, output_dir):
         else:
             os.chdir('single_point')
 
-        shutil.copyfile(xyz_file, os.getcwd()+'/output.xyz')
+        shutil.copyfile(xyz_file, os.path.join(os.getcwd(),'output.xyz'))
         
-        if os.path.exists(f'{output_dir}/QM/single_point/single_point.chk') == False:
+        chk_file = os.path.join(output_dir, 'QM', 'single_point', 'single_point.chk')
+        if os.path.exists(chk_file) == False:
             gaussian_sp('output.xyz', var)
             gaussian_sp_converged('single_point.log')
             gaussian_extract_CM5('single_point.log', 'output.xyz')

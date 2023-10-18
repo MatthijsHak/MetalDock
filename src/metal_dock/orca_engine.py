@@ -14,10 +14,11 @@ def orca_engine(xyz_file, var, output_dir):
         else:
             os.chdir('geom_opt')
 
-        shutil.copyfile(xyz_file, os.getcwd()+f'/{var.name_ligand}_c.xyz')
+        shutil.copyfile(xyz_file, os.path.join(os.getcwd(),f'{var.name_ligand}_c.xyz'))
 
         # If Geometry Converged Skip otherwise Run Again#
-        if os.path.exists(f'{output_dir}/QM/geom_opt/geom.out') == False:
+        out_file = os.path.join(output_dir,'QM','geom_opt','geom.out')
+        if os.path.exists(out_file) == False:
             orca_geom_opt(xyz_file, var)
             orca_opt_converged('geom.out')
             orca_extract_CM5('geom.out', xyz_file)
@@ -30,7 +31,7 @@ def orca_engine(xyz_file, var, output_dir):
 
     else:
         ## Single Point ##
-        os.chdir(f'{output_dir}/QM')
+        os.chdir(os.path.join(output_dir,'QM'))
 
         if os.path.isdir('single_point') == False:
             os.mkdir('single_point')
@@ -38,10 +39,11 @@ def orca_engine(xyz_file, var, output_dir):
         else:
             os.chdir('single_point')
 
-        shutil.copyfile(xyz_file, os.getcwd()+f'/{var.name_ligand}_c.xyz')
+        shutil.copyfile(xyz_file, os.path.join(os.getcwd(),f'{var.name_ligand}_c.xyz'))
 
         # If Geometry Converged Skip otherwise Run Again#
-        if os.path.exists(f'{output_dir}/QM/single_point/single_point.out') == False:
+        out_file = os.path.join(output_dir,'QM','single_point','single_point.out')
+        if os.path.exists(out_file) == False:
             orca_single_point(xyz_file, var)
             orca_sp_converged('single_point.out')
             orca_extract_CM5('single_point.out', xyz_file)

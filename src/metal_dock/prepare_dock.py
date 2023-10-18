@@ -538,42 +538,47 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     return max_side
 
 def prepare_receptor(name_protein):
-    subprocess.call([os.environ['PYTHON_2']+' '+os.environ['MGLTOOLS']+f'/prepare_receptor4.py -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_gpf4.py')
+    subprocess.call([os.environ['PYTHON_2']+f' {prepare_gpf4} -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
-def docking_func(par, dock, box_size, energy=None):
+def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, energy=None):
     #create_gpf():
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+f"/prepare_gpf4.py -l {par.name_ligand}.pdbqt  -r clean_{par.name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.4},{dock[1]:.4},{dock[2]:.4}'"], shell=True ) #, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    gpf = open(f'clean_{par.name_protein}.gpf', 'a')
+    prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_gpf4.py')
+    subprocess.call([os.environ['PYTHON_2']+f" {prepare_gpf4} -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.4},{dock[1]:.4},{dock[2]:.4}'"], shell=True )
+    gpf = open(f'clean_{name_protein}.gpf', 'a')
     gpf.write(f'nbp_r_eps 0.25 23.2135   12 6  NA TZ\n')
     gpf.write(f'nbp_r_eps 2.10  3.8453   12 6  OA Zn\n')
     gpf.write(f'nbp_r_eps 2.25  7.5914   12 6  SA Zn\n')
     gpf.write(f'nbp_r_eps 1.00  0.0000   12 6  HD Zn\n')
     gpf.write(f'nbp_r_eps 2.00  0.0060   12 6  NA Zn\n')
     gpf.write(f'nbp_r_eps 2.00  0.2966   12 6  N  Zn\n')
-    gpf.write(f'nbp_r_eps 2.20  {par.parameter_set[0]:>.4f}   12 10 NA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 2.25  {par.parameter_set[1]:>.4f}   12 10 OA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 2.30  {par.parameter_set[2]:>.4f}   12 10 SA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 1.00  {par.parameter_set[3]:>.4f}   12 6  HD {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 2.20  {parameter_set[0]:>.4f}   12 10 NA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 2.25  {parameter_set[1]:>.4f}   12 10 OA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 2.30  {parameter_set[2]:>.4f}   12 10 SA {par.metal_symbol}\n')
+    gpf.write(f'nbp_r_eps 1.00  {parameter_set[3]:>.4f}   12 6  HD {par.metal_symbol}\n')
     gpf.close()
 
     #autogrid()
+    autogrid4 = os.path.join(os.environ['ROOT_DIR'],'external','AutoDock','autogrid4')
     if par.method.lower() == 'mc':
-        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autogrid4 -p clean_{par.name_protein}.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        subprocess.call([f'{autogrid4} -p clean_{name_protein}.gpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     else:
-        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autogrid4 -p clean_{par.name_protein}.gpf'], shell=True)
+        subprocess.call([f'{autogrid4} -p clean_{name_protein}.gpf'], shell=True)
 
     #create_dpf()
-    write_dpf_file(f'clean_{par.name_protein}.gpf', par.name_ligand, f'clean_{par.name_protein}', par.parameter_file, par.num_poses, par.dock_algorithm, random_pos=par.random_pos, SA=par.sa_dock, GA=par.ga_dock, energy_ligand=energy)
+    write_dpf_file(f'clean_{name_protein}.gpf', name_ligand, f'clean_{name_protein}', par.parameter_file, par.num_poses, par.dock_algorithm, random_pos=par.random_pos, SA=par.sa_dock, GA=par.ga_dock, energy_ligand=energy)
 
     #autodock()
+    autodock4 = os.path.join(os.environ['ROOT_DIR'],'external','AutoDock','autodock4')
     if par.method.lower() == 'train' or par.method.lower() == 'mc':
-        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autodock4 -p {par.name_ligand}_clean_{par.name_protein}.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        subprocess.call([f'{autodock4} -p {name_ligand}_clean_{name_protein}.dpf'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     else:
-        subprocess.call([os.environ['ROOT_DIR']+f'/external/AutoDock/autodock4 -p {par.name_ligand}_clean_{par.name_protein}.dpf'], shell=True)
+        subprocess.call([f'{autodock4} -p {name_ligand}_clean_{name_protein}.dpf'], shell=True)
 
     #write_all_conformations()
-    subprocess.call([os.environ['PYTHON_2']+" "+os.environ['MGLTOOLS']+f"/write_conformations_from_dlg.py -d {par.name_ligand}_clean_{par.name_protein}.dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    write_conformations = os.path.join(os.environ['MGLTOOLS'], 'write_conformations_from_dlg.py')
+    subprocess.call([os.environ['PYTHON_2']+f" {write_conformations} -d {name_ligand}_clean_{name_protein}.dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     return
 
@@ -672,51 +677,22 @@ def rmsd_func(name_ligand, n_prot, directory, generation=None, num_gen=None, tra
         output = [f"-------------------------------------------     PROTEIN {n_prot}      --------------------------------------------\n"]
 
     i = 1
-    while os.path.exists(f'{directory}/docking/{name_ligand}_{i}.pdbqt'):
-        d.delete_hydrogen(f'{output_dir}/docking/{par.name_ligand}_{i}.pdbqt')
+    while os.path.exists(os.path.join(directory,'docking',f'{name_ligand}_{i}.pdbqt')):
+        pdbqt_file = os.path.join(output_dir,'docking',f'{name_ligand}_{i}.pdbqt')
+        d.delete_hydrogen(pdbqt_file)
         subprocess.call([os.environ['OBABEL']+" -ipdbqt "+name_ligand+"_{}.pdbqt".format(i)+" -oxyz "+name_ligand+"_{}.xyz".format(i)+" -d > "+name_ligand+"_{}.xyz".format(i)], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+' '+os.environ['ROOT_DIR']+'/metal_dock/calculate_rmsd.py ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
+        rmsd_func = os.path.join(os.environ['ROOT_DIR'],'metal_dock','calculate_rmsd.py')
+        rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+f' {rmsd_func} ref.xyz '+name_ligand+'_{}.xyz'.format(i)+' -nh --reorder --rotation none --translation none']))
         rmsd = rmsd_non_rotate
 
         rmsd_list.append(rmsd)
 
         rmsd_list.append("RMSD for Conformation %i = %.4f"% (i, rmsd))
         i += 1
-    
 
     for j in range(0,len(rmsd_print_list)):
         output.append(rmsd_print_list[j])
-
-        if standard == True:
-            std = open(f'{directory}/standard/standard_conformations','a')
-            std.write(rmsd_print_list[j])
-
-            protein = open(f'{directory}/standard/protein_{n_prot}','a')
-            protein.write(rmsd_print_list[j])
-
-
-        if test == True:   
-            t = open(f'{directory}/test/test_conformations','a')
-            t.write(rmsd_print_list[j])
-            
-            protein = open(f'{directory}/test/protein_{n_prot}','a')
-            protein.write(rmsd_print_list[j])
-
-        if train == True:
-            if generation == 0:
-                first_gen = open(f'{directory}/first_gen/all_conf_first_gen','a')
-                first_gen.write(rmsd_print_list[j])
-
-                protein = open(f'{directory}/first_gen/protein_{n_prot}','a')
-                protein.write(rmsd_print_list[j])
-
-            if generation == num_gen+1:   
-                last_gen = open(f'{directory}/last_gen/all_conf_last_gen','a')
-                last_gen.write(rmsd_print_list[j])
-            
-                protein = open(f'{directory}/last_gen/protein_{n_prot}','a')
-                protein.write(rmsd_print_list[j])
 
     avg_output = np.mean(rmsd_list)
     avg_list.append(avg_output)

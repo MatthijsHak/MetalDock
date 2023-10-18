@@ -113,7 +113,8 @@ def xyz_prep(xyz_file, df):
 
 def LoadModel(): 
     import json
-    with open(os.environ['ROOT_DIR']+'/metal_dock/cm5pars.json') as tweetfile:
+    cm5_path = os.path.join(os.environ['ROOT_DIR'], 'metal_dock', 'cm5pars.json')
+    with open(cm5_path) as tweetfile:
         cm5_model = json.loads(tweetfile.read())
     a0_df = pd.DataFrame.from_dict(cm5_model['A0'])
     rd_df = pd.DataFrame.from_dict(cm5_model['radii'])
