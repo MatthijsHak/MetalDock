@@ -24,10 +24,11 @@ Next, install several required packages using Conda and Pip:
 
 ```bash
 conda install -c bioconda mgltools
+conda install -c conda-forge openbabel
 ```
 
 ```bash
-pip install ase rdkit-pypi pdb2pqr networkx numpy plams ase
+pip install ase rdkit-pypi pdb2pqr networkx numpy plams ase pandas
 ```
 
 ## Step 3: Clone MetalDock repository 
