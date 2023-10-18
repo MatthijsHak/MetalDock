@@ -1,7 +1,9 @@
 
 # MetalDock 
 
-MetalDock is a versatile open-source software docking tool designed to facilitate the docking of metal-organic complexes for various transtions metals with proteins, DNA, or other biomolecules. For detailed instructions on how to utilize MetalDock, we refer you to our [documentation](https://metaldock.readthedocs.io/en/latest/) page. MetalDock, unfortunately, does not support the Windows OS. 
+MetalDock is a versatile open-source software docking tool designed to facilitate the docking of metal-organic complexes for various transtions metals with proteins, DNA, or other biomolecules. For detailed instructions on how to utilize MetalDock, we refer you to our [documentation](https://metaldock.readthedocs.io/en/latest/) page. 
+
+MetalDock, unfortunately, does not support the Windows OS. 
 
 # Citation
 
