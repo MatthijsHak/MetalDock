@@ -1,0 +1,43 @@
+REMARK  4 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: C3_5  and  C10_12 
+REMARK    2  A    between atoms: C10_12  and  C1'_13 
+REMARK    3  A    between atoms: C4'_16  and  N4'_24 
+REMARK    4  A    between atoms: N1'_19  and  C11_20 
+ROOT
+HETATM    1  C1' SU2 A1001      -6.747   4.400   3.931  1.00 54.37    -0.035 A 
+HETATM    2  C2' SU2 A1001      -5.409   4.071   3.761  1.00 58.87     0.013 A 
+HETATM    3  C3' SU2 A1001      -4.966   2.759   3.944  1.00 60.77     0.030 A 
+HETATM    4  C4' SU2 A1001      -5.854   1.751   4.303  1.00 62.10     0.030 A 
+HETATM    5  C5' SU2 A1001      -7.194   2.087   4.474  1.00 57.95     0.030 A 
+HETATM    6  C6' SU2 A1001      -7.638   3.399   4.289  1.00 56.28     0.013 A 
+ENDROOT
+BRANCH   1   7
+HETATM    7  C10 SU2 A1001      -7.197   5.844   3.730  1.00 47.02     0.029 C 
+BRANCH   7   8
+HETATM    8  C3  SU2 A1001      -8.514   6.465   4.184  1.00 41.97     0.045 A 
+HETATM    9  C2  SU2 A1001      -8.990   6.667   5.460  1.00 40.11     0.257 A 
+HETATM   10  N1  SU2 A1001     -10.215   7.287   5.421  1.00 40.50    -0.322 N 
+HETATM   11  O2  SU2 A1001      -8.467   6.390   6.540  1.00 36.41    -0.267 OA
+HETATM   12  C8  SU2 A1001     -10.574   7.486   4.113  1.00 40.40     0.046 A 
+ATOM     13  H1  SU2 A1001     -10.768   7.556   6.235  1.00  0.00     0.169 HD
+HETATM   14  C9  SU2 A1001      -9.530   6.981   3.303  1.00 41.23     0.006 A 
+HETATM   15  C7  SU2 A1001     -11.719   8.081   3.572  1.00 37.23     0.030 A 
+HETATM   16  C4  SU2 A1001      -9.651   7.076   1.907  1.00 37.17     0.015 A 
+HETATM   17  C5  SU2 A1001     -10.784   7.671   1.373  1.00 35.31     0.001 A 
+HETATM   18  C6  SU2 A1001     -11.801   8.169   2.205  1.00 35.46     0.002 A 
+ENDBRANCH   7   8
+ENDBRANCH   1   7
+BRANCH   4  19
+HETATM   19  N4' SU2 A1001      -5.405   0.414   4.487  1.00 66.39    -0.378 N 
+HETATM   20  C3B SU2 A1001      -5.353  -0.177   5.856  1.00 68.84     0.143 C 
+HETATM   21  C2B SU2 A1001      -5.295  -1.687   5.905  1.00 70.94     0.145 C 
+HETATM   22  N1' SU2 A1001      -4.317  -2.340   4.978  1.00 73.20    -0.356 N 
+HETATM   23  C6B SU2 A1001      -4.292  -1.727   3.601  1.00 71.32     0.145 C 
+HETATM   24  C5B SU2 A1001      -4.427  -0.205   3.529  1.00 69.35     0.143 C 
+BRANCH  22  25
+HETATM   25  C11 SU2 A1001      -3.905  -3.695   5.199  1.00 76.38     0.350 C 
+HETATM   26  O3  SU2 A1001      -2.762  -4.153   5.106  1.00 80.37    -0.284 OA
+ENDBRANCH  22  25
+ENDBRANCH   4  19
+TORSDOF 4

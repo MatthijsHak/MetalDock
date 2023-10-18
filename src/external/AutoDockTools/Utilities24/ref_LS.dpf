@@ -1,0 +1,45 @@
+outlev 1                             # diagnostic output level
+seed pid time                        # seeds for random generator
+types CANOH                          # atom type names
+fld hsg1.maps.fld                    # grid_data_file
+map hsg1.C.map                       # atom-specific affinity map
+map hsg1.A.map                       # atom-specific affinity map
+map hsg1.N.map                       # atom-specific affinity map
+map hsg1.O.map                       # atom-specific affinity map
+map hsg1.H.map                       # atom-specific affinity map
+map hsg1.e.map                       # electrostatics map
+move ref_ind.out.pdbq                # small molecule
+about 0.369 -0.215 -4.987            # small molecule center
+tran0 random                         # initial coordinates/A or random
+quat0 random                         # initial quaternion
+ndihe 14                             # number of active torsions
+dihe0 random                         # initial dihedrals (relative) or random
+torsdof 14 0.3113                    # torsional degrees of freedom and coeffiecent
+intnbp_r_eps  4.00 0.0222750 12 6    # C-C lj
+intnbp_r_eps  4.00 0.0222750 12 6    # C-A lj
+intnbp_r_eps  3.75 0.0230026 12 6    # C-N lj
+intnbp_r_eps  3.60 0.0257202 12 6    # C-O lj
+intnbp_r_eps  3.00 0.0081378 12 6    # C-H lj
+intnbp_r_eps  4.00 0.0222750 12 6    # A-A lj
+intnbp_r_eps  3.75 0.0230026 12 6    # A-N lj
+intnbp_r_eps  3.60 0.0257202 12 6    # A-O lj
+intnbp_r_eps  3.00 0.0081378 12 6    # A-H lj
+intnbp_r_eps  3.50 0.0237600 12 6    # N-N lj
+intnbp_r_eps  3.35 0.0265667 12 6    # N-O lj
+intnbp_r_eps  2.75 0.0084051 12 6    # N-H lj
+intnbp_r_eps  3.20 0.0297000 12 6    # O-O lj
+intnbp_r_eps  2.60 0.0093852 12 6    # O-H lj
+intnbp_r_eps  2.00 0.0029700 12 6    # H-H lj
+#
+rmstol 2.0                           # cluster_tolerance/A
+extnrg 1000.0                        # external grid energy
+e0max 0.0 10000                      # max initial energy; max number of retries
+sw_max_its 300                       # iterations of Solis & Wets local search
+sw_max_succ 4                        # consecutive successes before changing rho
+sw_max_fail 4                        # consecutive failures before changing rho
+sw_rho 1.0                           # size of local search space to sample
+sw_lb_rho 0.01                       # lower bound on rho
+ls_search_freq 0.06                  # probability of performing local search on individual
+set_psw1                             # set the above pseudo-Solis & Wets parameters
+do_local_only 50                     # do this many LS runs
+analysis                             # perform a ranked cluster analysis
