@@ -23,7 +23,6 @@ conda activate MetalDock
 Next, install several required packages using Conda and Pip:
 
 ```bash
-conda install -c bioconda mgltools
 conda install -c conda-forge openbabel
 ```
 
