@@ -14,6 +14,8 @@ def find_command_path(command):
         return result.strip()
     except subprocess.CalledProcessError:
         print(f"Error: The command '{command}' was not found in your system's PATH.")
+        print(f"Pleae ensure that all paths are set correctly.")
+        print(f"If paths keep failing, please try to set the absolute path manually in the file '/MetalDock/src/metal_dock/environment_variables.py'.")
         sys.exit(1)
 
 
