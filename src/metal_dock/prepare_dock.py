@@ -539,7 +539,7 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
 
 def prepare_receptor(name_protein):
     prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_receptor4.py')
-    subprocess.call([os.environ['PYTHON_3']+f' {prepare_gpf4} -U nphs -A None -r clean_{name_protein}.pdb'], shell=True), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['PYTHON_3']+f' {prepare_gpf4} -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     return
 
 def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, energy=None):
