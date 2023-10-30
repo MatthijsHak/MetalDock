@@ -18,7 +18,7 @@ def convertible(v):
         return False
 
 def random_sample_continuous():
-    return sc.random.uniform(low=0, high=7)
+    return np.random.uniform(low=0, high=7)
 
 def dock_pool(n_prot, par, parameter_set, input_dir, tmp_dir):
     dock_dir_in = os.path.join(input_dir, 'data_set', f'protein_{n_prot}', 'output', 'docking')

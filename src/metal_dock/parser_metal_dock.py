@@ -101,7 +101,7 @@ class Parser:
     self.xyz_file                 = config['METAL_COMPLEX']['xyz_file']
     self.name_ligand              = config['METAL_COMPLEX']['xyz_file'][:-4]
     self.charge                   = int(config['METAL_COMPLEX']['charge'])
-    self.spin                     = int(config['METAL_COMPLEX']['spin'])
+    self.spin                     = float(config['METAL_COMPLEX']['spin'])
     self.vacant_site              = config['METAL_COMPLEX'].getboolean('vacant_site')
 
     # [QM] # 

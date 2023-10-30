@@ -539,13 +539,33 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
 
 def prepare_receptor(name_protein):
     prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_receptor4.py')
-    subprocess.call([os.environ['PYTHON_3']+f' {prepare_gpf4} -U nphs -A None -r clean_{name_protein}.pdb'], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    return
+    command = os.environ['PYTHON_3']+f' {prepare_gpf4} -U nphs -A None -r clean_{name_protein}.pdb'
+    process = subprocess.Popen(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True
+    )
+
+    stdout, stderr = process.communicate()
+
+    if process.returncode != 0:
+        with open('prepare_receptor.out', 'w') as fout:
+            fout.write(stdout)
+            fout.write(stderr)
+        print(f'ERROR DURING PREPARATION OF RECEPTOR, SEE /output/docking/prepare_receptor.out FOR DETAILS\n')
+        print(f'IF PDB FILE IS NOT WRITTEN IN CORRECT PDB FORMAT, PLEASE EDIT MANUALLY\n')
+        sys.exit()
 
 def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, energy=None):
+    if os.path.exists(f'clean_{name_protein}.gpf'):
+        os.remove(f'clean_{name_protein}.gpf')
+
     #create_gpf():
     prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_gpf4.py')
-    subprocess.call([os.environ['PYTHON_3']+f" {prepare_gpf4} -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.6},{dock[1]:.6},{dock[2]:.6}'"], shell=True )
+    subprocess.call([os.environ['PYTHON_3']+f" {prepare_gpf4} -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.6},{dock[1]:.6},{dock[2]:.6}'"], shell=True)
+
     gpf = open(f'clean_{name_protein}.gpf', 'a')
     gpf.write(f'nbp_r_eps 0.25 23.2135   12 6  NA TZ\n')
     gpf.write(f'nbp_r_eps 2.10  3.8453   12 6  OA Zn\n')
