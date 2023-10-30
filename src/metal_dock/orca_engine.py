@@ -95,10 +95,10 @@ def orca_opt_converged(log_file):
 def orca_sp_converged(log_file):
      with open(log_file) as log:
         if 'SUCCESS' in log.read():
-            print('GEOMETRY CONVERGED')
+            print('SINGLE POINT CONVERGED')
             return True
         else:
-            print('GEOMETRY NOT CONVERGED - DELETE geom.out')
+            print('SINGLE POINT NOT CONVERGED - DELETE geom.out')
             return sys.exit()
 
 def orca_geom_opt(xyz_file, var):
@@ -109,7 +109,7 @@ def orca_geom_opt(xyz_file, var):
                     charge=var.charge,
                     mult=M,
                     orcasimpleinput=f'Opt {var.orcasimpleinput}',
-                    orcablocks=f'%pal nprocs {str(var.ncpu)} end % output Print[P_hirshfeld] 1 end {var.orcablocks}',
+                    orcablocks=f'%pal nprocs {str(var.ncpu)} end %output Print[P_hirshfeld] 1 end {var.orcablocks}',
                     )
 
     mol.get_potential_energy()
@@ -124,8 +124,9 @@ def orca_single_point(xyz_file, var):
                     charge=var.charge,
                     mult=M,
                     orcasimpleinput=f'{var.orcasimpleinput}',
-                    orcablocks=f'%pal nprocs {str(var.ncpu)} end % output Print[P_hirshfeld] 1 end {var.orcablocks}',
+                    orcablocks=f'%pal nprocs {str(var.ncpu)} end %output Print[P_hirshfeld] 1 end {var.orcablocks}',
                     )
 
     mol.get_potential_energy()
+    mol.write('output.xyz')
     return
