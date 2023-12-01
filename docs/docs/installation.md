@@ -74,7 +74,7 @@ Relativistic effects can be selected with input. For more infromation see [ORCA]
 If you want to use MetalDock conventiely from any directory, you can add its executable to your PATH. Replace /user/directory/MetalDock with the actual path to your MetalDock installation directory:
 
 ```bash
-export PATH=$PATH:/Users/matthijsh/Desktop/MetalDock
+export PATH=$PATH:/user/defined/path/MetalDock
 ```
 
 This completes the installation process for MetalDock. You can now run metaldock by:
