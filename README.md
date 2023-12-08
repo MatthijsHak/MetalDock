@@ -7,4 +7,4 @@ MetalDock is a versatile open-source software docking tool designed to facilitat
 
 If you decide to use MetalDock for any project, please cite the following paper: 
 
-[10.26434/chemrxiv-2023-5f3q9](https://chemrxiv.org/engage/chemrxiv/article-details/65252ef68bab5d2055071cb0)
+[https://doi.org/10.1021/acs.jcim.3c01582](https://doi.org/10.1021/acs.jcim.3c01582)
