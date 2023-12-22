@@ -95,7 +95,7 @@ class AtomHybridization:
         _name = name[0].upper()
         if len(name)>1:
             if not name[1] in string.digits:
-                _name = _name + string.lower(name[1])
+                _name = _name + name[1].lower()
         if _name in list(babel_elements.keys()):
             return babel_elements[_name]['num'] 
         else:
