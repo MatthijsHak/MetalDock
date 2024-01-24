@@ -139,7 +139,7 @@ def docking(input_file, par=None):
     d.create_ligand_pdbqt_file(par, par.name_ligand)
     if os.path.isfile(f'clean_{par.name_protein}.pdbqt') == False:
         d.prepare_receptor(par.name_protein)
-    d.docking_func(par, par.parameter_set, par.name_ligand, par.name_protein, dock, box_size, energy)
+    d.docking_func(par, par.name_ligand, par.name_protein, dock, box_size, energy)
 
     if par.rmsd == True:
         rmsd_list = []

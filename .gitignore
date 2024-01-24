@@ -1,3 +1,4 @@
 MetalDocs
 .readthedocs.yaml
 dist
+*.pyc

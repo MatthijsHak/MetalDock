@@ -804,8 +804,9 @@ class Chain(ProteinMolecule):
         # Get the C atom of the first residue res1 :
         c = res1.atoms.get(lambda x: x.name.split()[0] == 'C')
         
-        if c is None or len(c) == 0: c = res1.atoms.get(lambda x:
-                                        x.name.split([0]=='O3*'))
+        print(res1.atoms.get(lambda x: x.name.split()[0] == 'O*'))
+
+        if c is None or len(c) == 0: c = res1.atoms.get(lambda x: x.name.split()[0]=='O3*')
         # Get the N atom of the second Residue only if the first residue
         # has a C atom.
         if not c is None and len(c) != 0:

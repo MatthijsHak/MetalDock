@@ -121,10 +121,14 @@ class Parser:
 
     # [DOCKING] #
     self.ini_parameters           = config['DOCKING'].getboolean('ini_parameters')
-    if self.ini_parameters == True:
-      self.parameter_set          = [self.e_NA, self.e_OA, self.e_SA, self.e_HD]
+    if self.metal_symbol.upper() == 'FE' or self.metal_symbol.upper() == 'ZN' or self.metal_symbol.upper() == 'MN':
+      self.internal_param = True
     else:
-      self.parameter_set          = standard_set.get(self.metal_symbol.upper())
+      self.internal_param = False
+      if self.ini_parameters == True:
+        self.parameter_set          = [self.e_NA, self.e_OA, self.e_SA, self.e_HD]
+      else:
+        self.parameter_set          = standard_set.get(self.metal_symbol.upper())
 
     self.rmsd                     = config['DOCKING'].getboolean('rmsd')
     self.dock_x                   = float(config['DOCKING']['dock_x'])

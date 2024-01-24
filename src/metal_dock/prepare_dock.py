@@ -558,7 +558,7 @@ def prepare_receptor(name_protein):
         print(f'IF PDB FILE IS NOT WRITTEN IN CORRECT PDB FORMAT, PLEASE EDIT MANUALLY\n')
         sys.exit()
 
-def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, energy=None):
+def docking_func(par, name_ligand, name_protein, dock, box_size, energy=None):
     if os.path.exists(f'clean_{name_protein}.gpf'):
         os.remove(f'clean_{name_protein}.gpf')
 
@@ -573,10 +573,11 @@ def docking_func(par, parameter_set, name_ligand, name_protein, dock, box_size, 
     gpf.write(f'nbp_r_eps 1.00  0.0000   12 6  HD Zn\n')
     gpf.write(f'nbp_r_eps 2.00  0.0060   12 6  NA Zn\n')
     gpf.write(f'nbp_r_eps 2.00  0.2966   12 6  N  Zn\n')
-    gpf.write(f'nbp_r_eps 2.20  {parameter_set[0]:>.4f}   12 10 NA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 2.25  {parameter_set[1]:>.4f}   12 10 OA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 2.30  {parameter_set[2]:>.4f}   12 10 SA {par.metal_symbol}\n')
-    gpf.write(f'nbp_r_eps 1.00  {parameter_set[3]:>.4f}   12 6  HD {par.metal_symbol}\n')
+    if par.internal_param == False:
+        gpf.write(f'nbp_r_eps 2.20  {par.parameter_set[0]:>.4f}   12 10 NA {par.metal_symbol}\n')
+        gpf.write(f'nbp_r_eps 2.25  {par.parameter_set[1]:>.4f}   12 10 OA {par.metal_symbol}\n')
+        gpf.write(f'nbp_r_eps 2.30  {par.parameter_set[2]:>.4f}   12 10 SA {par.metal_symbol}\n')
+        gpf.write(f'nbp_r_eps 1.00  {par.parameter_set[3]:>.4f}   12 6  HD {par.metal_symbol}\n')
     gpf.close()
 
     #autogrid()
