@@ -12,25 +12,25 @@ from . import adf_engine as adf
 from . import gaussian_engine as g
 from . import orca_engine as orca
 
+
 def docking(input_file, par=None):
 
     par = input_file
 
     input_dir = os.getcwd()
     output_dir = input_dir+'/output'
-
     ###### Generate Output Dir #######
-    if os.path.isdir('output') == False:
-        os.mkdir('output')
-        os.chdir('output')
+    if os.path.isdir(output_dir) == False:
+        os.mkdir(output_dir)
+        os.chdir(output_dir)
     else:
-        os.chdir('output')
+        os.chdir(output_dir)
 
-    if os.path.isdir('file_prep') == False:
-        os.mkdir('file_prep')
-        os.chdir('file_prep')
+    if os.path.isdir(f'{output_dir}/file_prep') == False:
+        os.mkdir(f'{output_dir}/file_prep')
+        os.chdir(f'{output_dir}/file_prep')
     else:
-        os.chdir('file_prep')
+        os.chdir(f'{output_dir}/file_prep')
 
     if os.path.exists(f'{par.name_ligand}_c.xyz') == False:
         xyz_file = os.path.join(input_dir, par.xyz_file)
@@ -43,13 +43,13 @@ def docking(input_file, par=None):
         subprocess.call([os.environ['OBABEL']+f' -ixyz {par.name_ligand}_c.xyz -osdf {par.name_ligand}.sdf  > {par.name_ligand}.sdf'],shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     ###### Create pdb files ###### 
-
     if os.path.exists(f'clean_{par.name_protein}.pdb') == False:
         input_pdb = os.path.join(input_dir, par.pdb_file)
-        output_pdb = os.path.join(os.getcwd(), par.pdb_file)
+        output_pdb = os.path.join(f'{output_dir}/file_prep', f'{par.name_protein}.pdb')
+        
         shutil.copyfile(input_pdb, output_pdb)
         pdb.protonate_pdb(par.pdb_file, par.pH, par.clean_pdb)
-        pdb.clean_protein_pdb(par.name_protein, par.pdb_file, par.clean_pdb)
+        pdb.clean_protein_pdb(par.name_protein, par.clean_pdb)
 
     ###### Quantum Calculations ######
     os.chdir(output_dir)

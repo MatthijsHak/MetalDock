@@ -9,15 +9,15 @@ def protonate_pdb(pdb_file, pH, clean_pdb=True):
     return
 
 # Get clean.pdb
-def clean_protein_pdb(name_protein, pdb_file, clean_pdb=True):
+def clean_protein_pdb(name_protein, clean_pdb=True):
     if clean_pdb == True:
         # grep delete
         with open('pdb_prot.pdb', 'r') as fin:
-            with open(f'clean_{pdb_file}', 'w') as fout:
+            with open(f'clean_{name_protein}', 'w') as fout:
                 for line in fin:
                     if 'HETATM'  not in line:
                         fout.write(line)
     else:
-        shutil.move('pdb_prot.pdb', f'clean_{pdb_file}')
+        shutil.move('pdb_prot.pdb', f'clean_{name_protein}')
 
     return
