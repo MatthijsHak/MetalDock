@@ -190,8 +190,8 @@ def docking(input_file, par=None):
             shutil.copyfile(xyz_in, xyz_out)
         i += 1
     
-    clean_in = os.path.join(output_dir,'docking',f'clean_{par.pdb_file}')
-    clean_out = os.path.join(os.getcwd(), f'clean_{par.pdb_file}')
+    clean_in = os.path.join(output_dir,'docking',f'clean_{par.name_protein}.pdb')
+    clean_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
     shutil.copyfile(clean_in, clean_out)
  
     print("\nDOCKING SUCCESFULLY COMPLETED")
