@@ -13,11 +13,11 @@ def clean_protein_pdb(name_protein, clean_pdb=True):
     if clean_pdb == True:
         # grep delete
         with open('pdb_prot.pdb', 'r') as fin:
-            with open(f'clean_{name_protein}', 'w') as fout:
+            with open(f'clean_{name_protein}.pdb', 'w') as fout:
                 for line in fin:
                     if 'HETATM'  not in line:
                         fout.write(line)
     else:
-        shutil.move('pdb_prot.pdb', f'clean_{name_protein}')
+        shutil.move('pdb_prot.pdb', f'clean_{name_protein}.pdb')
 
     return
