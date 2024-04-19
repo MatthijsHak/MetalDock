@@ -109,6 +109,7 @@ def xyz_prep(xyz_file, df):
     opdb.close()
     subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol > output.mol'], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     hmol = Chem.MolFromMolFile('output.mol',removeHs=False, sanitize=False)
+    Chem.SanitizeMol(hmol, Chem.SanitizeFlags.SANITIZE_FINDRADICALS|Chem.SanitizeFlags.SANITIZE_KEKULIZE|Chem.SanitizeFlags.SANITIZE_SETAROMATICITY|Chem.SanitizeFlags.SANITIZE_SETCONJUGATION|Chem.SanitizeFlags.SANITIZE_SETHYBRIDIZATION|Chem.SanitizeFlags.SANITIZE_SYMMRINGS,catchErrors=True)
     return hmol 
 
 def LoadModel(): 

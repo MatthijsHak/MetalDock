@@ -82,37 +82,37 @@ class Parser:
 
     # Convert to correct datatype if necessary
     # [DEFAULT] #
-    self.method                   = config['DEFAULT']['method']
-    self.metal_symbol             = config['DEFAULT']['metal_symbol']
+    self.method                   = config['DEFAULT']['method'].strip()
+    self.metal_symbol             = config['DEFAULT']['metal_symbol'].strip()
 
-    self.parameter_file           = config['DEFAULT']['parameter_file']
+    self.parameter_file           = config['DEFAULT']['parameter_file'].strip()
     self.ncpu                     = int(config['DEFAULT']['ncpu'])
 
     self.atom_types_included()
 
     # [PROTEIN] # 
-    self.pdb_file                 = config['PROTEIN']['pdb_file']
-    self.name_protein             = config['PROTEIN']['pdb_file'].split('/')[-1][:-4]
+    self.pdb_file                 = config['PROTEIN']['pdb_file'].strip()
+    self.name_protein             = config['PROTEIN']['pdb_file'].strip().split('/')[-1][:-4]
     self.pH                       = float(config['PROTEIN']['pH'])
     self.clean_pdb                = config['PROTEIN'].getboolean('clean_pdb')
 
     # [METAL_COMPLEX] #
     self.geom_opt                 = config['METAL_COMPLEX'].getboolean('geom_opt')
-    self.xyz_file                 = config['METAL_COMPLEX']['xyz_file']
-    self.name_ligand              = config['METAL_COMPLEX']['xyz_file'].split('/')[-1][:-4]
+    self.xyz_file                 = config['METAL_COMPLEX']['xyz_file'].strip()
+    self.name_ligand              = config['METAL_COMPLEX']['xyz_file'].strip().split('/')[-1][:-4]
     self.charge                   = int(config['METAL_COMPLEX']['charge'])
     self.spin                     = float(config['METAL_COMPLEX']['spin'])
     self.vacant_site              = config['METAL_COMPLEX'].getboolean('vacant_site')
 
     # [QM] # 
-    self.engine                   = str(config['QM']['engine'])
-    self.basis_set                = config['QM']['basis_set']
-    self.functional_type          = config['QM']['functional_type']
-    self.functional               = config['QM']['functional']
-    self.dispersion               = config['QM']['dispersion']
-    self.solvent                  = config['QM']['solvent']
-    self.orcasimpleinput          = config['QM']['orcasimpleinput']
-    self.orcablocks               = config['QM']['orcablocks']
+    self.engine                   = str(config['QM']['engine']).strip()
+    self.basis_set                = config['QM']['basis_set'].strip()
+    self.functional_type          = config['QM']['functional_type'].strip()
+    self.functional               = config['QM']['functional'].strip()
+    self.dispersion               = config['QM']['dispersion'].strip()
+    self.solvent                  = config['QM']['solvent'].strip()
+    self.orcasimpleinput          = config['QM']['orcasimpleinput'].strip()
+    self.orcablocks               = config['QM']['orcablocks'].strip()
 
     if self.engine == 'ORCA' and self.orcasimpleinput == '':
       print('ORCA engine selected but no ORCA input found')
