@@ -129,7 +129,7 @@ xyz_file = metal_complex.xyz
 ---
 
 ### charge
-The total charge of the metal-organic compound. Spin is here defined as the number of spin-alpha electrons in excess of spin-beta electrons.
+The total charge of the metal-organic compound. 
 
 **Default input:**  
 charge = 0 
@@ -140,7 +140,7 @@ charge = 0
 ---
 
 ### spin 
-The total spin of the metal-organic compound. 
+The total spin of the metal-organic compound. Spin is here defined as the number of spin-alpha electrons in excess of spin-beta electrons. 
 
 **Default input:**   
 spin = 0
