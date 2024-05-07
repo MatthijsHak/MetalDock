@@ -90,7 +90,7 @@ def HirshfeldToCM5(xyz_file, df,a0):
                 factor = np.exp(-1.0*alpha*(dist-r.RAD-p.RAD))
                 qcm5=qcm5+factor*DVALS[r.AtNum-1,p.AtNum-1]
         cm5_charges.append(qcm5)
-    df['QCM5']     = np.array(cm5_charges) - np.mean(cm5_charges)
+    df['QCM5']     = np.array(cm5_charges)
     mol = xyz_prep(xyz_file, df)
     df['FPS'] = [AtomFPProgram(mol,atomNum,radii=2) for atomNum in df.index]
     uniq_fps = list(set(df.FPS))

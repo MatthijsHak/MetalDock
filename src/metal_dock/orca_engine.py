@@ -74,6 +74,8 @@ def orca_extract_CM5(log_file, xyz_file):
 
     with open('CM5_charges.csv', newline='') as f:
         reader = csv.reader(f)
+        #! delete underneath
+        print(data)
         data = list(reader)
 
         with open('CM5_charges','w') as fout:
