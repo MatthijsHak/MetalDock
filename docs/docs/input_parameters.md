@@ -66,7 +66,7 @@ ncpu = 1
 ---
 
 ### memory
-The amount of memory to maximully allocate to each core in MB.
+The amount of memory to maximally allocate to each core in MB.
 
 
 **Default input:**  
