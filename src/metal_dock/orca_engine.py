@@ -75,7 +75,6 @@ def orca_extract_CM5(log_file, xyz_file):
     with open('CM5_charges.csv', newline='') as f:
         reader = csv.reader(f)
         #! delete underneath
-        print(data)
         data = list(reader)
 
         with open('CM5_charges','w') as fout:
@@ -111,7 +110,7 @@ def orca_geom_opt(xyz_file, var):
                     charge=var.charge,
                     mult=M,
                     orcasimpleinput=f'Opt {var.orcasimpleinput}',
-                    orcablocks=f'%pal nprocs {str(var.ncpu)} end %output Print[P_hirshfeld] 1 end {var.orcablocks}',
+                    orcablocks=f'%maxcore {str(var.memory)} %pal nprocs {str(var.ncpu)} end %output Print[P_hirshfeld] 1 end {var.orcablocks}',
                     )
 
     mol.get_potential_energy()

@@ -125,7 +125,7 @@ def gaussian_geom_opt(xyz_file, var):
     if var.solvent == '':
         s   = Gaussian(label='geom_opt',
                         nprocshared=var.ncpu ,
-                        mem='4GB',
+                        mem=f'{var.memory}MB',
                         chk='geom_opt.chk',
                         xc=var.functional,
                         charge=var.charge,
@@ -137,7 +137,7 @@ def gaussian_geom_opt(xyz_file, var):
     else:
         s   = Gaussian(label='geom_opt',
                 nprocshared=var.ncpu ,
-                mem='4GB',
+                mem=f'{var.memory}MB',
                 chk='geom_opt.chk',
                 xc=var.functional,
                 charge=var.charge,
@@ -161,7 +161,7 @@ def gaussian_sp(xyz_file, var):
     if var.solvent == '':
         mol.calc = Gaussian(label='single_point',
                             nprocshared= var.ncpu,
-                            mem='4GB',
+                            mem=f'{var.memory}MB',
                             chk='single_point.chk',
                             xc=var.functional,
                             charge=var.charge,
@@ -173,7 +173,7 @@ def gaussian_sp(xyz_file, var):
     else:
         mol.calc = Gaussian(label='single_point',
                     nprocshared= var.ncpu,
-                    mem='4GB',
+                    mem=f'{var.memory}MB',
                     chk='single_point.chk',
                     xc=var.functional,
                     charge=var.charge,

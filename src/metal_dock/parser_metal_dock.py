@@ -21,7 +21,8 @@ config = configparser.ConfigParser(interpolation=None)
 config['DEFAULT']       =   { "method"                  :              'dock',
                               "metal_symbol"            :                'Ru',
                               "parameter_file"          :    'metal_dock.dat',
-                              "ncpu"                    :                 '1'}
+                              "ncpu"                    :                 '1',
+                              "memory"                  :              '3000',}
 
 config['PROTEIN']       =   { "pdb_file"                :       'protein.pdb',
                               "pH"                      :               '7.4',
@@ -87,6 +88,7 @@ class Parser:
 
     self.parameter_file           = config['DEFAULT']['parameter_file'].strip()
     self.ncpu                     = int(config['DEFAULT']['ncpu'])
+    self.memory                   = int(config['DEFAULT']['memory'])
 
     self.atom_types_included()
 
