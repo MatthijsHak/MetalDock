@@ -65,6 +65,18 @@ ncpu = 1
 
 ---
 
+### memory
+The amount of memory to maximully allocate to each core in MB.
+
+
+**Default input:**  
+ncpu = 3000
+
+**Valid Values:**  
+`integer` -  range[0,inf]  
+
+---
+
 ## PROTEIN keywords 
 
 ---
