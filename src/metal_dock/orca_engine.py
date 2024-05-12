@@ -103,7 +103,7 @@ def orca_sp_converged(log_file):
             return sys.exit()
 
 def orca_geom_opt(xyz_file, var):
-    M = 2 * var.spin + 1
+    M = 2 * (var.spin*0.5) + 1
 
     mol = read(xyz_file)
     mol.calc = ORCA(label='geom',
@@ -118,7 +118,7 @@ def orca_geom_opt(xyz_file, var):
     return
 
 def orca_single_point(xyz_file, var):
-    M = 2 * var.spin + 1
+    M = 2 * (var.spin*0.5) + 1
 
     mol = read(xyz_file)
     mol.calc = ORCA(label='single_point',

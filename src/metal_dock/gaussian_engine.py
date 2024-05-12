@@ -118,7 +118,7 @@ def gaussian_sp_converged(log_file):
             return sys.exit()
 
 def gaussian_geom_opt(xyz_file, var):
-    M = 2 * var.spin + 1 
+    M = 2 * (var.spin*0.5) + 1 
 
     mol = read(xyz_file)
 
@@ -180,7 +180,7 @@ def gaussian_geom_opt(xyz_file, var):
 
 
 def gaussian_sp(xyz_file, var):
-    M = 2 * var.spin + 1 
+    M = 2 * (var.spin*0.5) + 1 
 
     mol = read(xyz_file)
     if var.solvent != '' and var.dispersion != '':
