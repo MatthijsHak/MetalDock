@@ -17,6 +17,12 @@ metaldock -i input.ini
 
 For a detailed description of the output directories and files please see the [output](output.md) chapter.
 
+## What basis set and functional should I use?
+Choosing the correct settings for the quantum mechanical calculation can be tricky. Luckily, there have been numerous reviews on this subject that can help you with choosing the correct settings for your system. I would like to recommend the following two papers, for the less experienced quantum chemistry users:
+
+[Best-Practice DFT Protocols for Basic Molecular Computational Chemistry](https://onlinelibrary.wiley.com/doi/full/10.1002/ange.202205735)
+[Which functional should I choose?](https://www.chem.uci.edu/~kieron/dft/pubs/RCFB08.pdf)
+
 ## Docking workflow
 A workflow for the docking procedure is schematically given below.
 
