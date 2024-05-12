@@ -70,7 +70,7 @@ The amount of memory to maximally allocate to each core in MB.
 
 
 **Default input:**  
-ncpu = 3000
+memory = 3000
 
 **Valid Values:**  
 `integer` -  range[0,inf]  
@@ -329,22 +329,11 @@ box_size = 20
 
 ---
 
-### box_size
-This keyword specifies the box size side in Ångstrom of the box used in the docking procedure
-
-**Default input:**  
-box_size = 20
-
-**Valid values:**  
-`float`
-
----
-
 ### scale_factor
 This keyword scales the box to the volume of the metal-organic compound. 
 
 **Default input:**  
-box_size = 
+scale_factor = None
 
 **Valid values:**  
 `float`
@@ -355,7 +344,7 @@ box_size =
 Randomize the initial positions of the atoms within the box before the docking procedure. 
 
 **Default input:**  
-box_size = True
+random_pos = True
 
 **Valid values:**  
 `boolean`
@@ -363,7 +352,7 @@ box_size = True
 ---
 
 ### ini_parameters
-Keyword that needs to be activated if the well-depth parameters of the metal protein interaction are specified in the **'.ini'** file
+Keyword that needs to be activated if the well-depth parameters of the metal protein interaction are specified in the **'.ini'** file.
 
 **Default input:**  
 ini_parameters = False
@@ -374,10 +363,10 @@ ini_parameters = False
 ---
 
 ### e_NA
-The well-depth parameter of the Lennard-Jones interaction between the metal and the nitrogen hydrogen bond accepting atom type of the protein in kcal/mol. This function is only triggered when the standard keyword is set to False
+The well-depth parameter of the Lennard-Jones interaction between the metal and the nitrogen hydrogen bond accepting atom type of the protein in kcal/mol. This function is only triggered when the ini_parameters keyword is set to True.
 
 **Default input:**  
-box_size = 5.0
+e_NA = 5.0
 
 **Valid values:**  
 `float`
@@ -385,10 +374,10 @@ box_size = 5.0
 ---
 
 ### e_OA
-The well-depth parameter of the Lennard-Jones interaction between the metal and the oxygen hydrogen bond accepting atom type of the protein in kcal/mol. This function is only triggered when the standard keyword is set to False
+The well-depth parameter of the Lennard-Jones interaction between the metal and the oxygen hydrogen bond accepting atom type of the protein in kcal/mol. This function is only triggered when the ini_parameters keyword is set to True.
 
 **Default input:**  
-box_size = 5.0
+e_OA = 5.0
 
 **Valid values:**  
 `float`
@@ -396,10 +385,10 @@ box_size = 5.0
 ---
 
 ### e_SA
-The well-depth parameter of the Lennard-Jones interaction between the metal and the sulphur hydrogen bond accepting atom type of the protein in kcal/mol. This function is only triggered when the standard keyword is set to False
+The well-depth parameter of the Lennard-Jones interaction between the metal and the sulphur hydrogen bond accepting atom type of the protein in kcal/mol. This function is only triggered when the ini_parameters keyword is set to True.
 
 **Default input:**  
-box_size = 5.0
+e_SA = 5.0
 
 **Valid values:**  
 `float`
@@ -407,10 +396,10 @@ box_size = 5.0
 ---
 
 ### e_HD
-The well-depth parameter of the Lennard-Jones interaction between the metal and the hydrogen bond donating atom type of the protein in kcal/mol. This function is only triggered when the standard keyword is set to False
+The well-depth parameter of the Lennard-Jones interaction between the metal and the hydrogen bond donating atom type of the protein in kcal/mol. This function is only triggered when the ini_parameters keyword is set to True.
 
 **Default input:**  
-box_size = 5.0
+e_HD = 5.0
 
 **Valid values:**  
 `float`
