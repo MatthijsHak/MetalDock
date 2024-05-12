@@ -36,7 +36,6 @@ def docking(input_file, par=None):
         xyz_file = os.path.join(input_dir, par.xyz_file)
         # center the molecule around the metal_symbol
         xyz_file = d.center_molecule(input_dir, xyz_file, par.metal_symbol)
-        print(xyz_file)
         subprocess.call([os.environ['OBABEL']+f' -ixyz {xyz_file} -oxyz {par.name_ligand}_c.xyz --canonical > {par.name_ligand}_c.xyz'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
     if os.path.exists(f'{par.name_ligand}.mol2') == False:
