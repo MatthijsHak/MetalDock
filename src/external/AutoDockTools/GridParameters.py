@@ -749,7 +749,7 @@ class GridParameters(UserDict):
                     self['parameter_file']['value'] = old_parameter_file_value 
             elif p=='map':
                 # maps are a special case
-                for s in string.split(self['ligand_types']['value']):
+                for s in self['ligand_types']['value'].split():
                     gpf_ptr.write(self.make_map_string(p, s))
             # all the other parameters handle themselves
             elif p=='gridcenter' and self['gridcenterAuto']['value']==1:
@@ -856,10 +856,10 @@ class GridParameterFileMaker:
 
     def set_receptor(self, receptor_filename, gpf_filename=None):
         self.receptor_filename = os.path.basename(receptor_filename)
-        self.receptor_stem = string.split(self.receptor_filename, '.')[0]
+        self.receptor_stem = self.receptor_filename.split('.')[0]
         self.gpo.set_receptor(receptor_filename)
-        #FIX THIS
-        #self.gpo['mset']['value'] = self.receptor.types
+        # FIX THIS
+        # self.gpo['mset']['value'] = self.receptor.types
         self.gpo['types']['value'] = self.ligand.types
 
 

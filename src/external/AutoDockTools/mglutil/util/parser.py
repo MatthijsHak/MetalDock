@@ -35,7 +35,7 @@ class VRML2IndexedFaceSetToCoords:
         
         for i in range(len(self.data)):
             d = self.data[i]
-            spl = string.split(d)
+            spl = d.split()
 
             for k in range(len(spl)):
                 if spl[k] == 'coord' and spl[k+1] == 'Coordinate':
@@ -71,7 +71,7 @@ class VRML2IndexedFaceSetToCoords:
 
 
             if indexflag == 1:
-                testEnd = string.split(d)
+                testEnd = d.split()
 #                if testEnd[0]=='texCoord':
 #                    indexflag=0
 #                    continue
@@ -88,7 +88,7 @@ class VRML2IndexedFaceSetToCoords:
 
 
             if scaleflag == 1:
-                sc = string.split(d)
+                sc = d.split()
                 scale.append( float(sc[1]) )
                 scale.append( float(sc[2]) )
                 scale.append( float(sc[3]) )

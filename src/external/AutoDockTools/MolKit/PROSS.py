@@ -251,8 +251,8 @@ mydefs['PII'] = {'Dk':1, 'Dl':1, 'Ek':1, 'El':1}
 helix  = ('De', 'Df', 'Ed', 'Ee', 'Ef', 'Fd', 'Fe')
 strand = ('Bj', 'Bk', 'Bl', 'Cj', 'Ck', 'Cl', 'Dj', 'Dk', 'Dl')
 
-pat_helix  = "(%s){5,}" % string.join(["(%s)" % x for x in helix], '|')
-pat_strand = "(%s){3,}" % string.join(["(%s)" % x for x in strand], '|')
+pat_helix = "(%s){5,}" % '|'.join(["(%s)" % x for x in helix])
+pat_strand = "(%s){3,}" % '|'.join(["(%s)" % x for x in strand])
 
 mydefs['HELIX'] = re.compile(pat_helix)
 mydefs['STRAND'] = re.compile(pat_strand)
@@ -315,8 +315,8 @@ mydefs['PII'] = {'M':1, 'R':1}
 helix  = ('O', 'P')
 strand = ('L', 'G', 'F', 'A')
 
-pat_helix  = "(%s){5,}" % string.join(["(%s)" % x for x in helix],  '|')
-pat_strand = "(%s){3,}" % string.join(["(%s)" % x for x in strand], '|')
+pat_helix = "(%s){5,}" % '|'.join(["(%s)" % x for x in helix])
+pat_strand = "(%s){3,}" % '|'.join(["(%s)" % x for x in strand])
 
 mydefs['HELIX'] = re.compile(pat_helix)
 mydefs['STRAND'] = re.compile(pat_strand)
@@ -451,8 +451,8 @@ def _rc_find(codes, pattern, mcodes=None):
     if not mcodes: mcodes = default
     CODE_LENGTH = MSDEFS[mcodes]['CODE_LENGTH']
 
-    if not type(codes) == type(''):
-        codes = string.join(codes, '')
+    if not isinstance(codes, str):
+        codes = ''.join(codes)
 
     matches = []
     it = pattern.finditer(codes)
@@ -1451,16 +1451,16 @@ def fromint(v1, dis, v2, a, v3, t, sqrt=math.sqrt, sin=math.sin, cos=math.cos):
                   y1 + dis*(-u2y*cosa + u4y + u3y*sint),
                   z1 + dis*(-u2z*cosa + u4z + u3z*sint))
 
-def _atof(s, atof=string.atof):
+def _atof(s):
     try:
-        return atof(s)
-    except:
+        return float(s)
+    except ValueError:
         return None
 
-def _atoi(s, atoi=string.atoi):
+def _atoi(s):
     try:
-        return atoi(s)
-    except:
+        return int(s)
+    except ValueError:
         return None
 
 def get_sequences(file):
@@ -1486,7 +1486,7 @@ def get_sequences(file):
     
     while line[:6] == 'SEQRES':
         chain = line[11]
-        residues = string.split(line[19:71])
+        residues = line[19:71].split()
         if chain not in sequences:
             sequences[chain] = []
         sequences[chain].extend(residues)
@@ -1495,7 +1495,7 @@ def get_sequences(file):
     return sequences
      
 
-def unpack_pdb_line(line, ATOF=_atof, ATOI=_atoi, STRIP=string.strip):
+def unpack_pdb_line(line, ATOF=_atof, ATOI=_atoi, STRIP=str.strip):
     return (ATOI(line[6:11]),
            STRIP(line[12:16]),
            line[16],
@@ -1635,7 +1635,7 @@ def read_pdb(f, as_protein=0, as_rna=0, as_dna=0, all_models=0,
         try:
             if len(line) > 10 and line[:6] == 'REMARK' and line[9] == '2':
                 line = line[10:70].upper()
-                rpos = string.find(line, 'RESOLUTION.')
+                rpos = line.find('RESOLUTION.')
                 if rpos >= 0:
                     new_mol.resolution = float(line[rpos+11:].split()[0])
         except:
@@ -1656,14 +1656,14 @@ def read_pdb(f, as_protein=0, as_rna=0, as_dna=0, all_models=0,
             if len(line) > 10 and line[:6] == 'REMARK' and line[9] == '3':
                 line = line[10:70].upper()
 
-                if string.find(line, ':') >= 0:
-                    get_val = lambda x: string.split(x, ':')[1].strip()
+                if line.find(':') >= 0:
+                    get_val = lambda x: x.split(':')[1].strip()
                 else:
-                    get_val = lambda x: string.split(x)[0]
-                    
-                ppos = string.find(line,  '  PROGRAM  ')
-                rfpos = string.find(line, '  FREE R VALUE  ')
-                rvpos = string.find(line, '  R VALUE  ')
+                    get_val = lambda x: x.split()[0]
+
+                ppos = line.find('  PROGRAM  ')
+                rfpos = line.find('  FREE R VALUE  ')
+                rvpos = line.find('  R VALUE  ')
 
                 if ppos >= 0:
                     new_mol.rprog = get_val(line[ppos+11:])
@@ -1675,11 +1675,11 @@ def read_pdb(f, as_protein=0, as_rna=0, as_dna=0, all_models=0,
             pass
                 
         if line[:6] == 'COMPND':
-            if string.find(line, 'MOL_ID') != -1: continue
-            new_mol.name = new_mol.name + string.strip(line[10:72]) + ' '
+            if line.find('MOL_ID') != -1: continue
+            new_mol.name = new_mol.name + line[10:72].strip() + ' '
         if line[:4] == 'ATOM' or line[:4] == 'HETA' or line[:5] == 'MODEL':
             break
-    new_mol.name = string.strip(new_mol.name)    
+    new_mol.name = new_mol.name.strip() 
     data = inp.readlines()
     if line[:4] in ('ATOM', 'HETA', 'MODE'):
         data.insert(0, line)
@@ -1742,7 +1742,7 @@ def read_pdb(f, as_protein=0, as_rna=0, as_dna=0, all_models=0,
             #new_mol.append(new_chain)
             #old_chain = ' '
 
-            modnum = int(string.split(line)[1])
+            modnum = int(line.split()[1])
             old_chain = None
             old_res = None
             old_icode = None
@@ -1784,7 +1784,7 @@ def _read_chain(f, as_protein=0, as_rna=0, as_dna=0, unpack=unpack_pdb_line,
         if key == 'ATOM' or key == 'HETA':
             break
         elif key == 'MODE':
-            new_chain.name = string.split(line)[1]
+            new_chain.name = line.split()[1]
             line = None
 
     if line:
@@ -2009,7 +2009,7 @@ class Protein(molChain):
         residues = []
         Append = residues.append
         res_class = res.__class__
-        Strip = string.strip
+        Strip = str.strip
 
         for i in ids:
             res = self[i]

@@ -70,7 +70,7 @@ class Mol2Parser(MoleculeParser):
             if self.allLines[i][:9] == '@<TRIPOS>':
                 if self.keysAndLinesIndices:
                     self.keysAndLinesIndices[record].append(i)
-                record = string.strip(self.allLines[i])
+                record = self.allLines[i].strip()
                 self.keysAndLinesIndices[record] = [i+1]
                 i = i+1
             else:
@@ -109,11 +109,14 @@ class Mol2Parser(MoleculeParser):
             molList.append(self.mol)
 
         else:
-            atmlines = list(map(string.split, self.allLines
-                           [self.keysAndLinesIndices
-                            ['@<TRIPOS>ATOM'][0]:
-                            self.keysAndLinesIndices
-                            ['@<TRIPOS>ATOM'][1]]))
+            # atmlines = list(map(string.split, self.allLines
+                        #    [self.keysAndLinesIndices
+                            # ['@<TRIPOS>ATOM'][0]:
+                            # self.keysAndLinesIndices
+                            # ['@<TRIPOS>ATOM'][1]]))
+            
+            atmlines = [line.split() for line in self.allLines[self.keysAndLinesIndices['@<TRIPOS>ATOM'][0]:self.keysAndLinesIndices['@<TRIPOS>ATOM'][1]]]
+
             self.build4LevelsTree({},atmlines)
 ##              self.build2LevelsTree(map(string.split, self.allLines
 ##                                        [self.keysAndLinesIndices
@@ -182,7 +185,7 @@ class Mol2Parser(MoleculeParser):
         else:
             # case 3: at least 1 substructure and 1 chain --> 4 levels tree.
             #subst_chain = {}
-            substlines = list(map(string.split, substlines))
+            substlines = [line.split() for line in substlines]
             for line in substlines:
                 if len(line)<6 or line[5] == '****':
                     continue
@@ -222,9 +225,7 @@ class Mol2Parser(MoleculeParser):
         self.mol.levels = [Molecule, Atom]
         ##1/18:self.mol.levels = [Protein, Atom]
         for atmline in atomlines:
-            atom = Atom(atmline[1], self.mol,
-                        chemicalElement = string.split(atmline[5], '.')[0],
-            top = self.mol)
+            atom = Atom(atmline[1], self.mol, chemicalElement=atmline[5].split('.')[0], top=self.mol)
             #atom.element = atmline[5][0]
             atom.element = atom.chemElem
             atom.number = int(atmline[0])
@@ -266,7 +267,7 @@ class Mol2Parser(MoleculeParser):
         self.mol.levels = [Protein, Residue, Atom]
         for atmline in atomlines:
             if len(atmline)>= 10:
-                status = string.split(atmline[9], '|')
+                status = atmline[9].split('|')
             else:
                 status = None
             resName = atmline[7][:3]
@@ -274,7 +275,7 @@ class Mol2Parser(MoleculeParser):
             if resSeq != self.mol.curRes.number or \
                resName != self.mol.curRes.type:
                 # check if this residue already exists
-                na = string.strip(resName) + string.strip(resSeq)
+                na = resName.strip() + resSeq.strip()
                 res = self.mol.get(na)
                 if res:
                     self.mol.curRes = res[0]
@@ -285,7 +286,7 @@ class Mol2Parser(MoleculeParser):
             name = atmline[1]
             
             atom = Atom(name, self.mol.curRes, top = self.mol,
-            chemicalElement = string.split(atmline[5], '.')[0])
+            chemicalElement = atmline[5].split('.')[0])
             #atom.element = atmline[5][0]
             atom.element = atom.chemElem
             atom.number = int(atmline[0])
@@ -332,7 +333,7 @@ class Mol2Parser(MoleculeParser):
         i = 1
         for atmline in atomlines:
             if len(atmline)>= 10:
-                status = string.split(atmline[9], '|')
+                status = atmline[9].split('|')
             else:
                 status = None
 
@@ -386,7 +387,7 @@ class Mol2Parser(MoleculeParser):
             if resSeq != self.mol.curRes.number or \
                resName != self.mol.curRes.type:
                 # check if this residue already exists
-                na = string.strip(resName) + string.strip(resSeq)
+                na = resName.strip() + resSeq.strip()
                 res = self.mol.curChain.get( na )
                 if res:
                     self.mol.curRes = res[0]
@@ -397,7 +398,7 @@ class Mol2Parser(MoleculeParser):
             name = atmline[1]
             
             atom = Atom(name, self.mol.curRes, top = self.mol,
-            chemicalElement = string.split(atmline[5], '.')[0])
+            chemicalElement = atmline[5].split('.')[0])
             #atom.element = atmline[5][0]
             atom.element = atom.chemElem
             atom.number = int(atmline[0])
@@ -426,13 +427,13 @@ class Mol2Parser(MoleculeParser):
         
     def parse_MOL2_Molecule(self, mollines):
         """Function to parse the Molecule records"""
-        mollines = list(map(string.split, mollines))
+        mollines = [line.split() for line in mollines]
         return mollines
 
     def parse_MOL2_Bonds(self, bondlines):
         """ Function to build the bonds object using the bond record of
         the mol2 file."""
-        bondlines = list(map(string.split, bondlines))
+        bondlines = [line.split() for line in bondlines]
         for bd in bondlines:
             at1 = self.mol.atmNum[int(bd[1])]
             at2 = self.mol.atmNum[int(bd[2])]
@@ -454,8 +455,8 @@ class Mol2Parser(MoleculeParser):
         
     def parse_MOL2_Sets(self, setRecords):
         """ Function to parse the Sets records"""
-        setRecords = list(map(string.split, self.allLines[setRecords[0]:
-                                                     setRecords[1]]))
+        setRecords = [line.split() for line in self.allLines[setRecords[0]:setRecords[1]]]
+
         i = 0
         while i!=len(setRecords):
             rec = []

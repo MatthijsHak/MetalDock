@@ -309,7 +309,7 @@ class Atom(TreeNode):
             if l<5: # name is not "NoName"
                 celem = name[0].upper()
                 if l>1:
-                    chemElem = celem+string.lower(name[1])
+                    chemElem = celem+name[1].lower()
                     try:
                         babel_elements[chemElem]
                         self.chemElem=chemElem
@@ -509,7 +509,7 @@ class AtomSetSelector(TreeNodeSetSelector):
     def getRange(self, nodes, item):
         if len(nodes)<2:
             return None
-        levItList=string.split(item, '-')
+        levItList=item.split('-')
         if len(levItList)!=2: return None
         #if levItList[0][0]=='#' or levItList[1][0]=='#':
         if levItList[0][0]=='#' and levItList[1][0]=='#':
@@ -526,7 +526,7 @@ class AtomSetSelector(TreeNodeSetSelector):
 
 
     def getAtomRelRange(self, nodes, item):
-        levItList=string.split(item, '-')
+        levItList=item.split('-')
         #now the hard part: need to call pLI w/ each set of parent nodes
         selNodes = None
         parentNodes = nodes.parent.uniq()

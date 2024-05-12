@@ -1778,7 +1778,7 @@ class RotatableBondManager:
         self.detectAll = detectAll
         allowed_bond_list = []
         if allowed_bonds:
-            allowed_bond_list = string.split(allowed_bonds,'_')
+            allowed_bond_list = allowed_bonds.split('_')
         #set up flags:
         allow_amide_torsions = 'amide' in allowed_bond_list
         molecule.has_amide = allow_amide_torsions
@@ -1803,7 +1803,7 @@ class RotatableBondManager:
         else:
             self.setroot(int(root))
         if len(bonds_to_inactivate):
-            bnds_list = list(map(int,string.split(bonds_to_inactivate,'_')))
+            bnds_list = list(map(int, bonds_to_inactivate.split('_')))
             #???
             #molecule.has_amide = 'amide' not in bnds_list
             #molecule.has_guanidinium = 'guanidinium' not in bnds_list
@@ -2395,19 +2395,19 @@ class AD4FlexibleDockingPreparation:
         # in the flexible residues and must be 1-based
         self.outatom_counter = 1
         for line in ligfileptr:
-            #don't write any CONECT records
-            if string.find(line, 'active torsions')>-1:
+            # Don't write any CONECT records
+            if 'active torsions' in line:
                 lig_torscount = int(line.split()[1])
                 self.torsionCtr = lig_torscount
                 total = lig_torscount + res_total
-                line = 'REMARK  %2d active torsions:\n' %(total)
-                #print 'activeTorsionsLine= ', item
-            if string.find(line, "ATOM")>-1:
+                line = f'REMARK  {total} active torsions:\n'
+                # print('activeTorsionsLine= ', item)
+            if "ATOM" in line:
                 self.outatom_counter += 1
-            if string.find(line, "HETA")>-1:
+            if "HETA" in line:
                 self.outatom_counter += 1
-            if string.find(line, 'CONECT')>-1: continue
-            if string.find(line, 'MASTER')>-1: continue
+            if 'CONECT' in line or 'MASTER' in line:
+                continue
             outfileptr.write(line)
         ligfileptr.close()
         for res in flex_residues:

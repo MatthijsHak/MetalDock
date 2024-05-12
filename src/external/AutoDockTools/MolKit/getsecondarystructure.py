@@ -539,8 +539,8 @@ class GetSecondaryStructureFromPross(GetSecondaryStructure):
 
 		CODE_LENGTH = self.MSDEFS['CODE_LENGTH']
 
-		if not type(codes) == type(''):
-			codes = string.join(codes, '')
+        if not isinstance(codes, str):
+            codes = ''.join(codes)
 
 		matches = []
 		it = pattern.finditer(codes)

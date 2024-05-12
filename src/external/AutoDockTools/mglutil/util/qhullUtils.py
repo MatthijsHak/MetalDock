@@ -96,7 +96,7 @@ facet."""
             return
         
         # get more header info
-        header = string.split(data[1])
+        header = data[1].split()
         lenVerts = int(header[0])
         lenFaces = int(header[1])
 
@@ -104,11 +104,11 @@ facet."""
         faces = []
 
         for d in data[2:lenVerts+2]: # offset of 2 because of file header
-            spl = string.split(d)
+            spl = d.split()
             vertices.append( [float(spl[0]), float(spl[1]), float(spl[2])] )
 
-        for d in data[lenVerts+2:]: # offset of 2 because of file header
-            spl = list(map( int, string.split(d) ))
+        for d in data[lenVerts+2:]:  # offset of 2 because of file header
+            spl = list(map(int, d.split()))
 
             for i in range(3, len(spl)):
                 faces.append( [spl[1], spl[i], spl[i-1]] )

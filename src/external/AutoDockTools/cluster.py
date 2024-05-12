@@ -521,11 +521,11 @@ If comment is '#':
         d = self.clustering_dict # local copy
 
         # see if there's the last char is a 'd' or 'b'  or 'e'to denote energy
-        word_list = string.split(lines[0])
-        if word_list[-1][0] in ['b', 'd', 'e']: 
+        word_list = lines[0].split()
+        if word_list[-1][0] in ['b', 'd', 'e']:
             file_energy_used = word_list[-1]
-            ind = string.find(lines[0], file_energy_used)
-            lines[0] = lines[0][:ind] # strip energy symbol
+            ind = lines[0].find(file_energy_used)
+            lines[0] = lines[0][:ind]  # strip energy symbol
         else:
             file_energy_used = 'binding'
 
@@ -545,7 +545,7 @@ If comment is '#':
             self.argsort = numpy.argsort(energy_list)
             #print "self.argsort=", self.argsort
 
-        t_list = list(map(float, string.split(lines[0])))
+        t_list = list(map(float, lines[0].split()))
         #t_list for the example is [0.5, 2.0]
         num_t = len(t_list)   #number of clusterings
 

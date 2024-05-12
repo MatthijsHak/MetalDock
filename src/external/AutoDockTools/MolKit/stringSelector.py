@@ -460,7 +460,7 @@ class MVStringSelector:
         #make a list of the 4 lists
         self.selList = []
         for item in selString:
-            itemList = string.split(item, ',')
+            itemList = item.split(',')
             self.selList.append(itemList)
         self.procFunction = eval('self.processString%s' %userPref)
         #???should these be initialized here?
@@ -687,7 +687,7 @@ class MVStringSelector:
             pass
 
         #detect ranges:
-        if string.find(item, '-')!=-1 and string.find(item, '[')==-1:        
+        if item.find('-') != -1 and item.find('[') == -1:       
             #call range w/ nodes here:
             newNodes = FD['range'](item, nodes )
             return newNodes
@@ -740,7 +740,7 @@ class MVStringSelector:
     def getMolRange(self, item, nodes):
         if len(nodes)<2:
             return None
-        levItList=string.split(item, '-')
+        levItList = item.split('-')
         firstNodes = self.processListItem(nodes, levItList[0], self.molFD)
         lastNodes = self.processListItem(nodes, levItList[1], self.molFD)
         if firstNodes and lastNodes:        
@@ -772,7 +772,7 @@ class MVStringSelector:
     def getChainRange(self, item, nodes):
         if len(nodes)<2:
             return None
-        levItList=string.split(item, '-')
+        levItList = item.split('-')
         #Should chain range be on a per molecule basis????
         # this selects range of all chains 
         firstNodes = self.processListItem(nodes, levItList[0], self.chainFD)
@@ -822,7 +822,7 @@ class MVStringSelector:
     def getResidueRange(self, item, nodes):
         #this needs to be done on a PER CHAIN basis:
         if len(nodes) <2: return None
-        levItList=string.split(item, '-')
+        levItList = item.split('-')
         selNodes = None
         parentNodes = nodes[0].parent.setClass(nodes.parent.uniq())
         for par in parentNodes:
@@ -887,7 +887,7 @@ class MVStringSelector:
     def getAtomRange(self, item, nodes):
         if len(nodes)<2:
             return None
-        levItList=string.split(item, '-')
+        levItList = item.split('-')
         if len(levItList)!=2: return None
         if levItList[0][0]=='#' or levItList[1][0]=='#':
             return self.getAtomRelRange(item,nodes)
@@ -900,7 +900,7 @@ class MVStringSelector:
 
     def getAtomRelRange(self,item,nodes):
 
-        levItList=string.split(item, '-')
+        levItList = item.split('-')
         #now the hard part: need to call pLI w/ each set of parent nodes
         selNodes = None
         parentNodes = ResidueSet(nodes.parent.uniq())
@@ -960,7 +960,7 @@ class MVStringSelector:
     #Functions for converting input for regular expressions:
     def processStringcIWEC(self,someString):
         import string
-        strList = string.split(someString, ',')
+        strList = someString.split(',')
         retExp = ''
         specialList = ['?','*','.','$','#', ':', '-']
         numbList = ['0','1','2','3','4','5','6','7','8','9']
@@ -988,14 +988,15 @@ class MVStringSelector:
                     escape = 0
                 else:
                     if startbrace:
-                        if c =='^'or c =='[': newExp = newExp + c
+                        if c == '^' or c == '[':
+                            newExp += c
                         else:
-                            newExp = newExp + string.upper(c)+ string.lower(c)
+                            newExp += c.upper() + c.lower()
                     elif closebrace:
-                        newExp = newExp + c
-                        closebrace = closebrace -1
+                        newExp += c
+                        closebrace -= 1
                     else:
-                        newExp = newExp + '['+string.upper(c)+ string.lower(c)+']'
+                        newExp += '[' + c.upper() + c.lower() + ']'
             retExp = retExp + newExp
             if i < len(strList)-1:
                 retExp = retExp +','
@@ -1003,39 +1004,38 @@ class MVStringSelector:
         return  self.processStringcI(someString)
 
 
-    def processStringcI(self,someString):
-        import string
-        someString = string.replace(someString, '?', '.')
-        #if there are any commas, preceed them by (?i)
-        someString = string.replace(someString, ',','(?i),')
+    def processStringcI(self, someString):
+        someString = someString.replace('?', '.')
+        someString = someString.replace(',', '(?i),')
+
         #in any case add one (?i) at the end
         someString = someString + '(?i)'
         return self.processStringcS(someString)
 
 
     def processStringcS(self, someString):
-        import string
-        #in all cases do these things:
-        someString = string.replace(someString, '-', ':')
-        someString = string.replace(someString, '*', '.*')
+        someString = someString.replace('-', ':')
+        someString = someString.replace('*', '.*')
         return someString
+
 
 
 class Mv102StringSelector(MVStringSelector):
 
 
-    def __init__(self, moleculeSet, selString, userPref = 'cS'):
+    def __init__(self, moleculeSet, selString, userPref='cS'):
         self.form = None
-        if len(selString)<4:
-            self.selString =self.getMvStrings(selString)
+        if len(selString) < 4:
+            self.selString = self.getMvStrings(selString)
         else:
-            self.selString = string.split(selString, ':')
+            self.selString = selString.split(':')
         MVStringSelector.__init__(self, moleculeSet, self.selString,'cIWEC')
         
 
-    def getMvStrings(self,selString):
-        #nb  selString looks like ('::ALA:')
-        selList = string.split(selString[0], ':')
+    def getMvStrings(self, selString):
+        # nb selString looks like ('::ALA:')
+        selList = selString[0].split(':')
+
         z = ''
         if len(selList) == 1:
            selList.append(z)
@@ -1076,7 +1076,7 @@ class Mv102StringSelector(MVStringSelector):
             return nodes.ReturnType(newNodes)
 
         #detect ranges:
-        if string.find(item, '-')!=-1 and string.find(item, '[')==-1:        
+        if item.find('-')!=-1 and item.find('[')==-1:        
             #call range w/ nodes here:
             newNodes = FD['range'](item, nodes )
             return newNodes

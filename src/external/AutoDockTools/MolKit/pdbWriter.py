@@ -193,8 +193,9 @@ class PdbWriter(MoleculeWriter):
         altLoc = None
         name = at.name
         #if len(name)>2 and name[-2]=='@':
-        if string.find(name,'@')>-1:
-            ind = string.index(name,'@')
+        if '@' in name:
+            ind = name.index('@')
+
             altLoc = name[ind+1:]
             #altLoc = name[-1]
             name = name[:ind]

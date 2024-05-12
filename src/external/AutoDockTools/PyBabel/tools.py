@@ -28,7 +28,7 @@ def read_element_table(filename):
     f.close()
     elemTable = {}
     for i in range(len(lines)):
-        dd = string.split(lines[i])
+        dd = lines[i].split()
         elemTable[dd[1]] = { 'num':i,
                              'cov_rad':float(dd[2]),
                              'bond_ord_rad':float(dd[3]),
@@ -53,17 +53,19 @@ def writeElementTableAsPythonCode(elemTab, inFileName, outFileName):
 
 
 def read_types_table(filename):
-    f = open(filename)
-    typestab = {}
-    nrow, ncol = list(map( int, string.split(f.readline())))
-    typeFormats = string.split(f.readline())
-    for t in typeFormats:
-        typestab[t] = []
-    for i in range(nrow-1):
-        typeNames = string.split(f.readline())
-        for j in range(ncol):
-            typestab[typeFormats[j]].append(typeNames[j])
-    f.close()
+    with open(filename) as f:
+        typestab = {}
+        nrow, ncol = map(int, f.readline().split())
+        typeFormats = f.readline().split()
+        
+        for t in typeFormats:
+            typestab[t] = []
+
+        for _ in range(nrow - 1):
+            typeNames = f.readline().split()
+            for j in range(ncol):
+                typestab[typeFormats[j]].append(typeNames[j])
+
     return typestab
 
 

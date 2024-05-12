@@ -53,17 +53,21 @@ class GenPdbParser(PdbParser):
         # if type wrong, WARNING or Error?
         type = self.recSpecs.get(fieldName, 'var_type')
         ok = 1
-        if type=='int':
+        if type == 'int':
             for c in val:
-                if c not in (string.digits + ' -'): ok = 0
-        elif type=='character':
-            if len(val) != 1 or val not in (string.letters + ' '): ok = 0
-        elif type=='float':
+                if c not in (string.digits + ' -'):
+                    ok = 0
+        elif type == 'character':
+            if len(val) != 1 or val not in (string.ascii_letters + ' '):
+                ok = 0
+        elif type == 'float':
             for c in val:
-                if c not in (string.digits + '. -'): ok = 0
-        elif type=='alphabetic':
+                if c not in (string.digits + '. -'):
+                    ok = 0
+        elif type == 'alphabetic':
             for c in val:
-                if c not in (string.letters + ' '): ok = 0
+                if c not in (string.ascii_letters + ' '):
+                    ok = 0
         elif type=='string': pass
         if not ok:
             #self.f.write('WARNING: '+ fieldName+' value not of type '+type+ ' in record:\n'+rec)
@@ -105,26 +109,26 @@ class GenPdbParser(PdbParser):
 ##                  element = string.strip(name[0:1])
 ##                  # Won't work if the atomType is FE !!!!
 ##              else:
-            element = string.strip(name[0:2])
+            element = name[0:2].strip()
         else:
-            element = string.strip(element)
+            element = element.strip()
             # should I still check that it really is an element ???
         if name[1]=='H':
             if name[0] in ('1','2','3'):
-                name = string.strip(name[1:])+name[0]
+                name = name[1:].strip()+name[0]
                 element = 'H'
         if len(element)==2:
-            element = element[0]+string.lower(element[1])
-        elem = string.lower(element)
+            element = element[0]+element[1].lower()
+        elem = element.lower()
         if elem =='lp' or elem =='ld':
             element = 'Xx'
-        return string.strip(name), element
+        return name.strip(), element
 
     # if there is no specs, I'm not sure about the spaces for each variable
     def parse_PDB_ATOM_record(self, rec):
         """Parse PDB ATOM records using the pdb columns specifications"""
         self.atomCounter = self.atomCounter + 1  # not sure about altLoc
-        if self.specType=='i': rec = string.split(rec)
+        if self.specType=='i': rec = rec.split()
         # Handle the alternate location using a flag.
         altLoc = self.get_Field_Value(rec, 'altLoc')
         if altLoc!= ' ': self.altLoc = altLoc
@@ -151,7 +155,7 @@ class GenPdbParser(PdbParser):
 
         # check for residue break
         resName = self.get_Field_Value(rec, 'resName')
-        resSeq = string.strip(self.get_Field_Value(rec, 'resSeq'))
+        resSeq = self.get_Field_Value(rec, 'resSeq').strip()
         #WARNING reSeq is a STRING
         noresSeq = 0
         if not resSeq and resName==self.mol.curRes.type and resName!='HOH':
@@ -160,7 +164,7 @@ class GenPdbParser(PdbParser):
         if resSeq != self.mol.curRes.number or \
            resName != self.mol.curRes.type:
             # check if this residue already exists
-            na = string.strip(resName) + string.strip(resSeq)
+            na = resName.strip() + resSeq.strip()
             res = self.mol.curChain.get( na )
             if res:
                 self.mol.curRes = res[0]
@@ -213,7 +217,7 @@ class GenPdbParser(PdbParser):
         zcoord = self.get_Field_Value(rec, 'z')
         assert xcoord and ycoord and zcoord
         atom._coords = [ [ float(xcoord), float(ycoord), float(zcoord) ] ]
-        atom.segID = string.strip(self.get_Field_Value(rec, 'segID'))
+        atom.segID = self.get_Field_Value(rec, 'segID').strip()
         if rec[:4]=='ATOM' or rec[0]=='ATOM': atom.hetatm = 0
         else: atom.hetatm = 1
         #atom.alternate = []
@@ -247,8 +251,8 @@ class GenPdbParser(PdbParser):
                 # the new atom has been add to the current residue
                 # You have to go to the one before.
                 lastAtom = self.mol.curRes.atoms[-2]
-                altname = string.split(lastAtom.name, '@')[0]
-                if string.split(name, '@')[0] == altname:
+                altname = lastAtom.name.split('@')[0]
+                if name.split('@')[0] == altname:
                     # Add the new alternate atom to the LastAtom.alternate and
                     # add the lastAtom to the atom.alternate.
                     lastAtom.alternate.append(atom)

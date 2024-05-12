@@ -17,7 +17,7 @@ import string
 def Read(filename):
     from MolKit.pdbParser import PdbParser, PdbqParser,PdbqsParser, PQRParser
     from MolKit.mol2Parser import Mol2Parser
-    ext = string.split(filename, '.')
+    ext = filename.split('.')
     if ext[-1]=='pdb':
         parser = PdbParser(filename)
 

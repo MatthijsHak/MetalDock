@@ -153,7 +153,7 @@ module is caseSensitive.  This is changed by setting caseSensitive to False.
             ind = nodes.name.index(selectionString)
             return nodes[ind:ind+1], zeroSelect
         else:
-            selList = string.split(selectionString, ',')
+            selList = selectionString.split(',')
 
         # build a set of selected nodes by selecting w/ each item in list
         selNodes = self.level([])
@@ -212,7 +212,7 @@ sets
                 pass
 
         # check for ranges that do not contain [ because these are regexp
-        if string.find(item, '-')!=-1 and string.find(item, '[')==-1:        
+        if item.find('-')!=-1 and item.find('[')==-1:        
             #call range w/ nodes here:
             newNodes = self.getRange( nodes, item )
             return newNodes
@@ -248,7 +248,7 @@ sets
         #general range
         if len(nodes)<2:
             return None
-        levItList=string.split(item, '-')
+        levItList=item.split('-')
         firstNodes = self.processListItem(nodes, levItList[0].strip())
         lastNodes = self.processListItem(nodes, levItList[1].strip())
         if firstNodes and lastNodes:        
@@ -285,7 +285,7 @@ sets
     def processStringcIWEC(self,someString):
         # COMMENT
         import string
-        strList = string.split(someString, ',')
+        strList = someString.split(',')
         retExp = ''
         specialList = ['?','*','.','$','#', ':', '-']
         numbList = ['0','1','2','3','4','5','6','7','8','9']
@@ -317,12 +317,12 @@ sets
                         if c =='^'or c =='[': 
                             newExp = newExp + c
                         else:
-                            newExp = newExp + string.upper(c)+ string.lower(c)
+                            newExp = newExp + c.upper() + c.lower()
                     elif closebrace:
                         newExp = newExp + c
                         closebrace = closebrace -1
                     else:
-                        newExp = newExp + '['+string.upper(c)+ string.lower(c)+']'
+                        newExp = newExp + '['+c.upper()+ c.lower()+']'
             retExp = retExp + newExp
             if i < len(strList)-1:
                 retExp = retExp +','
@@ -332,9 +332,9 @@ sets
 
     def processStringcI(self, someString):
         import string
-        someString = string.replace(someString, '?', '.')
-        #if there are any commas, preceed them by (?i)
-        someString = string.replace(someString, ',','(?i),')
+        someString = someString.replace('?', '.')
+        someString = someString.replace(',', '(?i),')
+
         #in any case add one (?i) at the end
         someString = someString + '(?i)'
         return self.processStringcS(someString)
@@ -346,7 +346,7 @@ sets
         if type(someString)==bytes:
             #protect [A-Z]
             if someString.find(']')==-1:
-                someString = string.replace(someString, '-', ':')
+                someString = someString.replac('-', ':')
             #convert * to .* except for \*
             if someString.find('\*')>-1:
                 #mask \* before replacing * with .*
@@ -355,7 +355,7 @@ sets
                 #unmask \\ after replacing * with .*
                 someString.replace('\\', '\*')
             else:
-                someString = string.replace(someString, '*', '.*')
+                someString = someString.replace('*', '.*')
         return someString
 
 
@@ -1313,7 +1313,7 @@ class TreeNode:
         """retrieves nodes using a name. Name is a string as produced by
         full_name() i.e. node names separated by ':' going from root to leaf
         """
-        names = string.split(name, ':')
+        names = name.split(':')
         if self.name!=names[0]:
             return None
         node = self
