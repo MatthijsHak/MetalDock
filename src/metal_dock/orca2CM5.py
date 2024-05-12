@@ -101,7 +101,7 @@ def HirshfeldToCM5(xyz_file, df,a0):
 def xyz_prep(xyz_file, df):
     opdb = open(xyz_file, 'w+')
     opdb.write('%3d\n'%(len(df.QCM5)))
-    opdb.write('REMARK LIGPARGEN GENERATED XYZ FILE\n')
+    opdb.write('\n')
     num = 0
     for (i, r) in df.iterrows(): 
         opdb.write('%-6s    %8.3f%8.3f%8.3f\n' %

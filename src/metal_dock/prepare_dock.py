@@ -99,6 +99,35 @@ def readXYZ(xyz_file, no_hydrogen=True):
       
         return coord
 
+def center_molecule(input_dir, xyz_file, metal_symbol):
+    xyz = []
+    atom_symbols = []
+
+    with open(xyz_file, 'r') as f:
+        for _ in range(2):
+            next(f)
+        for line in f:
+            coords = line.split()[1:]
+            xyz.append([float(coord) for coord in coords])
+            atom_symbols.append(line.split()[0])
+
+    # find the ruthenium atom and center the molecule around it
+    ruthenium_index = atom_symbols.index(metal_symbol)
+    ruthenium_coords = xyz[ruthenium_index]
+
+    centered_xyz = np.array(xyz) - ruthenium_coords
+
+    out_file = xyz_file.split('/')[-1][:-4]
+
+    # write the centered coordinates to a new file
+    with open(f'{out_file}_centered.xyz', 'w') as f:
+        f.write(f'{len(centered_xyz)}\n')
+        f.write('centered molecule\n')
+        for atom, coords in zip(atom_symbols, centered_xyz):
+            f.write(f'{atom} {coords[0]:10.7f} {coords[1]:10.7f} {coords[2]:10.7f}\n')
+
+    return os.path.join(os.getcwd(), f'{out_file}_centered.xyz'  )
+
 def pdbqtToMol2(name_ligand):
     subprocess.call([os.environ['OBABEL']+f' -ipdbqt {name_ligand}.pdbqt -omol2 {name_ligand}.mol2 > {name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     lg = RDLogger.logger()
@@ -382,6 +411,12 @@ def write_pdbqt(par, xyz_file, lines, metal_atom, pos_hydrogen=None):
             elif 'ATOM' in line:
                 if len(line) < 13: 
                     fout.write(f'{line[0]}   {n_atoms:>4} {line[2]:>2}   LIG A   1     {line[5]:>7} {line[6]:>7} {line[7]:>7}  {line[8]:>4}  {line[9]:>4}    {line[10]:>6} {line[11]:<2}\n')
+                    n_atoms+=1
+                elif len(line[2]) == 3:
+                    fout.write(f'{line[0]}   {n_atoms:>4} {line[2]:>3}   LIG A   1    {line[6]:>7} {line[7]:>7} {line[8]:>7}  {line[9]:>4}  {line[10]:>4}    {line[11]:>6} {line[12]:<2}\n')
+                    n_atoms+=1
+                elif len(line[2]) == 4:
+                    fout.write(f'{line[0]}   {n_atoms:>4} {line[2]:>4}   LIG A   1    {line[6]:>7} {line[7]:>7} {line[8]:>7}  {line[9]:>4}  {line[10]:>4}    {line[11]:>6} {line[12]:<2}\n')
                     n_atoms+=1
                 else:
                     fout.write(f'{line[0]}   {n_atoms:>4} {line[2]:>2}   LIG A   1     {line[6]:>7} {line[7]:>7} {line[8]:>7}  {line[9]:>4}  {line[10]:>4}    {line[11]:>6} {line[12]:<2}\n')
