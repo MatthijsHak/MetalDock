@@ -58,7 +58,7 @@ To run Gaussian as QM engine the following environment variables need to be expo
 export g16root=/full/path/to/gaussian/g16
 ```
 
-Relativistic effects with DKH. For more infromation see [Gaussian](https://gaussian.com/) site
+Relativistic effects with DKH. For more information see [Gaussian](https://gaussian.com/) site.
 
 ### ORCA (free)
 To run ORCA as QM engine with correct parralelization the full path to the orca binary has to be exported with the following command:
@@ -66,7 +66,7 @@ To run ORCA as QM engine with correct parralelization the full path to the orca 
 export ASE_ORCA_COMMAND='/full/path/to/orca/orca PREFIX.inp > PREFIX.out'
 ```
 
-Relativistic effects can be selected with input. For more infromation see [ORCA](https://www.orcasoftware.de/tutorials_orca/index.html) site
+Relativistic effects can be selected with input. For more infromation see [ORCA](https://www.orcasoftware.de/tutorials_orca/index.html) site.
 
 
 ## Step 5: Add MetalDock to PATH
