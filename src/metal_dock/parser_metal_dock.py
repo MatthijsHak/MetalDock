@@ -40,8 +40,8 @@ config['QM']            =   { "engine"                  :                'ADF',
                               "basis_set"               :                'TZP',
                               "functional_type"         :                'GGA',
                               "functional"              :                'PBE',
-                              "dispersion"              :    'GRIMME3 -BJDAMP',
-                              "solvent"                 :              'Water',
+                              "dispersion"              :                   '',
+                              "solvent"                 :                   '',
 
                               # ORCA input keywords
                               "orcasimpleinput"         : 'PBE def2-TZVP CPCMC(Water)',

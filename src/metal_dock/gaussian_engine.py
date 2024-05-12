@@ -122,7 +122,7 @@ def gaussian_geom_opt(xyz_file, var):
 
     mol = read(xyz_file)
 
-    if var.solvent == '':
+    if var.solvent != '' and var.dispersion != '':
         s   = Gaussian(label='geom_opt',
                         nprocshared=var.ncpu ,
                         mem=f'{var.memory}MB',
@@ -132,9 +132,23 @@ def gaussian_geom_opt(xyz_file, var):
                         mult=M,
                         basis=var.basis_set,
                         pop='Hirshfeld',
+                        SCRF=f'PCM, solvent={var.solvent}',
                         EmpiricalDispersion=var.dispersion,
                         integral='dkh')
-    else:
+    elif var.solvent == '' and var.dispersion != '':
+        s   = Gaussian(label='geom_opt',
+                nprocshared=var.ncpu ,
+                mem=f'{var.memory}MB',
+                chk='geom_opt.chk',
+                xc=var.functional,
+                charge=var.charge,
+                mult=M,
+                basis=var.basis_set,
+                pop='Hirshfeld',
+                EmpiricalDispersion=var.dispersion,
+                integral='dkh')
+        
+    elif var.solvent != '' and var.dispersion == '':
         s   = Gaussian(label='geom_opt',
                 nprocshared=var.ncpu ,
                 mem=f'{var.memory}MB',
@@ -145,9 +159,20 @@ def gaussian_geom_opt(xyz_file, var):
                 basis=var.basis_set,
                 pop='Hirshfeld',
                 SCRF=f'PCM, solvent={var.solvent}',
-                EmpiricalDispersion=var.dispersion,
                 integral='dkh')
-
+        
+    else:
+        s   = Gaussian(label='geom_opt',
+                nprocshared=var.ncpu ,
+                mem=f'{var.memory}MB',
+                chk='geom_opt.chk',
+                xc=var.functional,
+                charge=var.charge,
+                mult=M,
+                basis=var.basis_set,
+                pop='Hirshfeld',
+                integral='dkh')
+    
     opt = GaussianOptimizer(mol, s)
     opt.run(fmax='tight')
     mol.write('output.xyz')
@@ -158,31 +183,57 @@ def gaussian_sp(xyz_file, var):
     M = 2 * var.spin + 1 
 
     mol = read(xyz_file)
-    if var.solvent == '':
-        mol.calc = Gaussian(label='single_point',
-                            nprocshared= var.ncpu,
-                            mem=f'{var.memory}MB',
-                            chk='single_point.chk',
-                            xc=var.functional,
-                            charge=var.charge,
-                            mult=M,
-                            basis=var.basis_set,
-                            pop='Hirshfeld',
-                            scf='tight',
-                            integral='dkh')
+    if var.solvent != '' and var.dispersion != '':
+        s   = Gaussian(label='single_point',
+                        nprocshared=var.ncpu ,
+                        mem=f'{var.memory}MB',
+                        chk='single_point.chk',
+                        xc=var.functional,
+                        charge=var.charge,
+                        mult=M,
+                        basis=var.basis_set,
+                        pop='Hirshfeld',
+                        SCRF=f'PCM, solvent={var.solvent}',
+                        EmpiricalDispersion=var.dispersion,
+                        integral='dkh')
+        
+    elif var.solvent == '' and var.dispersion != '':
+        s   = Gaussian(label='single_point',
+                nprocshared=var.ncpu ,
+                mem=f'{var.memory}MB',
+                chk='single_point.chk',
+                xc=var.functional,
+                charge=var.charge,
+                mult=M,
+                basis=var.basis_set,
+                pop='Hirshfeld',
+                EmpiricalDispersion=var.dispersion,
+                integral='dkh')
+    
+    elif var.solvent != '' and var.dispersion == '':
+        s   = Gaussian(label='single_point',
+                nprocshared=var.ncpu ,
+                mem=f'{var.memory}MB',
+                chk='single_point.chk',
+                xc=var.functional,
+                charge=var.charge,
+                mult=M,
+                basis=var.basis_set,
+                pop='Hirshfeld',
+                SCRF=f'PCM, solvent={var.solvent}',
+                integral='dkh')
+    
     else:
-        mol.calc = Gaussian(label='single_point',
-                    nprocshared= var.ncpu,
-                    mem=f'{var.memory}MB',
-                    chk='single_point.chk',
-                    xc=var.functional,
-                    charge=var.charge,
-                    mult=M,
-                    basis=var.basis_set,
-                    pop='Hirshfeld',
-                    SCRF=f'PCM, solvent={var.solvent}',
-                    scf='tight',
-                    integral='dkh')
+        s   = Gaussian(label='single_point',
+                nprocshared=var.ncpu ,
+                mem=f'{var.memory}MB',
+                chk='single_point.chk',
+                xc=var.functional,
+                charge=var.charge,
+                mult=M,
+                basis=var.basis_set,
+                pop='Hirshfeld',
+                integral='dkh')
 
     mol.get_potential_energy()
     return
