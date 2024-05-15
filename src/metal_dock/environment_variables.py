@@ -30,5 +30,4 @@ os.environ['ROOT_DIR']=ROOT_DIR
 os.environ['OBABEL']=find_command_path('obabel')
 os.environ['PDB2PQR']=find_command_path('pdb2pqr30')
 os.environ['MGLTOOLS']=os.path.join(os.environ['ROOT_DIR'],'external','AutoDockTools')
-os.environ['PYTHON_2']=find_command_path('python2.7')
 os.environ['PYTHON_3']=find_command_path('python3')
