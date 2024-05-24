@@ -119,8 +119,9 @@ def adf_geom_opt(xyz_file, var):
         s.input.adf.unrestricted='yes'
         s.input.adf.spinpolarization=''+str(var.spin)+''
 
-    s.input.adf.relativity.formalism='ZORA'
-    s.input.adf.relativity.level='Scalar'
+    if var.relativity == 'ZORA':
+        s.input.adf.relativity.formalism='ZORA'
+        s.input.adf.relativity.level='Scalar'
 
     if var.solvent != '':
         s.input.adf.Solvation.Solv = f"Name={var.solvent}"
@@ -172,9 +173,10 @@ def adf_sp(xyz_file, var):
     if var.spin != 0:
         s.input.adf.unrestricted='yes'
         s.input.adf.spinpolarization=''+str(var.spin)+''
-
-    s.input.adf.relativity.formalism='ZORA'
-    s.input.adf.relativity.level='Scalar'
+    
+    if var.relativity == 'ZORA':
+        s.input.adf.relativity.formalism='ZORA'
+        s.input.adf.relativity.level='Scalar'
 
     if var.solvent != '':
         s.input.adf.Solvation.Solv = f"Name={var.solvent}"
@@ -184,5 +186,3 @@ def adf_sp(xyz_file, var):
     result = j.run()
 
     scm.finish()
-
-    

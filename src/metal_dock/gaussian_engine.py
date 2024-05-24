@@ -28,6 +28,7 @@ def gaussian_engine(xyz_file, var, output_dir):
 
         ## Single Point ##
         os.chdir(os.path.join(output_dir,'QM'))
+        print('GAUSSIAN REQUIRES A SINGLE POINT CALCULATION TO EXTRACT CM5 CHARGES\n')
 
         if os.path.isdir('single_point') == False:
             os.mkdir('single_point')
@@ -133,8 +134,8 @@ def gaussian_geom_opt(xyz_file, var):
                         basis=var.basis_set,
                         pop='Hirshfeld',
                         SCRF=f'PCM, solvent={var.solvent}',
-                        EmpiricalDispersion=var.dispersion,
-                        integral='dkh')
+                        EmpiricalDispersion=var.dispersion)
+    
     elif var.solvent == '' and var.dispersion != '':
         s   = Gaussian(label='geom_opt',
                 nprocshared=var.ncpu ,
@@ -145,8 +146,7 @@ def gaussian_geom_opt(xyz_file, var):
                 mult=M,
                 basis=var.basis_set,
                 pop='Hirshfeld',
-                EmpiricalDispersion=var.dispersion,
-                integral='dkh')
+                EmpiricalDispersion=var.dispersion)
         
     elif var.solvent != '' and var.dispersion == '':
         s   = Gaussian(label='geom_opt',
@@ -158,8 +158,7 @@ def gaussian_geom_opt(xyz_file, var):
                 mult=M,
                 basis=var.basis_set,
                 pop='Hirshfeld',
-                SCRF=f'PCM, solvent={var.solvent}',
-                integral='dkh')
+                SCRF=f'PCM, solvent={var.solvent}')
         
     else:
         s   = Gaussian(label='geom_opt',
@@ -170,13 +169,11 @@ def gaussian_geom_opt(xyz_file, var):
                 charge=var.charge,
                 mult=M,
                 basis=var.basis_set,
-                pop='Hirshfeld',
-                integral='dkh')
+                pop='Hirshfeld')
     
     opt = GaussianOptimizer(mol, s)
     opt.run(fmax='tight')
     mol.write('output.xyz')
-    return 
 
 
 def gaussian_sp(xyz_file, var):
@@ -194,8 +191,7 @@ def gaussian_sp(xyz_file, var):
                         basis=var.basis_set,
                         pop='Hirshfeld',
                         SCRF=f'PCM, solvent={var.solvent}',
-                        EmpiricalDispersion=var.dispersion,
-                        integral='dkh')
+                        EmpiricalDispersion=var.dispersion)
         
     elif var.solvent == '' and var.dispersion != '':
         s   = Gaussian(label='single_point',
@@ -207,8 +203,7 @@ def gaussian_sp(xyz_file, var):
                 mult=M,
                 basis=var.basis_set,
                 pop='Hirshfeld',
-                EmpiricalDispersion=var.dispersion,
-                integral='dkh')
+                EmpiricalDispersion=var.dispersion)
     
     elif var.solvent != '' and var.dispersion == '':
         s   = Gaussian(label='single_point',
@@ -220,8 +215,7 @@ def gaussian_sp(xyz_file, var):
                 mult=M,
                 basis=var.basis_set,
                 pop='Hirshfeld',
-                SCRF=f'PCM, solvent={var.solvent}',
-                integral='dkh')
+                SCRF=f'PCM, solvent={var.solvent}')
     
     else:
         s   = Gaussian(label='single_point',
@@ -232,8 +226,6 @@ def gaussian_sp(xyz_file, var):
                 charge=var.charge,
                 mult=M,
                 basis=var.basis_set,
-                pop='Hirshfeld',
-                integral='dkh')
-
+                pop='Hirshfeld')
+    mol.calc = s
     mol.get_potential_energy()
-    return

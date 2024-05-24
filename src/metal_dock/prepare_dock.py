@@ -7,11 +7,18 @@ import numpy as np
 import networkx as nx
 from networkx.algorithms.components.connected import connected_components
 
+from .xyz2graph import MolGraph, to_networkx_graph
+from openbabel import openbabel as ob
+
+from scipy.spatial.distance import cdist
+
 from collections import defaultdict 
 from random import seed
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit import RDLogger
+
+ob.obErrorLog.SetOutputLevel(0)
 
 # Dictionary of all elements matched with their atomic masses.
 mass_dict = {'H' : 1.008,'HE' : 4.003, 'LI' : 6.941, 'BE' : 9.012,\
@@ -43,6 +50,196 @@ mass_dict = {'H' : 1.008,'HE' : 4.003, 'LI' : 6.941, 'BE' : 9.012,\
             'HS' : 269, 'MT' : 268, 'DS' : 271, 'RG' : 272, 'CN' : 285,\
             'NH' : 284, 'FL' : 289, 'MC' : 288, 'LV' : 292, 'TS' : 294,\
             'OG' : 294}
+
+def extract_interacting_residues(pose, protein, cutoff=4.0):
+    pose_xyz = []
+
+    with open(pose, 'r') as fin:
+        for _ in range(2):
+            next(fin)
+        for line in fin:
+            split = line.strip().split()[1:4]
+            pose_xyz.append([float(split[0]), float(split[1]), float(split[2])])
+
+    interacting_residues = []
+    interacting_residues_xyz = []
+    # calculate all the residues that are within 4 angstroms of the ligand
+    with open(protein,'r') as fin:
+        for line in fin:
+            if 'ATOM' in line or 'HETATM' in line:
+                # calculate the distance between the pose_xyz and the 
+                split = line.strip().split()
+                interacting_residues.append((split[3], split[5]))
+                interacting_residues_xyz.append([float(split[6]), float(split[7]), float(split[8])])
+
+    distance_matrix = cdist(pose_xyz, interacting_residues_xyz,'euclidean')
+
+    # Find indices of residues within 4 angstroms
+    within_4_angstrom_indices = np.any(distance_matrix <= 4.0, axis=0)
+
+    # Get the unique residues that are within 4 angstroms
+    unique_residues_within_4_angstrom = set()
+    for i, within in enumerate(within_4_angstrom_indices):
+        if within:
+            unique_residues_within_4_angstrom.add(interacting_residues[i])
+
+    # Convert set to a list for further processing or output
+    unique_residues_within_4_angstrom = list(unique_residues_within_4_angstrom)
+
+    # order based on the id of the residues 
+    unique_residues_within_4_angstrom = sorted(unique_residues_within_4_angstrom, key=lambda x: int(x[1]))
+
+    return unique_residues_within_4_angstrom
+
+def extract_dlg(dlg_file, var):
+    # print the scores of the docking
+    idx = 0
+    scores = []
+    with open(dlg_file,'r') as fin:
+        for line in fin:
+            if 'RMSD TABLE' in line or idx > 0:
+                scores.append(line)
+                idx += 1
+                if idx == 19:
+                    break
+
+    binding_energy = []
+    for score in scores:
+        # extract the binding energy 
+        split = score.strip().split()
+        if len(split) == 7:
+            binding_energy.append((int(split[2]), float(split[3])))
+
+    # sort the binding eneryg based on the first element
+    binding_energy = sorted(binding_energy, key=lambda x: x[0])
+
+    # calculate the ligand efficiency
+    ligand_efficiency = []
+    # ligand efficiecny = binding energy / number of heavy atoms
+    for be in binding_energy:
+        ligand_efficiency.append(be[1] / var.n_heavy_atoms)
+
+    return binding_energy, ligand_efficiency
+
+def write_pose_to_pdb(xyz_file_name, pdb_file_name):
+    graph = MolGraph()
+    graph.read_xyz(xyz_file_name)
+    
+    G = to_networkx_graph(graph)
+
+    nodes_sorted = sorted(G.nodes(data=True), key=lambda x: x[0])
+
+    with open(pdb_file_name, 'w') as f:
+        f.write('MODEL         1\n')
+        for node in nodes_sorted:
+            f.write(f"HETATM{node[0]+1:>5} {node[1]['element'].upper():>2}   UNL          {node[1]['xyz'][0]:>8.3f}{node[1]['xyz'][1]:>8.3f}{node[1]['xyz'][2]:>8.3f}  1.00  0.00          {node[1]['element']:>2}\n")
+        for edge in G.edges():
+            f.write(f"CONECT {edge[0]+1:>4} {edge[1]+1:>4}\n")
+        f.write('ENDMDL\n')
+
+# extract from the following bonds the implicit H, set subsequently the number of implicit Hs correct
+def add_non_polar_hydrogens(name_xyz_H, name_pdb_H, name_xyz_noH, output_file_name):
+    #=== Count the number of hydrogen atoms per heavy atom  ===#
+    atoms = []
+    bonds = []
+    atom_constraints = [] 
+    with open(name_pdb_H,'r') as fin:
+        for line in fin:
+            if 'HETATM' in line or 'ATOM' in line:
+                split = line.strip().split()
+                atoms.append((int(split[1]), split[-1]))
+
+            elif 'CONECT' in line:
+                split = line.strip().split()
+                # add all combinations to the bonds list in form of tuples 
+                atom1 = split[1]
+                for atom2 in split[2:]:
+                    bonds.append((int(atom1), int(atom2))) 
+
+    # count the number of hydrogen atoms bound to each atom carbon atom 
+    implicit_H = [0 for i in range(len(atoms))]
+    for bond in bonds:
+        atom1 = bond[0]
+        atom2 = bond[1]
+
+        # make sure it is a carbon atom 
+        if 'C' == atoms[atom1 - 1][1] and 'H' == atoms[atom2 - 1][1]: 
+            implicit_H[atom1 - 1] += 1
+
+    # go through the xyz without the hydrogens and ensure that all indices are in the constraints list
+    with open(name_xyz_noH,'r') as fin:
+        for _ in range(2):
+            next(fin)
+        for idx, line in enumerate(fin):
+            atom_constraints.append(idx)
+
+    #=== Perform mapping between the docked and initial structure ===#
+    # Step 1: Obtain graphs for struct_init and struct_dock
+    mg_init = MolGraph()
+    mg_init.read_xyz(name_xyz_H)
+    G_init = to_networkx_graph(mg_init)
+
+    mg_dock = MolGraph()
+    mg_dock.read_xyz(name_xyz_noH)
+    G_dock = to_networkx_graph(mg_dock)
+
+    G_init_noH = G_init.copy()
+    G_dock_noH = G_dock.copy()
+
+    for node in list(G_init_noH.nodes):
+        if G_init_noH.nodes[node]['element'] == 'H':
+            G_init_noH.remove_node(node)
+
+    for node in list(G_dock_noH.nodes):
+        if G_dock_noH.nodes[node]['element'] == 'H':
+            G_dock_noH.remove_node(node)
+
+    gm = nx.algorithms.isomorphism.GraphMatcher(G_init_noH, G_dock_noH)
+    gm.is_isomorphic()
+    mapping = gm.mapping   
+
+    # Reorder implicit_H using mapping
+    implicit_H_mapped = [None] * len(implicit_H)  
+    for current_index, new_index in mapping.items():
+        implicit_H_mapped[new_index] = implicit_H[current_index]
+
+    #=== Add and optimize non-polar hydrogen atoms ===#
+    conv = ob.OBConversion()
+    conv.SetInAndOutFormats('xyz','xyz')
+    mol = ob.OBMol()
+    conv.ReadFile(mol, name_xyz_noH)
+
+    for i in list(range(1,len(atoms)+1)):
+        # add hydrogens
+        atom = mol.GetAtom(i)
+
+        if implicit_H_mapped[i-1] == None:
+            atom.SetImplicitHCount(0)
+        else:
+            atom.SetImplicitHCount(implicit_H_mapped[i-1])
+        mol.AddHydrogens(atom)
+
+    # Define constraints
+    constraints = ob.OBFFConstraints()
+    for i in atom_constraints:
+        constraints.AddAtomConstraint(i)
+
+    # Setup the force field with the constraints
+    forcefield = ob.OBForceField.FindForceField("gaff")
+    forcefield.Setup(mol)
+    forcefield.SetConstraints(constraints)
+
+    # Do a 500 steps conjugate gradient minimiazation
+    # and save the coordinates to mol.
+    forcefield.ConjugateGradients(1000, 1E-8)
+    forcefield.GetCoordinates(mol)
+
+    # Write the mol to a file
+    conv.WriteFile(mol, output_file_name)
+
+    # return the indices of the atoms that have not been added 
+    return atom_constraints
+
 
 def is_float(string):
     try:
@@ -235,7 +432,7 @@ def maximum_distance_sphere(n_ligands, atom_pos, metal_pos, radius=0.75):
     return [new_pos_hydrogen[0], new_pos_hydrogen[1], new_pos_hydrogen[2]]
 
 
-def delete_hydrogen(pdbqt_file):
+def delete_dummy_atom(pdbqt_file):
     with open(pdbqt_file,'r') as fin:
         with open('output.pdbqt','w') as fout:
             for line in fin:
@@ -250,7 +447,8 @@ def create_ligand_pdbqt_file(par, name_ligand):
     with open(f'{name_ligand}.mol2','r') as fin_1:
         with open('CM5_charges','r') as fin_2:
             cm = [line.strip().split() for line in fin_2]
-            cm = cm[1:]
+            if par.engine.lower() != 'gaussian':
+                cm = cm[1:]
             with open('output.mol2', 'w') as fout:
                 atom_id = 0
                 for line in fin_1:
@@ -634,10 +832,6 @@ def docking_func(par, name_ligand, name_protein, dock, box_size, energy=None):
 
     #write_all_conformations()
     write_conformations(name_ligand, name_protein)
-    # write_conformations = os.path.join(os.environ['MGLTOOLS'], 'write_conformations_from_dlg.py')
-    # subprocess.call([os.environ['PYTHON_3']+f" {write_conformations} -d {name_ligand}_clean_{name_protein}.dlg"], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-
-    return
 
 def write_conformations(name_ligand, name_protein):
     with open(f'{name_ligand}_clean_{name_protein}.dlg', 'r') as fin:
@@ -686,9 +880,9 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, num_pose
     dpf_file.write('elecmap '+name_protein+'.e.map             # electrostatics map\n')
     dpf_file.write('desolvmap '+name_protein+'.d.map           # desolvation map\n\n')
 
-    dpf_file.write('# Unbound Ligand Parameters\n')
-    if energy_ligand != None:
-        dpf_file.write('unbound_energy '+str(energy_ligand)+'              # set the energy of the unbound state\n')
+    # dpf_file.write('# Unbound Ligand Parameters\n')
+    # if energy_ligand != None:
+        # dpf_file.write('unbound_energy '+str(energy_ligand)+'              # set the energy of the unbound state\n')
     
     dpf_file.write('move '+name_ligand+'.pdbqt                # small molecule\n')
 
@@ -741,7 +935,6 @@ def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, num_pose
         dpf_file.write('simanneal '+str(num_poses)+'                         # run this many SA docking\n')
 
     dpf_file.write('analysis                             # perforem a ranked cluster analysis\n')
-    return
 
 def rmsd_func(name_ligand, n_prot, directory, generation=None, num_gen=None, train=False, standard=False, test=False):
     rmsd_avg = []

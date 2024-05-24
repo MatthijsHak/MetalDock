@@ -22,7 +22,7 @@ config['DEFAULT']       =   { "method"                  :              'dock',
                               "metal_symbol"            :                'Ru',
                               "parameter_file"          :    'metal_dock.dat',
                               "ncpu"                    :                 '1',
-                              "memory"                  :              '3000',}
+                              "memory"                  :              '1500',}
 
 config['PROTEIN']       =   { "pdb_file"                :       'protein.pdb',
                               "pH"                      :               '7.4',
@@ -41,6 +41,7 @@ config['QM']            =   { "engine"                  :                'ADF',
                               "functional_type"         :                'GGA',
                               "functional"              :                'PBE',
                               "dispersion"              :                   '',
+                              "relativity"              :                   '',
                               "solvent"                 :                   '',
 
                               # ORCA input keywords
@@ -112,6 +113,7 @@ class Parser:
     self.functional_type          = config['QM']['functional_type'].strip()
     self.functional               = config['QM']['functional'].strip()
     self.dispersion               = config['QM']['dispersion'].strip()
+    self.relativity               = config['QM']['relativity'].strip()
     self.solvent                  = config['QM']['solvent'].strip()
     self.orcasimpleinput          = config['QM']['orcasimpleinput'].strip()
     self.orcablocks               = config['QM']['orcablocks'].strip()
@@ -184,6 +186,37 @@ class Parser:
     if self.ga_dock == False and self.sa_dock == False:
         print('At least ga_dock or sa_dock must be set to True for MetalDock to run properly')
         sys.exit()
+
+    # heavy atoms 
+    self.n_heavy_atoms = self.calculate_heavy_atoms(self.xyz_file)
+
+    # check if metal symbol is present in the xyz file
+    if self.find_metal_symbol(self.xyz_file, self.metal_symbol) == False:
+      print('The metal symbol you have chosen is not present in the xyz file')
+      print('Please choose a different metal symbol or add the missing metal symbol to the xyz file')
+      sys.exit()
+
+  def find_metal_symbol(self, xyz_file, metal_symbol):
+    with open(xyz_file, 'r') as file:
+      lines = file.readlines()
+      for line in lines[2:]:
+        if line.strip() == '':
+          break
+        if line.strip().split()[0] == metal_symbol:
+          return True
+      return False
+
+  def calculate_heavy_atoms(self, xyz_file):
+    with open(xyz_file, 'r') as file:
+      lines = file.readlines()
+      n_heavy_atoms = 0
+      for line in lines[2:]:
+        # if empty line break 
+        if line.strip() == '':
+          break
+        if line.strip().split()[0] != 'H':
+          n_heavy_atoms += 1
+    return n_heavy_atoms
 
   def atom_types_included(self):
     if self.parameter_file == 'metal_dock.dat':

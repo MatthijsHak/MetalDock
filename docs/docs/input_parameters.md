@@ -70,7 +70,7 @@ The amount of memory to maximally allocate to each core in MB.
 
 
 **Default input:**  
-memory = 3000
+memory = 1500
 
 **Valid Values:**  
 `integer` -  range[0,inf]  
@@ -230,7 +230,7 @@ functional = PBE
 The basis set used for the DFT calculations.
 
 **Default input:**  
-dispsersion = Grimme3 BJDAMP
+dispsersion = None
 
 **Valid values:**  
 `ADF` valid inputs can be found [here](https://www.scm.com/doc/ADF/Input/Density_Functional.html#dispersion-corrections)   
@@ -242,11 +242,22 @@ dispsersion = Grimme3 BJDAMP
 The basis set used for the DFT calculations.
 
 **Default input:**  
-solvent = water
+solvent = None
 
 **Valid values:**  
 `ADF` valid inputs can be found [here](https://www.scm.com/doc/ADF/Input/COSMO.html)   
 `Gaussian` valid inputs can be found [here](https://gaussian.com/basissets/)  
+
+---
+
+### relativity (only ADF)
+Use scalar relativistic effects by e.g. ZORA.
+
+**Default input:**  
+relativity = None
+
+**Valid values:**  
+`ADF` valid inputs can be found [here](https://www.scm.com/doc/ADF/Input/Relativistic_effects.html)   
 
 ---
 

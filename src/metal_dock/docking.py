@@ -3,6 +3,11 @@ import subprocess
 import math
 import numpy as np
 
+from ase.constraints import FixAtoms
+from ase.optimize import QuasiNewton
+from ase.io import read, write
+from xtb.ase.calculator import XTB
+
 from . import environment_variables
 
 from . import pdb_extraction as pdb
@@ -34,9 +39,10 @@ def docking(input_file, par=None):
 
     if os.path.exists(f'{par.name_ligand}_c.xyz') == False:
         xyz_file = os.path.join(input_dir, par.xyz_file)
-        # center the molecule around the metal_symbol
-        xyz_file = d.center_molecule(input_dir, xyz_file, par.metal_symbol)
+        # center the molecule around the metal_symbol --> messes up the reference xyz file for rmsd 
+        # xyz_file = d.center_molecule(input_dir, xyz_file, par.metal_symbol)
         subprocess.call([os.environ['OBABEL']+f' -ixyz {xyz_file} -oxyz {par.name_ligand}_c.xyz --canonical > {par.name_ligand}_c.xyz'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.call([os.environ['OBABEL']+f' -ixyz {par.name_ligand}_c.xyz -opdb {par.name_ligand}_c.pdb > {par.name_ligand}_c.pdb'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
     if os.path.exists(f'{par.name_ligand}.mol2') == False:
         subprocess.call([os.environ['OBABEL']+f' -ixyz {par.name_ligand}_c.xyz -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -143,35 +149,6 @@ def docking(input_file, par=None):
         d.prepare_receptor(par.name_protein)
     d.docking_func(par, par.name_ligand, par.name_protein, dock, box_size, energy)
 
-    if par.rmsd == True:
-        rmsd_list = []
-        avg_list = []
-        i = 1
-        while os.path.exists(os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
-            d.delete_hydrogen(os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt'))
-            subprocess.call([os.environ['OBABEL']+f" -ipdbqt {par.name_ligand}_{i}.pdbqt -oxyz {par.name_ligand}_{i}.xyz -d > {par.name_ligand}_{i}.xyz"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-            rmsd_func = os.path.join(os.environ['ROOT_DIR'], 'metal_dock','calculate_rmsd.py')
-
-            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+f' {rmsd_func} ref.xyz {par.name_ligand}_{i}.xyz -nh --reorder --rotation none --translation none']))
-            rmsd = rmsd_non_rotate
-
-            avg_list.append(rmsd)
-
-            rmsd_list.append("RMSD for Conformation %i = %.4f"% (i, rmsd))
-            i += 1
-
-        for i in range(0,len(rmsd_list)):
-            print(rmsd_list[i])
-
-        avg_output = np.mean(avg_list)
-        print(f'Average RMSD: {avg_output:.4f}')
-        stdv_rmsd = np.std(avg_list)
-        print(f'Standard Deviation RMSD: {stdv_rmsd:.4}')
-        var_rmsd = np.var(avg_list)
-        print(f"Variance RMSD: {var_rmsd:.4}\n")
-
-
     ##### results #####
     os.chdir(f'{output_dir}')
 
@@ -181,21 +158,129 @@ def docking(input_file, par=None):
     else:
         os.chdir('results')
 
+
+    print('#==============================================================================#')
+    print("ADDING AND OPTIMIZING HYDROGEN ATOMS TO THE METAL COMPLEX POSES")
+
     i = 1
     while os.path.exists(os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
+        if os.path.isdir(f'{output_dir}/results/pose_{i}') == False:
+            os.mkdir(f'{output_dir}/results/pose_{i}')
+            os.chdir(f'{output_dir}/results/pose_{i}')
+        else:
+            os.chdir(f'{output_dir}/results/pose_{i}')
+
         pdqt_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')
         pdqt_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.pdbqt')
         shutil.copyfile(pdqt_in, pdqt_out)
-        if par.rmsd == True:
-            xyz_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.xyz')
-            xyz_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.xyz')
-            shutil.copyfile(xyz_in, xyz_out)
+
+        # remove dummy atom if present 
+        d.delete_dummy_atom(pdqt_out)
+
+        subprocess.call([os.environ['OBABEL']+f" -ipdbqt {par.name_ligand}_{i}.pdbqt -oxyz {par.name_ligand}_{i}.xyz > {par.name_ligand}_{i}.xyz"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # add hydrogens to the xyz file 
+        atom_constraints = d.add_non_polar_hydrogens(f'{output_dir}/file_prep/{par.name_ligand}_c.xyz',
+                                                        f'{output_dir}/file_prep/{par.name_ligand}_c.pdb',
+                                                        f'{par.name_ligand}_{i}.xyz', 
+                                                        f'{par.name_ligand}_{i}_H.xyz')
+        
+        print('\n#-------------------------------------------------#')
+        print(f'Optimizing Hydrogen Atoms with GFN2-xTB of Pose {i}')
+        atoms = read(f'{par.name_ligand}_{i}_H.xyz', format='xyz')
+        atoms.calc = XTB(method='GFN2-xTB')
+        atoms.set_constraint(FixAtoms(indices=atom_constraints))
+        opt = QuasiNewton(atoms, trajectory=f'{par.name_ligand}_{i}_H.traj')
+        opt.run(fmax=0.05)
+
+        write(f'{par.name_ligand}_{i}_H.xyz', atoms, format='xyz')
+        d.write_pose_to_pdb(f'{par.name_ligand}_{i}_H.xyz', f'{par.name_ligand}_{i}_H.pdb')
+        # remove the xyz file and pdbqt file 
+        os.remove(f'{par.name_ligand}_{i}.xyz')
+        os.remove(f'{par.name_ligand}_{i}.pdbqt')
         i += 1
-    
+
+    # copy clean protein file to results directory
+    os.chdir(f'{output_dir}/results')
     clean_in = os.path.join(output_dir,'docking',f'clean_{par.name_protein}.pdb')
     clean_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
     shutil.copyfile(clean_in, clean_out)
- 
-    print("\nDOCKING SUCCESFULLY COMPLETED")
+
+    # copy the dlg file to results directory
+    dlg_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_clean_{par.name_protein}.dlg')
+    dlg_out = os.path.join(os.getcwd(), f'docking_results.dlg')
+    shutil.copyfile(dlg_in, dlg_out)
+
+    binding_energy, ligand_efficiency = d.extract_dlg(dlg_out, par)
+    print('\n#==============================================================================#')
+    print('DOCKING RESULTS:')
+    print('Ligand Efficiency = (binding energy) / (number of heavy atoms in metal complex)')
+    print('Interacting Residues = residues within 4 Angstrom of the metal complex\n')
+
+    for i in range(par.num_poses):
+        print(f"Pose {i+1}:")
+        print("-------------")
+        pose_residues = d.extract_interacting_residues(f'{output_dir}/results/pose_{i+1}/{par.name_ligand}_{i+1}_H.xyz', f'clean_{par.name_protein}.pdb')
+        print(f'Binding Energy: {binding_energy[i][1]:7.4f} kcal/mol')
+        print(f'Ligand Efficiency: {ligand_efficiency[i]:7.4f} kcal/mol')
+        print(f'Interacting Residues:')
+        for residue in pose_residues:
+            print(f'Residue: {residue[0]}, ID: {residue[1]:>3}')
+        print('\n')
+
+    if par.rmsd == True:
+        print('\n#==============================================================================#')
+        print("CALCULATING RMSD VALUES FOR EACH POSE WITH RESPECT TO THE STARTING XYZ FILE\n")
+
+        rmsd_list = []
+        avg_list = []
+        rmsd_func = os.path.join(os.environ['ROOT_DIR'], 'metal_dock','calculate_rmsd.py')
+
+        for pose in range(par.num_poses):
+            os.chdir(f'{output_dir}/results/pose_{pose+1}')
+            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+f' {rmsd_func} {output_dir}/file_prep/{par.name_ligand}_c.xyz {output_dir}/results/pose_{pose+1}/{par.name_ligand}_{pose+1}_H.xyz -nh --reorder --rotation none --translation none']))
+            rmsd = rmsd_non_rotate
+
+            avg_list.append(rmsd)
+
+            rmsd_list.append(f"RMSD for Conformation {pose+1:>3} = {rmsd:>8.4f}")
+
+        for i in range(0,len(rmsd_list)):
+            print(rmsd_list[i])
+
+        avg_output = np.mean(avg_list)
+        print(f'Average RMSD              = {avg_output:8.4f}')
+        stdv_rmsd = np.std(avg_list)
+        print(f'Standard Deviation RMSD   = {stdv_rmsd:8.4f}')
+        var_rmsd = np.var(avg_list)
+        print(f"Variance RMSD             = {var_rmsd:8.4f}\n")
+
+    print('\n#==============================================================================#')
+    print("METALDOCK SUCCESFULLY COMPLETED")
     print("THE PRINTED POSES AND PROTEIN CAN BE FOUND IN THE RESULTS DIRECTORY")
-    return
+    print("EACH PDB FILE IN THE RESULTS/POSE_X DIRECTORY CAN BE VISUALIZED WITH E.G. PYMOL")
+
+
+    # ##### results #####
+    # os.chdir(f'{output_dir}')
+
+    # if os.path.isdir('results') == False:
+    #     os.mkdir('results')
+    #     os.chdir('results')
+    # else:
+    #     os.chdir('results')
+
+    # i = 1
+    # while os.path.exists(os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
+    #     pdqt_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')
+    #     pdqt_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.pdbqt')
+    #     shutil.copyfile(pdqt_in, pdqt_out)
+    #     if par.rmsd == True:
+    #         xyz_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.xyz')
+    #         xyz_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.xyz')
+    #         shutil.copyfile(xyz_in, xyz_out)
+    #     i += 1
+    
+    # clean_in = os.path.join(output_dir,'docking',f'clean_{par.name_protein}.pdb')
+    # clean_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
+    # shutil.copyfile(clean_in, clean_out)
