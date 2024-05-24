@@ -27,7 +27,7 @@ conda install -c conda-forge openbabel
 ```
 
 ```bash
-pip install ase rdkit-pypi pdb2pqr networkx numpy plams ase pandas
+pip install ase rdkit-pypi pdb2pqr networkx numpy plams pandas xtb
 ```
 
 ## Step 3: Clone MetalDock repository 
