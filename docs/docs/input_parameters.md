@@ -163,7 +163,7 @@ spin = 0
 ---
 
 ### vacant_site
-Specify whether there is a vancy in the first coordiantion sphere. For docking procedure where it is expected that the metal atom would coordinate directly to an atom of the residue, this keyword should be set to True. If there is no vanacy in the coordination sphere and the metal does not directly coordinated to the protein, this keyword should be set to False
+Specify whether there is a vacancy in the first coordination sphere. For docking procedures where it is expected that the metal atom would coordinate directly to an atom of the residue, this keyword should be set to True. If there is no vanacy in the coordination sphere and the metal does not directly coordinated to the protein, this keyword should be set to False
 
 **Default input:**  
 vacant_site = True 

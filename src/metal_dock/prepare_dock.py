@@ -304,6 +304,8 @@ def center_molecule(input_dir, xyz_file, metal_symbol):
         for _ in range(2):
             next(f)
         for line in f:
+            if not line.strip():  
+                break 
             coords = line.split()[1:]
             xyz.append([float(coord) for coord in coords])
             atom_symbols.append(line.split()[0])
