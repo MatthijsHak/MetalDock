@@ -4,6 +4,7 @@ from . import orca2CM5 as oc
 
 from ase.calculators.orca import ORCA
 from ase.io import read, write
+from ase.optimize.lbfgs import LBFGS
 
 def orca_engine(xyz_file, var, output_dir):
     ## Geometry Optimization ##
@@ -109,9 +110,12 @@ def orca_geom_opt(xyz_file, var):
     mol.calc = ORCA(label='geom',
                     charge=var.charge,
                     mult=M,
-                    orcasimpleinput=f'Opt {var.orcasimpleinput}',
+                    orcasimpleinput=f'{var.orcasimpleinput}',
                     orcablocks=f'%maxcore {str(var.memory)} %pal nprocs {str(var.ncpu)} end %output Print[P_hirshfeld] 1 end {var.orcablocks}',
                     )
+    
+    opt = LBFGS(mol)
+    opt.run(fmax=0.05)
 
     mol.get_potential_energy()
     mol.write('output.xyz')
@@ -130,15 +134,15 @@ def orca_single_point(xyz_file, var):
     mol.get_potential_energy()
     mol.write('output.xyz')
 
-def optimize_hydrogens(xyz_file, var):
-    M = 2 * (var.spin*0.5) + 1
+# def optimize_hydrogens(xyz_file, var):
+#     M = 2 * (var.spin*0.5) + 1
 
-    mol = read(xyz_file)
-    mol.calc = ORCA(label='hydrogen_opt',
-                    charge=var.charge,
-                    mult=M,
-                    orcasimpleinput=f'Opt {var.orcasimpleinput}',
-                    orcablocks=f'%maxcore {str(var.memory)} %pal nprocs {str(var.ncpu)} end %geom optimizehydrogens true end')
+#     mol = read(xyz_file)
+#     mol.calc = ORCA(label='hydrogen_opt',
+#                     charge=var.charge,
+#                     mult=M,
+#                     orcasimpleinput=f'Opt {var.orcasimpleinput}',
+#                     orcablocks=f'%maxcore {str(var.memory)} %pal nprocs {str(var.ncpu)} end %geom optimizehydrogens true end')
 
-    mol.get_potential_energy()
-    mol.write(xyz_file)
+#     mol.get_potential_energy()
+#     mol.write(xyz_file)

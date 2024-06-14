@@ -130,6 +130,8 @@ def adf_geom_opt(xyz_file, var):
     j = scm.AMSJob(molecule=m, settings=s)
     result = j.run()
 
+    j.results.get_main_molecule().write('output.xyz', 'xyz')
+    subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol  > output.mol'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     scm.finish()
 
 def adf_sp(xyz_file, var):
@@ -184,5 +186,7 @@ def adf_sp(xyz_file, var):
     #Run Job
     j = scm.AMSJob(molecule=m, settings=s)
     result = j.run()
-
+    
+    j.results.get_main_molecule().write('output.xyz', 'xyz')
+    subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol  > output.mol'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     scm.finish()

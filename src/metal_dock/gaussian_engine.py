@@ -174,7 +174,7 @@ def gaussian_geom_opt(xyz_file, var):
     opt = GaussianOptimizer(mol, s)
     opt.run(fmax='tight')
     mol.write('output.xyz')
-
+    subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol  > output.mol'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
 def gaussian_sp(xyz_file, var):
     M = 2 * (var.spin*0.5) + 1 
@@ -229,3 +229,5 @@ def gaussian_sp(xyz_file, var):
                 pop='Hirshfeld')
     mol.calc = s
     mol.get_potential_energy()
+    mol.write('output.xyz')
+    subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol  > output.mol'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)

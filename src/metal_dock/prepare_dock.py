@@ -240,7 +240,6 @@ def add_non_polar_hydrogens(name_xyz_H, name_pdb_H, name_xyz_noH, output_file_na
     # return the indices of the atoms that have not been added 
     return atom_constraints
 
-
 def is_float(string):
     try:
         float(string)
@@ -463,17 +462,17 @@ def create_ligand_pdbqt_file(par, name_ligand):
                         fout.write(f'     {line[0]:>2} {line[1]:<2}      {line[2]:>9} {line[3]:>9} {line[4]:>9} {line[5]:<5}   {line[6]:>1}  {line[7]:>4}       {line[8]:>6}\n')
 
     subprocess.call([os.environ['OBABEL']+' -imol2 output.mol2 -opdbqt '+name_ligand+'.pdbqt  > '+name_ligand+'.pdbqt'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.call([os.environ['OBABEL']+' -imol2 output.mol2 -oxyz '+name_ligand+'_c.xyz  > '+name_ligand+'_c.xyz'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     n_mdl = 0 
     with open(f'{name_ligand}.pdbqt','r') as fin:
         for line in fin:
             if 'MODEL' in line:
                 n_mdl+=1
-    
+
     if n_mdl == 1:
         one_model_file(par, name_ligand, f'{name_ligand}_c.xyz', f'{name_ligand}.pdbqt')
     else:
         multiple_model_file(par, name_ligand, f'{name_ligand}_c.xyz', f'{name_ligand}.pdbqt')
-    return
 
 def one_model_file(par, name_ligand, xyz_file, pdbqt_file):
     with open(pdbqt_file, 'r') as fin:
@@ -499,105 +498,566 @@ def one_model_file(par, name_ligand, xyz_file, pdbqt_file):
 
     if par.vacant_site == True:
         pos_hydrogen = find_pos_dummy(par, f'{name_ligand}_c.xyz', f'{name_ligand}.pdbqt',f'{name_ligand}')
-        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom, pos_hydrogen)
+        write_pdbqt(par, new_pdbqt, pos_hydrogen)
     else:
-        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom)
+        write_pdbqt(par, new_pdbqt)
         
     return
 
 def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
-    with open(pdbqt_file, 'r') as fin:
+    # rename and reorder the pdbqt file 
+    reindex_atoms_branches(pdbqt_file, 'out.pdbqt')
+    # I need to ensure that the atom numbering is the same for the graph as the pdbqt file 
+    with open('out.pdbqt', 'r') as fin:
         new_lines = [line.strip().split() for line in fin]
 
-    mdl = 1
+    n_atoms = 0
+    xyz_lines = []
+    for line in new_lines:
+        if 'ATOM' in line:
+            n_atoms+=1
+            xyz_lines.append([line[2], float(line[6]), float(line[7]), float(line[8])])
+
+    # add to the beginning of the list and empty list and the number of atoms
+    xyz_lines.insert(0, [n_atoms])
+
+    with open('out.xyz', 'w') as f:
+        for line in xyz_lines:
+            if len(line) == 1:
+                f.write(f'{line[0]}\n\n')
+            else:
+                # set the second letter to small letter if length of letter is 2
+                if len(line[0]) == 2:
+                    f.write(f'{line[0][0]}{line[0][1].lower()} {line[1]:.6f} {line[2]:.6f} {line[3]:.6f}\n')
+                else:
+                    f.write(f'{line[0]} {line[1]:.6f} {line[2]:.6f} {line[3]:.6f}\n')
+
+    pdbqt_file = 'out.pdbqt'
     atom = 0
-    mol_id = 0
-    torsdof = 0
-
-    new_pdbqt = []
-
-    mol = globals()
 
     new_lines = [s for s in new_lines if "REMARK" not in s]
+
+    graph = MolGraph()
+    graph.read_xyz('out.xyz')
     
-    for item in new_lines:
+    G = to_networkx_graph(graph)
+
+    # Remove all nodes that have the element 'H' except for the 'H' atoms
+    # that are connected to O, N, S, P
+    remove_hydrogens(G)
+
+    # find which atom is the metal atom from the graph
+    for node in G.nodes(data=True):
+        if node[1]['element'] == par.metal_symbol:
+            metal_idx= node[0] # add 1 to the index to match the pdbqt file
+
+    # generate the ligand indicies and obtain the hapticity interactions 
+    hapt_atoms = []
+    neighbor_list = sorted(list(G.neighbors(metal_idx)))
+
+    ligands_list = []
+    for node in neighbor_list:
+        ligand = bfs(G, node, metal_idx)
+        if ligand not in ligands_list:
+            ligands_list.append(ligand)
+
+    for n in neighbor_list:
+        path_from_n = find_groups(G, n, neighbor_list, set())
+        if sorted(path_from_n) not in hapt_atoms:
+            hapt_atoms.append(sorted(path_from_n))
+
+    hapticity_atoms = []
+    for idx,ligand in enumerate(ligands_list):
+        for connect in hapt_atoms: 
+            if any(item in ligand for item in connect):
+                hapticity_atoms.append(connect) 
+
+    # extract all branches 
+    branches, connections = extract_branches(new_lines)
+
+    root = []
+    branches_to_root = []
+    root.append(['ROOT'])
+
+    # identify the model in which the metal atom is located
+    branches_metal, _ = identify_model(branches, connections, metal_idx+1, G)
+
+    metal_branch = None
+    for n in branches_metal.keys():
+        if str(metal_idx) in branches_metal[n]['atoms']:
+            for line in branches_metal[n]['lines']:
+                if 'ATOM' in line:
+                    root.append(line)
+            metal_branch = n
+    # remove the branch from the branches list
+    branches_metal.pop(metal_branch)
+
+    # No hapticity ligand with small number of atoms
+    # if len(ligand) =< 3 and len(hapticity_atoms) == 1: 
+    # The ligand atoms need to be placed in the root branch
+    for idx, (ligand, hapt_atoms) in enumerate(zip(ligands_list, hapticity_atoms)):
+        ligand_graph = G.subgraph(ligand)
+        # No hapticity ligand with small number of atoms
+        # Add all atoms to the root branch
+        if len(ligand) <= 3 and len(hapt_atoms) == 1:
+            for atom in ligand:
+                root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
+
+    # No hapticity ligand with larger number of atoms
+    # if len(ligand) > 3 and len(hapticity_atoms) == 1:
+        elif len(ligand) > 3 and len(hapt_atoms) == 1:
+            # The ligand atoms need to be placed in a new branch
+            # Add branch between metal atom and the interacting atom 
+            # Search the ligand for more branches 
+            branches, connections = extract_branches(new_lines)
+            branches, connections = identify_model(branches, connections, hapt_atoms, G)
+            branches_ligand, connections_ligand = remove_root_branches(branches, root, connections)
+
+            # # all the atoms in the ligand are already added
+            if branches_ligand == None and connections_ligand == None:
+                continue
+
+            branches_to_root = add_branches_to_root(branches_to_root, branches_ligand, connections_ligand, hapt_atoms, ligand_graph, G, root)
+
+    # Hapticity ligand where all atoms are connected to the metal atom
+    # if ligand == hapticity_atoms:
+        elif ligand == hapt_atoms:
+            # Add to the root branch 
+            for atom in hapt_atoms:
+                root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
+
+    # Hapticity ligand with small number of atoms
+    # if len(ligand) =< 3 and len(hapticity_atoms) > 1:
+        elif len(ligand) <= 3 and len(hapt_atoms) > 1:
+            # The ligand atoms need to be placed in the root branch
+            for atom in ligand:
+                root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
+
+    # Hapticity ligand with larger number of atoms
+    # if len(ligand) > 3 and len(hapticity_atoms) > 1:
+        elif len(ligand) > 3 and len(hapt_atoms) > 1:
+            # Add hapticity atoms to the root branch if they are not already added
+            for atom in hapt_atoms:
+                # get xyz of the atom
+                xyz = G.nodes[atom]['xyz']
+                # Check if the atom is already in the root branch
+                atom_exists = False
+                for line in root:
+                    if 'ATOM' not in line:
+                        continue
+                    # Compare the coordinates with a tolerance to account for floating-point precision issues
+                    if line[6] == f'{xyz[0]:.3f}' and line[7] == f'{xyz[1]:.3f}' and line[8] == f'{xyz[2]:.3f}':
+                        atom_exists = True
+                        break
+                
+                # If the atom is not in the root branch, add it
+                if not atom_exists:
+                    root.append(search_pdbqt_file(pdbqt_file, xyz))
+   
+            # extract all branches 
+            branches, connections = extract_branches(new_lines)
+            branches, connections = identify_model(branches, connections, hapt_atoms, G)
+            branches_ligand, connections_ligand = remove_root_branches(branches, root, connections)
+
+            # # all the atoms in the ligand are already added
+            if branches_ligand == None and connections_ligand == None:
+                continue
+            
+            branches_to_root = add_branches_to_root(branches_to_root, branches_ligand, connections_ligand, metal_idx,  G, root)
+
+    root.append(['ENDROOT'])
+
+
+    # append the branches to the root
+    for branch in branches_to_root:
+        root.append(branch)
+
+    # root.append(final_branch[0])
+
+    # find the metal_atom
+    for item in root:
         try:
             if item[2] == par.metal_symbol.upper():
                 metal_atom = item[1]
-                metal_mdl = mdl 
         except IndexError:
             pass
 
-        if 'MODEL' in item:
-            mol[f'mol_{mdl}'] = []
-            mol_id+=1
-
-        if 'ENDMDL' not in item:
-            mol[f'mol_{mdl}'].append(item)
-        else:
-            mol[f'mol_{mdl}'].append(item)
-            mdl+=1
-
-    # first insert the part that contains the metal
-    for line in mol[f'mol_{metal_mdl}']:
-        if 'TORSDOF' in line:
-            torsdof+=int(line[1])
-        elif 'ATOM' in line:
-            atom+=1
-            new_pdbqt.append(line)
-        elif 'MODEL' in line:
-            pass
-        elif 'ENDMDL' in line:
-            pass
-        else:
-            new_pdbqt.append(line)
-
-    iter_over = list(range(mol_id))
-    iter_over.remove(metal_mdl-1)
-
-    for lig in iter_over:
-        branch = False
-        for line in mol[f'mol_{lig+1}']:
-            if 'ATOM' in line and line[2] != 'H':
-                branch_id = atom+int(line[1])
-                break
-
-        for line in mol[f'mol_{lig+1}']:
-            if 'TORSDOF' in line:
-                torsdof+=int(line[1])
-            elif 'MODEL' in line:
-                pass
-            elif 'ROOT' in line:
-                pass
-            elif 'ATOM' in line:
-                atom+=1
-                if branch == False:
-                    new_pdbqt.append(['BRANCH',f'{metal_atom}',f'{branch_id}'])
-                    branch = True 
-                new_pdbqt.append(line)
-                
-        new_pdbqt.append(['ENDBRANCH',f'{metal_atom}',f'{branch_id}'])
-    new_pdbqt.append(['TORSDOF', str(torsdof)])
+    # remove out.pdbqt and out.xyz
+    os.remove('out.pdbqt')
+    os.remove('out.xyz')
 
     if par.vacant_site == True:
-        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom)
+        write_pdbqt(par, root)
         pos_hydrogen = find_pos_dummy(par, f'{name_ligand}_c.xyz', f'{name_ligand}.pdbqt',f'{name_ligand}')
-        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom, pos_hydrogen)
+        write_pdbqt(par, root, pos_hydrogen)
     else:
-        write_pdbqt(par, xyz_file, new_pdbqt, metal_atom)
+        write_pdbqt(par, root)
 
-    return
+def add_branches_to_root(branches_to_root, branches_ligand, connections_ligand, metal_idx, G, root):
+    final_branch = []
+    branches_added = []
+    end_branches = []
+    # find the branch that is connected to the root branch 
+    root_atoms = [int(line[1])-1 for line in root if 'ATOM' in line]
+    # I need to iterate not over the hapt atoms, but over the atoms in the root 
+    for root_atom in root_atoms:
+        n = list(G.neighbors(root_atom)) 
+        for neighbor in n:
+            # if we find a branch start new branch
+            end_branches = []
+            # I need to know that the neighbor is not in the root branch 
+            if neighbor not in root_atoms and neighbor != metal_idx and root_atom != metal_idx:
+                root_branch_atom_xyz = G.nodes[neighbor]['xyz']
+                branches_to_root.append(['BRANCH', root_atom+1, neighbor+1])
+                final_branch.append(['ENDBRANCH', root_atom+1, neighbor+1])
 
-def write_pdbqt(par, xyz_file, lines, metal_atom, pos_hydrogen=None):
+                main_branch = None
+                # verify which branch the xyz is located and add the branch to the root
+                for branch in branches_ligand.keys():
+                    if list(root_branch_atom_xyz) in branches_ligand[branch]['xyz']:
+                        # add the branch to the root 
+                        for line in branches_ligand[branch]['lines']:
+                            if 'BRANCH' in line:
+                                pass # atom_id_new_branch = [line[1], line[2]]
+                            else:
+                                branches_to_root.append(line)
+
+                        main_branch = branch
+
+                connected_branches = []
+                for connection in connections_ligand:
+                    if (connection[0] in branches_ligand[main_branch]['atoms'] 
+                        or connection[1] in branches_ligand[main_branch]['atoms']):
+                        connected_branches.append(connection)
+                
+                if connected_branches == []:
+                    for endbranch in end_branches:
+                        branches_to_root.append(endbranch)
+                    continue
+                else:
+                    branches_to_root, end_branches = recursive_branches_write(
+                        main_branch, connections_ligand, branches_ligand, 
+                        end_branches, branches_added, branches_to_root
+                    )
+
+                    if end_branches:
+                        for endbranch in end_branches[::-1]:
+                            branches_to_root.append(endbranch)
+
+    branches_to_root.append(final_branch[0])
+    return branches_to_root
+
+def recursive_branches_write(current_branch, connections, branches_ligand, end_branches, branches_added, root):
+    current_branch_atoms = branches_ligand[current_branch]['atoms']
+    next_branch = None
+    current_connection = None
+
+    # I need to keep track of the added branches up until a point where the branch ends
+    # if next_branch is None:  # I need to verify if any of the branches in the branches_added has a connection to other connections if not then print the branch to the root
+    for branch, line in branches_added[::-1]:
+        if any(atom in connection for atom in branches_ligand[branch]['atoms'] for connection in connections):
+            break
+        else:
+            root.append(line)
+            branches_added.remove((branch, line))
+            end_branches.remove(line)
+
+    
+    # Use the atom in the connection that is in the current branch to obtain the atom in the next branch
+    for connection in connections:
+        if connection[0] in current_branch_atoms:
+            next_branch_atom = connection[1]
+            current_connection = connection
+            connections.remove(connection)
+            break
+        elif connection[1] in current_branch_atoms:
+            next_branch_atom = connection[0]
+            current_connection = connection
+            connections.remove(connection)
+            break
+
+    # Find the next branch 
+    # if current_connection:
+    for branch in branches_ligand.keys():
+        if next_branch_atom in branches_ligand[branch]['atoms']:
+            next_branch = branch
+            break
+
+    # Write the next branch to the root
+    # if current_connection and next_branch:
+    root.append(['BRANCH', current_connection[0], current_connection[1]]) 
+    end_branches.append(['ENDBRANCH', current_connection[0], current_connection[1]])
+    branches_added.append((next_branch, ['ENDBRANCH', current_connection[0], current_connection[1]]))
+    for line in branches_ligand[next_branch]['lines']:
+        if 'ATOM' in line:
+            root.append(line)
+    
+
+    next_branch_atoms = branches_ligand[next_branch]['atoms']
+    connection_to_this_branch = []
+    for connection in connections:
+        if connection[0] in next_branch_atoms or connection[1] in next_branch_atoms:
+            connection_to_this_branch.append(connection)
+
+
+    if connection_to_this_branch:
+        for connection in connection_to_this_branch:
+            root, end_branches = recursive_branches_write(next_branch, connections, branches_ligand, end_branches, branches_added, root)
+
+    # remove all tuples from list
+    for branch in end_branches:
+        if type(branch) == tuple:
+            end_branches.remove(branch)
+    return root, end_branches
+                            
+def identify_model(branches, connections, atoms, G):
+    # go over the xyz coordinates and find the model that contains the hapticity atoms 
+    # if hapticity atoms is list then iterate over the list
+    if hasattr(atoms, '__iter__'):
+        for atom in atoms:
+            xyz_hapt = G.nodes[atom]['xyz']
+            for model in branches.keys():
+                for branch in branches[model].keys():
+                    for line in branches[model][branch]['xyz']:
+                        if xyz_hapt == tuple(line):
+                            return branches[model], connections[model]
+    else:
+        xyz_hapt = G.nodes[atoms]['xyz']
+        for model in branches.keys():
+            for branch in branches[model].keys():
+                for line in branches[model][branch]['xyz']:
+                    if xyz_hapt == tuple(line):
+                        return branches[model], connections[model]
+
+def reindex_atoms_branches(input_file, output_file):
+    with open(input_file, 'r') as f:
+        lines = f.readlines()
+
+    atom_index_offset = 0
+    branch_index_offset = 0
+
+    model = {}
+    mdl = 0
+
+    # Iterate over the different text
+
+    # For first model no changes 
+
+    # For second model add number of atoms to atom index and each branch index
+
+    # For third model add number of atoms to atom index and each branch index
+
+    with open(output_file, 'w') as f:
+        for line in lines:
+            if 'MODEL' in line:
+                mdl += 1
+                model[mdl] = {'atom_index_offset': 0}
+
+            if line.startswith("ATOM") and mdl == 1:
+                f.write(line)
+                model[mdl]['atom_index_offset'] += 1
+
+            elif line.startswith("ATOM") and mdl > 1:
+                atom_index_offset = model[mdl-1]['atom_index_offset']
+                atom_index = int(line.split()[1])
+                new_atom_index = atom_index + atom_index_offset
+                f.write(f"ATOM {new_atom_index} {' '.join(line.split()[2:])}\n")
+                model[mdl]['atom_index_offset'] += 1
+
+            elif line.startswith("BRANCH") and mdl == 1:
+                f.write(line)
+
+            elif line.startswith("BRANCH") and mdl > 1:
+                atom_index_offset = model[mdl-1]['atom_index_offset']
+                branch_indices = [int(i) for i in line.split()[1:]]
+                new_branch_indices = [str(i + atom_index_offset) for i in branch_indices]
+                f.write(f"BRANCH {' '.join(new_branch_indices)}\n")
+
+            elif line.startswith("ENDBRANCH") and mdl == 1:
+                f.write(line)
+
+            elif line.startswith("ENDBRANCH") and mdl > 1:
+                atom_index_offset = model[mdl-1]['atom_index_offset']
+                branch_indices = [int(i) for i in line.split()[1:]]
+                new_branch_indices = [str(i + atom_index_offset) for i in branch_indices]
+                f.write(f"ENDBRANCH {' '.join(new_branch_indices)}\n")
+
+            elif 'REMARK' in line:
+                pass
+            else:
+                f.write(line)
+
+def remove_root_branches(branches, root, connections_ligand):
+    delete_branches = set()
+    # remove the branches that are already in the root based on the xyz coordinates
+    for branch in branches.keys():
+        for line in branches[branch]['lines']:
+            for root_line in root:
+                if 'ATOM' in line and 'ATOM' in root_line:
+                # find if the xyz of the branch is in the root
+                    if [float(root_line[6]), float(root_line[7]), float(root_line[8])] in branches[branch]['xyz']:
+                        # Check if key exists before deleting
+                        delete_branches.add(branch)
+                        break
+
+    for branch in delete_branches:
+        del branches[branch]
+
+    # also remove the connections that are already in the root based on the atom indices
+    atom_indices_root = []
+    for line in root:
+        if 'ATOM' in line:
+            atom_indices_root.append(line[1])
+
+    delete_connections = []
+    for atom in atom_indices_root:
+        for connections in connections_ligand:
+            if atom in connections:
+                delete_connections.append(connections)
+
+    for connection in delete_connections:
+        connections_ligand.remove(connection)
+
+    return branches, connections_ligand
+
+def extract_branches(ligand_pdbqt_lines):
+    model_idx = 0
+    branch_idx = 0
+    branches = {}
+    connections = {}
+
+    current_root = False
+    current_branch = False
+
+    for line in ligand_pdbqt_lines:
+        if 'MODEL' in line:
+            model_idx += 1
+            branches[model_idx] = {}
+            connections[model_idx] = []
+
+        if 'ROOT' in line:
+            current_root = True
+            branches[model_idx][branch_idx] = {'lines': [], 'atoms': [], 'xyz': []}
+            branches[model_idx][branch_idx]['lines'].append(line)
+            
+        elif 'ENDROOT' in line:
+            branches[model_idx][branch_idx]['lines'].append(line)
+            current_root = False
+            branch_idx += 1
+
+        elif current_root:
+            branches[model_idx][branch_idx]['lines'].append(line)
+            branches[model_idx][branch_idx]['atoms'].append(line[1])
+            branches[model_idx][branch_idx]['xyz'].append([float(line[6]), float(line[7]), float(line[8])])
+
+        elif 'BRANCH' in line: #and not current_branch:
+            current_branch = True
+            branch_idx += 1
+            branches[model_idx][branch_idx] = {'lines': [], 'atoms': [], 'xyz': []}
+            branches[model_idx][branch_idx]['lines'].append(line)
+            connections[model_idx].append([line[1], line[2]])
+            # branches[branch_idx]['atoms'].append(line[1])
+            # branches[branch_idx]['xyz'].append([float(line[5]), float(line[6]), float(line[7])])
+
+        elif 'ENDBRANCH' in line:
+            branches[model_idx][branch_idx]['lines'].append(line)
+            current_branch = False
+
+        elif current_branch:
+            branches[model_idx][branch_idx]['lines'].append(line)
+            branches[model_idx][branch_idx]['atoms'].append(line[1])
+            branches[model_idx][branch_idx]['xyz'].append([float(line[6]), float(line[7]), float(line[8])])
+
+    return branches, connections
+
+def remove_hydrogens(graph):
+    nodes_to_remove = []
+    
+    # Iterate over all nodes with their attributes
+    for node, data in graph.nodes(data=True):
+        if data.get('element') == 'H':
+            keep_hydrogen = False
+            # Check if this hydrogen is connected to any O, N, S, P
+            for neighbor in graph.neighbors(node):
+                if graph.nodes[neighbor].get('element') in ['O', 'N', 'S', 'P']:
+                    keep_hydrogen = True
+                    break
+            if not keep_hydrogen:
+                nodes_to_remove.append(node)
+    
+    # Remove the nodes outside the iteration to avoid modification during iteration
+    graph.remove_nodes_from(nodes_to_remove)
+
+def search_pdbqt_file(pdbqt_file, xyz):
+    '''
+    Search the pdbqt file and return the line of the atom where the xyz coordinates
+    match the input coordinates
+    '''
+    with open(pdbqt_file, 'r') as fin:
+        for line in fin:
+            if 'ATOM' in line or 'HETATM' in line:
+                split = line.strip().split()
+                if compare_decimals([float(split[6]), float(split[7]), float(split[8])], xyz):
+                    return split 
+
+def compare_decimals(set1, set2):
+    rounded_set1 = tuple(round(num, 3) for num in set1)
+    rounded_set2 = tuple(round(num, 3) for num in set2)
+    return rounded_set1 == rounded_set2
+
+def bfs(G, starting_node, metal_idx):
+    ligand_atoms = []
+    queue = [starting_node]
+
+    while queue:
+        atom = queue.pop(0)
+
+        if atom not in ligand_atoms:
+            ligand_atoms.append(atom)
+
+        for i in G.neighbors(atom):
+            if i not in ligand_atoms and i != metal_idx:
+                queue.append(i)
+                
+    return sorted(ligand_atoms)
+
+def find_groups(graph, current_node, metal_neighbors, visited):
+    idx_group = []  # Create a new group for each starting node
+
+    def recursive_search(node):
+        if node in metal_neighbors and node not in visited and node not in idx_group:
+            visited.add(node)
+            idx_group.append(node)
+            for neighbor in graph.neighbors(node):
+                recursive_search(neighbor)
+
+    recursive_search(current_node)
+    return idx_group
+
+def write_pdbqt(par, lines, pos_hydrogen=None):
+    # I need to keep track of the old index and the new index such that I can shift the branch ids 
+    mapping = {}
+
+    if pos_hydrogen != None:
+        n_atoms = 2
+    else:
+        n_atoms = 1
+
+    # create mapping
+    for line in lines:
+        if 'ATOM' in line:
+            mapping[int(line[1])] = n_atoms
+            n_atoms+=1
+
     n_atoms = 1
-    hydrogen_added = False
+
+    torsdof = 0
     with open(f'{par.name_ligand}.pdbqt', 'w') as fout:
         fout.write('ROOT\n')
         for line in lines:
-            if pos_hydrogen != None and n_atoms == int(metal_atom)+1:
+            if pos_hydrogen != None and n_atoms == 1:
                 fout.write(f'ATOM     {n_atoms:>2}  H   LIG A   1     {pos_hydrogen[0]:>7.3f} {pos_hydrogen[1]:>7.3f} {pos_hydrogen[2]:>7.3f}  0.00  0.00     0.000 DD\n')
                 n_atoms+=1
-                hydrogen_added = True
 
             if 'MODEL' in line:
                 pass
@@ -623,24 +1083,14 @@ def write_pdbqt(par, xyz_file, lines, metal_atom, pos_hydrogen=None):
                     n_atoms+=1
 
             elif 'BRANCH' in line:
-                if hydrogen_added == True:
-                    if int(line[1]) > int(metal_atom):
-                        line[1] = int(line[1])+1
-                    if int(line[2]) > int(metal_atom):
-                        line[2] = int(line[2])+1
-                fout.write(f'{line[0]}   {line[1]}  {line[2]}\n')
+                fout.write(f'{line[0]}   {mapping[int(line[1])]}  {mapping[int(line[2])]}\n')
+                torsdof+=1
 
             elif 'ENDBRANCH' in line:
-                if hydrogen_added == True:
-                    if int(line[1]) > int(metal_atom):
-                        line[1] = int(line[1])+1
-                    if int(line[2]) > int(metal_atom):
-                        line[2] = int(line[2])+1
-                fout.write(f'{line[0]}   {line[1]}  {line[2]}\n')
+                fout.write(f'{line[0]}   {mapping[int(line[1])]}  {mapping[int(line[2])]}\n')
 
-            elif 'TORSDOF' in line:
-                fout.write(f'{line[0]} {line[1]}\n')
-    return
+        
+        fout.write(f'TORSDOF {torsdof}\n')
  
 def merge_common(lists): 
     neigh = defaultdict(set) 
@@ -858,7 +1308,6 @@ def write_conformations(name_ligand, name_protein):
             elif in_docked_block:
                 docked_block.append(line)
 
-
 def write_dpf_file(gpf_file, name_ligand, name_protein, parameter_file, num_poses, dock_algorithm, random_pos=False, GA=False, SA=False, energy_ligand=None):
     gpf_file = open(gpf_file,'r')
     gpf_lines = [line.split() for line in gpf_file]
@@ -986,62 +1435,3 @@ def rmsd_func(name_ligand, n_prot, directory, generation=None, num_gen=None, tra
     output.append("-----------------------------------------------------------------------------------------------------------\n")
 
     return avg_list, min_list, print(''.join(output))
-
-
-# # Translation Matrix - Translation is switched from column to row because we work with (1,4) coordinate matrix
-# def translation_matrix(matrix,dx,dy,dz):
-#     translation_matrix = np.array(([1,0,0,0],
-#                                    [0,1,0,0],
-#                                    [0,0,1,0],
-#                                    [dx,dy,dz,1]),dtype=np.float64)
-
-#     y_dim,x_dim = np.shape(matrix)
-#     extra_dim_arr = np.c_[matrix, np.ones(y_dim)]
-
-#     new_extra_dim_arr = np.dot(extra_dim_arr, translation_matrix)
-#     new_arr = np.delete(new_extra_dim_arr, (3), 1)
-
-#     return new_arr
-
-# # Rotation Matrices
-# def x_axis_rotation(matrix,theta):
-#     rotation_matrix = np.array(([1,0,0,0],
-#                                 [0,np.cos(theta),-np.sin(theta),0],
-#                                 [0,np.sin(theta),np.cos(theta),0],
-#                                 [0,0,0,1]), dtype=np.float64)
-
-#     y_dim,x_dim = np.shape(matrix)
-#     extra_dim_arr = np.c_[matrix, np.ones(y_dim)]
-
-#     new_extra_dim_arr = np.dot(extra_dim_arr, rotation_matrix)
-#     new_arr = np.delete(new_extra_dim_arr, (3), 1)
-
-#     return new_arr
-
-# def y_axis_rotation(matrix,theta):
-#     rotation_matrix = np.array(([np.cos(theta),0,np.sin(theta),0],
-#                                 [0,1,0,0],
-#                                 [-np.sin(theta),0,np.cos(theta),0],
-#                                 [0,0,0,1]),dtype=np.float64)
-
-#     y_dim,x_dim = np.shape(matrix)
-#     extra_dim_arr = np.c_[matrix, np.ones(y_dim)]
-
-#     new_extra_dim_arr = np.dot(extra_dim_arr, rotation_matrix)
-#     new_arr = np.delete(new_extra_dim_arr, (3), 1)
-
-#     return new_arr
-
-# def z_axis_rotation(matrix,theta):
-#     rotation_matrix = np.array(([np.cos(theta),-np.sin(theta),0,0],
-#                                 [np.sin(theta),np.cos(theta),0,0],
-#                                 [0,0,1,0],
-#                                 [0,0,0,1]),dtype=np.float64)
-
-#     y_dim,x_dim = np.shape(matrix)
-#     extra_dim_arr = np.c_[matrix, np.ones(y_dim)]
-
-#     new_extra_dim_arr = np.dot(extra_dim_arr, rotation_matrix)
-#     new_arr = np.delete(new_extra_dim_arr, (3), 1)
-
-#     return new_arr

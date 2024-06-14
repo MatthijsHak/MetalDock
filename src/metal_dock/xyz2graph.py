@@ -129,11 +129,11 @@ class MolGraph:
     def read_xyz(self, file_path: str) -> None:
         """Reads an XYZ file, searches for elements and their cartesian coordinates
         and adds them to corresponding arrays."""
-        pattern = re.compile(
-            r"([A-Za-z]{1,3})\s*(-?\d+(?:\.\d+)?)\s*(-?\d+(?:\.\d+)?)\s*(-?\d+(?:\.\d+)?)"
-        )
         with open(file_path) as file:
-            for element, x, y, z in pattern.findall(file.read()):
+            for _ in range(2):
+                next(file)
+            for line in file:
+                element, x, y, z = line.strip().split()
                 self.elements.append(element)
                 self.x.append(float(x))
                 self.y.append(float(y))
@@ -150,7 +150,7 @@ class MolGraph:
         distances = np.sqrt(np.einsum("ijk,ijk->ij", distances, distances))
 
         atomic_radii = np.array(self.atomic_radii)
-        distance_bond = (atomic_radii[:, np.newaxis] + atomic_radii) * 1.3
+        distance_bond = (atomic_radii[:, np.newaxis] + atomic_radii) * 1.4
 
         adj_matrix = np.logical_and(0.1 < distances, distance_bond > distances).astype(
             int

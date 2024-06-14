@@ -101,9 +101,18 @@ def docking(input_file, par=None):
     clean_pdb_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
     shutil.copyfile(clean_pdb_in, clean_pdb_out)
 
-    mol2_in = os.path.join(output_dir, 'file_prep', f'{par.name_ligand}.mol2')
-    mol2_out = os.path.join(os.getcwd(), f'{par.name_ligand}.mol2')
-    shutil.copyfile(mol2_in, mol2_out)
+    # if par.engine.lower() == 'adf':
+    #     mol_in = os.path.join(output_dir, 'QM', 'geom_opt', 'plams_workdir', 'output.mol')
+    # else:
+    # mol_in = os.path.join(output_dir, 'QM', 'geom_opt', 'output.mol')
+    # mol_out = os.path.join(os.getcwd(), f'{par.name_ligand}.mol')
+    # shutil.copyfile(mol_in, mol_out)
+
+    # f'{output_dir}/QM/geom_opt/output.mol'
+    if par.geom_opt == True:
+        subprocess.call([os.environ['OBABEL']+f' -imol {output_dir}/QM/geom_opt/output.mol -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    else:
+        subprocess.call([os.environ['OBABEL']+f' -imol {output_dir}/QM/single_point/output.mol -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     cm5_in = os.path.join(qm_dir, 'CM5_charges')
     cm5_out = os.path.join(os.getcwd(), 'CM5_charges')
