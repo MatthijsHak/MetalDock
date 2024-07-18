@@ -132,17 +132,20 @@ def docking(input_file, par=None):
     else:
         dock = d.get_coordinates(f'{par.name_ligand}_c.xyz', par.metal_symbol)
 
-    if par.box_size != 0 and par.scale_factor == 0:
-        npts = par.box_size * 2.66 # Convert Å to grid points
-        if int(npts) == npts:
+    # if one value in the list of box size is not 0 then use that value
+    if any(x != 0 for x in par.box_size) and par.scale_factor == 0:
+        npts = [x * 2.66 for x in par.box_size] # Convert Å to grid points
+        if [int(x) for x in npts] == npts:
             box_size =  int(npts)
         else:
-            box_size = math.ceil(npts)
+            # box_size = math.ceil(npts)
+            box_size = [math.ceil(x) for x in npts]
             print('SPACING BETWEEN GRID POINTS IS STANDARD SET TO 0.375 Å')
             print('BOX SIZE MUST BE INTEGER GRID POINTS WHICH WAS NOT FOUND')
-            print('BOX SIZE SIDE ROUNDED UP AND SET TO {:.3f} Å\n'.format(box_size / 2.66))
+            print(f'BOX SIZE SIDE ROUNDED UP AND SET TO {box_size[0] / 2.66:.3f} {box_size[1] / 2.66:.3f} {box_size[2] / 2.66:.3f} Å\n')
 
-    if par.box_size == 0 and par.scale_factor != 0:
+    # if all values in the list of box size are 0 then calculate the box size
+    if all(x == 0 for x in par.box_size) and par.scale_factor != 0:
         box_size = d.box_size_func(f'{par.name_ligand}_c.xyz', par.metal_symbol, 0.375, par.scale_factor)
 
     if par.box_size != 0 and par.scale_factor != 0:

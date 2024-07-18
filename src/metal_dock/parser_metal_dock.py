@@ -139,11 +139,17 @@ class Parser:
     self.dock_y                   = float(config['DOCKING']['dock_y'])
     self.dock_z                   = float(config['DOCKING']['dock_z'])
     
-    try: 
-      self.box_size               = int(config['DOCKING']['box_size'])
-    except ValueError:
-      self.box_size               = 0 
-    
+    self.box_size = []
+    for i in config['DOCKING']['box_size'].split(','):
+      self.box_size.append(int(i))
+
+    if len(self.box_size) == 1:
+      print('ONLY ONE BOX SIZE GIVEN, SETTING BOX SIZE TO CUBIC')
+      self.box_size = [self.box_size[0], self.box_size[0], self.box_size[0]]
+    elif len(self.box_size) == 2:
+      print('ONLY TWO BOX SIZES GIVEN, SETTING THIRD BOX SIZE TO 20')
+      self.box_size.append(20)
+
     try:
       self.scale_factor           = float(config['DOCKING']['scale_factor'])
     except ValueError:

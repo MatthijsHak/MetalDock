@@ -1218,9 +1218,7 @@ def box_size_func(xyz_file, metal_symbol, spacing, scale_factor):
     y_npts = (round(y_dist / spacing)) & (-2)
     z_npts = (round(z_dist / spacing)) & (-2)
 
-    max_side = max([x_npts,y_npts,z_npts])
-
-    return max_side
+    return [x_npts, y_npts, z_npts]
 
 def prepare_receptor(name_protein):
     prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_receptor4.py')
@@ -1249,7 +1247,7 @@ def docking_func(par, name_ligand, name_protein, dock, box_size, energy=None):
 
     #create_gpf():
     prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_gpf4.py')
-    subprocess.call([os.environ['PYTHON_3']+f" {prepare_gpf4} -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size},{box_size},{box_size}' -p gridcenter='{dock[0]:.6},{dock[1]:.6},{dock[2]:.6}'"], shell=True)
+    subprocess.call([os.environ['PYTHON_3']+f" {prepare_gpf4} -l {name_ligand}.pdbqt  -r clean_{name_protein}.pdbqt -p parameter_file={par.parameter_file} -p npts='{box_size[0]},{box_size[1]},{box_size[2]}' -p gridcenter='{dock[0]:.6},{dock[1]:.6},{dock[2]:.6}'"], shell=True)
 
     gpf = open(f'clean_{name_protein}.gpf', 'a')
     gpf.write(f'nbp_r_eps 0.25 23.2135   12 6  NA TZ\n')
