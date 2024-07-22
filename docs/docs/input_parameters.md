@@ -333,7 +333,7 @@ dock_z = 0.0
 This keyword specifies the box size side in Ångstrom of the box used in the docking procedure
 
 **Default input:**  
-box_size = 20
+box_size = 20,20,20
 
 **Valid values:**  
 `float`
