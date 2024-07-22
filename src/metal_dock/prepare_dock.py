@@ -450,10 +450,12 @@ def create_ligand_pdbqt_file(par, name_ligand):
             cm = [line.strip().split() for line in fin_2]
             if par.engine.lower() != 'gaussian':
                 cm = cm[1:]
+                print(cm)
+
             with open('output.mol2', 'w') as fout:
                 atom_id = 0
                 for line in fin_1:
-                    if len(line.strip().split()) < 7:
+                    if len(line.strip().split()) < 7 or 'Properties' in line:
                         fout.write(line)
                     else:
                         line = line.strip().split()
@@ -592,8 +594,13 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
     # remove the branch from the branches list
     branches_metal.pop(metal_branch)
 
-    # No hapticity ligand with small number of atoms
-    # if len(ligand) =< 3 and len(hapticity_atoms) == 1: 
+    # The ligand_list and hapticity atoms that are already in the root can be removed 
+    for line in root[1:]:
+        for idx, (ligand, hapt_atoms) in enumerate(zip(ligands_list, hapticity_atoms)):
+            if int(line[1]) in ligand or int(line[1]) in hapt_atoms:
+                ligands_list.pop(idx)
+                hapticity_atoms.pop(idx)
+
     # The ligand atoms need to be placed in the root branch
     for idx, (ligand, hapt_atoms) in enumerate(zip(ligands_list, hapticity_atoms)):
         ligand_graph = G.subgraph(ligand)
@@ -603,9 +610,9 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
             for atom in ligand:
                 root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
 
-    # No hapticity ligand with larger number of atoms
-    # if len(ligand) > 3 and len(hapticity_atoms) == 1:
+        # No hapticity ligand with larger number of atoms
         elif len(ligand) > 3 and len(hapt_atoms) == 1:
+            print(ligand, hapt_atoms)
             # The ligand atoms need to be placed in a new branch
             # Add branch between metal atom and the interacting atom 
             # Search the ligand for more branches 
@@ -617,24 +624,21 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
             if branches_ligand == None and connections_ligand == None:
                 continue
 
-            branches_to_root = add_branches_to_root(branches_to_root, branches_ligand, connections_ligand, hapt_atoms, ligand_graph, G, root)
+            branches_to_root = add_branches_to_root(branches_to_root, branches_ligand, connections_ligand, metal_idx,  G, root)
 
-    # Hapticity ligand where all atoms are connected to the metal atom
-    # if ligand == hapticity_atoms:
+        # Hapticity ligand where all atoms are connected to the metal atom
         elif ligand == hapt_atoms:
             # Add to the root branch 
             for atom in hapt_atoms:
                 root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
 
-    # Hapticity ligand with small number of atoms
-    # if len(ligand) =< 3 and len(hapticity_atoms) > 1:
+        # Hapticity ligand with small number of atoms
         elif len(ligand) <= 3 and len(hapt_atoms) > 1:
             # The ligand atoms need to be placed in the root branch
             for atom in ligand:
                 root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
 
-    # Hapticity ligand with larger number of atoms
-    # if len(ligand) > 3 and len(hapticity_atoms) > 1:
+        # Hapticity ligand with larger number of atoms
         elif len(ligand) > 3 and len(hapt_atoms) > 1:
             # Add hapticity atoms to the root branch if they are not already added
             for atom in hapt_atoms:
