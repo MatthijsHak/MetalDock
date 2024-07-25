@@ -91,7 +91,7 @@ def orca_opt_converged(log_file):
             print('GEOMETRY CONVERGED')
             return True
         else:
-            print('GEOMETRY NOT CONVERGED - DELETE geom.out')
+            print('GEOMETRY NOT CONVERGED - VERIFY THE PROBLEM IN geom.out AND DELETE FILE BEFORE RUNNING AGAIN')
             return sys.exit()
 
 def orca_sp_converged(log_file):
@@ -100,7 +100,7 @@ def orca_sp_converged(log_file):
             print('SINGLE POINT CONVERGED')
             return True
         else:
-            print('SINGLE POINT NOT CONVERGED - DELETE geom.out')
+            print('SINGLE POINT NOT CONVERGED - VERIFY THE PROBLEM IN single_point.out AND DELETE FILE BEFORE RUNNING AGAIN')
             return sys.exit()
 
 def orca_geom_opt(xyz_file, var):
