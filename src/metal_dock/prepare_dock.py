@@ -581,7 +581,7 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
     root.append(['ROOT'])
 
     # identify the model in which the metal atom is located
-    branches_metal, _ = identify_model(branches, connections, metal_idx+1, G)
+    branches_metal, _ = identify_model(branches, connections, metal_idx, G)
 
     metal_branch = None
     for n in branches_metal.keys():
@@ -590,15 +590,9 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
                 if 'ATOM' in line:
                     root.append(line)
             metal_branch = n
+
     # remove the branch from the branches list
     branches_metal.pop(metal_branch)
-
-    # The ligand_list and hapticity atoms that are already in the root can be removed 
-    for line in root[1:]:
-        for idx, (ligand, hapt_atoms) in enumerate(zip(ligands_list, hapticity_atoms)):
-            if int(line[1]) in ligand or int(line[1]) in hapt_atoms:
-                ligands_list.pop(idx)
-                hapticity_atoms.pop(idx)
 
     # The ligand atoms need to be placed in the root branch
     for idx, (ligand, hapt_atoms) in enumerate(zip(ligands_list, hapticity_atoms)):
@@ -669,12 +663,9 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
 
     root.append(['ENDROOT'])
 
-
     # append the branches to the root
     for branch in branches_to_root:
         root.append(branch)
-
-    # root.append(final_branch[0])
 
     # find the metal_atom
     for item in root:
