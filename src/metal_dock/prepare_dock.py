@@ -450,7 +450,6 @@ def create_ligand_pdbqt_file(par, name_ligand):
             cm = [line.strip().split() for line in fin_2]
             if par.engine.lower() != 'gaussian':
                 cm = cm[1:]
-                print(cm)
 
             with open('output.mol2', 'w') as fout:
                 atom_id = 0
