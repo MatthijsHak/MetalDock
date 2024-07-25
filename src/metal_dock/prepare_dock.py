@@ -612,7 +612,6 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
 
         # No hapticity ligand with larger number of atoms
         elif len(ligand) > 3 and len(hapt_atoms) == 1:
-            print(ligand, hapt_atoms)
             # The ligand atoms need to be placed in a new branch
             # Add branch between metal atom and the interacting atom 
             # Search the ligand for more branches 
