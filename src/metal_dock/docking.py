@@ -77,6 +77,7 @@ def docking(input_file, par=None):
     if par.engine.lower() == 'orca':
         qm_dir, energy = orca.orca_engine(xyz_file, par, par.output_dir)
 
+    subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol  > output.mol'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     ##### AutoDock #####
     os.chdir(par.output_dir)
 

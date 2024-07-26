@@ -161,16 +161,3 @@ def orca_single_point(xyz_file, var):
 
     mol.get_potential_energy()
     mol.write('output.xyz')
-
-# def optimize_hydrogens(xyz_file, var):
-#     M = 2 * (var.spin*0.5) + 1
-
-#     mol = read(xyz_file)
-#     mol.calc = ORCA(label='hydrogen_opt',
-#                     charge=var.charge,
-#                     mult=M,
-#                     orcasimpleinput=f'Opt {var.orcasimpleinput}',
-#                     orcablocks=f'%maxcore {str(var.memory)} %pal nprocs {str(var.ncpu)} end %geom optimizehydrogens true end')
-
-#     mol.get_potential_energy()
-#     mol.write(xyz_file)

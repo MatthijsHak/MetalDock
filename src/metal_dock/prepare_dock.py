@@ -524,9 +524,9 @@ def get_bond_order(par, mapping, G):
     elif par.engine.lower() == 'adf' and par.geom_opt == True:
         bond_orders = read_ams_bond_order(f'{par.output_dir}/QM/geom_opt/plams_workdir/plamsjob/plamsjob.out')
     elif par.engine.lower() == 'gaussian' and par.geom_opt == False:
-        bond_orders = read_gaussian_bond_order(f'{par.output_dir}/QM/single_point/output.log')
+        bond_orders = read_gaussian_bond_order(f'{par.output_dir}/QM/single_point/single_point.log', len(G.nodes))
     elif par.engine.lower() == 'gaussian' and par.geom_opt == True:
-        bond_orders = read_gaussian_bond_order(f'{par.output_dir}/QM/geom_opt/output')
+        bond_orders = read_gaussian_bond_order(f'{par.output_dir}/QM/geom_opt/geom_opt.log', len(G.nodes))
 
     for bond in bond_orders:
         atom1 = mapping[bond[0]]
@@ -592,7 +592,7 @@ def read_ams_bond_order(log_file):
 
     return bond_orders
 
-def read_gaussian_bond_order(log_file):
+def read_gaussian_bond_order(log_file, n_atoms):
     with open(log_file, 'r') as file:
         lines = file.readlines()
     
@@ -610,12 +610,37 @@ def read_gaussian_bond_order(log_file):
         
         if recording:
             extract_lines.append(line)
+
+    # Remove any empty lines and strip whitespace
+    lines = [line.strip() for line in extract_lines if line.strip()]
+
+    matrix = np.zeros((n_atoms, n_atoms))
+    n_chunks = n_atoms // 6
+    rest_columns = n_atoms % 6
+
+    for chunk in range(n_chunks + 1):  # +1 to include the final smaller chunk
+        start_line = 1 + chunk * (n_atoms+1)  # Skip header line and previous chunks
+        end_line = start_line + n_atoms  # Each chunk has 74 data lines
         
-    for line in extract_lines:
-        print(line)
+        if chunk < n_chunks:
+            columns = 6
+        else:
+            columns = rest_columns
 
-    sys.exit()
+        for col in range(columns):
+            for row in range(n_atoms):
+                line = lines[start_line + row].split()
+                value = float(line[col + 2])  # +2 to skip index and atom symbol
+                matrix[row][chunk * 6 + col] = value
 
+    # from the matrix create bond orders that are larger than 0.2 in the following format (atom1, atom2): bond_order
+    bond_orders = {}
+    for i in range(n_atoms):
+        for j in range(i+1, n_atoms):
+            if matrix[i][j] > 0.2:
+                bond_orders[(i, j)] = matrix[i][j]
+
+    return bond_orders
 
 def generate_dihedrals(ligand_graph, metal_idx):
     all_dihedrals = []
@@ -784,6 +809,8 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
         if par.engine.lower() == 'adf' and bond_order < 1.3:
             branch_atoms.append([dihedral[1], dihedral[2]])
         if par.engine.lower() == 'orca' and bond_order < 1.2:
+            branch_atoms.append([dihedral[1], dihedral[2]])
+        if par.engine.lower() == 'gaussian' and bond_order < 1.2:
             branch_atoms.append([dihedral[1], dihedral[2]])
 
     root = process_ligands(G, G_H, ligands_list, hapticity_atoms, branch_atoms, pdbqt_file, metal_idx)

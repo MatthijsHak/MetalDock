@@ -7,6 +7,13 @@ from ase.calculators.gaussian import Gaussian, GaussianOptimizer
 
 
 def gaussian_engine(xyz_file, var, output_dir):
+    print('\nGAUSSIAN ENGINE CURRENTLY HAS A BUG DUE TO ASE MODULE')
+    print("THERE WILL BE AN ERRROR AFTER RUNNING THE QM CALCULATION")
+    print("PLEASE VERIFY IF THE CALCULATION WAS SUCCESSFUL BY CHECKING THE LOG FILE\n")
+
+    print("IF THE CALCULATION WAS SUCCESSFUL, PLEASE RUN METALDOCK AGAIN")
+    print("EVERYTHING SHOULD THEN STILL RUN SMOOTHLY\n")
+
     ## Geometry Optimization ##
     if var.geom_opt == True:
         if os.path.isdir('geom_opt') == False:
@@ -176,7 +183,6 @@ def gaussian_geom_opt(xyz_file, var):
     opt = GaussianOptimizer(mol, s)
     opt.run(fmax='tight')
     mol.write('output.xyz')
-    subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol  > output.mol'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
 def gaussian_sp(xyz_file, var):
     M = 2 * (var.spin*0.5) + 1 
@@ -237,4 +243,3 @@ def gaussian_sp(xyz_file, var):
     mol.calc = s
     mol.get_potential_energy()
     mol.write('output.xyz')
-    subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol  > output.mol'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
