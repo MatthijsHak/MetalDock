@@ -12,7 +12,7 @@ from openbabel import openbabel as ob
 
 from scipy.spatial.distance import cdist
 
-from collections import defaultdict 
+from collections import defaultdict, deque
 from random import seed
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -505,6 +505,185 @@ def one_model_file(par, name_ligand, xyz_file, pdbqt_file):
         
     return
 
+
+import re
+
+def get_bond_order(par, mapping, G):
+    """
+    Function that adds the bond order to the edges. It first starts by reading 
+    the bond order information from the QM output file. It then iterates over 
+    the indices of the bond orders, it maps the indices of the bond order to 
+    the G_H order, finally it adds it to the graph.
+    """
+    if par.engine.lower() == 'orca' and par.geom_opt == False:
+        bond_orders = read_orca_bond_order(f'{par.output_dir}/QM/single_point/single_point.out')
+    elif par.engine.lower() == 'orca' and par.geom_opt == True:
+        bond_orders = read_orca_bond_order(f'{par.output_dir}/QM/geom_opt/geom_opt.out')
+    elif par.engine.lower() == 'adf' and par.geom_opt == False:
+        bond_orders = read_ams_bond_order(f'{par.output_dir}/QM/single_point/plams_workdir/plamsjob/plamsjob.out')
+    elif par.engine.lower() == 'adf' and par.geom_opt == True:
+        bond_orders = read_ams_bond_order(f'{par.output_dir}/QM/geom_opt/plams_workdir/plamsjob/plamsjob.out')
+    elif par.engine.lower() == 'gaussian' and par.geom_opt == False:
+        bond_orders = read_gaussian_bond_order(f'{par.output_dir}/QM/single_point/output.log')
+    elif par.engine.lower() == 'gaussian' and par.geom_opt == True:
+        bond_orders = read_gaussian_bond_order(f'{par.output_dir}/QM/geom_opt/output')
+
+    for bond in bond_orders:
+        atom1 = mapping[bond[0]]
+        atom2 = mapping[bond[1]]
+        # add this attritbute to the graph
+        G[atom1][atom2]['bond_order'] = bond_orders[bond]
+
+    return G
+
+def read_orca_bond_order(log_file):
+    bond_orders = {}
+    
+    with open(log_file, 'r') as file:
+        content = file.read()
+    
+    pattern = r"Mayer bond orders larger than \d+\.\d+\n(.*?)\n\n"
+    match = re.search(pattern, content, re.DOTALL)
+    
+    if match:
+        bond_order_section = match.group(1)
+        
+        bond_pattern = r"B\(\s*(\d+)-\w+\s*,\s*(\d+)-\w+\s*\)\s*:\s*(\d+\.\d+)"
+        bonds = re.findall(bond_pattern, bond_order_section)
+        
+        for bond in bonds:
+            atom1 = int(bond[0])
+            atom2 = int(bond[1])
+            order = float(bond[2])
+
+            # sort atoms
+            atoms = tuple(sorted((atom1, atom2)))
+            # Store bond order for both directions
+            bond_orders[atoms] = order
+
+    return bond_orders
+
+def read_ams_bond_order(log_file):
+    bond_orders = {}
+    
+    with open(log_file, 'r') as file:
+        content = file.read()
+    
+    # Define the pattern to capture the bond order section
+    pattern = r"Description: Mayer bond orders\nOnly bonds with bond orders > 0\.200 are printed\.\n\n Index  Atom    Index  Atom    BondOrder\n(.*?)\n\n"
+    match = re.search(pattern, content, re.DOTALL)
+    
+    if match:
+        bond_order_section = match.group(1)
+        
+        # Define the pattern to extract bond order information
+        bond_pattern = r"\s*(\d+)\s+\w+\s+(\d+)\s+\w+\s+([\d.]+)"
+        bonds = re.findall(bond_pattern, bond_order_section)
+        
+        for bond in bonds:
+            atom1 = int(bond[0])-1
+            atom2 = int(bond[1])-1
+            order = float(bond[2])
+
+            # Sort atoms
+            atoms = tuple(sorted((atom1, atom2)))
+            # Store bond order for both directions
+            bond_orders[atoms] = order
+
+    return bond_orders
+
+def read_gaussian_bond_order(log_file):
+    with open(log_file, 'r') as file:
+        lines = file.readlines()
+    
+    # Initialize variables
+    extract_lines = []
+    recording = False
+    
+    for line in lines:
+        if ' Atomic Valencies and Mayer Atomic Bond Orders:' in line:
+            recording = True
+            continue
+        elif ' Lowdin Atomic Charges:' in line:
+            recording = False
+            break
+        
+        if recording:
+            extract_lines.append(line)
+        
+    for line in extract_lines:
+        print(line)
+
+    sys.exit()
+
+
+def generate_dihedrals(ligand_graph, metal_idx):
+    all_dihedrals = []
+    sorted_dihedral = []
+    
+    for atom in ligand_graph:
+        dihedrals = find_dihedrals(ligand_graph, atom, 3)
+        
+        for dihedral in dihedrals:
+            dihedral_sort = dihedral.copy()
+            dihedral_sort.sort(key = lambda k: k)
+
+            if dihedral_sort not in sorted_dihedral:
+                all_dihedrals.append(dihedral)
+                sorted_dihedral.append(dihedral_sort)
+
+    proper_dihedrals = []
+    dihedral_bond_atoms = []
+    rings = nx.cycle_basis(ligand_graph)
+
+    for dihedral in all_dihedrals:
+        if metal_idx in dihedral:
+            continue
+
+        in_ring = False
+        for ring in rings:
+            if dihedral[1] in ring and dihedral[2] in ring:
+                in_ring = True
+                break
+
+        if in_ring:
+            continue
+        else:
+            bond_atoms = tuple(sorted((dihedral[1], dihedral[2])))
+            if bond_atoms not in dihedral_bond_atoms:
+                proper_dihedrals.append(dihedral)
+                dihedral_bond_atoms.append(bond_atoms)
+
+
+    # I only want to keep the dihedrals that have unique atoms in position 1 and 2
+
+    return proper_dihedrals
+
+
+def find_dihedrals(graph, node, depth):
+    """
+    Recursively find dihedral angles involving the given node.
+
+    Args:
+        graph: Molecular graph.
+        node: Starting atom node.
+        depth: Maximum depth of dihedral search.
+
+    Returns:
+        List of dihedral angle lists.
+    """
+    if depth == 0:
+        return[[node]]
+    
+    dihedral = []
+    for neighbor in graph.neighbors(node):
+        for path in find_dihedrals(graph,neighbor,depth-1):
+            if node not in path:
+                dihedral.append([node]+path)
+    return dihedral
+
+
+
 def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
     # rename and reorder the pdbqt file 
     reindex_atoms_branches(pdbqt_file, 'out.pdbqt')
@@ -533,6 +712,12 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
                 else:
                     f.write(f'{line[0]} {line[1]:.6f} {line[2]:.6f} {line[3]:.6f}\n')
 
+    # print all attributes of the par object
+    add_non_polar_hydrogens(f'{par.output_dir}/file_prep/{par.name_ligand}_c.xyz',
+                            f'{par.output_dir}/file_prep/{par.name_ligand}_c.pdb',
+                            'out.xyz',
+                            'out_H.xyz')
+
     pdbqt_file = 'out.pdbqt'
     atom = 0
 
@@ -540,12 +725,28 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
 
     graph = MolGraph()
     graph.read_xyz('out.xyz')
-    
     G = to_networkx_graph(graph)
 
-    # Remove all nodes that have the element 'H' except for the 'H' atoms
-    # that are connected to O, N, S, P
-    remove_hydrogens(G)
+    graph_H = MolGraph()
+    graph_H.read_xyz('out_H.xyz')
+    G_H = to_networkx_graph(graph_H)
+
+    qm_graph_H = MolGraph()
+    if par.geom_opt == True:
+        qm_graph_H.read_xyz(f'{par.output_dir}/QM/geom_opt/output.xyz')
+    else:
+        qm_graph_H.read_xyz(f'{par.output_dir}/QM/single_point/output.xyz')
+
+    G_qm_H = to_networkx_graph(qm_graph_H)
+
+    # perform graph isomorphism with G_H
+    gm = nx.algorithms.isomorphism.GraphMatcher(G_qm_H, G_H)
+    gm.is_isomorphic()
+    mapping = gm.mapping
+
+    # Key is the index of the atom in the QM graph
+    # Value is the index of the atom in the G_H graph
+    G_H = get_bond_order(par, mapping, G_H)
 
     # find which atom is the metal atom from the graph
     for node in G.nodes(data=True):
@@ -573,107 +774,19 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
             if any(item in ligand for item in connect):
                 hapticity_atoms.append(connect) 
 
-    # extract all branches 
-    branches, connections = extract_branches(new_lines)
+    dihedrals = generate_dihedrals(G, metal_idx)
 
-    root = []
-    branches_to_root = []
-    root.append(['ROOT'])
+    # print all edge attribute names
+    branch_atoms = []
+    for dihedral in dihedrals:
+        # I want to obtain the bond_order of the edge 
+        bond_order = G_H[dihedral[1]][dihedral[2]]['bond_order']
+        if par.engine.lower() == 'adf' and bond_order < 1.3:
+            branch_atoms.append([dihedral[1], dihedral[2]])
+        if par.engine.lower() == 'orca' and bond_order < 1.2:
+            branch_atoms.append([dihedral[1], dihedral[2]])
 
-    # identify the model in which the metal atom is located
-    branches_metal, _ = identify_model(branches, connections, metal_idx, G)
-
-    metal_branch = None
-    for n in branches_metal.keys():
-        if str(metal_idx) in branches_metal[n]['atoms']:
-            for line in branches_metal[n]['lines']:
-                if 'ATOM' in line:
-                    root.append(line)
-            metal_branch = n
-
-    # remove the branch from the branches list
-    branches_metal.pop(metal_branch)
-
-    # The ligand atoms need to be placed in the root branch
-    for idx, (ligand, hapt_atoms) in enumerate(zip(ligands_list, hapticity_atoms)):
-        ligand_graph = G.subgraph(ligand)
-        # No hapticity ligand with small number of atoms
-        # Add all atoms to the root branch
-        if len(ligand) <= 3 and len(hapt_atoms) == 1:
-            for atom in ligand:
-                root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
-
-        # No hapticity ligand with larger number of atoms
-        elif len(ligand) > 3 and len(hapt_atoms) == 1:
-            # The ligand atoms need to be placed in a new branch
-            # Add branch between metal atom and the interacting atom 
-            # Search the ligand for more branches 
-            branches, connections = extract_branches(new_lines)
-            branches, connections = identify_model(branches, connections, hapt_atoms, G)
-            branches_ligand, connections_ligand = remove_root_branches(branches, root, connections)
-
-            # # all the atoms in the ligand are already added
-            if branches_ligand == None and connections_ligand == None:
-                continue
-
-            branches_to_root = add_branches_to_root(branches_to_root, branches_ligand, connections_ligand, metal_idx,  G, root)
-
-        # Hapticity ligand where all atoms are connected to the metal atom
-        elif ligand == hapt_atoms:
-            # Add to the root branch 
-            for atom in hapt_atoms:
-                root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
-
-        # Hapticity ligand with small number of atoms
-        elif len(ligand) <= 3 and len(hapt_atoms) > 1:
-            # The ligand atoms need to be placed in the root branch
-            for atom in ligand:
-                root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
-
-        # Hapticity ligand with larger number of atoms
-        elif len(ligand) > 3 and len(hapt_atoms) > 1:
-            # Add hapticity atoms to the root branch if they are not already added
-            for atom in hapt_atoms:
-                # get xyz of the atom
-                xyz = G.nodes[atom]['xyz']
-                # Check if the atom is already in the root branch
-                atom_exists = False
-                for line in root:
-                    if 'ATOM' not in line:
-                        continue
-                    # Compare the coordinates with a tolerance to account for floating-point precision issues
-                    if line[6] == f'{xyz[0]:.3f}' and line[7] == f'{xyz[1]:.3f}' and line[8] == f'{xyz[2]:.3f}':
-                        atom_exists = True
-                        break
-                
-                # If the atom is not in the root branch, add it
-                if not atom_exists:
-                    root.append(search_pdbqt_file(pdbqt_file, xyz))
-   
-            # extract all branches 
-            branches, connections = extract_branches(new_lines)
-            branches, connections = identify_model(branches, connections, hapt_atoms, G)
-            branches_ligand, connections_ligand = remove_root_branches(branches, root, connections)
-
-            # # all the atoms in the ligand are already added
-            if branches_ligand == None and connections_ligand == None:
-                continue
-            
-            branches_to_root = add_branches_to_root(branches_to_root, branches_ligand, connections_ligand, metal_idx,  G, root)
-
-    root.append(['ENDROOT'])
-
-    # append the branches to the root
-    for branch in branches_to_root:
-        root.append(branch)
-
-    # find the metal_atom
-    for item in root:
-        try:
-            if item[2] == par.metal_symbol.upper():
-                metal_atom = item[1]
-        except IndexError:
-            pass
+    root = process_ligands(G, G_H, ligands_list, hapticity_atoms, branch_atoms, pdbqt_file, metal_idx)
 
     # remove out.pdbqt and out.xyz
     os.remove('out.pdbqt')
@@ -686,141 +799,95 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
     else:
         write_pdbqt(par, root)
 
-def add_branches_to_root(branches_to_root, branches_ligand, connections_ligand, metal_idx, G, root):
-    final_branch = []
-    branches_added = []
-    end_branches = []
-    # find the branch that is connected to the root branch 
-    root_atoms = [int(line[1])-1 for line in root if 'ATOM' in line]
-    # I need to iterate not over the hapt atoms, but over the atoms in the root 
-    for root_atom in root_atoms:
-        n = list(G.neighbors(root_atom)) 
-        for neighbor in n:
-            # if we find a branch start new branch
-            end_branches = []
-            # I need to know that the neighbor is not in the root branch 
-            if neighbor not in root_atoms and neighbor != metal_idx and root_atom != metal_idx:
-                root_branch_atom_xyz = G.nodes[neighbor]['xyz']
-                branches_to_root.append(['BRANCH', root_atom+1, neighbor+1])
-                final_branch.append(['ENDBRANCH', root_atom+1, neighbor+1])
+    return
 
-                main_branch = None
-                # verify which branch the xyz is located and add the branch to the root
-                for branch in branches_ligand.keys():
-                    if list(root_branch_atom_xyz) in branches_ligand[branch]['xyz']:
-                        # add the branch to the root 
-                        for line in branches_ligand[branch]['lines']:
-                            if 'BRANCH' in line:
-                                pass # atom_id_new_branch = [line[1], line[2]]
-                            else:
-                                branches_to_root.append(line)
 
-                        main_branch = branch
+def process_ligands(G, G_H, ligands_list, hapticity_atoms, branch_atoms, pdbqt_file, metal_idx):
+    root = [['ROOT']]
+    # Add the metal atom to the root branch first
+    root.append(search_pdbqt_file(pdbqt_file, G.nodes[metal_idx]['xyz']))
+    
+    all_branches = []
+    branch_idx = 0
+    for ligand, hapt_atoms in zip(ligands_list, hapticity_atoms):
+        if len(ligand) == 1 and len(hapt_atoms) == 1:
+            # add to the root branch
+            for atom in ligand:
+                root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
+        elif len(ligand) > 1 and len(hapt_atoms) == 1:
+            # add to the root branch
+            for atom in ligand:
+                root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
+        elif len(ligand) > 1:
+            root = explore_ligand_graph(G, G_H, root, all_branches, branch_idx, ligand, hapt_atoms, branch_atoms, pdbqt_file)
+    
+    root.append(['ENDROOT'])
 
-                connected_branches = []
-                for connection in connections_ligand:
-                    if (connection[0] in branches_ligand[main_branch]['atoms'] 
-                        or connection[1] in branches_ligand[main_branch]['atoms']):
-                        connected_branches.append(connection)
-                
-                if connected_branches == []:
-                    for endbranch in end_branches:
-                        branches_to_root.append(endbranch)
-                    continue
+    for branch in all_branches:
+        root.extend(branch)
+
+    return root
+
+
+def explore_ligand_graph(G, G_H, root, branches, branch_idx, ligand, hapt_atoms, branch_atoms, pdbqt_file):
+    ligand_graph = G.subgraph(ligand)
+    
+    # Add hapticity atoms to root
+    for atom in hapt_atoms:
+        root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
+    
+    # BFS to explore the ligand
+    visited = set(hapt_atoms)
+    queue = deque(hapt_atoms)
+
+    while queue:
+        current_atom = queue.popleft()
+        
+        for neighbor in ligand_graph.neighbors(current_atom):
+            if neighbor not in visited:
+                visited.add(neighbor)
+
+                if [current_atom, neighbor] in branch_atoms or [neighbor, current_atom] in branch_atoms:
+                    # Start a new branch
+                    branches.append([])
+                    branches[branch_idx].append(['BRANCH', current_atom + 1, neighbor + 1])
+                    # Add the atom to the branch
+                    branches[branch_idx].append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
+
+                    # Recursively explore this branch
+                    explore_branch(ligand_graph, neighbor, visited, branches[branch_idx], pdbqt_file, G, branch_atoms)
+
+                    branches[branch_idx].append(['ENDBRANCH', current_atom + 1, neighbor + 1])
+                    branch_idx += 1
                 else:
-                    branches_to_root, end_branches = recursive_branches_write(
-                        main_branch, connections_ligand, branches_ligand, 
-                        end_branches, branches_added, branches_to_root
-                    )
+                    # Add to root if it doesn't form a branch
+                    root.append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
+                    queue.append(neighbor)
 
-                    if end_branches:
-                        for endbranch in end_branches[::-1]:
-                            branches_to_root.append(endbranch)
+    return root
 
-    branches_to_root.append(final_branch[0])
-    return branches_to_root
-
-def recursive_branches_write(current_branch, connections, branches_ligand, end_branches, branches_added, root):
-    current_branch_atoms = branches_ligand[current_branch]['atoms']
-    next_branch = None
-    current_connection = None
-
-    # I need to keep track of the added branches up until a point where the branch ends
-    # if next_branch is None:  # I need to verify if any of the branches in the branches_added has a connection to other connections if not then print the branch to the root
-    for branch, line in branches_added[::-1]:
-        if any(atom in connection for atom in branches_ligand[branch]['atoms'] for connection in connections):
-            break
-        else:
-            root.append(line)
-            branches_added.remove((branch, line))
-            end_branches.remove(line)
-
+def explore_branch(ligand_graph, start_atom, visited, branch, pdbqt_file, G, branch_atoms):
+    branch_queue = deque([start_atom])
+    branch_visited = set([start_atom])
     
-    # Use the atom in the connection that is in the current branch to obtain the atom in the next branch
-    for connection in connections:
-        if connection[0] in current_branch_atoms:
-            next_branch_atom = connection[1]
-            current_connection = connection
-            connections.remove(connection)
-            break
-        elif connection[1] in current_branch_atoms:
-            next_branch_atom = connection[0]
-            current_connection = connection
-            connections.remove(connection)
-            break
+    while branch_queue:
+        branch_atom = branch_queue.popleft()
+        
+        for branch_neighbor in ligand_graph.neighbors(branch_atom):
+            if branch_neighbor not in branch_visited and branch_neighbor not in visited:
+                branch_visited.add(branch_neighbor)
+                visited.add(branch_neighbor)
+                branch_queue.append(branch_neighbor)
 
-    # Find the next branch 
-    # if current_connection:
-    for branch in branches_ligand.keys():
-        if next_branch_atom in branches_ligand[branch]['atoms']:
-            next_branch = branch
-            break
+                # Recursively explore sub-branches
+                if [branch_atom, branch_neighbor] in branch_atoms or [branch_neighbor, branch_atom] in branch_atoms:
+                    branch.append(['BRANCH', branch_atom + 1, branch_neighbor + 1])
+                    branch.append(search_pdbqt_file(pdbqt_file, G.nodes[branch_neighbor]['xyz']))
+                    explore_branch(ligand_graph, branch_neighbor, visited, branch, pdbqt_file, G, branch_atoms)
+                    branch.append(['ENDBRANCH', branch_atom + 1, branch_neighbor + 1])
+                else:
+                    branch.append(search_pdbqt_file(pdbqt_file, G.nodes[branch_neighbor]['xyz']))
 
-    # Write the next branch to the root
-    # if current_connection and next_branch:
-    root.append(['BRANCH', current_connection[0], current_connection[1]]) 
-    end_branches.append(['ENDBRANCH', current_connection[0], current_connection[1]])
-    branches_added.append((next_branch, ['ENDBRANCH', current_connection[0], current_connection[1]]))
-    for line in branches_ligand[next_branch]['lines']:
-        if 'ATOM' in line:
-            root.append(line)
-    
-
-    next_branch_atoms = branches_ligand[next_branch]['atoms']
-    connection_to_this_branch = []
-    for connection in connections:
-        if connection[0] in next_branch_atoms or connection[1] in next_branch_atoms:
-            connection_to_this_branch.append(connection)
-
-
-    if connection_to_this_branch:
-        for connection in connection_to_this_branch:
-            root, end_branches = recursive_branches_write(next_branch, connections, branches_ligand, end_branches, branches_added, root)
-
-    # remove all tuples from list
-    for branch in end_branches:
-        if type(branch) == tuple:
-            end_branches.remove(branch)
-    return root, end_branches
-                            
-def identify_model(branches, connections, atoms, G):
-    # go over the xyz coordinates and find the model that contains the hapticity atoms 
-    # if hapticity atoms is list then iterate over the list
-    if hasattr(atoms, '__iter__'):
-        for atom in atoms:
-            xyz_hapt = G.nodes[atom]['xyz']
-            for model in branches.keys():
-                for branch in branches[model].keys():
-                    for line in branches[model][branch]['xyz']:
-                        if xyz_hapt == tuple(line):
-                            return branches[model], connections[model]
-    else:
-        xyz_hapt = G.nodes[atoms]['xyz']
-        for model in branches.keys():
-            for branch in branches[model].keys():
-                for line in branches[model][branch]['xyz']:
-                    if xyz_hapt == tuple(line):
-                        return branches[model], connections[model]
 
 def reindex_atoms_branches(input_file, output_file):
     with open(input_file, 'r') as f:
@@ -879,107 +946,6 @@ def reindex_atoms_branches(input_file, output_file):
                 pass
             else:
                 f.write(line)
-
-def remove_root_branches(branches, root, connections_ligand):
-    delete_branches = set()
-    # remove the branches that are already in the root based on the xyz coordinates
-    for branch in branches.keys():
-        for line in branches[branch]['lines']:
-            for root_line in root:
-                if 'ATOM' in line and 'ATOM' in root_line:
-                # find if the xyz of the branch is in the root
-                    if [float(root_line[6]), float(root_line[7]), float(root_line[8])] in branches[branch]['xyz']:
-                        # Check if key exists before deleting
-                        delete_branches.add(branch)
-                        break
-
-    for branch in delete_branches:
-        del branches[branch]
-
-    # also remove the connections that are already in the root based on the atom indices
-    atom_indices_root = []
-    for line in root:
-        if 'ATOM' in line:
-            atom_indices_root.append(line[1])
-
-    delete_connections = []
-    for atom in atom_indices_root:
-        for connections in connections_ligand:
-            if atom in connections:
-                delete_connections.append(connections)
-
-    for connection in delete_connections:
-        connections_ligand.remove(connection)
-
-    return branches, connections_ligand
-
-def extract_branches(ligand_pdbqt_lines):
-    model_idx = 0
-    branch_idx = 0
-    branches = {}
-    connections = {}
-
-    current_root = False
-    current_branch = False
-
-    for line in ligand_pdbqt_lines:
-        if 'MODEL' in line:
-            model_idx += 1
-            branches[model_idx] = {}
-            connections[model_idx] = []
-
-        if 'ROOT' in line:
-            current_root = True
-            branches[model_idx][branch_idx] = {'lines': [], 'atoms': [], 'xyz': []}
-            branches[model_idx][branch_idx]['lines'].append(line)
-            
-        elif 'ENDROOT' in line:
-            branches[model_idx][branch_idx]['lines'].append(line)
-            current_root = False
-            branch_idx += 1
-
-        elif current_root:
-            branches[model_idx][branch_idx]['lines'].append(line)
-            branches[model_idx][branch_idx]['atoms'].append(line[1])
-            branches[model_idx][branch_idx]['xyz'].append([float(line[6]), float(line[7]), float(line[8])])
-
-        elif 'BRANCH' in line: #and not current_branch:
-            current_branch = True
-            branch_idx += 1
-            branches[model_idx][branch_idx] = {'lines': [], 'atoms': [], 'xyz': []}
-            branches[model_idx][branch_idx]['lines'].append(line)
-            connections[model_idx].append([line[1], line[2]])
-            # branches[branch_idx]['atoms'].append(line[1])
-            # branches[branch_idx]['xyz'].append([float(line[5]), float(line[6]), float(line[7])])
-
-        elif 'ENDBRANCH' in line:
-            branches[model_idx][branch_idx]['lines'].append(line)
-            current_branch = False
-
-        elif current_branch:
-            branches[model_idx][branch_idx]['lines'].append(line)
-            branches[model_idx][branch_idx]['atoms'].append(line[1])
-            branches[model_idx][branch_idx]['xyz'].append([float(line[6]), float(line[7]), float(line[8])])
-
-    return branches, connections
-
-def remove_hydrogens(graph):
-    nodes_to_remove = []
-    
-    # Iterate over all nodes with their attributes
-    for node, data in graph.nodes(data=True):
-        if data.get('element') == 'H':
-            keep_hydrogen = False
-            # Check if this hydrogen is connected to any O, N, S, P
-            for neighbor in graph.neighbors(node):
-                if graph.nodes[neighbor].get('element') in ['O', 'N', 'S', 'P']:
-                    keep_hydrogen = True
-                    break
-            if not keep_hydrogen:
-                nodes_to_remove.append(node)
-    
-    # Remove the nodes outside the iteration to avoid modification during iteration
-    graph.remove_nodes_from(nodes_to_remove)
 
 def search_pdbqt_file(pdbqt_file, xyz):
     '''

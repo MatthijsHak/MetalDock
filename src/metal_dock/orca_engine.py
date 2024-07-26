@@ -1,4 +1,4 @@
-import os, sys, csv, subprocess, shutil
+import os, sys, csv, subprocess, shutil, re
 
 from . import orca2CM5 as oc
 
@@ -56,6 +56,35 @@ def orca_engine(xyz_file, var, output_dir):
 
     return os.getcwd(), energy 
 
+def orca_extract_bond_orders(log_file):
+    bond_orders = {}
+    
+    with open(log_file, 'r') as file:
+        content = file.read()
+    
+    pattern = r"Mayer bond orders larger than \d+\.\d+\n(.*?)\n\n"
+    match = re.search(pattern, content, re.DOTALL)
+    
+    if match:
+        bond_order_section = match.group(1)
+        
+        bond_pattern = r"B\(\s*(\d+)-\w+\s*,\s*(\d+)-\w+\s*\)\s*:\s*(\d+\.\d+)"
+        bonds = re.findall(bond_pattern, bond_order_section)
+        
+        for bond in bonds:
+            atom1 = int(bond[0])
+            atom2 = int(bond[1])
+            order = float(bond[2])
+
+            # sort atoms
+            atoms = sorted([atom1, atom2])
+            
+            # Store bond order for both directions
+            bond_orders[atoms] = order
+    
+    print(bond_orders)
+    sys.exit()
+    return bond_orders
 
 def orca_extract_energy(log_file):
     with open(log_file,'r') as fin:
@@ -82,7 +111,6 @@ def orca_extract_CM5(log_file, xyz_file):
             fout.write('\n')
             for i in data[1:]:
                 fout.write('{} {}\n'.format(i[0],i[8]))
-                
     return
 
 def orca_opt_converged(log_file):

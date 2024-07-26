@@ -88,6 +88,8 @@ def adf_geom_opt(xyz_file, var):
     #AMS driver input
     s.input.ams.Task = 'GeometryOptimization'
 
+    s.input.ams.properties.bondorders = 'Yes'
+
     #ADF engine input
     s.input.adf.scf.iterations='500'
     s.input.adf.AtomicChargesTypeForAMS='CM5'
@@ -145,7 +147,12 @@ def adf_sp(xyz_file, var):
     #AMS driver input
     s.input.ams.Task='SinglePoint'
 
+    # Bond orders
+    s.input.ams.properties.bondorders = 'Yes'
+
     #ADF engine input
+    s.input.adf.bondorders.TypeForAMS='Mayer'
+
     s.input.adf.scf.iterations='500'
     s.input.adf.AtomicChargesTypeForAMS='CM5'
     s.input.adf.basis.type=''+var.basis_set.upper()+''

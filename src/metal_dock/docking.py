@@ -23,24 +23,22 @@ def docking(input_file, par=None):
     par = input_file
 
     input_dir = os.getcwd()
-    output_dir = input_dir+'/output'
+    par.output_dir = input_dir+'/output'
     ###### Generate Output Dir #######
-    if os.path.isdir(output_dir) == False:
-        os.mkdir(output_dir)
-        os.chdir(output_dir)
+    if os.path.isdir(par.output_dir) == False:
+        os.mkdir(par.output_dir)
+        os.chdir(par.output_dir)
     else:
-        os.chdir(output_dir)
+        os.chdir(par.output_dir)
 
-    if os.path.isdir(f'{output_dir}/file_prep') == False:
-        os.mkdir(f'{output_dir}/file_prep')
-        os.chdir(f'{output_dir}/file_prep')
+    if os.path.isdir(f'{par.output_dir}/file_prep') == False:
+        os.mkdir(f'{par.output_dir}/file_prep')
+        os.chdir(f'{par.output_dir}/file_prep')
     else:
-        os.chdir(f'{output_dir}/file_prep')
+        os.chdir(f'{par.output_dir}/file_prep')
 
     if os.path.exists(f'{par.name_ligand}_c.xyz') == False:
         xyz_file = os.path.join(input_dir, par.xyz_file)
-        # center the molecule around the metal_symbol --> messes up the reference xyz file for rmsd 
-        # xyz_file = d.center_molecule(input_dir, xyz_file, par.metal_symbol)
         subprocess.call([os.environ['OBABEL']+f' -ixyz {xyz_file} -oxyz {par.name_ligand}_c.xyz --canonical > {par.name_ligand}_c.xyz'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         subprocess.call([os.environ['OBABEL']+f' -ixyz {par.name_ligand}_c.xyz -opdb {par.name_ligand}_c.pdb > {par.name_ligand}_c.pdb'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
@@ -53,14 +51,14 @@ def docking(input_file, par=None):
     ###### Create pdb files ###### 
     if os.path.exists(f'clean_{par.name_protein}.pdb') == False:
         input_pdb = os.path.join(input_dir, par.pdb_file)
-        output_pdb = os.path.join(f'{output_dir}/file_prep', f'{par.name_protein}.pdb')
+        output_pdb = os.path.join(f'{par.output_dir}/file_prep', f'{par.name_protein}.pdb')
         
         shutil.copyfile(input_pdb, output_pdb)
         pdb.protonate_pdb(par.pdb_file, par.pH, par.clean_pdb)
         pdb.clean_protein_pdb(par.name_protein, par.clean_pdb)
 
     ###### Quantum Calculations ######
-    os.chdir(output_dir)
+    os.chdir(par.output_dir)
 
     if os.path.isdir('QM') == False:
         os.mkdir('QM')
@@ -68,19 +66,19 @@ def docking(input_file, par=None):
     else:
         os.chdir('QM')
 
-    xyz_file = os.path.join(output_dir,'file_prep', f'{par.name_ligand}_c.xyz')
+    xyz_file = os.path.join(par.output_dir,'file_prep', f'{par.name_ligand}_c.xyz')
 
     if par.engine.lower() == 'adf':
-        qm_dir, energy = adf.adf_engine(xyz_file, par, output_dir)
+        qm_dir, energy = adf.adf_engine(xyz_file, par, par.output_dir)
 
     if par.engine.lower() == 'gaussian':
-        qm_dir, energy = g.gaussian_engine(xyz_file, par, output_dir)
+        qm_dir, energy = g.gaussian_engine(xyz_file, par, par.output_dir)
 
     if par.engine.lower() == 'orca':
-        qm_dir, energy = orca.orca_engine(xyz_file, par, output_dir)
+        qm_dir, energy = orca.orca_engine(xyz_file, par, par.output_dir)
 
     ##### AutoDock #####
-    os.chdir(output_dir)
+    os.chdir(par.output_dir)
 
     if os.path.isdir('docking') == False:
         os.mkdir('docking')
@@ -97,28 +95,21 @@ def docking(input_file, par=None):
         out_file = os.path.join(os.getcwd(), par.parameter_file)
         shutil.copyfile(in_file, out_file)
 
-    clean_pdb_in = os.path.join(output_dir, 'file_prep', f'clean_{par.name_protein}.pdb')
+    clean_pdb_in = os.path.join(par.output_dir, 'file_prep', f'clean_{par.name_protein}.pdb')
     clean_pdb_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
     shutil.copyfile(clean_pdb_in, clean_pdb_out)
 
-    # if par.engine.lower() == 'adf':
-    #     mol_in = os.path.join(output_dir, 'QM', 'geom_opt', 'plams_workdir', 'output.mol')
-    # else:
-    # mol_in = os.path.join(output_dir, 'QM', 'geom_opt', 'output.mol')
-    # mol_out = os.path.join(os.getcwd(), f'{par.name_ligand}.mol')
-    # shutil.copyfile(mol_in, mol_out)
-
-    # f'{output_dir}/QM/geom_opt/output.mol'
+    # f'{par.output_dir}/QM/geom_opt/output.mol'
     if par.geom_opt == True:
-        subprocess.call([os.environ['OBABEL']+f' -imol {output_dir}/QM/geom_opt/output.mol -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        subprocess.call([os.environ['OBABEL']+f' -imol {par.output_dir}/QM/geom_opt/output.mol -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     else:
-        subprocess.call([os.environ['OBABEL']+f' -imol {output_dir}/QM/single_point/output.mol -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        subprocess.call([os.environ['OBABEL']+f' -imol {par.output_dir}/QM/single_point/output.mol -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     cm5_in = os.path.join(qm_dir, 'CM5_charges')
     cm5_out = os.path.join(os.getcwd(), 'CM5_charges')
     shutil.copyfile(cm5_in, cm5_out)
 
-    c_xyz_in = os.path.join(output_dir, 'file_prep', f'{par.name_ligand}_c.xyz')
+    c_xyz_in = os.path.join(par.output_dir, 'file_prep', f'{par.name_ligand}_c.xyz')
     c_xyz_out = os.path.join(os.getcwd(), f'{par.name_ligand}_c.xyz')
     shutil.copyfile(c_xyz_in, c_xyz_out)
     
@@ -134,9 +125,9 @@ def docking(input_file, par=None):
 
     # if one value in the list of box size is not 0 then use that value
     if any(x != 0 for x in par.box_size) and par.scale_factor == 0:
-        npts = [x * 2.66 for x in par.box_size] # Convert Å to grid points
+        npts = [x * 2.66 for x in par.box_size] # Convert Å to grid point
         if [int(x) for x in npts] == npts:
-            box_size =  int(npts)
+            box_size =  [int(x) for x in npts]
         else:
             # box_size = math.ceil(npts)
             box_size = [math.ceil(x) for x in npts]
@@ -162,7 +153,7 @@ def docking(input_file, par=None):
     d.docking_func(par, par.name_ligand, par.name_protein, dock, box_size, energy)
 
     ##### results #####
-    os.chdir(f'{output_dir}')
+    os.chdir(f'{par.output_dir}')
 
     if os.path.isdir('results') == False:
         os.mkdir('results')
@@ -175,14 +166,14 @@ def docking(input_file, par=None):
     print("ADDING AND OPTIMIZING HYDROGEN ATOMS TO THE METAL COMPLEX POSES")
 
     i = 1
-    while os.path.exists(os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
-        if os.path.isdir(f'{output_dir}/results/pose_{i}') == False:
-            os.mkdir(f'{output_dir}/results/pose_{i}')
-            os.chdir(f'{output_dir}/results/pose_{i}')
+    while os.path.exists(os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
+        if os.path.isdir(f'{par.output_dir}/results/pose_{i}') == False:
+            os.mkdir(f'{par.output_dir}/results/pose_{i}')
+            os.chdir(f'{par.output_dir}/results/pose_{i}')
         else:
-            os.chdir(f'{output_dir}/results/pose_{i}')
+            os.chdir(f'{par.output_dir}/results/pose_{i}')
 
-        pdqt_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')
+        pdqt_in = os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')
         pdqt_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.pdbqt')
         shutil.copyfile(pdqt_in, pdqt_out)
 
@@ -192,8 +183,8 @@ def docking(input_file, par=None):
         subprocess.call([os.environ['OBABEL']+f" -ipdbqt {par.name_ligand}_{i}.pdbqt -oxyz {par.name_ligand}_{i}.xyz > {par.name_ligand}_{i}.xyz"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         # add hydrogens to the xyz file 
-        atom_constraints = d.add_non_polar_hydrogens(f'{output_dir}/file_prep/{par.name_ligand}_c.xyz',
-                                                        f'{output_dir}/file_prep/{par.name_ligand}_c.pdb',
+        atom_constraints = d.add_non_polar_hydrogens(f'{par.output_dir}/file_prep/{par.name_ligand}_c.xyz',
+                                                        f'{par.output_dir}/file_prep/{par.name_ligand}_c.pdb',
                                                         f'{par.name_ligand}_{i}.xyz', 
                                                         f'{par.name_ligand}_{i}_H.xyz')
         
@@ -213,13 +204,13 @@ def docking(input_file, par=None):
         i += 1
 
     # copy clean protein file to results directory
-    os.chdir(f'{output_dir}/results')
-    clean_in = os.path.join(output_dir,'docking',f'clean_{par.name_protein}.pdb')
+    os.chdir(f'{par.output_dir}/results')
+    clean_in = os.path.join(par.output_dir,'docking',f'clean_{par.name_protein}.pdb')
     clean_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
     shutil.copyfile(clean_in, clean_out)
 
     # copy the dlg file to results directory
-    dlg_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_clean_{par.name_protein}.dlg')
+    dlg_in = os.path.join(par.output_dir,'docking',f'{par.name_ligand}_clean_{par.name_protein}.dlg')
     dlg_out = os.path.join(os.getcwd(), f'docking_results.dlg')
     shutil.copyfile(dlg_in, dlg_out)
 
@@ -232,7 +223,7 @@ def docking(input_file, par=None):
     for i in range(par.num_poses):
         print(f"Pose {i+1}:")
         print("-------------")
-        pose_residues = d.extract_interacting_residues(f'{output_dir}/results/pose_{i+1}/{par.name_ligand}_{i+1}_H.xyz', f'clean_{par.name_protein}.pdb')
+        pose_residues = d.extract_interacting_residues(f'{par.output_dir}/results/pose_{i+1}/{par.name_ligand}_{i+1}_H.xyz', f'clean_{par.name_protein}.pdb')
         print(f'Binding Energy: {binding_energy[i][1]:7.4f} kcal/mol')
         print(f'Ligand Efficiency: {ligand_efficiency[i]:7.4f} kcal/mol')
         print(f'Interacting Residues:')
@@ -249,8 +240,8 @@ def docking(input_file, par=None):
         rmsd_func = os.path.join(os.environ['ROOT_DIR'], 'metal_dock','calculate_rmsd.py')
 
         for pose in range(par.num_poses):
-            os.chdir(f'{output_dir}/results/pose_{pose+1}')
-            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+f' {rmsd_func} {output_dir}/file_prep/{par.name_ligand}_c.xyz {output_dir}/results/pose_{pose+1}/{par.name_ligand}_{pose+1}_H.xyz -nh --reorder --rotation none --translation none']))
+            os.chdir(f'{par.output_dir}/results/pose_{pose+1}')
+            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+f' {rmsd_func} {par.output_dir}/file_prep/{par.name_ligand}_c.xyz {par.output_dir}/results/pose_{pose+1}/{par.name_ligand}_{pose+1}_H.xyz -nh --reorder --rotation none --translation none']))
             rmsd = rmsd_non_rotate
 
             avg_list.append(rmsd)
@@ -274,7 +265,7 @@ def docking(input_file, par=None):
 
 
     # ##### results #####
-    # os.chdir(f'{output_dir}')
+    # os.chdir(f'{par.output_dir}')
 
     # if os.path.isdir('results') == False:
     #     os.mkdir('results')
@@ -283,16 +274,16 @@ def docking(input_file, par=None):
     #     os.chdir('results')
 
     # i = 1
-    # while os.path.exists(os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
-    #     pdqt_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')
+    # while os.path.exists(os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
+    #     pdqt_in = os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')
     #     pdqt_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.pdbqt')
     #     shutil.copyfile(pdqt_in, pdqt_out)
     #     if par.rmsd == True:
-    #         xyz_in = os.path.join(output_dir,'docking',f'{par.name_ligand}_{i}.xyz')
+    #         xyz_in = os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.xyz')
     #         xyz_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.xyz')
     #         shutil.copyfile(xyz_in, xyz_out)
     #     i += 1
     
-    # clean_in = os.path.join(output_dir,'docking',f'clean_{par.name_protein}.pdb')
+    # clean_in = os.path.join(par.output_dir,'docking',f'clean_{par.name_protein}.pdb')
     # clean_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
     # shutil.copyfile(clean_in, clean_out)

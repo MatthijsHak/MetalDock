@@ -134,7 +134,8 @@ def gaussian_geom_opt(xyz_file, var):
                         basis=var.basis_set,
                         pop='Hirshfeld',
                         SCRF=f'PCM, solvent={var.solvent}',
-                        EmpiricalDispersion=var.dispersion)
+                        EmpiricalDispersion=var.dispersion,
+                        ioplist=['6/80=1'])
     
     elif var.solvent == '' and var.dispersion != '':
         s   = Gaussian(label='geom_opt',
@@ -146,7 +147,8 @@ def gaussian_geom_opt(xyz_file, var):
                 mult=M,
                 basis=var.basis_set,
                 pop='Hirshfeld',
-                EmpiricalDispersion=var.dispersion)
+                EmpiricalDispersion=var.dispersion,
+                ioplist=['6/80=1'])
         
     elif var.solvent != '' and var.dispersion == '':
         s   = Gaussian(label='geom_opt',
@@ -191,7 +193,8 @@ def gaussian_sp(xyz_file, var):
                         basis=var.basis_set,
                         pop='Hirshfeld',
                         SCRF=f'PCM, solvent={var.solvent}',
-                        EmpiricalDispersion=var.dispersion)
+                        EmpiricalDispersion=var.dispersion,
+                        ioplist=['6/80=1'])
         
     elif var.solvent == '' and var.dispersion != '':
         s   = Gaussian(label='single_point',
@@ -203,7 +206,8 @@ def gaussian_sp(xyz_file, var):
                 mult=M,
                 basis=var.basis_set,
                 pop='Hirshfeld',
-                EmpiricalDispersion=var.dispersion)
+                EmpiricalDispersion=var.dispersion,
+                ioplist=['6/80=1'])
     
     elif var.solvent != '' and var.dispersion == '':
         s   = Gaussian(label='single_point',
@@ -215,7 +219,8 @@ def gaussian_sp(xyz_file, var):
                 mult=M,
                 basis=var.basis_set,
                 pop='Hirshfeld',
-                SCRF=f'PCM, solvent={var.solvent}')
+                SCRF=f'PCM, solvent={var.solvent}',
+                ioplist=['6/80=1'])
     
     else:
         s   = Gaussian(label='single_point',
@@ -226,7 +231,9 @@ def gaussian_sp(xyz_file, var):
                 charge=var.charge,
                 mult=M,
                 basis=var.basis_set,
-                pop='Hirshfeld')
+                pop='Hirshfeld',
+                ioplist=['6/80=1'])
+        
     mol.calc = s
     mol.get_potential_energy()
     mol.write('output.xyz')

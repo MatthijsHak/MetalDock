@@ -133,7 +133,7 @@ class MolGraph:
             for _ in range(2):
                 next(file)
             for line in file:
-                element, x, y, z = line.strip().split()
+                element, x, y, z = line.strip().split()[:4]
                 self.elements.append(element)
                 self.x.append(float(x))
                 self.y.append(float(y))
