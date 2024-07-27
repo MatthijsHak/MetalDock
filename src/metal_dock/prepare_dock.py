@@ -1,6 +1,6 @@
 import random
 import math
-import os, sys, shutil, glob, subprocess
+import os, sys, shutil, glob, subprocess, re
 
 import itertools as it
 import numpy as np
@@ -505,9 +505,6 @@ def one_model_file(par, name_ligand, xyz_file, pdbqt_file):
         
     return
 
-
-import re
-
 def get_bond_order(par, mapping, G):
     """
     Function that adds the bond order to the edges. It first starts by reading 
@@ -518,7 +515,7 @@ def get_bond_order(par, mapping, G):
     if par.engine.lower() == 'orca' and par.geom_opt == False:
         bond_orders = read_orca_bond_order(f'{par.output_dir}/QM/single_point/single_point.out')
     elif par.engine.lower() == 'orca' and par.geom_opt == True:
-        bond_orders = read_orca_bond_order(f'{par.output_dir}/QM/geom_opt/geom_opt.out')
+        bond_orders = read_orca_bond_order(f'{par.output_dir}/QM/geom_opt/geom.out')
     elif par.engine.lower() == 'adf' and par.geom_opt == False:
         bond_orders = read_ams_bond_order(f'{par.output_dir}/QM/single_point/plams_workdir/plamsjob/plamsjob.out')
     elif par.engine.lower() == 'adf' and par.geom_opt == True:
@@ -556,6 +553,9 @@ def read_orca_bond_order(log_file):
             atom2 = int(bond[1])
             order = float(bond[2])
 
+            if order < 0.8:
+                continue
+
             # sort atoms
             atoms = tuple(sorted((atom1, atom2)))
             # Store bond order for both directions
@@ -584,6 +584,9 @@ def read_ams_bond_order(log_file):
             atom1 = int(bond[0])-1
             atom2 = int(bond[1])-1
             order = float(bond[2])
+
+            if order < 0.8:
+                continue
 
             # Sort atoms
             atoms = tuple(sorted((atom1, atom2)))
@@ -637,7 +640,7 @@ def read_gaussian_bond_order(log_file, n_atoms):
     bond_orders = {}
     for i in range(n_atoms):
         for j in range(i+1, n_atoms):
-            if matrix[i][j] > 0.2:
+            if matrix[i][j] > 0.8:
                 bond_orders[(i, j)] = matrix[i][j]
 
     return bond_orders
@@ -752,6 +755,11 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
     graph.read_xyz('out.xyz')
     G = to_networkx_graph(graph)
 
+    # find which atom is the metal atom from the graph
+    for node in G.nodes(data=True):
+        if node[1]['element'] == par.metal_symbol:
+            metal_idx= node[0] # add 1 to the index to match the pdbqt file
+
     graph_H = MolGraph()
     graph_H.read_xyz('out_H.xyz')
     G_H = to_networkx_graph(graph_H)
@@ -772,11 +780,6 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
     # Key is the index of the atom in the QM graph
     # Value is the index of the atom in the G_H graph
     G_H = get_bond_order(par, mapping, G_H)
-
-    # find which atom is the metal atom from the graph
-    for node in G.nodes(data=True):
-        if node[1]['element'] == par.metal_symbol:
-            metal_idx= node[0] # add 1 to the index to match the pdbqt file
 
     # generate the ligand indicies and obtain the hapticity interactions 
     hapt_atoms = []
@@ -806,14 +809,14 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
     for dihedral in dihedrals:
         # I want to obtain the bond_order of the edge 
         bond_order = G_H[dihedral[1]][dihedral[2]]['bond_order']
-        if par.engine.lower() == 'adf' and bond_order < 1.3:
+        if par.engine.lower() == 'adf' and bond_order > 0.8 and bond_order < 1.3:
             branch_atoms.append([dihedral[1], dihedral[2]])
-        if par.engine.lower() == 'orca' and bond_order < 1.2:
+        if par.engine.lower() == 'orca'and bond_order > 0.8 and bond_order < 1.2:
             branch_atoms.append([dihedral[1], dihedral[2]])
-        if par.engine.lower() == 'gaussian' and bond_order < 1.2:
+        if par.engine.lower() == 'gaussian' and bond_order > 0.8 and bond_order < 1.2:
             branch_atoms.append([dihedral[1], dihedral[2]])
 
-    root = process_ligands(G, G_H, ligands_list, hapticity_atoms, branch_atoms, pdbqt_file, metal_idx)
+    root = process_ligands(G, ligands_list, hapticity_atoms, branch_atoms, pdbqt_file, metal_idx)
 
     # remove out.pdbqt and out.xyz
     os.remove('out.pdbqt')
@@ -829,13 +832,12 @@ def multiple_model_file(par, name_ligand, xyz_file, pdbqt_file):
     return
 
 
-def process_ligands(G, G_H, ligands_list, hapticity_atoms, branch_atoms, pdbqt_file, metal_idx):
+def process_ligands(G, ligands_list, hapticity_atoms, branch_atoms, pdbqt_file, metal_idx):
     root = [['ROOT']]
     # Add the metal atom to the root branch first
     root.append(search_pdbqt_file(pdbqt_file, G.nodes[metal_idx]['xyz']))
     
     all_branches = []
-    branch_idx = 0
     for ligand, hapt_atoms in zip(ligands_list, hapticity_atoms):
         if len(ligand) == 1 and len(hapt_atoms) == 1:
             # add to the root branch
@@ -846,7 +848,8 @@ def process_ligands(G, G_H, ligands_list, hapticity_atoms, branch_atoms, pdbqt_f
             for atom in ligand:
                 root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
         elif len(ligand) > 1:
-            root = explore_ligand_graph(G, G_H, root, all_branches, branch_idx, ligand, hapt_atoms, branch_atoms, pdbqt_file)
+            root, new_branches = explore_ligand_graph(G, root, [], ligand, hapt_atoms, branch_atoms, pdbqt_file)
+            all_branches.extend(new_branches)
     
     root.append(['ENDROOT'])
 
@@ -856,64 +859,148 @@ def process_ligands(G, G_H, ligands_list, hapticity_atoms, branch_atoms, pdbqt_f
     return root
 
 
-def explore_ligand_graph(G, G_H, root, branches, branch_idx, ligand, hapt_atoms, branch_atoms, pdbqt_file):
+def explore_neighbors_recursively(ligand_graph, current_atom, visited, branch_atoms):
+    non_branch_neighbors = []
+    branch_neighbors = []
+    
+    def recursive_explore(atom):
+        for neighbor in ligand_graph.neighbors(atom):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                if [atom, neighbor] in branch_atoms or [neighbor, atom] in branch_atoms:
+                    if neighbor not in branch_neighbors:
+                        branch_neighbors.append(neighbor)
+                else:
+                    if neighbor not in non_branch_neighbors:
+                        non_branch_neighbors.append(neighbor)
+                    recursive_explore(neighbor)
+    
+    recursive_explore(current_atom)
+    return non_branch_neighbors, branch_neighbors
+
+def explore_ligand_graph(G, root, branches, ligand, hapt_atoms, branch_atoms, pdbqt_file):
     ligand_graph = G.subgraph(ligand)
     
     # Add hapticity atoms to root
     for atom in hapt_atoms:
         root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
-    
+
     # BFS to explore the ligand
     visited = set(hapt_atoms)
     queue = deque(hapt_atoms)
-
+    
     while queue:
         current_atom = queue.popleft()
         
-        for neighbor in ligand_graph.neighbors(current_atom):
-            if neighbor not in visited:
-                visited.add(neighbor)
+        non_branch_neighbors, branch_neighbors = explore_neighbors_recursively(ligand_graph, current_atom, visited, branch_atoms)
+        
+        # Add non-branch neighbors to root and queue
+        for neighbor in non_branch_neighbors:
+            root.append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
+            queue.append(neighbor)
+        
+        # Explore branch neighbors
+        for neighbor in branch_neighbors:
+            new_branch = []
+            new_branch.append(['BRANCH', current_atom + 1, neighbor + 1])
+            new_branch.append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
+            
+            # Explore this branch
+            explore_branch(ligand_graph, neighbor, visited, new_branch, pdbqt_file, G, branch_atoms)
+            
+            new_branch.append(['ENDBRANCH', current_atom + 1, neighbor + 1])
+            branches.append(new_branch)
 
-                if [current_atom, neighbor] in branch_atoms or [neighbor, current_atom] in branch_atoms:
-                    # Start a new branch
-                    branches.append([])
-                    branches[branch_idx].append(['BRANCH', current_atom + 1, neighbor + 1])
-                    # Add the atom to the branch
-                    branches[branch_idx].append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
-
-                    # Recursively explore this branch
-                    explore_branch(ligand_graph, neighbor, visited, branches[branch_idx], pdbqt_file, G, branch_atoms)
-
-                    branches[branch_idx].append(['ENDBRANCH', current_atom + 1, neighbor + 1])
-                    branch_idx += 1
-                else:
-                    # Add to root if it doesn't form a branch
-                    root.append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
-                    queue.append(neighbor)
-
-    return root
+    return root, branches
 
 def explore_branch(ligand_graph, start_atom, visited, branch, pdbqt_file, G, branch_atoms):
     branch_queue = deque([start_atom])
-    branch_visited = set([start_atom])
     
     while branch_queue:
-        branch_atom = branch_queue.popleft()
+        current_atom = branch_queue.popleft()
         
-        for branch_neighbor in ligand_graph.neighbors(branch_atom):
-            if branch_neighbor not in branch_visited and branch_neighbor not in visited:
-                branch_visited.add(branch_neighbor)
-                visited.add(branch_neighbor)
-                branch_queue.append(branch_neighbor)
+        non_branch_neighbors, branch_neighbors = explore_neighbors_recursively(ligand_graph, current_atom, visited, branch_atoms)
+        
+        # Add non-branch neighbors to branch and queue
+        for neighbor in non_branch_neighbors:
+            branch.append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
+            branch_queue.append(neighbor)
+        
+        # Explore branch neighbors
+        for neighbor in branch_neighbors:
+            sub_branch = []
+            sub_branch.append(['BRANCH', current_atom + 1, neighbor + 1])
+            sub_branch.append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
+            
+            # Recursively explore this sub-branch
+            explore_branch(ligand_graph, neighbor, visited, sub_branch, pdbqt_file, G, branch_atoms)
+            
+            sub_branch.append(['ENDBRANCH', current_atom + 1, neighbor + 1])
+            branch.extend(sub_branch)
 
-                # Recursively explore sub-branches
-                if [branch_atom, branch_neighbor] in branch_atoms or [branch_neighbor, branch_atom] in branch_atoms:
-                    branch.append(['BRANCH', branch_atom + 1, branch_neighbor + 1])
-                    branch.append(search_pdbqt_file(pdbqt_file, G.nodes[branch_neighbor]['xyz']))
-                    explore_branch(ligand_graph, branch_neighbor, visited, branch, pdbqt_file, G, branch_atoms)
-                    branch.append(['ENDBRANCH', branch_atom + 1, branch_neighbor + 1])
-                else:
-                    branch.append(search_pdbqt_file(pdbqt_file, G.nodes[branch_neighbor]['xyz']))
+
+
+
+# def explore_ligand_graph(G, root, branches, branch_idx, ligand, hapt_atoms, branch_atoms, pdbqt_file):
+#     ligand_graph = G.subgraph(ligand)
+    
+#     # Add hapticity atoms to root
+#     for atom in hapt_atoms:
+#         root.append(search_pdbqt_file(pdbqt_file, G.nodes[atom]['xyz']))
+
+    
+#     # BFS to explore the ligand
+#     visited = set(hapt_atoms)
+#     queue = deque(hapt_atoms)
+
+#     while queue:
+#         current_atom = queue.popleft()
+        
+#         for neighbor in ligand_graph.neighbors(current_atom):
+#             if neighbor not in visited:
+#                 visited.add(neighbor)
+#                 print(neighbor)
+
+#                 if [current_atom, neighbor] in branch_atoms or [neighbor, current_atom] in branch_atoms:
+#                     # Start a new branch
+#                     branches.append([])
+#                     branches[branch_idx].append(['BRANCH', current_atom + 1, neighbor + 1])
+#                     # Add the atom to the branch
+#                     branches[branch_idx].append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
+
+#                     # Recursively explore this branch
+#                     explore_branch(ligand_graph, neighbor, visited, branches[branch_idx], pdbqt_file, G, branch_atoms)
+
+#                     branches[branch_idx].append(['ENDBRANCH', current_atom + 1, neighbor + 1])
+#                     branch_idx += 1
+#                 else:
+#                     # Add to root if it doesn't form a branch
+#                     root.append(search_pdbqt_file(pdbqt_file, G.nodes[neighbor]['xyz']))
+#                     queue.append(neighbor)
+
+#     return root, branch_idx
+
+# def explore_branch(ligand_graph, start_atom, visited, branch, branch_idx pdbqt_file, G, branch_atoms):
+#     branch_queue = deque([start_atom])
+#     branch_visited = set([start_atom])
+    
+#     while branch_queue:
+#         branch_atom = branch_queue.popleft()
+        
+#         for branch_neighbor in ligand_graph.neighbors(branch_atom):
+#             if branch_neighbor not in branch_visited and branch_neighbor not in visited:
+#                 branch_visited.add(branch_neighbor)
+#                 visited.add(branch_neighbor)
+#                 branch_queue.append(branch_neighbor)
+
+#                 # Recursively explore sub-branches
+#                 if [branch_atom, branch_neighbor] in branch_atoms or [branch_neighbor, branch_atom] in branch_atoms:
+#                     branch.append(['BRANCH', branch_atom + 1, branch_neighbor + 1])
+#                     branch.append(search_pdbqt_file(pdbqt_file, G.nodes[branch_neighbor]['xyz']))
+#                     explore_branch(ligand_graph, branch_neighbor, visited, branch, pdbqt_file, G, branch_atoms)
+#                     branch.append(['ENDBRANCH', branch_atom + 1, branch_neighbor + 1])
+#                 else:
+#                     branch.append(search_pdbqt_file(pdbqt_file, G.nodes[branch_neighbor]['xyz']))
 
 
 def reindex_atoms_branches(input_file, output_file):
