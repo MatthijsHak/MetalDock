@@ -141,7 +141,7 @@ class Parser:
     
     self.box_size = []
     for i in config['DOCKING']['box_size'].split(','):
-      self.box_size.append(int(i))
+      self.box_size.append(float(i))
 
     if len(self.box_size) == 1:
       print('ONLY ONE BOX SIZE GIVEN, SETTING BOX SIZE TO CUBIC')
