@@ -61,7 +61,7 @@ export g16root=/full/path/to/gaussian/g16
 Relativistic effects with DKH. For more information see [Gaussian](https://gaussian.com/) site.
 
 ### ORCA (free)
-To run ORCA as QM engine with correct parralelization the full path to the orca binary has to be exported with the following command:
+Currently, the latest ORCA 6.0.0 version is not supported, install ORCA 5.0.4 or lower to use MetalDock. To run ORCA as QM engine with correct parralelization the full path to the orca binary has to be exported with the following command:
 ``` bash
 export ASE_ORCA_COMMAND='/full/path/to/orca/orca PREFIX.inp > PREFIX.out'
 ```
