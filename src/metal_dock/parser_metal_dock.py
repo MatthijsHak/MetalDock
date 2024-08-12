@@ -45,7 +45,7 @@ config['QM']            =   { "engine"                  :                'ADF',
                               "solvent"                 :                   '',
 
                               # ORCA input keywords
-                              "orcasimpleinput"         : 'PBE def2-TZVP CPCMC(Water)',
+                              "orcasimpleinput"         : 'PBE def2-TZVP CPCM(Water)',
                               "orcablocks"              :                  ''}
 
 config['DOCKING']       =   { "ini_parameters"          :              'False',
