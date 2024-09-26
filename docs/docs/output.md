@@ -16,6 +16,6 @@ The "docking" directory is where the core docking process takes place. MetalDock
 
 ## 4. results
 
-The "results" directory holds the output of the docking procedure. It presents the obtained poses in two file formats: ".pdbqt" and ".xyz." It's worth noting that AutoDock generates these structures without non-polar hydrogens. To complete the structures, you may need to manually add the missing non-polar hydrogens at a later stage.
+The "results" directory holds the output of the docking procedure. It presents the obtained poses in two file formats: ".pdbqt" and ".xyz." AutoDock generates the poses without non-polar hydrogens, so these are later on added and their position optimized with GFNxTB.
 
 The organization of the "output" directory ensures that you have easy access to all the essential files and results generated during the docking process, facilitating further analysis and exploration.
