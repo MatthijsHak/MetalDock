@@ -1,0 +1,14 @@
+
+JOB STATISTICS
+==============
+Job ID: 9807103
+Cluster: snellius
+User/Group: mhakkennes/mhakkennes
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 16
+CPU Utilized: 00:00:45
+CPU Efficiency: 4.93% of 00:15:12 core-walltime
+Job Wall-clock time: 00:00:57
+Memory Utilized: 124.81 MB
+Memory Efficiency: 0.44% of 28.00 GB
