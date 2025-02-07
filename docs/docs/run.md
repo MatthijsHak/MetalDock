@@ -87,6 +87,7 @@ Create a monte_carlo.ini file in the mc directory.
 ```bash
 metaldock -i monte_carlo.ini -m mc  
 
+#### 6. Schematic overview Monte Carlo optimization
 Here's an schematic overview of the Monte Carlo optimisation procedure:
 
 ![monte_carlo)](img/MC_diagram.png)
