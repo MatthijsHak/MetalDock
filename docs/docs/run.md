@@ -56,6 +56,8 @@ atom_par M     Rii    0.010  Vol  -0.00110  0.0  0.0  2  -1  -1  4        # Non 
 * Replace M with the metal symbol of the new metal atom that you are going to optimize
 * Replace Rii with the sum of vdW radii of two like atoms (in Angstrom)
 * Replace Vol with the atomic solvation volume (in Angstrom^3)
+
+Use this parameter file as well for the next step in creating the dataset files. If you do not do this you will receive errors that the atom type is not found.
   
 #### 2. Set Up the Dataset Directory
 Create a dataset directory in the mc directory to store your dataset:
