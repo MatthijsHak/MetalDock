@@ -42,6 +42,7 @@ This protocol describes the steps to prepare input files for Monte Carlo paramet
  
 #### 1. Set Up the Run Directory & Parameter File
 Create a directory where you are going to run the Monte Carlo optimization protocol in.
+
 ```bash
 mc
 cd mc
@@ -61,6 +62,7 @@ Use this parameter file as well for the next step in creating the dataset files.
   
 #### 2. Set Up the Dataset Directory
 Create a dataset directory in the mc directory to store your dataset:
+
 ```bash
 mkdir data_set
 cd data_set
@@ -70,20 +72,26 @@ cd data_set
 For each compound, follow these steps:
  
 1. Create a directory for the compound:
+   
    ```bash
    mkdir compound_1
    ```
  
 2. Copy and rename the required files from the MetalDock output:
    - **Ligand file**
+     
      ```bash
      cp path/to/MetalDock/output/docking/ligand.pdbqt compound_1/compound_1.pdbqt
      ```
+     
    - **Protein file**
+     
      ```bash
      cp path/to/MetalDock/output/docking/protein.pdbqt compound_1/protein_1.pdbqt
      ```
+     
    - **XYZ coordinate file**
+     
      ```bash
      cp path/to/MetalDock/output/file_prep/ligand_c.xyz compound_1/compound_1_c.xyz
      ```
