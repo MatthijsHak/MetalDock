@@ -72,29 +72,29 @@ cd data_set
 For each compound, follow these steps:
  
 1. Create a directory for the compound:
-   
-   ```bash
-   mkdir compound_1
-   ```
+
+```bash
+mkdir compound_1
+```
  
-2. Copy and rename the required files from the MetalDock output:
+3. Copy and rename the required files from the MetalDock output:
    - **Ligand file**
      
-     ```bash
-     cp path/to/MetalDock/output/docking/ligand.pdbqt compound_1/compound_1.pdbqt
-     ```
+```bash
+cp path/to/MetalDock/output/docking/ligand.pdbqt compound_1/compound_1.pdbqt
+```
      
    - **Protein file**
      
-     ```bash
-     cp path/to/MetalDock/output/docking/protein.pdbqt compound_1/protein_1.pdbqt
-     ```
+```bash
+cp path/to/MetalDock/output/docking/protein.pdbqt compound_1/protein_1.pdbqt
+```
      
    - **XYZ coordinate file**
      
-     ```bash
-     cp path/to/MetalDock/output/file_prep/ligand_c.xyz compound_1/compound_1_c.xyz
-     ```
+```bash
+cp path/to/MetalDock/output/file_prep/ligand_c.xyz compound_1/compound_1_c.xyz
+```
  
    > Replace `path/to/MetalDock/` with the actual directory where MetalDock output files are stored.
  
