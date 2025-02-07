@@ -92,7 +92,7 @@ For each compound, follow these steps:
 Repeat the above steps for each compound in your dataset, renaming directories and files accordingly (e.g., `compound_2`, `compound_3`, etc.).
  
 #### 5. Create input.ini file
-Create a monte_carlo.ini file in the mc directory. Adjust in the monte_carlo.ini file the path and set it correctl to monte_carlo_optimize.dat
+Create a monte_carlo.ini file in the mc directory. Adjust in the monte_carlo.ini file the path and set it correctly to metal_dock_optimize.dat
 
 ```
 [MC]
