@@ -8,4 +8,4 @@
 module load 2023 
 module load AMS/2023.101-intelmpi
 
-~/.conda/envs/MetalDock/bin/python -u /home/MetalDock/metaldock -i input.ini
+/gpfs/home6/mhakkennes/.micromamba/bin/envs/atm8.1.2/bin/python -u /home/mhakkennes/MetalDock/metaldock -i input.ini -m dock

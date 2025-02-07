@@ -12,7 +12,7 @@ To dock organometallic compounds, follow these simple steps:
 You can run MetalDock with a single command. Simply provide the path to your input configuration file (e.g., input.ini) as shown below:
 
 ```bash
-metaldock -i input.ini 
+metaldock -i input.ini -m dock 
 ```
 
 For a detailed description of the output directories and files please see the [output](output.md) chapter.
@@ -30,11 +30,62 @@ A workflow for the docking procedure is schematically given below.
 ![docking_flowchart](img/flowchart.png)
 
 ## How to run Monte Carlo Optimisation scheme?
-To parametrise your own parameters you will need to create a subdirectory named **'data_set'** in the directory where you are going to run MetalDock. Inside **'data_set'**, nam each subdirectory fo the protein metal-complex pair, e.g., **'protein_0'**, **'protein_1'**, and so on.
-
-For each data point, run a separate calculation with MetalDock to ensure there are no errors during the optimsation scheme. After optimisation, you can keep the QM directory somewhere stored, but remove it from the data point directory, to preven excessive storage usage, as the subdirectories will be copied. 
-
-Set the method to **'mc'** and fine-tune the docking paremeters according to your preference. 
+ 
+This protocol describes the steps to prepare input files for Monte Carlo parameter optimization after running the MetalDock protocol for each compound in your dataset.
+ 
+### Prerequisites
+- MetalDock installed and configured
+- A dataset of compounds to be processed
+- Completed MetalDock runs for each compound
+ 
+### Step-by-Step Instructions
+ 
+#### 1. Set Up the Data Directory
+Create a directory where you are going to run the Monte Carlo optimization protocol in.
+```bash
+mc
+cd mc
+```
+ 
+Create a dataset directory in the mc directory to store your dataset:
+```bash
+mkdir data_set
+cd data_set
+```
+ 
+#### 2. Prepare Each Compound
+For each compound, follow these steps:
+ 
+1. Create a directory for the compound:
+   ```bash
+   mkdir compound_1
+   ```
+ 
+2. Copy and rename the required files from the MetalDock output:
+   - **Ligand file**
+     ```bash
+     cp path/to/MetalDock/output/docking/ligand.pdbqt compound_1/compound_1.pdbqt
+     ```
+   - **Protein file**
+     ```bash
+     cp path/to/MetalDock/output/docking/protein.pdbqt compound_1/protein_1.pdbqt
+     ```
+   - **XYZ coordinate file**
+     ```bash
+     cp path/to/MetalDock/output/file_prep/ligand_c.xyz compound_1/compound_1_c.xyz
+     ```
+ 
+   > Replace `path/to/MetalDock/` with the actual directory where MetalDock output files are stored.
+ 
+#### 3. Repeat for All Compounds
+Repeat the above steps for each compound in your dataset, renaming directories and files accordingly (e.g., `compound_2`, `compound_3`, etc.).
+ 
+#### 4. Create input.ini file
+Create a monte_carlo.ini file in the mc directory.
+ 
+#### 5. Run the Monte Carlo optimization
+```bash
+metaldock -i monte_carlo.ini -m mc  
 
 Here's an schematic overview of the Monte Carlo optimisation procedure:
 

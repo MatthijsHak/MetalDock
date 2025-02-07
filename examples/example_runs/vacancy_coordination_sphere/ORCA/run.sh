@@ -5,9 +5,9 @@
 #SBATCH -p genoa 
 #
 
-module load 2022
-module load ORCA/5.0.4-foss-2022a
+module load 2024
+module load ORCA/6.0.1-gompi-2024a-avx2
 
-export ASE_ORCA_COMMAND='/sw/arch/RHEL8/EB_production/2022/software/ORCA/5.0.4-foss-2022a/bin/orca PREFIX.inp > PREFIX.out'
+export ASE_ORCA_COMMAND='/sw/arch/RHEL9/EB_production/2024/software/ORCA/6.0.1-gompi-2024a-avx2/bin/orca PREFIX.inp > PREFIX.out'
 
-~/.conda/envs/MetalDock/bin/python -u /home/MetalDock/metaldock -i input.ini
+/gpfs/home6/mhakkennes/.micromamba/bin/envs/atm8.1.2/bin/python -u /home/mhakkennes/MetalDock/metaldock -i input.ini -m dock

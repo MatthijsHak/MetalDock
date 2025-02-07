@@ -1,0 +1,368 @@
+          AutoDock 4.2 Release 4.2.6   
+         (C) 1989-2012 The Scripps Research Institute
+        AutoDock comes with ABSOLUTELY NO WARRANTY.
+        AutoDock is free software, and you are welcome
+        to redistribute it under certain conditions;
+        for details type 'autodock4 -C'
+
+                     main.cc  $Revision: 1.213 $
+
+                   Compiled on Jul 18 2014 at 18:34:22
+
+
+This file was created at:			10:03 35" a.m., 02/07/2025
+                   on host:		"tcn1175.local.snellius.surf.nl"
+Current Working Directory = "/gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1"
+
+      ________________________________________________________________
+
+                   SETTING UP DEFAULT PARAMETER LIBRARY
+      ________________________________________________________________
+
+
+Random number generator was seeded with values 3640793, 1738919015.
+Docking parameter file (DPF) used for this docking:		/gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dpf
+DPF> autodock_parameter_version 4.2       # used by autodock to validate parameter set
+
+	Autodock parameter version 4.2.
+DPF> parameter_file /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/metal_dock.dat # parameter library filename
+
+Using read_parameter_library() to try to open and read "/gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/metal_dock.dat".
+
+DPF> outlev 1                             # diagnostic output level
+
+Output Level = 1  ADT-COMPATIBLE OUTPUT DURING DOCKING.
+DPF> intelec                              # calculate internal electrostatics
+
+Electrostatic energies will be calculated for all non-bonds between moving atoms.
+DPF> seed pid time                        # seeds for random generator
+
+Random number generator was seeded with values 3640793, 1738919015.
+DPF> ligand_types Re OA C A N DD             # atoms types in ligand
+
+WARNING: pairwise distance, Rij, 0.75, is not a very reasonable value for the equilibrium separation of two atoms! (0.90 Angstroms <= Rij <= 6.00 Angstroms)
+
+Perhaps you meant to use "intnbp_coeffs" instead of "intnbp_r_eps"?
+
+DPF> fld protein_1.maps.fld              # grid_data_file
+
+Opening Grid Map Dimensions file:		protein_1.maps.fld
+Grid Point Spacing =				0.375 Angstroms
+
+Even Number of User-specified Grid Points =	54 x-points
+						54 y-points
+						54 z-points
+
+Coordinates of Central Grid Point of Maps =	(1.650, -7.803, 27.176)
+Macromolecule file used to create Grid Maps =	protein_1.pdbqt
+Grid Parameter file used to create Grid Maps =	/gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1.gpf
+Minimum coordinates in grid = (-8.475, -17.928, 17.051)
+Maximum coordinates in grid = (11.775, 2.322, 37.301)
+
+DPF> map protein_1.Re.map                 # atom-specific affinity map
+
+DPF> map protein_1.OA.map                 # atom-specific affinity map
+
+DPF> map protein_1.C.map                 # atom-specific affinity map
+
+DPF> map protein_1.A.map                 # atom-specific affinity map
+
+DPF> map protein_1.N.map                 # atom-specific affinity map
+
+DPF> map protein_1.DD.map                 # atom-specific affinity map
+
+DPF> elecmap protein_1.e.map             # electrostatics map
+
+DPF> desolvmap protein_1.d.map           # desolvation map
+
+DPF> 
+
+DPF> move compound_1.pdbqt                # small molecule
+
+1,4-interactions will be _ignored_ in the non-bonded internal energy calculation.
+
+Ligand PDBQT file = "compound_1.pdbqt"
+
+INPUT LIGAND PDBQT FILE:
+________________________
+
+INPUT-LIGAND-PDBQT: ROOT
+INPUT-LIGAND-PDBQT: ATOM      1 Re    LIG A   1      1.650  -7.803  27.176  0.00  0.00     0.740 Re
+INPUT-LIGAND-PDBQT: ATOM      2 H     LIG A   1      1.423  -6.872  26.891  0.00  0.00     0.000 DD
+INPUT-LIGAND-PDBQT: ATOM      3 C     LIG A   1      2.539  -9.348  27.972  0.00  0.00     0.100 C 
+INPUT-LIGAND-PDBQT: ATOM      4 O     LIG A   1      3.052 -10.277  28.423  0.00  0.00    -0.149 OA
+INPUT-LIGAND-PDBQT: ATOM      5 C     LIG A   1      3.353  -7.239  26.462  0.00  0.00     0.056 C 
+INPUT-LIGAND-PDBQT: ATOM      6 O     LIG A   1      4.370  -6.908  26.065  0.00  0.00    -0.160 OA
+INPUT-LIGAND-PDBQT: ATOM      7 C     LIG A   1      2.110  -6.786  28.770  0.00  0.00     0.072 C 
+INPUT-LIGAND-PDBQT: ATOM      8 O     LIG A   1      2.349  -6.191  29.681  0.00  0.00    -0.150 OA
+INPUT-LIGAND-PDBQT: ATOM      9 N     LIG A   1     -0.345  -8.421  27.733  0.00  0.00    -0.361 N 
+INPUT-LIGAND-PDBQT: ATOM     10 C     LIG A   1     -0.983  -8.127  28.874  0.00  0.00     0.083 A 
+INPUT-LIGAND-PDBQT: ATOM     11 C     LIG A   1     -2.271  -8.593  29.156  0.00  0.00    -0.067 A 
+INPUT-LIGAND-PDBQT: ATOM     12 C     LIG A   1     -2.917  -9.345  28.249  0.00  0.00    -0.040 C 
+INPUT-LIGAND-PDBQT: ATOM     13 C     LIG A   1     -2.294  -9.687  27.015  0.00  0.00     0.020 A 
+INPUT-LIGAND-PDBQT: ATOM     14 C     LIG A   1     -0.992  -9.184  26.803  0.00  0.00     0.125 A 
+INPUT-LIGAND-PDBQT: ATOM     15 C     LIG A   1     -0.292  -9.471  25.584  0.00  0.00     0.124 A 
+INPUT-LIGAND-PDBQT: ATOM     16 N     LIG A   1      0.976  -8.950  25.457  0.00  0.00    -0.355 N 
+INPUT-LIGAND-PDBQT: ATOM     17 C     LIG A   1      1.629  -9.208  24.316  0.00  0.00     0.082 A 
+INPUT-LIGAND-PDBQT: ATOM     18 C     LIG A   1      1.088  -9.985  23.277  0.00  0.00    -0.064 A 
+INPUT-LIGAND-PDBQT: ATOM     19 C     LIG A   1     -0.170 -10.491  23.426  0.00  0.00    -0.042 C 
+INPUT-LIGAND-PDBQT: ATOM     20 C     LIG A   1     -0.897 -10.258  24.588  0.00  0.00     0.015 A 
+INPUT-LIGAND-PDBQT: ATOM     21 C     LIG A   1     -2.228 -10.756  24.823  0.00  0.00    -0.069 C 
+INPUT-LIGAND-PDBQT: ATOM     22 C     LIG A   1     -2.885 -10.490  25.972  0.00  0.00    -0.071 C 
+INPUT-LIGAND-PDBQT: ENDROOT
+________________________________________________________________________________
+
+Total charge on ligand                               =	-0.111 e
+
+/gpfs/home6/mhakkennes/MetalDock/src/external/AutoDock/autodock4: *** Caution!  Non-integral total charge (-0.111 e) on ligand may indicate a problem... ***
+
+
+*** No Rotatable Bonds detected in Small Molecule. ***
+
+Number of atoms in ligand:  22
+
+Number of non-hydrogen atoms in ligand:  22
+
+Number of vibrational degrees of freedom of ligand:  60
+
+
+Number of torsional degrees of freedom = 0
+Estimated loss of torsional free energy upon binding = +0.0000 kcal/mol
+
+
+DPF> tran0 random                         # initial coordinates/A or random
+
+Initial translation =			(3.658, -14.571, 29.937) Angstroms
+DPF> quaternion0 random                   # initial orientation
+
+Each run will begin with a new, random initial orientation.
+Initial quaternion,  (x,y,z,w) =	( -0.967, 0.042, 0.162, -0.193 ),
+DPF> dihe0 random                         # initial dihedrals (relative) or random
+
+DPF> # GA parameters
+
+DPF> ga_pop_size 200                      # number of individuals in population
+
+A population of 200 individuals will be used
+DPF> ga_num_evals 2500000                 # maximum number of energy evaluations
+
+There will be at most 2500000 function evaluations used.
+DPF> ga_num_generations 30000             # maximum number of generations
+
+The GA will run for at most 30000 generations.
+DPF> ga_elitism 2                         # number of top individuals to survive to next generation
+
+The 2 best will be preserved each GA generation.
+DPF> ga_mutation_rate 0.2                 # rate of gene mutation
+
+The mutation rate is 0.200000.
+DPF> ga_crossover_rate 0.8                # rate of crossover
+
+The crossover rate is 0.800000.
+DPF> ga_window_size 20                    # number of preceding generation when deciding threshold for worst individual current population
+
+The GA's selection window is 20 generations.
+DPF> ga_cauchy_alpha 0.0                  # Alpha parameter of Cauchy distribution
+
+The alpha parameter (for the Cauchy distribution) is being set to 0.000000.
+DPF> ga_cauchy_beta 1.0                   # Beta parameter Cauchy distribution
+
+The beta parameter (for the Cauchy distribution) is being set to 1.000000.
+DPF> # Local Search Parameters
+
+DPF> sw_max_its 300                       # iterations of Solis & Wets local search
+
+Solis & Wets algorithms will perform at most 300 iterations.
+DPF> sw_max_succ 4                        # consecutive successes before changing rho
+
+Solis & Wets algorithms expand rho every 4 in a row successes.
+DPF> sw_max_fail 4                        # consecutive failures before changing rho
+
+Solis & Wets algorithms contract rho every 4 in a row failures.
+DPF> sw_rho 1.0                           # size of local search space to sample
+
+rho is set to 1.000000.
+DPF> sw_lb_rho 0.01                       # lower bound on rho
+
+rho will never get smaller than 0.010000.
+DPF> ls_search_freq 0.06                  # probability of performing local search on individual
+
+Local search will be performed with frequency 0.060000.
+DPF> # Activate LGA
+
+DPF> set_ga                               # set the above parameters for GA or LGA
+
+DPF> set_psw1                             # set the above pseudo-Solis & Wets parameters
+
+Creating a new Local Search object using the pseudo-Solis-Wets algorithm (pSW1) with the current settings.
+
+DPF> ga_run 1                             # do this many hybrid GA-LS runs
+
+auto-centering ligand on root atoms: 0.376 -8.836 26.669
+Furthest true ligand atom from "about" center is 4.476 Angstroms (maxrad).
+Number of requested GA dockings = 1 run
+Unbound model to be used is from file: "/gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/metal_dock.dat".
+
+	BEGINNING GENETIC ALGORITHM DOCKING 1 of 1
+Run: 1 Seed: 1351065615 515876329 [ Run 1 of 1 GA/GALS ]
+Beginning LAMARCKIAN GENETIC ALGORITHM (LGA), with a maximum of 2500000 energy evaluations.
+
+Final-Value: -11.382
+
+
+	FINAL GENETIC ALGORITHM DOCKED STATE
+	_______________________________________________
+
+
+Detailed state:  trans 0.072 -8.447 27.770 quatxyzw -0.155246 0.283135 -0.239239 -0.915695 center 0.376 -8.836 26.669 ntor 0
+State:	  0.072  -8.447  27.770  -0.386  0.705 -0.595 -47.391  
+
+DOCKED: MODEL        1
+DOCKED: USER    Run = 1
+DOCKED: USER    DPF = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dpf
+DOCKED: USER  
+DOCKED: USER    Estimated Free Energy of Binding    =  -11.38 kcal/mol  [=(1)+(2)+(3)-(4)]
+DOCKED: USER    Estimated Inhibition Constant, Ki   =    4.54 nM (nanomolar)  [Temperature = 298.15 K]
+DOCKED: USER    
+DOCKED: USER    (1) Final Intermolecular Energy     =  -11.38 kcal/mol
+DOCKED: USER        vdW + Hbond + desolv Energy     =  -11.35 kcal/mol
+DOCKED: USER        Electrostatic Energy            =   -0.03 kcal/mol
+DOCKED: USER    (2) Final Total Internal Energy     =   +0.00 kcal/mol
+DOCKED: USER    (3) Torsional Free Energy           =   +0.00 kcal/mol
+DOCKED: USER    (4) Unbound System's Energy  [=(2)] =   +0.00 kcal/mol
+DOCKED: USER    
+DOCKED: USER    
+DOCKED: USER    NEWDPF move compound_1.pdbqt
+DOCKED: USER    NEWDPF about 0.375682 -8.835909 26.668773
+DOCKED: USER    NEWDPF tran0 0.071934 -8.447146 27.770269
+DOCKED: USER    NEWDPF quaternion0 -0.155246 0.283135 -0.239239 -0.915695
+DOCKED: USER    NEWDPF axisangle0 -0.386306 0.704538 -0.595310 -47.390618
+DOCKED: USER    NEWDPF quat0 -0.386306 0.704538 -0.595310 -47.390618
+DOCKED: USER  keepresnum = 1 
+DOCKED: USER  
+DOCKED: USER                              x       y       z     vdW  Elec       q    Type
+DOCKED: USER                           _______ _______ _______ _____ _____    ______ ____
+DOCKED: ROOT
+DOCKED: ATOM      1 Re    LIG A   1      1.659  -8.177  27.172 -6.08 -0.36    +0.740 Re
+DOCKED: ATOM      2 H     LIG A   1      1.651  -7.321  26.656 -0.38 -0.00    +0.000 DD
+DOCKED: ATOM      3 C     LIG A   1      2.234  -9.820  28.056 -0.05 -0.03    +0.100 C 
+DOCKED: ATOM      4 O     LIG A   1      2.548 -10.801  28.575 -0.02 +0.04    -0.149 OA
+DOCKED: ATOM      5 C     LIG A   1      2.668  -8.707  25.614 -0.11 -0.02    +0.056 C 
+DOCKED: ATOM      6 O     LIG A   1      3.286  -9.024  24.709 -0.06 +0.04    -0.160 OA
+DOCKED: ATOM      7 C     LIG A   1      3.293  -7.330  27.802 -0.09 -0.03    +0.072 C 
+DOCKED: ATOM      8 O     LIG A   1      4.215  -6.822  28.167 -0.07 +0.05    -0.150 OA
+DOCKED: ATOM      9 N     LIG A   1      0.325  -7.562  28.759 -0.05 +0.15    -0.361 N 
+DOCKED: ATOM     10 C     LIG A   1      0.642  -6.811  29.822 -0.24 -0.03    +0.083 A 
+DOCKED: ATOM     11 C     LIG A   1     -0.288  -6.481  30.813 -0.42 +0.02    -0.067 A 
+DOCKED: ATOM     12 C     LIG A   1     -1.557  -6.906  30.697 -0.47 +0.02    -0.040 C 
+DOCKED: ATOM     13 C     LIG A   1     -1.957  -7.704  29.588 -0.54 -0.01    +0.020 A 
+DOCKED: ATOM     14 C     LIG A   1     -0.962  -7.999  28.630 -0.28 -0.04    +0.125 A 
+DOCKED: ATOM     15 C     LIG A   1     -1.278  -8.789  27.475 -0.22 -0.04    +0.124 A 
+DOCKED: ATOM     16 N     LIG A   1     -0.251  -9.039  26.592 -0.04 +0.13    -0.355 N 
+DOCKED: ATOM     17 C     LIG A   1     -0.544  -9.768  25.508 -0.17 -0.03    +0.082 A 
+DOCKED: ATOM     18 C     LIG A   1     -1.825 -10.289  25.252 -0.28 +0.02    -0.064 A 
+DOCKED: ATOM     19 C     LIG A   1     -2.826 -10.029  26.141 -0.40 +0.02    -0.042 C 
+DOCKED: ATOM     20 C     LIG A   1     -2.583  -9.278  27.286 -0.42 -0.01    +0.015 A 
+DOCKED: ATOM     21 C     LIG A   1     -3.583  -8.960  28.272 -0.48 +0.03    -0.069 C 
+DOCKED: ATOM     22 C     LIG A   1     -3.285  -8.221  29.362 -0.49 +0.03    -0.071 C 
+DOCKED: ENDROOT
+DOCKED: TER
+DOCKED: ENDMDL
+________________________________________________________________________________
+
+DPF> analysis                             # perforem a ranked cluster analysis
+
+
+		CLUSTER ANALYSIS OF CONFORMATIONS
+		_________________________________
+
+Number of conformations = 1
+
+RMSD cluster analysis will be performed using the ligand atoms only (22 / 22 total atoms).
+
+Sorry!  Unable to perform cluster analysis, because not enough conformations were generated.
+MODEL        1
+USER    Run = 1
+USER    Cluster Rank = 1
+USER    Number of conformations in this cluster = 1
+USER  
+USER    RMSD from reference structure       = 29.190 A
+USER  
+USER    Estimated Free Energy of Binding    =  -11.38 kcal/mol  [=(1)+(2)+(3)-(4)]
+USER    Estimated Inhibition Constant, Ki   =    4.54 nM (nanomolar)  [Temperature = 298.15 K]
+USER    
+USER    (1) Final Intermolecular Energy     =  -11.38 kcal/mol
+USER        vdW + Hbond + desolv Energy     =  -11.35 kcal/mol
+USER        Electrostatic Energy            =   -0.03 kcal/mol
+USER    (2) Final Total Internal Energy     =   +0.00 kcal/mol
+USER    (3) Torsional Free Energy           =   +0.00 kcal/mol
+USER    (4) Unbound System's Energy  [=(2)] =   +0.00 kcal/mol
+USER    
+USER    
+USER  
+USER    DPF = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dpf
+USER    NEWDPF move	compound_1.pdbqt
+USER    NEWDPF about	0.375682 -8.835909 26.668773
+USER    NEWDPF tran0	0.071934 -8.447146 27.770269
+USER    NEWDPF axisangle0	-0.386306 0.704538 -0.595310 -47.390618
+USER    NEWDPF quaternion0	-0.155246 0.283135 -0.239239 -0.915695
+USER  
+USER                              x       y       z    vdW   Elec        q     RMS 
+ATOM      1 Re    LIG A   1      1.659  -8.177  27.172 -6.08 -0.36    +0.740    29.190
+ATOM      2 H     LIG A   1      1.651  -7.321  26.656 -0.38 -0.00    +0.000    29.190
+ATOM      3 C     LIG A   1      2.234  -9.820  28.056 -0.05 -0.03    +0.100    29.190
+ATOM      4 O     LIG A   1      2.548 -10.801  28.575 -0.02 +0.04    -0.149    29.190
+ATOM      5 C     LIG A   1      2.668  -8.707  25.614 -0.11 -0.02    +0.056    29.190
+ATOM      6 O     LIG A   1      3.286  -9.024  24.709 -0.06 +0.04    -0.160    29.190
+ATOM      7 C     LIG A   1      3.293  -7.330  27.802 -0.09 -0.03    +0.072    29.190
+ATOM      8 O     LIG A   1      4.215  -6.822  28.167 -0.07 +0.05    -0.150    29.190
+ATOM      9 N     LIG A   1      0.325  -7.562  28.759 -0.05 +0.15    -0.361    29.190
+ATOM     10 C     LIG A   1      0.642  -6.811  29.822 -0.24 -0.03    +0.083    29.190
+ATOM     11 C     LIG A   1     -0.288  -6.481  30.813 -0.42 +0.02    -0.067    29.190
+ATOM     12 C     LIG A   1     -1.557  -6.906  30.697 -0.47 +0.02    -0.040    29.190
+ATOM     13 C     LIG A   1     -1.957  -7.704  29.588 -0.54 -0.01    +0.020    29.190
+ATOM     14 C     LIG A   1     -0.962  -7.999  28.630 -0.28 -0.04    +0.125    29.190
+ATOM     15 C     LIG A   1     -1.278  -8.789  27.475 -0.22 -0.04    +0.124    29.190
+ATOM     16 N     LIG A   1     -0.251  -9.039  26.592 -0.04 +0.13    -0.355    29.190
+ATOM     17 C     LIG A   1     -0.544  -9.768  25.508 -0.17 -0.03    +0.082    29.190
+ATOM     18 C     LIG A   1     -1.825 -10.289  25.252 -0.28 +0.02    -0.064    29.190
+ATOM     19 C     LIG A   1     -2.826 -10.029  26.141 -0.40 +0.02    -0.042    29.190
+ATOM     20 C     LIG A   1     -2.583  -9.278  27.286 -0.42 -0.01    +0.015    29.190
+ATOM     21 C     LIG A   1     -3.583  -8.960  28.272 -0.48 +0.03    -0.069    29.190
+ATOM     22 C     LIG A   1     -3.285  -8.221  29.362 -0.49 +0.03    -0.071    29.190
+TER
+ENDMDL
+
+
+AVSFLD: # AVS field file
+AVSFLD: #
+AVSFLD: # Created by AutoDock
+AVSFLD: #
+AVSFLD: ndim=2           # number of dimensions in the field
+AVSFLD: nspace=1         # number of physical coordinates
+AVSFLD: veclen=7         # vector size
+AVSFLD: dim1=22          # atoms
+AVSFLD: dim2=1           # conformations
+AVSFLD: data=Real       # data type (byte,integer,Real,double)
+AVSFLD: field=uniform    # field coordinate layout
+AVSFLD: label= x y z vdW Elec q RMS
+AVSFLD: variable 1 file = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dlg.pdb filetype = ascii offset = 5 stride = 12
+AVSFLD: variable 2 file = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dlg.pdb filetype = ascii offset = 6 stride = 12
+AVSFLD: variable 3 file = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dlg.pdb filetype = ascii offset = 7 stride = 12
+AVSFLD: variable 4 file = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dlg.pdb filetype = ascii offset = 8 stride = 12
+AVSFLD: variable 5 file = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dlg.pdb filetype = ascii offset = 9 stride = 12
+AVSFLD: variable 6 file = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dlg.pdb filetype = ascii offset = 10 stride = 12
+AVSFLD: variable 7 file = /gpfs/home6/mhakkennes/MetalDock/examples/example_runs/monte_carlo/output/tmp/compound_1/compound_1_protein_1.dlg.pdb filetype = ascii offset = 11 stride = 12
+AVSFLD: # end of file
+
+>>> Closing the docking parameter file (DPF)...
+This docking finished at:			10:03 41" a.m., 02/07/2025
+
+
+________________________________________________________________________________
+
+/gpfs/home6/mhakkennes/MetalDock/src/external/AutoDock/autodock4: Successful Completion on "tcn1175.local.snellius.surf.nl"
+
+Real= 5.79s,  CPU= 5.75s,  System= 0.01s
+________________________________________________________________________________
+

@@ -1,290 +1,688 @@
-import os,sys, shutil
-import subprocess
 import math
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
 import numpy as np
 
-from ase.constraints import FixAtoms
-from ase.optimize import QuasiNewton
-from ase.io import read, write
-from xtb.ase.calculator import XTB
+from scipy.spatial.distance import cdist
+from src.metal_dock.logger import MetalDockLogger
 
-from . import environment_variables
+class Docking:
+    def __init__(self, par, metal_complex, protein):
+        self.logger = MetalDockLogger() 
+        self.par = par
+        self.metal_complex = metal_complex
+        self.protein = protein
+        self.box_centre, self.box_size = self._get_box_parameters()
 
-from . import pdb_extraction as pdb
-from . import prepare_dock as d
+    def run(self):
+        """
+        Run the MetalDock process.
+        """
+        self.logger.info("STARTING METALDOCK DOCKING PROCESS...")
+        # move the ligand and receptor pdbqt files to the docking directory
+        shutil.move(self.par.output_dir / 'file_prep' / f'{self.par.name_ligand}.pdbqt', 
+                   self.par.output_dir / 'docking' / f'{self.par.name_ligand}.pdbqt')
+        shutil.move(self.par.output_dir / 'file_prep' / f'clean_{self.par.name_protein}.pdbqt', 
+                   self.par.output_dir / 'docking' / f'{self.par.name_protein}.pdbqt')
 
-from . import adf_engine as adf 
-from . import gaussian_engine as g
-from . import orca_engine as orca
+        gpf_path = self.par.output_dir / 'docking' / f'{self.par.name_ligand}_{self.par.name_protein}.gpf'
+        dpf_path = self.par.output_dir / 'docking' / f'{self.par.name_ligand}_{self.par.name_protein}.dpf'
 
-
-def docking(input_file, par=None):
-
-    par = input_file
-
-    input_dir = os.getcwd()
-    par.output_dir = input_dir+'/output'
-    ###### Generate Output Dir #######
-    if os.path.isdir(par.output_dir) == False:
-        os.mkdir(par.output_dir)
-        os.chdir(par.output_dir)
-    else:
-        os.chdir(par.output_dir)
-
-    if os.path.isdir(f'{par.output_dir}/file_prep') == False:
-        os.mkdir(f'{par.output_dir}/file_prep')
-        os.chdir(f'{par.output_dir}/file_prep')
-    else:
-        os.chdir(f'{par.output_dir}/file_prep')
-
-    if os.path.exists(f'{par.name_ligand}_c.xyz') == False:
-        xyz_file = os.path.join(input_dir, par.xyz_file)
-        subprocess.call([os.environ['OBABEL']+f' -ixyz {xyz_file} -oxyz {par.name_ligand}_c.xyz --canonical > {par.name_ligand}_c.xyz'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        subprocess.call([os.environ['OBABEL']+f' -ixyz {par.name_ligand}_c.xyz -opdb {par.name_ligand}_c.pdb > {par.name_ligand}_c.pdb'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-    if os.path.exists(f'{par.name_ligand}.mol2') == False:
-        subprocess.call([os.environ['OBABEL']+f' -ixyz {par.name_ligand}_c.xyz -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    if os.path.exists(f'{par.name_ligand}.sdf') == False:
-        subprocess.call([os.environ['OBABEL']+f' -ixyz {par.name_ligand}_c.xyz -osdf {par.name_ligand}.sdf  > {par.name_ligand}.sdf'],shell=True,  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    ###### Create pdb files ###### 
-    if os.path.exists(f'clean_{par.name_protein}.pdb') == False:
-        input_pdb = os.path.join(input_dir, par.pdb_file)
-        output_pdb = os.path.join(f'{par.output_dir}/file_prep', f'{par.name_protein}.pdb')
-        
-        shutil.copyfile(input_pdb, output_pdb)
-        pdb.protonate_pdb(par.pdb_file, par.pH, par.clean_pdb)
-        pdb.clean_protein_pdb(par.name_protein, par.clean_pdb)
-
-    ###### Quantum Calculations ######
-    os.chdir(par.output_dir)
-
-    if os.path.isdir('QM') == False:
-        os.mkdir('QM')
-        os.chdir('QM')
-    else:
-        os.chdir('QM')
-
-    xyz_file = os.path.join(par.output_dir,'file_prep', f'{par.name_ligand}_c.xyz')
-
-    if par.engine.lower() == 'adf':
-        qm_dir, energy = adf.adf_engine(xyz_file, par, par.output_dir)
-
-    if par.engine.lower() == 'gaussian':
-        qm_dir, energy = g.gaussian_engine(xyz_file, par, par.output_dir)
-
-    if par.engine.lower() == 'orca':
-        qm_dir, energy = orca.orca_engine(xyz_file, par, par.output_dir)
-
-    subprocess.call([os.environ['OBABEL']+f' -ixyz output.xyz -omol output.mol  > output.mol'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    ##### AutoDock #####
-    os.chdir(par.output_dir)
-
-    if os.path.isdir('docking') == False:
-        os.mkdir('docking')
-        os.chdir('docking')
-    else:
-        os.chdir('docking')
-    
-    if par.parameter_file == 'metal_dock.dat':
-        in_file = os.path.join(os.environ['ROOT_DIR'], 'metal_dock.dat')
-        out_file = os.path.join(os.getcwd(), 'metal_dock.dat')
-        shutil.copyfile(in_file, out_file)
-    else:
-        in_file = os.path.join(input_dir, par.parameter_file)
-        out_file = os.path.join(os.getcwd(), par.parameter_file)
-        shutil.copyfile(in_file, out_file)
-
-    clean_pdb_in = os.path.join(par.output_dir, 'file_prep', f'clean_{par.name_protein}.pdb')
-    clean_pdb_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
-    shutil.copyfile(clean_pdb_in, clean_pdb_out)
-
-    # f'{par.output_dir}/QM/geom_opt/output.mol'
-    if par.geom_opt == True:
-        subprocess.call([os.environ['OBABEL']+f' -imol {par.output_dir}/QM/geom_opt/output.mol -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    else:
-        subprocess.call([os.environ['OBABEL']+f' -imol {par.output_dir}/QM/single_point/output.mol -omol2 {par.name_ligand}.mol2  > {par.name_ligand}.mol2'],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-
-    cm5_in = os.path.join(qm_dir, 'CM5_charges')
-    cm5_out = os.path.join(os.getcwd(), 'CM5_charges')
-    shutil.copyfile(cm5_in, cm5_out)
-
-    c_xyz_in = os.path.join(par.output_dir, 'file_prep', f'{par.name_ligand}_c.xyz')
-    c_xyz_out = os.path.join(os.getcwd(), f'{par.name_ligand}_c.xyz')
-    shutil.copyfile(c_xyz_in, c_xyz_out)
-    
-    if par.rmsd == True:
-        if os.path.isfile('ref.xyz') == False:
-            subprocess.call([os.environ['OBABEL']+f" -ixyz {par.name_ligand}_c.xyz -oxyz ref.xyz -d > ref.xyz"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-
-    if par.dock_x and par.dock_y and par.dock_z != None:
-        dock = d.users_coordinates(par.dock_x, par.dock_y, par.dock_z)
-    else:
-        dock = d.get_coordinates(f'{par.name_ligand}_c.xyz', par.metal_symbol)
-
-    # if one value in the list of box size is not 0 then use that value
-    if any(x != 0 for x in par.box_size) and par.scale_factor == 0:
-        npts = [x * 2.66 for x in par.box_size] # Convert Å to grid point
-        if [int(x) for x in npts] == npts:
-            box_size =  [int(x) for x in npts]
+        if self.par.parameter_file == 'metal_dock.dat':
+            parameter_path = os.environ['ROOT_DIR']+'/metal_dock/'+self.par.parameter_file
         else:
-            # box_size = math.ceil(npts)
-            box_size = [math.ceil(x) for x in npts]
-            print('SPACING BETWEEN GRID POINTS IS STANDARD SET TO 0.375 Å')
-            print('BOX SIZE MUST BE INTEGER GRID POINTS WHICH WAS NOT FOUND')
-            print(f'BOX SIZE SIDE ROUNDED UP AND SET TO {box_size[0] / 2.66:.3f} {box_size[1] / 2.66:.3f} {box_size[2] / 2.66:.3f} Å\n')
+            parameter_path = self.par.parameter_file
 
-    # if all values in the list of box size are 0 then calculate the box size
-    if all(x == 0 for x in par.box_size) and par.scale_factor != 0:
-        box_size = d.box_size_func(f'{par.name_ligand}_c.xyz', par.metal_symbol, 0.375, par.scale_factor)
+        ligand_pdbqt_path = self.par.output_dir / 'docking' / f'{self.par.name_ligand}.pdbqt'
+        receptor_pdbqt_path = self.par.output_dir / 'docking' / f'{self.par.name_protein}.pdbqt'
 
-    if par.box_size != 0 and par.scale_factor != 0:
-        print("CANNOT SELECT BOXSIZE AND SCALE FACTOR - SET ONE VALUE TO 0")
-        sys.exit()
-
-    if par.box_size == 0 and par.scale_factor == 0:
-        print("CANNOT SELECT BOXSIZE AND SCALE FACTOR - SET ONE VALUE GREATER THAN 0")
-        sys.exit()
-
-    d.create_ligand_pdbqt_file(par, par.name_ligand)
-    if os.path.isfile(f'clean_{par.name_protein}.pdbqt') == False:
-        d.prepare_receptor(par.name_protein)
-    d.docking_func(par, par.name_ligand, par.name_protein, dock, box_size, energy)
-
-    ##### results #####
-    os.chdir(f'{par.output_dir}')
-
-    if os.path.isdir('results') == False:
-        os.mkdir('results')
-        os.chdir('results')
-    else:
-        os.chdir('results')
-
-
-    print('#==============================================================================#')
-    print("ADDING AND OPTIMIZING HYDROGEN ATOMS TO THE METAL COMPLEX POSES")
-
-    i = 1
-    while os.path.exists(os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
-        if os.path.isdir(f'{par.output_dir}/results/pose_{i}') == False:
-            os.mkdir(f'{par.output_dir}/results/pose_{i}')
-            os.chdir(f'{par.output_dir}/results/pose_{i}')
+        if not gpf_path.exists():
+            self._create_gpf_file(ligand_pdbqt_path, receptor_pdbqt_path, gpf_path, parameter_path)
         else:
-            os.chdir(f'{par.output_dir}/results/pose_{i}')
+            os.remove(gpf_path)
+            self._create_gpf_file(ligand_pdbqt_path, receptor_pdbqt_path, gpf_path, parameter_path)
 
-        pdqt_in = os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')
-        pdqt_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.pdbqt')
-        shutil.copyfile(pdqt_in, pdqt_out)
+        if not dpf_path.exists():
+            self._create_dpf_file(dpf_path, gpf_path, parameter_path)
+        else:
+            os.remove(dpf_path)
+            self._create_dpf_file(dpf_path, gpf_path, parameter_path)
 
-        # remove dummy atom if present 
-        d.delete_dummy_atom(pdqt_out)
-
-        subprocess.call([os.environ['OBABEL']+f" -ipdbqt {par.name_ligand}_{i}.pdbqt -oxyz {par.name_ligand}_{i}.xyz > {par.name_ligand}_{i}.xyz"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        # add hydrogens to the xyz file 
-        atom_constraints = d.add_non_polar_hydrogens(f'{par.output_dir}/file_prep/{par.name_ligand}_c.xyz',
-                                                        f'{par.output_dir}/file_prep/{par.name_ligand}_c.pdb',
-                                                        f'{par.name_ligand}_{i}.xyz', 
-                                                        f'{par.name_ligand}_{i}_H.xyz')
+        dlg_path = self.par.output_dir / 'docking' / f'{self.par.name_ligand}_{self.par.name_protein}.dlg'
+        dock_dir_path = self.par.output_dir / 'docking'
         
-        print('\n#-------------------------------------------------#')
-        print(f'Optimizing Hydrogen Atoms with GFN2-xTB of Pose {i}')
-        atoms = read(f'{par.name_ligand}_{i}_H.xyz', format='xyz')
-        atoms.calc = XTB(method='GFN2-xTB')
-        atoms.set_constraint(FixAtoms(indices=atom_constraints))
-        opt = QuasiNewton(atoms, trajectory=f'{par.name_ligand}_{i}_H.traj')
-        opt.run(fmax=0.05)
+        results_dir_path = self.par.output_dir / 'results'
+        results_dir_path.mkdir(exist_ok=True)
+        autogrid_logfile = self.par.output_dir / 'docking' / 'autogrid.log'
+        autodock_logfile = self.par.output_dir / 'docking' / 'autodock.log'
 
-        write(f'{par.name_ligand}_{i}_H.xyz', atoms, format='xyz')
-        d.write_pose_to_pdb(f'{par.name_ligand}_{i}_H.xyz', f'{par.name_ligand}_{i}_H.pdb')
-        # remove the xyz file and pdbqt file 
-        os.remove(f'{par.name_ligand}_{i}.xyz')
-        os.remove(f'{par.name_ligand}_{i}.pdbqt')
-        i += 1
+        os.chdir(dock_dir_path)
+        self._run_autogrid(autogrid_logfile, gpf_path)
+        self._run_autodock(autodock_logfile, dpf_path)
+        self._write_conformations(dlg_path, dock_dir_path)
+        # self._adding_and_optimizing_hydrogens()
+        self._clean_dummy_atoms()
+        self._write_pdbqt_to_xyz()
 
-    # copy clean protein file to results directory
-    os.chdir(f'{par.output_dir}/results')
-    clean_in = os.path.join(par.output_dir,'docking',f'clean_{par.name_protein}.pdb')
-    clean_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
-    shutil.copyfile(clean_in, clean_out)
+    def _write_pdbqt_to_xyz(self):
+        """
+        Write the pdbqt file to an xyz file
+        """
+        docking_dir = self.par.output_dir / 'docking'
+        results_dir = self.par.output_dir / 'results'
 
-    # copy the dlg file to results directory
-    dlg_in = os.path.join(par.output_dir,'docking',f'{par.name_ligand}_clean_{par.name_protein}.dlg')
-    dlg_out = os.path.join(os.getcwd(), f'docking_results.dlg')
-    shutil.copyfile(dlg_in, dlg_out)
+        for i in range(1, self.par.num_poses+1):
+            pose_dir = results_dir / f'pose_{i}'
+            pose_dir.mkdir(exist_ok=True)
 
-    binding_energy, ligand_efficiency = d.extract_dlg(dlg_out, par)
-    print('\n#==============================================================================#')
-    print('DOCKING RESULTS:')
-    print('Ligand Efficiency = (binding energy) / (number of heavy atoms in metal complex)')
-    print('Interacting Residues = residues within 4 Angstrom of the metal complex\n')
+            pdqt_in = docking_dir / f'{self.par.name_ligand}_{i}.pdbqt'
+            pdqt_out = pose_dir / f'{self.par.name_ligand}_{i}.xyz'
+            self._write_pose_to_xyz(pdqt_out, pdqt_in)
 
-    for i in range(par.num_poses):
-        print(f"Pose {i+1}:")
-        print("-------------")
-        pose_residues = d.extract_interacting_residues(f'{par.output_dir}/results/pose_{i+1}/{par.name_ligand}_{i+1}_H.xyz', f'clean_{par.name_protein}.pdb')
-        print(f'Binding Energy: {binding_energy[i][1]:7.4f} kcal/mol')
-        print(f'Ligand Efficiency: {ligand_efficiency[i]:7.4f} kcal/mol')
-        print(f'Interacting Residues:')
-        for residue in pose_residues:
-            print(f'Residue: {residue[0]}, ID: {residue[1]:>3}')
-        print('\n')
+    def _write_pose_to_xyz(self, xyz_file, pdbqt_file):
+        """
+        Write the pose to an xyz file
+        """
+        output_lines = []
+        with open(pdbqt_file, 'r') as fin:
+            for line in fin:
+                if 'ATOM' in line or 'HETATM' in line:
+                    splits = line.strip().split()
+                    output_lines.append(f'{splits[2]:>2} {float(splits[6]):>8.3f} {float(splits[7]):>8.3f} {float(splits[8]):>8.3f}\n')
 
-    if par.rmsd == True:
-        print('\n#==============================================================================#')
-        print("CALCULATING RMSD VALUES FOR EACH POSE WITH RESPECT TO THE STARTING XYZ FILE\n")
+        # insert the total number of atoms at the top of the file
+        output_lines.insert(0, f'{len(output_lines)}\n\n')
 
+        with open(xyz_file, 'w') as fout:
+            for line in output_lines:
+                fout.write(line)
+
+    def analyze_results(self):
+        # copy the dlg file to results directory
+        dlg_in = self.par.output_dir / 'docking' / f'{self.par.name_ligand}_{self.par.name_protein}.dlg'
+        dlg_out = self.par.output_dir / 'results' / 'docking_results.dlg'
+        shutil.copyfile(dlg_in, dlg_out)
+
+        # copy the pdb file of the receptor to results directory
+        pdb_in = self.par.output_dir / 'file_prep' / f'clean_{self.par.name_protein}.pdb'
+        pdb_out = self.par.output_dir / 'results' / f'clean_{self.par.name_protein}.pdb'
+        shutil.copyfile(pdb_in, pdb_out)
+
+        binding_energies, binding_efficiencies = self._extract_dlg(dlg_out)
+        self.logger.info('\n#==============================================================================#')
+        self.logger.info('DOCKING RESULTS:')
+        self.logger.info(f'#==============================================================================#\n')
+        self.logger.info('Ligand Efficiency = (binding energy) / (number of heavy atoms in metal complex)')
+        self.logger.info('Interacting Residues = residues within 4 Angstrom of the metal complex\n')
+
+        for i in range(self.par.num_poses):
+            self.logger.info(f"Pose {i+1}:")
+            self.logger.info("-------------")
+            pose_path = self.par.output_dir / 'results' / f'pose_{i+1}' / f'{self.par.name_ligand}_{i+1}.xyz'
+            pdb_path = self.par.output_dir / 'results' / f'clean_{self.par.name_protein}.pdb'
+            pose_residues = self._extract_interacting_residues(pose_path, pdb_path)
+            self.logger.info(f'Binding Energy: {binding_energies[i]:7.4f} kcal/mol')
+            self.logger.info(f'Ligand Efficiency: {binding_efficiencies[i]:7.4f} kcal/mol')
+            self.logger.info(f'Interacting Residues:')
+            for residue in pose_residues:
+                self.logger.info(f'Residue: {residue[0]}, ID: {residue[1]:>3}')
+            self.logger.info('\n')
+
+        if self.par.rmsd:
+            rmsd_path = self.par.output_dir / 'file_prep' / f'{self.par.name_ligand}_c.xyz'
+            results_dir_path = self.par.output_dir / 'results'
+            print_list, rmsd_list, avg_rmsd, stdv_rmsd, var_rmsd = self._calculate_rmsd(rmsd_path, results_dir_path)
+
+            for line in print_list:
+                self.logger.info(line)
+        self.logger.info("THE PRINTED POSES AND PROTEIN CAN BE FOUND IN THE RESULTS DIRECTORY")
+        self.logger.info("EACH PDB FILE IN THE RESULTS/POSE_X DIRECTORY CAN BE VISUALIZED WITH E.G. PYMOL")
+
+        self.logger.info('\n#==============================================================================#')
+        self.logger.info("METALDOCK SUCCESFULLY COMPLETED")
+        self.logger.info('#==============================================================================#\n')
+
+    def _extract_interacting_residues(self, pose, protein, cutoff=4.0):
+        pose_xyz = []
+
+        with open(pose, 'r') as fin:
+            for _ in range(2):
+                next(fin)
+            for line in fin:
+                split = line.strip().split()[1:4]
+                pose_xyz.append([float(split[0]), float(split[1]), float(split[2])])
+
+        interacting_residues = []
+        interacting_residues_xyz = []
+        # calculate all the residues that are within 4 angstroms of the ligand
+        with open(protein,'r') as fin:
+            for line in fin:
+                if 'ATOM' in line or 'HETATM' in line:
+                    # calculate the distance between the pose_xyz and the 
+                    split = line.strip().split()
+                    interacting_residues.append((split[3], split[5]))
+                    interacting_residues_xyz.append([float(split[6]), float(split[7]), float(split[8])])
+
+        distance_matrix = cdist(pose_xyz, interacting_residues_xyz,'euclidean')
+
+        # Find indices of residues within 4 angstroms
+        within_4_angstrom_indices = np.any(distance_matrix <= 4.0, axis=0)
+
+        # Get the unique residues that are within 4 angstroms
+        unique_residues_within_4_angstrom = set()
+        for i, within in enumerate(within_4_angstrom_indices):
+            if within:
+                unique_residues_within_4_angstrom.add(interacting_residues[i])
+
+        # Convert set to a list for further processing or output
+        unique_residues_within_4_angstrom = list(unique_residues_within_4_angstrom)
+
+        # order based on the id of the residues 
+        unique_residues_within_4_angstrom = sorted(unique_residues_within_4_angstrom, key=lambda x: int(x[1]))
+
+        return unique_residues_within_4_angstrom
+
+    def _extract_dlg(self, dlg_file):
+        """Extracts all occurrences of the Estimated Free Energy of Binding from a docking output file."""
+        binding_energies = []
+        
+        with open(dlg_file, 'r') as file:
+            content = file.read()  # Read the entire file as a string
+
+        # Find all occurrences of "Estimated Free Energy of Binding" followed by a number
+        matches = re.findall(r'Estimated Free Energy of Binding\s*=\s*([-\d.]+)\s*kcal/mol', content)
+
+        # Convert matches to float values
+        binding_energies = [float(value) for value in matches]
+
+        # only take the first n poses 
+        binding_energies = binding_energies[:self.par.num_poses]
+        binding_efficiencies = [binding_energy / self.par.n_heavy_atoms for binding_energy in binding_energies]
+        return binding_energies, binding_efficiencies
+
+    def _write_pose_to_pdb(self, pdb_file):
+        """
+        Write the pose to a pdb file
+
+        Args:
+            pdb_file (str): The path to the PDB file to write the pose to.
+        """
+        # read the xyz file 
+        atoms = []
+        with open(xyz_file, 'r') as fin:
+            for line in fin:
+                split = line.strip().split()
+                atoms.append([int(split[0]), split[1], [float(split[2]), float(split[3]), float(split[4])]])
+
+        # atom index
+        atom_index = 1
+        with open(pdb_file, 'w') as f:
+            for atom in atoms:
+                f.write(f"HETATM{atom_index:>5} {atom[1].upper():>2}   UNL          {atom[2][0]:>8.3f}{atom[2][1]:>8.3f}{atom[2][2]:>8.3f}  1.00  0.00          {atom[1]:>2}\n")
+                atom_index += 1
+            for edge in G.edges():
+                f.write(f"CONECT {edge[0]+1:>4} {edge[1]+1:>4}\n")
+            f.write('ENDMDL\n')
+
+    def _write_xyz_file(self, pdbqt_lines, xyz_file):
+        with open(xyz_file, 'w') as fout:
+            fout.write(f'{len(pdbqt_lines)}\n')
+            fout.write(f'{self.par.name_ligand}\n')
+            for line in pdbqt_lines:
+                fout.write(f'{line[1]:<2} {float(line[2]):>8.3f} {float(line[3]):>8.3f} {float(line[4]):>8.3f}\n')
+
+    def _clean_dummy_atoms(self):
+        """
+        Remove dummy atoms from the metal complex graph and the pdbqt file.
+        """
+        # Collect nodes to remove in a separate list
+        nodes_to_remove = [node for node in self.metal_complex.graph.nodes() if self.metal_complex.graph.nodes[node]['element'] == 'DD']
+
+        # Remove nodes after iteration
+        for node in nodes_to_remove:
+            self.metal_complex.graph.remove_node(node)
+
+        # remove dummy atoms from the pdbqt file
+        for n in range(self.par.num_poses):
+            self._delete_dummy_atom(self.par.output_dir / 'docking' / f'{self.par.name_ligand}_{n+1}.pdbqt')
+
+    def _delete_dummy_atom(self, pdbqt_file):
+        """
+        Delete dummy atoms from the pdbqt file.
+
+        Args:
+            pdbqt_file (str): The path to the PDBQT file to delete dummy atoms from.
+        """
+        with open(pdbqt_file,'r') as fin:
+            with open('output.pdbqt','w') as fout:
+                for line in fin:
+                    if 'DD' in line:
+                        pass
+                    else:
+                        fout.write(line)
+        shutil.move('output.pdbqt', pdbqt_file)
+
+    def _write_conformations(self, dlg_path, output_path):
+        """
+        Write the pose to a pdbqt file
+        """
+        with open(dlg_path, 'r') as fin:
+            pose = []
+            atom_id = 0
+            mol_id = 1
+            in_docked_block = False  
+            docked_block = []  
+            for line in fin:
+                if 'DOCKED: ROOT' in line:
+                    in_docked_block = True
+                    docked_block.append(line)
+                elif in_docked_block and 'TER' in line:
+                    in_docked_block = False
+                    docked_block.append(line)
+                    with open(output_path / f'{self.par.name_ligand}_{mol_id}.pdbqt', 'w') as output_file:
+                        for block_line in docked_block:
+                            cleaned_line = block_line.replace('DOCKED: ', '', 1)
+                            output_file.write(cleaned_line)
+                    mol_id += 1
+                    docked_block = []  
+                elif in_docked_block:
+                    docked_block.append(line)
+
+    def _run_autodock(self, log_file, dpf_path):
+        """
+        Run the autodock4 program.
+
+        Args:
+            dpf_path (str): The path to the DPF file to run.
+        """
+        autodock4 = os.path.join(os.environ['ROOT_DIR'], 'external', 'AutoDock', 'autodock4')
+
+        with open(log_file, 'w') as log_file:
+            subprocess.call(
+                [f'{autodock4} -p {dpf_path}'],
+                shell=True,
+                stdout=log_file,
+                stderr=subprocess.STDOUT
+            )
+
+    def _run_autogrid(self, log_file, gpf_path):
+        """
+        Run the autogrid4 program.
+
+        Args:
+            gpf_path (str): The path to the GPF file to run.
+        """
+        autogrid4 = os.path.join(os.environ['ROOT_DIR'],'external','AutoDock','autogrid4')
+        with open(log_file, 'w') as log_file:
+            subprocess.call([f'{autogrid4} -p {gpf_path}'], 
+                            shell=True, 
+                            stdout=log_file, 
+                            stderr=subprocess.STDOUT)
+
+    def _create_dpf_file(self, dpf_path, gpf_path, parameter_path):
+        """
+        Create the DPF file for docking.
+
+        Args:
+            dpf_path (str): The path to the DPF file to create.
+            gpf_path (str): The path to the GPF file to read.
+            parameter_path (str): The path to the parameter file to read.
+        """
+        gpf_file = open(gpf_path,'r')
+        gpf_lines = [line.split() for line in gpf_file]
+
+        ligand_type = gpf_lines[5]
+        del ligand_type[0]
+        del ligand_type[-4:]
+        ligand_type_str = ' '.join(ligand_type)
+
+        dpf_file = open(dpf_path,'w')
+        dpf_file.write('autodock_parameter_version 4.2       # used by autodock to validate parameter set\n')
+        dpf_file.write('parameter_file '+str(parameter_path)+' # parameter library filename\n')
+        dpf_file.write('outlev 1                             # diagnostic output level\n')
+        dpf_file.write('intelec                              # calculate internal electrostatics\n')
+        dpf_file.write('seed pid time                        # seeds for random generator\n')
+        dpf_file.write('ligand_types '+ligand_type_str+'             # atoms types in ligand\n')
+        dpf_file.write('fld '+self.par.name_protein+'.maps.fld              # grid_data_file\n')
+        for i in range(0,len(ligand_type)):
+            dpf_file.write('map '+self.par.name_protein+'.'+ligand_type[i]+'.map                 # atom-specific affinity map\n')
+
+        dpf_file.write('elecmap '+self.par.name_protein+'.e.map             # electrostatics map\n')
+        dpf_file.write('desolvmap '+self.par.name_protein+'.d.map           # desolvation map\n\n')
+        dpf_file.write('move '+self.par.name_ligand+'.pdbqt                # small molecule\n')
+
+        if self.par.random_pos == True:
+            dpf_file.write('tran0 random                         # initial coordinates/A or random\n')
+            dpf_file.write('quaternion0 random                   # initial orientation\n')
+            dpf_file.write('dihe0 random                         # initial dihedrals (relative) or random\n')
+
+        if self.par.ga_dock == True and self.par.sa_dock == False:
+            dpf_file.write('# GA parameters\n')
+            dpf_file.write('ga_pop_size '+str(self.par.dock_algorithm[0])+'                      # number of individuals in population\n')
+            dpf_file.write('ga_num_evals '+str(self.par.dock_algorithm[1])+'                 # maximum number of energy evaluations\n')
+            dpf_file.write('ga_num_generations '+str(self.par.dock_algorithm[2])+'             # maximum number of generations\n')
+            dpf_file.write('ga_elitism '+str(self.par.dock_algorithm[3])+'                         # number of top individuals to survive to next generation\n')
+            dpf_file.write('ga_mutation_rate '+str(self.par.dock_algorithm[4])+'                 # rate of gene mutation\n')
+            dpf_file.write('ga_crossover_rate '+str(self.par.dock_algorithm[5])+'                # rate of crossover\n')
+            dpf_file.write('ga_window_size '+str(self.par.dock_algorithm[6])+'                    # number of preceding generation when deciding threshold for worst individual current population\n')
+            dpf_file.write('ga_cauchy_alpha 0.0                  # Alpha parameter of Cauchy distribution\n')
+            dpf_file.write('ga_cauchy_beta 1.0                   # Beta parameter Cauchy distribution\n')
+
+            dpf_file.write('# Local Search Parameters\n')
+            dpf_file.write('sw_max_its 300                       # iterations of Solis & Wets local search\n')
+            dpf_file.write('sw_max_succ 4                        # consecutive successes before changing rho\n')
+            dpf_file.write('sw_max_fail 4                        # consecutive failures before changing rho\n')
+            dpf_file.write('sw_rho 1.0                           # size of local search space to sample\n')
+            dpf_file.write('sw_lb_rho 0.01                       # lower bound on rho\n')
+            dpf_file.write('ls_search_freq 0.06                  # probability of performing local search on individual\n')
+            # dpf_file.write('do_local_only 20\n')
+            dpf_file.write('# Activate LGA\n')
+            dpf_file.write('set_ga                               # set the above parameters for GA or LGA\n')
+            dpf_file.write('set_psw1                             # set the above pseudo-Solis & Wets parameters\n')
+            dpf_file.write('ga_run '+str(self.par.num_poses)+'                             # do this many hybrid GA-LS runs\n')
+        if self.par.ga_dock == False and self.par.sa_dock == True:
+            dpf_file.write('# SA Parameters\n')
+            dpf_file.write('tstep 2.0\n')
+            #dpf_file.write('e0max 0.0 10000                      # max initial energy; max number of retries\n')
+            dpf_file.write('linear_schedule                      # linear_schedule or geometric_schedule\n')
+            dpf_file.write('rt0 500                              # initial annealing temperature (absolute tmperature multiplied by gas constant\n')
+            dpf_file.write('rtrf '+str(self.par.dock_algorithm[0])+'           # annealing temperature reductin factor < 1 cools > 1 heats system\n')
+            dpf_file.write('runs '+str(self.par.dock_algorithm[1])+'           # number of docking runs\n')
+            dpf_file.write('cycles '+str(self.par.dock_algorithm[2])+'         # number of temperature reduction cycles\n')
+            dpf_file.write('accs 30000                           # maximum number of accepted steps per cycle\n')
+            dpf_file.write('rejs 30000                           # maximum number of rejected steps per cycle\n')
+            dpf_file.write('select m                             # m selects the minimum state, 1 selects the last state during each cycle\n')
+            dpf_file.write('trnrf 1.0                            # per cycle reduction factor for translation steps\n')
+            dpf_file.write('quarf 1.0                            # per cycle reduction factor for orientation steps\n')
+            dpf_file.write('dihrf 1.0                            # per cycle reduction factor for torsional dihedral steps\n')
+
+            dpf_file.write('# Activate SA\n')
+            dpf_file.write('simanneal '+str(self.par.num_poses)+'                         # run this many SA docking\n')
+
+        dpf_file.write('analysis                             # perforem a ranked cluster analysis\n')
+
+    def _create_gpf_file(self, ligand_pdbqt_path, receptor_pdbqt_path, gpf_path, parameter_path):
+        """
+        Create the GPF file for docking.
+
+        Args:
+            gpf_path (str): The path to the GPF file to create.
+            parameter_path (str): The path to the parameter file to read.
+        """
+        prepare_gpf4 = os.path.join(os.environ['MGLTOOLS'], 'prepare_gpf4.py')
+        command = os.environ['PYTHON_3']+f" {prepare_gpf4} -l {ligand_pdbqt_path} -r {receptor_pdbqt_path} -p parameter_file={parameter_path} -p npts='{self.box_size[0]},{self.box_size[1]},{self.box_size[2]}' -p gridcenter='{self.box_centre[0]:.6},{self.box_centre[1]:.6},{self.box_centre[2]:.6}' -o {gpf_path}"
+        subprocess.call([command], shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+
+        gpf = open(gpf_path,'a')
+        gpf.write(f'nbp_r_eps 0.25 23.2135   12 6  NA TZ\n')
+        gpf.write(f'nbp_r_eps 2.10  3.8453   12 6  OA Zn\n')
+        gpf.write(f'nbp_r_eps 2.25  7.5914   12 6  SA Zn\n')
+        gpf.write(f'nbp_r_eps 1.00  0.0000   12 6  HD Zn\n')
+        gpf.write(f'nbp_r_eps 2.00  0.0060   12 6  NA Zn\n')
+        gpf.write(f'nbp_r_eps 2.00  0.2966   12 6  N  Zn\n')
+
+        if self.par.internal_param == False:
+            gpf.write(f'nbp_r_eps 2.20  {self.par.parameter_set[0]:>.4f}   12 10 NA {self.par.metal_symbol}\n')
+            gpf.write(f'nbp_r_eps 2.25  {self.par.parameter_set[1]:>.4f}   12 10 OA {self.par.metal_symbol}\n')
+            gpf.write(f'nbp_r_eps 2.30  {self.par.parameter_set[2]:>.4f}   12 10 SA {self.par.metal_symbol}\n')
+            gpf.write(f'nbp_r_eps 1.00  {self.par.parameter_set[3]:>.4f}   12 6  HD {self.par.metal_symbol}\n')
+        gpf.close()
+
+    def _get_box_parameters(self):
+        """
+        Get the box parameters for docking.
+        """
+        if self.par.dock_x is not None and self.par.dock_y is not None and self.par.dock_z is not None:
+            box_centre = [self.par.dock_x, self.par.dock_y, self.par.dock_z]
+        else:
+            box_centre = self._get_box_centre()
+
+        # if one value in the list of box size is not 0 then use that value
+        if any(x != 0 for x in self.par.box_size) and self.par.scale_factor == 0:
+            npts = [x * 2.66 for x in self.par.box_size] # Convert Å to grid point
+            if [int(x) for x in npts] == npts:
+                box_size =  [int(x) for x in npts]
+            else:
+                # box_size = math.ceil(npts)
+                box_size = [math.ceil(x) for x in npts]
+                if self.par.method != 'mc':  # Check if method is not 'mc'
+                    self.logger.info('SPACING BETWEEN GRID POINTS IS STANDARD SET TO 0.375 Å')
+                    self.logger.info('BOX SIZE MUST BE INTEGER GRID POINTS WHICH WAS NOT FOUND')
+                    self.logger.info(f'BOX SIZE SIDE ROUNDED UP AND SET TO {box_size[0] / 2.66:.3f} {box_size[1] / 2.66:.3f} {box_size[2] / 2.66:.3f} Å\n')
+
+        # if all values in the list of box size are 0 then calculate the box size
+        if all(x == 0 for x in self.par.box_size) and self.par.scale_factor != 0:
+            box_size = self._calculate_box_size(self.par.metal_symbol, 0.375, self.par.scale_factor)
+
+        if self.par.box_size != 0 and self.par.scale_factor != 0:
+            if self.par.method != 'mc':  # Check if method is not 'mc'
+                self.logger.info("CANNOT SELECT BOXSIZE AND SCALE FACTOR - SET ONE VALUE TO 0")
+            sys.exit()
+
+        if self.par.box_size == 0 and self.par.scale_factor == 0:
+            if self.par.method != 'mc':  # Check if method is not 'mc'
+                self.logger.info("CANNOT SELECT BOXSIZE AND SCALE FACTOR - SET ONE VALUE GREATER THAN 0")
+            sys.exit()
+        
+        return box_centre, box_size
+    
+    def _get_box_centre(self):
+        """
+        Get the box centre for docking.
+
+        Args:
+            metal_symbol (str): The symbol of the metal to get the centre for.
+
+        Returns:
+            list: The coordinates of the box centre.
+        """
+        dock_x = None
+        dock_y = None
+        dock_z = None
+
+        # Iterate over all nodes in the graph
+        if self.par.method.lower() == 'mc':
+            # open the xyz file and read the coordinates
+            with open(self.par.output_dir / 'docking' / f'{self.par.name_ligand}_{self.par.name_protein}.xyz', 'r') as f:
+                dock_x, dock_y, dock_z = f.read().split()
+        else:
+            for node, data in self.metal_complex.graph.nodes(data=True):
+                if data['element'] == self.par.metal_symbol:
+                    dock_x, dock_y, dock_z = data['xyz']
+                    break
+
+        if dock_x is None:
+            raise ValueError('metal symbol not found in the graph')
+
+        dock = [dock_x, dock_y, dock_z]
+        return dock
+    
+    def _calculate_box_size(self, metal_symbol, spacing, scale_factor):
+        """
+        Calculate the box size for docking.
+
+        Args:
+            metal_symbol (str): The symbol of the metal to calculate the box size for.
+            spacing (float): The spacing between grid points.
+            scale_factor (float): The scale factor for the box size.
+
+        Returns:
+            list: The box size.
+        """
+        coordinates = []
+        x_axis = []
+        y_axis = []
+        z_axis = []
+        metal = None
+
+        # Iterate over all nodes in the graph
+        for node, data in self.metal_complex.graph.nodes(data=True):
+            element = data['element']
+            xyz = data['xyz']
+            coordinates.append(xyz)
+            x_axis.append(xyz[0])
+            y_axis.append(xyz[1])
+            z_axis.append(xyz[2])
+
+            if element == metal_symbol:
+                metal = np.array(xyz)
+
+        if metal is None:
+            raise ValueError('metal symbol not found in the graph')
+
+        # Shift axis to centre at metal
+        x_dist = np.abs(np.max(x_axis - metal[0]) - np.min(x_axis - metal[0])) * scale_factor
+        y_dist = np.abs(np.max(y_axis - metal[1]) - np.min(y_axis - metal[1])) * scale_factor
+        z_dist = np.abs(np.max(z_axis - metal[2]) - np.min(z_axis - metal[2])) * scale_factor
+
+        # Limit distances to a maximum of 20
+        x_dist = min(x_dist, 20)
+        y_dist = min(y_dist, 20)
+        z_dist = min(z_dist, 20)
+
+        # Calculate the number of points
+        x_npts = (round(x_dist / spacing)) & (-2)
+        y_npts = (round(y_dist / spacing)) & (-2)
+        z_npts = (round(z_dist / spacing)) & (-2)
+
+        return [x_npts, y_npts, z_npts]
+
+    def _calculate_rmsd(self, rmsd_path, pose_dir_path, mc=False):
+        if not mc:
+            self.logger.info('\n#==============================================================================#')
+            self.logger.info("CALCULATING RMSD VALUES FOR EACH POSE WITH RESPECT TO THE STARTING XYZ FILE\n")
+
+        print_list = []
         rmsd_list = []
-        avg_list = []
-        rmsd_func = os.path.join(os.environ['ROOT_DIR'], 'metal_dock','calculate_rmsd.py')
+        rmsd_func = Path(os.environ['ROOT_DIR']) / 'metal_dock' / 'calculate_rmsd.py'
 
-        for pose in range(par.num_poses):
-            os.chdir(f'{par.output_dir}/results/pose_{pose+1}')
-            rmsd_non_rotate = float(subprocess.getoutput([os.environ['PYTHON_3']+f' {rmsd_func} {par.output_dir}/file_prep/{par.name_ligand}_c.xyz {par.output_dir}/results/pose_{pose+1}/{par.name_ligand}_{pose+1}_H.xyz -nh --reorder --rotation none --translation none']))
+        for pose in range(1, self.par.num_poses + 1):
+            if not mc:
+                pose_path = pose_dir_path / f'pose_{pose}'
+            else:
+                pose_path = pose_dir_path
+
+            pose_path = pose_path / f'{self.par.name_ligand}_{pose}.xyz'
+            command = os.environ['PYTHON_3']+f' {rmsd_func} {rmsd_path} {pose_path} -nh --reorder --rotation none --translation none'
+            rmsd_non_rotate = float(subprocess.getoutput([command]))
             rmsd = rmsd_non_rotate
 
-            avg_list.append(rmsd)
-
-            rmsd_list.append(f"RMSD for Conformation {pose+1:>3} = {rmsd:>8.4f}")
-
-        for i in range(0,len(rmsd_list)):
-            print(rmsd_list[i])
-
-        avg_output = np.mean(avg_list)
-        print(f'Average RMSD              = {avg_output:8.4f}')
-        stdv_rmsd = np.std(avg_list)
-        print(f'Standard Deviation RMSD   = {stdv_rmsd:8.4f}')
-        var_rmsd = np.var(avg_list)
-        print(f"Variance RMSD             = {var_rmsd:8.4f}\n")
-
-    print('\n#==============================================================================#')
-    print("METALDOCK SUCCESFULLY COMPLETED")
-    print("THE PRINTED POSES AND PROTEIN CAN BE FOUND IN THE RESULTS DIRECTORY")
-    print("EACH PDB FILE IN THE RESULTS/POSE_X DIRECTORY CAN BE VISUALIZED WITH E.G. PYMOL")
+            rmsd_list.append(rmsd)
+            print_list.append(f"RMSD for Conformation {pose:>3} = {rmsd:>8.4f}")
 
 
-    # ##### results #####
-    # os.chdir(f'{par.output_dir}')
+        avg_output = np.mean(rmsd_list)
+        stdv_rmsd = np.std(rmsd_list)
+        var_rmsd = np.var(rmsd_list)
+        print_list.append(f'Average RMSD              = {avg_output:8.4f}')
+        print_list.append(f'Standard Deviation RMSD   = {stdv_rmsd:8.4f}')
+        print_list.append(f"Variance RMSD             = {var_rmsd:8.4f}\n")
+        return print_list, rmsd_list, avg_output, stdv_rmsd, var_rmsd
 
-    # if os.path.isdir('results') == False:
-    #     os.mkdir('results')
-    #     os.chdir('results')
-    # else:
-    #     os.chdir('results')
 
-    # i = 1
-    # while os.path.exists(os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')):
-    #     pdqt_in = os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.pdbqt')
-    #     pdqt_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.pdbqt')
-    #     shutil.copyfile(pdqt_in, pdqt_out)
-    #     if par.rmsd == True:
-    #         xyz_in = os.path.join(par.output_dir,'docking',f'{par.name_ligand}_{i}.xyz')
-    #         xyz_out = os.path.join(os.getcwd(), f'{par.name_ligand}_{i}.xyz')
-    #         shutil.copyfile(xyz_in, xyz_out)
-    #     i += 1
-    
-    # clean_in = os.path.join(par.output_dir,'docking',f'clean_{par.name_protein}.pdb')
-    # clean_out = os.path.join(os.getcwd(), f'clean_{par.name_protein}.pdb')
-    # shutil.copyfile(clean_in, clean_out)
+class DockingMC(Docking):
+    def __init__(self, par, metal_complex, protein, xyz_path):
+        self.xyz_path = xyz_path
+        super().__init__(par, metal_complex=None, protein=None)
+
+    def run_mc(self, dock_dir_path):
+        """
+        Run a MetalDock run for the Monte Carlo optimization protocol.
+        """
+        gpf_path = dock_dir_path / f'{self.par.name_ligand}.gpf'
+        dpf_path = dock_dir_path / f'{self.par.name_ligand}_{self.par.name_protein}.dpf'
+
+        ligand_pdbqt_path = dock_dir_path / f'{self.par.name_ligand}.pdbqt'
+        receptor_pdbqt_path = dock_dir_path / f'{self.par.name_protein}.pdbqt'
+
+        if not gpf_path.exists():
+            self._create_gpf_file(ligand_pdbqt_path, receptor_pdbqt_path, gpf_path, self.par.parameter_file)
+        else:
+            os.remove(gpf_path)
+            self._create_gpf_file(ligand_pdbqt_path, receptor_pdbqt_path, gpf_path, self.par.parameter_file)
+
+        if not dpf_path.exists():
+            self._create_dpf_file(dpf_path, gpf_path, self.par.parameter_file)
+        else:
+            os.remove(dpf_path)
+            self._create_dpf_file(dpf_path, gpf_path, self.par.parameter_file)
+
+        dlg_path = self.par.output_dir / self.par.name_ligand / f'{self.par.name_ligand}_{self.par.name_protein}.dlg'
+        autogrid_log_file = self.par.output_dir / self.par.name_ligand / 'autogrid.log'
+        autodock_log_file = self.par.output_dir / self.par.name_ligand / 'autodock.log'
+
+        os.chdir(dock_dir_path)
+        self._run_autogrid(autogrid_log_file, gpf_path)
+        self._run_autodock(autodock_log_file, dpf_path)
+        self._write_conformations(dlg_path, dock_dir_path)
+        self._write_pdbqt_to_xyz(dock_dir_path)
+
+        rmsd_path = dock_dir_path / f'{self.par.name_ligand}_c.xyz'
+        # remove all hydrogens from the rmsd path file 
+        self._remove_hydrogens(rmsd_path)
+        pose_path = dock_dir_path 
+
+        print_list, rmsd_list, avg_rmsd, stdv_rmsd, var_rmsd = self._calculate_rmsd(rmsd_path, pose_path, mc=True)
+        return print_list, rmsd_list, avg_rmsd, stdv_rmsd, var_rmsd
+
+    def _get_box_centre(self):
+        """
+        Get the box centre for Monte Carlo docking.
+
+        Args:
+            metal_symbol (str): The symbol of the metal to get the centre for.
+
+        Returns:
+            list: The coordinates of the box centre.
+        """
+        with open(self.xyz_path, 'r') as f:
+            for line in f:
+                if self.par.metal_symbol in line:
+                    dock_x, dock_y, dock_z = map(float, line.split()[1:4])
+                    break
+        return [dock_x, dock_y, dock_z]
+
+    def _write_pdbqt_to_xyz(self, dock_dir_path):
+        """
+        This function writes the pdbqt file to an xyz file without the hydrogens
+        """
+        for pose in range(1, self.par.num_poses + 1):
+            pdqt_path = dock_dir_path / f'{self.par.name_ligand}_{pose}.pdbqt'
+            xyz_path = dock_dir_path / f'{self.par.name_ligand}_{pose}.xyz'
+            # just write the pdbqt file to an xyz file without the hydrogens
+            pdqt_file = open(pdqt_path, 'r')
+            xyz_file = open(xyz_path, 'w')
+            
+            xyz_lines = []
+            n_atoms = 0
+            for line in pdqt_file:
+                if "ATOM" in line and "DD" not in line:
+                    xyz_lines.append(f'{line.strip().split()[2]:>2}  {float(line.strip().split()[6]):>8.3f}  {float(line.strip().split()[7]):>8.3f} {float(line.strip().split()[8]):>8.3f}\n')
+                    n_atoms += 1
+                else:
+                    continue
+
+            # insert at the beginning of the xyz_lines the number of atoms
+            xyz_lines.insert(0, f'{n_atoms}\n\n')
+
+            # write the xyz_lines to the xyz file
+            xyz_file.writelines(xyz_lines)
+
+            pdqt_file.close()
+            pdqt_file.close()
+            xyz_file.close()
+
+    def _remove_hydrogens(self, xyz_file):
+        """
+        Remove all hydrogens from the xyz file
+        """
+        with open(xyz_file, 'r') as f:
+            lines = f.readlines()
+            lines = [line for line in lines if line.strip().split()[0] != 'H']
+        with open(xyz_file, 'w') as f:
+            f.writelines(lines)

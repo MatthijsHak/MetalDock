@@ -1,7 +1,19 @@
-#!/usr/bin/env python
-import os,sys,subprocess
+import os
+import sys
+import subprocess as sp
 
-def find_command_path(command):
+from src.metal_dock.logger import MetalDockLogger
+
+def find_command_path(command: str):
+    """
+    Function to find the path of a command.
+
+    Args:
+        command (str): The command to find.
+
+    Returns:
+        str: The path of the command.
+    """
     # Try searching in the Conda environment's bin directory
     conda_env_bin = os.path.join(sys.prefix, 'bin', command)
     if os.path.exists(conda_env_bin):
@@ -10,17 +22,18 @@ def find_command_path(command):
     try:
         if sys.platform.startswith('win'):
             # On Windows, use the 'where' command
-            result = subprocess.check_output(['where', command], universal_newlines=True)
+            result = sp.check_output(['where', command], universal_newlines=True)
         else:
             # On Unix-based systems, use the 'which' command
-            result = subprocess.check_output(['which', command], universal_newlines=True)
+            result = sp.check_output(['which', command], universal_newlines=True)
 
         # Remove any leading/trailing whitespace and return the path
         return result.strip()
-    except subprocess.CalledProcessError:
-        print(f"Error: The command '{command}' was not found in your system's PATH.")
-        print(f"Pleae ensure that all paths are set correctly.")
-        print(f"If paths keep failing, please try to set the absolute path manually in the file '/MetalDock/src/metal_dock/environment_variables.py'.")
+    except sp.CalledProcessError:
+        logger = MetalDockLogger()
+        logger.info(f"Error: The command '{command}' was not found in your system's PATH.")
+        logger.info(f"Pleae ensure that all paths are set correctly.")
+        logger.info(f"If paths keep failing, please try to set the absolute path manually in the file '/MetalDock/src/metal_dock/environment_variables.py'.")
         sys.exit()
 
 

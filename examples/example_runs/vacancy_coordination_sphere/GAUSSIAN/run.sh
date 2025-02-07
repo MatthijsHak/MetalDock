@@ -5,7 +5,8 @@
 #SBATCH -p genoa 
 #
 
-module load 2022 
+
+module load 2024
 module load Gaussian/g16.c02
 
-~/.conda/envs/MetalDock/bin/python -u /home/MetalDock/metaldock -i input.ini
+/gpfs/home6/mhakkennes/.micromamba/bin/envs/atm8.1.2/bin/python -u /home/mhakkennes/MetalDock/metaldock -i input.ini -m dock

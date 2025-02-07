@@ -1010,8 +1010,8 @@ class GridParameter4FileMaker:
         if ftype!=".pdbqt":
             print("set_receptor:only pdbqt files valid.  ", ftype," files are not supported.")
             return "ERROR:"
+        
         self.receptor = Read(receptor_filename)[0]
-        receptor_filename = os.path.basename(receptor_filename)
         if self.receptor==None:
             print('ERROR reading: ', receptor_filename)
             return 

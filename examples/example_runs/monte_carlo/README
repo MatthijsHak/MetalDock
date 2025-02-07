@@ -1,0 +1,60 @@
+## Monte Carlo Parameter Optimization Protocol
+
+This protocol describes the steps to prepare input files for Monte Carlo parameter optimization after running the MetalDock protocol for each compound in your dataset.
+
+### Prerequisites
+- MetalDock installed and configured
+- A dataset of compounds to be processed
+- Completed MetalDock runs for each compound
+
+### Step-by-Step Instructions
+
+#### 1. Set Up the Data Directory
+Create a directory where you are going to run the Monte Carlo optimization protocol in. 
+```bash
+mc
+cd mc
+```
+
+Create a dataset directory to store your dataset:
+```bash
+mkdir data_set
+cd data_set
+```
+
+#### 2. Prepare Each Compound
+For each compound, follow these steps:
+
+1. Create a directory for the compound:
+   ```bash
+   mkdir compound_1
+   ```
+
+2. Copy and rename the required files from the MetalDock output:
+   - **Ligand file**
+     ```bash
+     cp path/to/MetalDock/output/docking/ligand.pdbqt compound_1/compound_1.pdbqt
+     ```
+   - **Protein file**
+     ```bash
+     cp path/to/MetalDock/output/docking/protein.pdbqt compound_1/protein_1.pdbqt
+     ```
+   - **XYZ coordinate file**
+     ```bash
+     cp path/to/MetalDock/output/file_prep/ligand_c.xyz compound_1/compound_1_c.xyz
+     ```
+
+   > Replace `path/to/MetalDock/` with the actual directory where MetalDock output files are stored.
+
+#### 3. Repeat for All Compounds
+Repeat the above steps for each compound in your dataset, renaming directories and files accordingly (e.g., `compound_2`, `compound_3`, etc.).
+
+#### 4. Create input.ini file 
+Create a monte_carlo.ini file in the mc directory.
+
+#### 5. Run the Monte Carlo optimization 
+```bash
+metaldock -i input.ini -m dock
+```
+
+

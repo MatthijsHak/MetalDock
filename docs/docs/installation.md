@@ -27,7 +27,7 @@ conda install -c conda-forge openbabel
 ```
 
 ```bash
-pip install ase==3.22.1 networkx numpy pandas pdb2pqr plams rdkit-pypi typing_extensions xtb
+pip install ase==3.22.1 networkx numpy pandas pdb2pqr plams typing_extensions
 ```
 
 ## Step 3: Clone MetalDock repository 
