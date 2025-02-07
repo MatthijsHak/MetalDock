@@ -40,20 +40,31 @@ This protocol describes the steps to prepare input files for Monte Carlo paramet
  
 ### Step-by-Step Instructions
  
-#### 1. Set Up the Data Directory
+#### 1. Set Up the Run Directory & Parameter File
 Create a directory where you are going to run the Monte Carlo optimization protocol in.
 ```bash
 mc
 cd mc
 ```
- 
+
+Copy to this folder from the /MetalDock/src/metal_dock/metal_dock.dat to the mc directory and name it metal_dock_optimize.dat. 
+
+Add at the bottom of the file the following line:
+
+atom_par M     Rii    0.010  Vol  -0.00110  0.0  0.0  2  -1  -1  4        # Non H-bonding    
+
+* Replace M with the metal symbol of the new metal atom that you are going to optimize
+* Replace Rii with the sum of vdW radii of two like atoms (in Angstrom)
+* Replace Vol with the atomic solvation volume (in Angstrom^3)
+  
+#### 2. Set Up the Dataset Directory
 Create a dataset directory in the mc directory to store your dataset:
 ```bash
 mkdir data_set
 cd data_set
 ```
  
-#### 2. Prepare Each Compound
+#### 3. Prepare Each Compound
 For each compound, follow these steps:
  
 1. Create a directory for the compound:
@@ -77,18 +88,26 @@ For each compound, follow these steps:
  
    > Replace `path/to/MetalDock/` with the actual directory where MetalDock output files are stored.
  
-#### 3. Repeat for All Compounds
+#### 4. Repeat for All Compounds
 Repeat the above steps for each compound in your dataset, renaming directories and files accordingly (e.g., `compound_2`, `compound_3`, etc.).
  
-#### 4. Create input.ini file
-Create a monte_carlo.ini file in the mc directory.
+#### 5. Create input.ini file
+Create a monte_carlo.ini file in the mc directory. Adjust in the monte_carlo.ini file the path and set it correctl to monte_carlo_optimize.dat
+
+```
+[MC]
+mc_steps = 100
+parameter_file = metal_dock_optimize.dat
+```
  
-#### 5. Run the Monte Carlo optimization
+#### 6. Run the Monte Carlo optimization
+Run the following command to start the optimization.
+
 ```bash
 metaldock -i monte_carlo.ini -m mc  
 ```
 
-#### 6. Schematic overview Monte Carlo optimization
+#### 7. Schematic overview Monte Carlo optimization
 Here's an schematic overview of the Monte Carlo optimisation procedure:
 
 ![monte_carlo)](img/MC_diagram.png)
