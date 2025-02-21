@@ -38,7 +38,7 @@ class Protein:
                         if 'HETATM'  not in line:
                             fout.write(line)
         else:
-            shutil.move('pdb_prot.pdb', pdb_output_path)
+            shutil.move(pdb_input_path, pdb_output_path)
 
         self.pdb_file = pdb_output_path
 
