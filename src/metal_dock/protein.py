@@ -66,7 +66,7 @@ class Protein:
                 with open(out_file, 'w') as fout:
                     fout.write(stdout)
                     fout.write(stderr)
-                self.logger.error('ERROR DURING PREPARATION OF RECEPTOR, SEE /output/docking/prepare_receptor.out FOR DETAILS')
+                self.logger.error('ERROR DURING PREPARATION OF RECEPTOR, SEE /output/file_prep/prepare_receptor.out FOR DETAILS')
                 self.logger.error('IF PDB FILE IS NOT WRITTEN IN CORRECT PDB FORMAT, PLEASE EDIT MANUALLY')
                 sys.exit()
         else:
