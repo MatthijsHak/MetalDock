@@ -62,7 +62,7 @@ class Protein:
             stdout, stderr = process.communicate()
 
             if process.returncode != 0:
-                out_file = self.par.output_dir / 'docking' / 'prepare_receptor.out'
+                out_file = self.par.output_dir / 'file_prep' / 'prepare_receptor.out'
                 with open(out_file, 'w') as fout:
                     fout.write(stdout)
                     fout.write(stderr)
