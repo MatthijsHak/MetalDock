@@ -122,16 +122,7 @@ class MetalComplex:
                         if connection_info:
                             from_atom = connection_info['from_atom']
                             from_atom = self.atom_index_mapping[from_atom]['pdbqt_index'] + 1
-                        
-                            # print atom information 
-                            print(f'from_atom: {connection_info["from_atom"]}')
-                            print(f'node info: {self.graph.nodes[connection_info["from_atom"]]}')
-                            print(f'atom index: {self.atom_index_mapping[connection_info["from_atom"]]}')
-                            print(f'to_atom: {connection_info["to_atom"] }')
-                            print(f'node info: {self.graph.nodes[connection_info["to_atom"]]}')
-                            print(f'atom index: {self.atom_index_mapping[connection_info["to_atom"]]}')
-
-
+            
                             to_atom = connection_info['to_atom'] 
                             to_atom = self.atom_index_mapping[to_atom]['pdbqt_index'] + 1
 
