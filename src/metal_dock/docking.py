@@ -68,6 +68,7 @@ class Docking:
         # self._adding_and_optimizing_hydrogens()
         self._clean_dummy_atoms()
         self._write_pdbqt_to_xyz()
+        self._write_pose_to_pdb()
 
     def _write_pdbqt_to_xyz(self):
         """
@@ -205,29 +206,38 @@ class Docking:
         binding_efficiencies = [binding_energy / self.par.n_heavy_atoms for binding_energy in binding_energies]
         return binding_energies, binding_efficiencies
 
-    def _write_pose_to_pdb(self, pdb_file):
+    def _write_pose_to_pdb(self, residue_name='UNK'):
         """
         Write the pose to a pdb file
 
         Args:
-            pdb_file (str): The path to the PDB file to write the pose to.
+            residue_name (str): The three letter code for thet metal complex residue
         """
-        # read the xyz file 
-        atoms = []
-        with open(xyz_file, 'r') as fin:
-            for line in fin:
-                split = line.strip().split()
-                atoms.append([int(split[0]), split[1], [float(split[2]), float(split[3]), float(split[4])]])
+        results_dir = self.par.output_dir / 'results'
+        for i in range(1, self.par.num_poses+1):
+            pose_dir = results_dir / f'pose_{i}'
+            xyz_file = pose_dir / f'{self.par.name_ligand}_{i}.xyz'
+            pdb_file = pose_dir / f'{self.par.name_ligand}_{i}.pdb'
+            # read the xyz file 
+            atoms = []
+            with open(xyz_file, 'r') as fin:
+                for _ in range(2):
+                    next(fin)
+                for line in fin:
+                    split = line.strip().split()
+                    atoms.append([split[0], [float(split[1]), float(split[2]), float(split[3])]])
 
-        # atom index
-        atom_index = 1
-        with open(pdb_file, 'w') as f:
-            for atom in atoms:
-                f.write(f"HETATM{atom_index:>5} {atom[1].upper():>2}   UNL          {atom[2][0]:>8.3f}{atom[2][1]:>8.3f}{atom[2][2]:>8.3f}  1.00  0.00          {atom[1]:>2}\n")
-                atom_index += 1
-            for edge in G.edges():
-                f.write(f"CONECT {edge[0]+1:>4} {edge[1]+1:>4}\n")
-            f.write('ENDMDL\n')
+            # atom index
+            atom_index = 1
+            with open(pdb_file, 'w') as f:
+                for atom in atoms:
+                    atom_type = f'{atom[0]}{atom_index-1}'
+                    f.write(f"HETATM{atom_index:>5} {atom_type:>3}  {residue_name} A   1    {atom[1][0]:>8.3f}{atom[1][1]:>8.3f}{atom[1][2]:>8.3f}  1.00  0.00          {atom[0]:>2}\n")
+                    atom_index += 1
+
+                for edge in self.metal_complex.graph.edges():
+                    f.write(f"CONECT {edge[0]+1:>4} {edge[1]+1:>4}\n")
+                f.write('ENDMDL\n')
 
     def _write_xyz_file(self, pdbqt_lines, xyz_file):
         with open(xyz_file, 'w') as fout:
