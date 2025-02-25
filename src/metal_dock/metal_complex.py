@@ -512,7 +512,7 @@ class MetalComplex:
                              atom2: int):
         """
         This function checks if the bond order between two atoms is valid. 
-        This is done by checking if the bond order is within the range of 0.8 to 1.050.
+        This is done by checking if the bond order is within the range of 0.68  to 1.20.
         Args:
             atom1 (int): The index of the first atom.
             atom2 (int): The index of the second atom.
@@ -527,7 +527,7 @@ class MetalComplex:
 
         bond_order = edge_data.get('bond_order', 0)
         # Check if the bond order is within the specified range
-        return 0.8 < bond_order < 1.2
+        return 0.68  < bond_order < 1.2
 
     def _obtain_ligand_subgraphs(self):
         """
