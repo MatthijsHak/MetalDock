@@ -228,6 +228,28 @@ class Docking:
                     atoms.append([split[0], [float(split[1]), float(split[2]), float(split[3])]])
 
             # atom index
+    def _write_pose_to_pdb(self, residue_name='UNK'):
+        """
+        Write the pose to a pdb file
+
+        Args:
+            pdb_file (str): The path to the PDB file to write the pose to.
+        """
+        results_dir = self.par.output_dir / 'results'
+        for i in range(1, self.par.num_poses+1):
+            pose_dir = results_dir / f'pose_{i}'
+            xyz_file = pose_dir / f'{self.par.name_ligand}_{i}.xyz'
+            pdb_file = pose_dir / f'{self.par.name_ligand}_{i}.pdb'
+            # read the xyz file 
+            atoms = []
+            with open(xyz_file, 'r') as fin:
+                for _ in range(2):
+                    next(fin)
+                for line in fin:
+                    split = line.strip().split()
+                    atoms.append([split[0], [float(split[1]), float(split[2]), float(split[3])]])
+
+            # atom index
             atom_index = 1
             with open(pdb_file, 'w') as f:
                 for atom in atoms:
@@ -236,7 +258,7 @@ class Docking:
                     atom_index += 1
 
                 for edge in self.metal_complex.graph.edges():
-                    f.write(f"CONECT {edge[0]+1:>4} {edge[1]+1:>4}\n")
+                        f.write(f"CONECT {self.metal_complex.atom_index_mapping[edge[0]]['pdbqt_index']+1:>4} {self.metal_complex.atom_index_mapping[edge[1]]['pdbqt_index']+1:>4}\n")
                 f.write('ENDMDL\n')
 
     def _write_xyz_file(self, pdbqt_lines, xyz_file):
