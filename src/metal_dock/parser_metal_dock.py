@@ -86,6 +86,8 @@ class ParserBase:
         """
         value = self.config[section].get(key, default)
         if cast_type and value is not None:
+            if cast_type is bool:
+                return str(value).strip().lower() in ("true", "1", "yes")
             return cast_type(value)
         return value
 
