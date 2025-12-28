@@ -64,11 +64,12 @@ class Docking:
         os.chdir(dock_dir_path)
         self._run_autogrid(autogrid_logfile, gpf_path)
         self._run_autodock(autodock_logfile, dpf_path)
-        self._write_conformations(dlg_path, dock_dir_path)
-        # self._adding_and_optimizing_hydrogens()
-        self._clean_dummy_atoms()
-        self._write_pdbqt_to_xyz()
-        self._write_pose_to_pdb()
+        if not self.par.score_only:
+            self._write_conformations(dlg_path, dock_dir_path)
+            # self._adding_and_optimizing_hydrogens()
+            self._clean_dummy_atoms()
+            self._write_pdbqt_to_xyz()
+            self._write_pose_to_pdb()
 
     def _write_pdbqt_to_xyz(self):
         """
@@ -121,18 +122,22 @@ class Docking:
         self.logger.info('Ligand Efficiency = (binding energy) / (number of heavy atoms in metal complex)')
         self.logger.info('Interacting Residues = residues within 4 Angstrom of the metal complex\n')
 
-        for i in range(self.par.num_poses):
-            self.logger.info(f"Pose {i+1}:")
-            self.logger.info("-------------")
-            pose_path = self.par.output_dir / 'results' / f'pose_{i+1}' / f'{self.par.name_ligand}_{i+1}.xyz'
-            pdb_path = self.par.output_dir / 'results' / f'clean_{self.par.name_protein}.pdb'
-            pose_residues = self._extract_interacting_residues(pose_path, pdb_path)
-            self.logger.info(f'Binding Energy: {binding_energies[i]:7.4f} kcal/mol')
-            self.logger.info(f'Ligand Efficiency: {binding_efficiencies[i]:7.4f} kcal/mol')
-            self.logger.info(f'Interacting Residues:')
-            for residue in pose_residues:
-                self.logger.info(f'Residue: {residue[0]}, ID: {residue[1]:>3}')
+        if self.par.score_only:
+            self.logger.info(f'Binding Energy: {binding_energies[0]:7.4f} kcal/mol')
             self.logger.info('\n')
+        else:
+            for i in range(self.par.num_poses):
+                self.logger.info(f"Pose {i+1}:")
+                self.logger.info("-------------")
+                pose_path = self.par.output_dir / 'results' / f'pose_{i+1}' / f'{self.par.name_ligand}_{i+1}.xyz'
+                pdb_path = self.par.output_dir / 'results' / f'clean_{self.par.name_protein}.pdb'
+                pose_residues = self._extract_interacting_residues(pose_path, pdb_path)
+                self.logger.info(f'Binding Energy: {binding_energies[i]:7.4f} kcal/mol')
+                self.logger.info(f'Ligand Efficiency: {binding_efficiencies[i]:7.4f} kcal/mol')
+                self.logger.info(f'Interacting Residues:')
+                for residue in pose_residues:
+                    self.logger.info(f'Residue: {residue[0]}, ID: {residue[1]:>3}')
+                self.logger.info('\n')
 
         if self.par.rmsd:
             rmsd_path = self.par.output_dir / 'file_prep' / f'{self.par.name_ligand}_c.xyz'
@@ -435,6 +440,9 @@ class Docking:
 
             dpf_file.write('# Activate SA\n')
             dpf_file.write('simanneal '+str(self.par.num_poses)+'                         # run this many SA docking\n')
+        
+        elif self.par.score_only == True:
+            dpf_file.write('epdb                                # used to calculate the energy of a particular ligand conformation')
 
         dpf_file.write('analysis                             # perforem a ranked cluster analysis\n')
 

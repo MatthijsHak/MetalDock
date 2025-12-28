@@ -55,7 +55,8 @@ STANDARD_DEFAULTS = {
     'temp_reduction_factor': 0.90,
     'number_of_runs': 50,
     'max_cycles': 50,
-    'mc_steps': 250
+    'mc_steps': 250,
+    'score_only': False
 }
 
              #         e_NA, e_OA, e_SA,  e_HD,
@@ -154,8 +155,12 @@ class ParserBase:
         if self.sa_dock:
             self.dock_algorithm = [self.temp_reduction_factor, self.number_of_runs, self.max_cycles]
 
-        if not self.ga_dock and not self.sa_dock:
-            self.logger.info('At least ga_dock or sa_dock must be set to True for MetalDock to run properly')
+        if self.score_only and (self.ga_dock or self.sa_dock):
+            self.logger.info('ga_dock and/or sa_dock must be set to False when performing score_only')
+            sys.exit()
+
+        if not self.ga_dock and not self.sa_dock and not self.score_only:
+            self.logger.info('At least ga_dock or sa_dock or score_only must be set to True for MetalDock to run properly')
             sys.exit()
 
 
@@ -284,6 +289,8 @@ class DockParser(ParserBase):
         self.temp_reduction_factor = self.get_config_value('DOCKING', 'temp_reduction_factor', STANDARD_DEFAULTS['temp_reduction_factor'], float)
         self.number_of_runs = self.get_config_value('DOCKING', 'number_of_runs', STANDARD_DEFAULTS['number_of_runs'], int)
         self.max_cycles = self.get_config_value('DOCKING', 'max_cycles', STANDARD_DEFAULTS['max_cycles'], int)
+
+        self.score_only = self.get_config_value('DOCKING', 'score_only', STANDARD_DEFAULTS['score_only'], bool)
 
         self._validate_docking_algorithm()
 

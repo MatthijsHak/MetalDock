@@ -38,7 +38,10 @@ class MetalComplex:
             run_type (str): The type of run.
         """
         mg = MolGraph()
-        mg.read_xyz(self.par.output_dir / 'QM' / run_type / 'output.xyz')
+        if self.par.score_only:
+            mg.read_xyz(self.par.input_dir / f'{self.par.name_ligand}.xyz')
+        else:
+            mg.read_xyz(self.par.output_dir / 'QM' / run_type / 'output.xyz')
         self.graph = to_networkx_graph(mg)
 
     def add_charges_to_graph(self):

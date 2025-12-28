@@ -19,6 +19,7 @@ def docking(par: DockParser):
         par (DockParser): The parser object.
     """
     input_dir = Path.cwd()
+    par.input_dir = input_dir
     par.output_dir = input_dir / 'output'
     #=== OUTPUT DIRECTORY ===#
     par.output_dir.mkdir(exist_ok=True)
